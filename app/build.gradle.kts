@@ -105,6 +105,9 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
+    // Browser (Chrome Custom Tabs for OAuth)
+    implementation(libs.browser)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)

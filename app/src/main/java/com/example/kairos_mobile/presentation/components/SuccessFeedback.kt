@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,17 +17,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.kairos_mobile.ui.components.glassCard
 import com.example.kairos_mobile.ui.theme.SuccessColor
+import com.example.kairos_mobile.ui.theme.TextPrimary
+import com.example.kairos_mobile.ui.theme.TextTertiary
+import com.example.kairos_mobile.ui.theme.WarningColor
 
 /**
- * 성공 피드백 애니메이션
+ * 글래스모피즘 스타일의 성공 피드백 애니메이션
  */
 @Composable
 fun SuccessFeedback(
@@ -43,11 +46,8 @@ fun SuccessFeedback(
     ) {
         Box(
             modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .padding(24.dp),
+                .glassCard()
+                .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -56,21 +56,23 @@ fun SuccessFeedback(
                 Icon(
                     imageVector = if (isOffline) Icons.Default.CloudOff else Icons.Default.CheckCircle,
                     contentDescription = if (isOffline) "오프라인 저장됨" else "성공",
-                    tint = if (isOffline) MaterialTheme.colorScheme.secondary else SuccessColor,
-                    modifier = Modifier.size(64.dp)
+                    tint = if (isOffline) WarningColor else SuccessColor,
+                    modifier = Modifier.size(56.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = if (isOffline) "오프라인 저장됨" else "저장 완료!",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextPrimary
                 )
                 if (isOffline) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "네트워크 연결 시 자동 동기화됩니다",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Light,
+                        color = TextTertiary
                     )
                 }
             }

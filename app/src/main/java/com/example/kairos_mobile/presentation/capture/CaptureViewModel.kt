@@ -7,8 +7,10 @@ import com.example.kairos_mobile.data.processor.VoiceRecognizer
 import com.example.kairos_mobile.domain.model.Result
 import com.example.kairos_mobile.domain.model.SyncStatus
 import com.example.kairos_mobile.domain.repository.PreferencesRepository
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.usecase.GenerateSummaryUseCase
 import com.example.kairos_mobile.domain.usecase.GetPendingCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.MatchKeywordsUseCase
 import com.example.kairos_mobile.domain.usecase.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.SubmitImageCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.SubmitVoiceCaptureUseCase
@@ -36,7 +38,9 @@ class CaptureViewModel @Inject constructor(
     private val getPendingCapturesUseCase: GetPendingCapturesUseCase,
     private val voiceRecognizer: VoiceRecognizer,                       // Phase 2: M06
     private val generateSummaryUseCase: GenerateSummaryUseCase,        // Phase 3: M09
-    private val suggestTagsUseCase: SuggestTagsUseCase                 // Phase 3: M10
+    private val suggestTagsUseCase: SuggestTagsUseCase,                // Phase 3: M10
+    private val matchKeywordsUseCase: MatchKeywordsUseCase,            // Phase 3: 키워드 매칭
+    private val preferencesRepository: PreferencesRepository           // Phase 3: 설정
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CaptureUiState())
@@ -48,9 +52,28 @@ class CaptureViewModel @Inject constructor(
 
     /**
      * 텍스트 입력 변경 처리
+     * Phase 3: 키워드 매칭으로 QuickTypeButtons 동적 표시
      */
     fun onTextChanged(text: String) {
-        _uiState.update { it.copy(inputText = text) }
+        // 키워드 매칭 수행
+        val suggestedTypes = matchKeywordsUseCase(text)
+
+        _uiState.update {
+            it.copy(
+                inputText = text,
+                suggestedQuickTypes = suggestedTypes
+            )
+        }
+    }
+
+    /**
+     * QuickType 버튼 선택 처리
+     * 사용자가 추천된 타입을 선택하면 해당 타입으로 바로 캡처 제출
+     */
+    fun onQuickTypeSelected(type: CaptureType) {
+        // TODO: 선택된 타입으로 바로 캡처 제출 (추후 구현)
+        // 현재는 일반 제출과 동일하게 처리
+        onSubmit()
     }
 
     /**
@@ -85,18 +108,23 @@ class CaptureViewModel @Inject constructor(
                             isOffline = capture.syncStatus != SyncStatus.SYNCED,
                             // Phase 3: 이전 스마트 처리 결과 초기화
                             latestSummary = null,
-                            suggestedTags = emptyList()
+                            suggestedTags = emptyList(),
+                            suggestedQuickTypes = emptyList()  // QuickType도 초기화
                         )
                     }
 
                     // Phase 3: 스마트 처리 기능 (비동기 실행)
-                    // M09: AI 요약 생성 (긴 콘텐츠인 경우)
-                    if (generateSummaryUseCase.shouldSummarize(content)) {
+                    // 설정에서 활성화된 경우에만 실행
+
+                    // M09: AI 요약 생성 (설정 활성화 + 긴 콘텐츠인 경우)
+                    val autoSummarizeEnabled = preferencesRepository.getAutoSummarizeEnabled().first()
+                    if (autoSummarizeEnabled && generateSummaryUseCase.shouldSummarize(content)) {
                         generateSummaryForCapture(capture.id, content)
                     }
 
-                    // M10: 스마트 태그 제안
-                    if (suggestTagsUseCase.canSuggestTags(content)) {
+                    // M10: 스마트 태그 제안 (설정 활성화된 경우)
+                    val smartTagsEnabled = preferencesRepository.getSmartTagsEnabled().first()
+                    if (smartTagsEnabled && suggestTagsUseCase.canSuggestTags(content)) {
                         suggestTagsForCapture(content, capture.classification?.type?.name)
                     }
 

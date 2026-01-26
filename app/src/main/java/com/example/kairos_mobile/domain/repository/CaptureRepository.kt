@@ -5,6 +5,7 @@ import com.example.kairos_mobile.data.remote.dto.SuggestedTag
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.Result
+import com.example.kairos_mobile.domain.model.SearchQuery
 import com.example.kairos_mobile.domain.model.SyncStatus
 import kotlinx.coroutines.flow.Flow
 
@@ -90,4 +91,50 @@ interface CaptureRepository {
      * @return 제안된 태그 리스트
      */
     suspend fun suggestTags(content: String, classification: String?): Result<List<SuggestedTag>>
+
+    // ========== Phase 3: 검색 및 히스토리 기능 ==========
+
+    /**
+     * 검색 쿼리로 캡처 항목 조회
+     *
+     * @param query 검색 조건
+     * @param offset 페이징 시작 위치
+     * @param limit 페이지 크기
+     * @return 검색된 캡처 리스트
+     */
+    suspend fun searchCaptures(
+        query: SearchQuery,
+        offset: Int = 0,
+        limit: Int = 20
+    ): Result<List<Capture>>
+
+    /**
+     * 모든 캡처 항목 조회 (페이징 지원)
+     *
+     * @param offset 페이징 시작 위치
+     * @param limit 페이지 크기
+     * @return 캡처 리스트 Flow
+     */
+    fun getAllCaptures(
+        offset: Int = 0,
+        limit: Int = 20
+    ): Flow<List<Capture>>
+
+    /**
+     * 날짜별로 그룹화된 캡처 조회
+     * Archive 화면에서 사용
+     *
+     * @return 날짜 키(예: "Today", "2026-01-25")와 캡처 리스트 맵
+     */
+    fun getCapturesGroupedByDate(): Flow<Map<String, List<Capture>>>
+
+    /**
+     * 특정 ID의 캡처 조회
+     */
+    suspend fun getCaptureById(id: String): Result<Capture?>
+
+    /**
+     * 전체 캡처 개수 조회
+     */
+    fun getTotalCount(): Flow<Int>
 }

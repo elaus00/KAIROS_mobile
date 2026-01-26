@@ -65,7 +65,7 @@ fun QuickTypeButtons(
 }
 
 /**
- * 개별 Quick Type 버튼
+ * 미니멀한 Quick Type 버튼
  */
 @Composable
 private fun QuickTypeButton(
@@ -78,29 +78,30 @@ private fun QuickTypeButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .glassButton(shape = RoundedCornerShape(12.dp))
-            .height(36.dp),
+            .glassButton(shape = RoundedCornerShape(10.dp))
+            .height(34.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            contentColor = TextSecondary
+            contentColor = TextTertiary
         ),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = TextDim,
-                modifier = Modifier.size(18.dp)
+                tint = TextTertiary,
+                modifier = Modifier.size(16.dp)
             )
             Text(
                 text = label,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Light,
-                color = TextSecondary
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = TextTertiary,
+                letterSpacing = 0.2.sp
             )
         }
     }

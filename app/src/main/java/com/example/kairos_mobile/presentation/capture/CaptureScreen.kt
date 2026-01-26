@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.domain.model.CaptureType
+import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.*
 import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
 
@@ -24,6 +25,7 @@ import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
 fun CaptureScreen(
     sharedText: String? = null,       // M07: 공유된 텍스트 (URL 포함)
     sharedImageUri: Uri? = null,      // M07: 공유된 이미지 URI
+    onNavigate: (String) -> Unit = {},
     viewModel: CaptureViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -84,7 +86,9 @@ fun CaptureScreen(
                 ) {
                     // 헤더
                     GlassHeader(
-                        onProfileClick = { /* TODO: Profile screen */ }
+                        onProfileClick = {
+                            onNavigate(NavRoutes.NOTIFICATIONS)
+                        }
                     )
 
                     // 메인 콘텐츠 영역
@@ -95,27 +99,19 @@ fun CaptureScreen(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // 메인 캡처 카드
+                        // 메인 캡처 카드 (Phase 3: QuickTypeButtons 통합)
                         GlassCaptureCard(
                             text = uiState.inputText,
                             onTextChange = viewModel::onTextChanged,
                             onSubmit = viewModel::onSubmit,
                             onModeSelected = viewModel::onCaptureModeChanged,
+                            suggestedQuickTypes = uiState.suggestedQuickTypes,
+                            onQuickTypeSelected = viewModel::onQuickTypeSelected,
                             enabled = !uiState.isLoading,
                             isLoading = uiState.isLoading,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 24.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Quick Type Buttons
-                        QuickTypeButtons(
-                            onTypeSelected = { type ->
-                                // TODO: Quick type selection
-                            },
-                            modifier = Modifier.padding(horizontal = 24.dp)
                         )
                     }
                 }
@@ -137,7 +133,15 @@ fun CaptureScreen(
                     GlassBottomNavigation(
                         selectedTab = NavigationTab.CAPTURE,
                         onTabSelected = { tab ->
-                            // TODO: Navigation
+                            val route = when (tab) {
+                                NavigationTab.CAPTURE -> NavRoutes.CAPTURE
+                                NavigationTab.SEARCH -> NavRoutes.SEARCH
+                                NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
+                                NavigationTab.SETTINGS -> NavRoutes.SETTINGS
+                            }
+                            if (route != NavRoutes.CAPTURE) {
+                                onNavigate(route)
+                            }
                         }
                     )
                 }

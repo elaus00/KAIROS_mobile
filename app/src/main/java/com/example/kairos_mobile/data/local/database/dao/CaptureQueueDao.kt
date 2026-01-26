@@ -80,4 +80,56 @@ interface CaptureQueueDao {
      */
     @Query("DELETE FROM capture_queue")
     suspend fun deleteAll()
+
+    /**
+     * 검색 쿼리로 캡처 항목 조회 (페이징 지원)
+     *
+     * @param searchText 검색할 텍스트 (content에서 검색)
+     * @param types 필터링할 타입들 (비어있으면 모든 타입)
+     * @param sources 필터링할 소스들 (비어있으면 모든 소스)
+     * @param startDate 시작 날짜 (null이면 제한 없음)
+     * @param endDate 종료 날짜 (null이면 제한 없음)
+     * @param limit 페이지 크기
+     * @param offset 시작 위치
+     */
+    @Query("""
+        SELECT * FROM capture_queue
+        WHERE (:searchText = '' OR content LIKE '%' || :searchText || '%'
+               OR title LIKE '%' || :searchText || '%')
+        AND (:types IS NULL OR :types = '' OR classification_type IN (:typesList))
+        AND (:sources IS NULL OR :sources = '' OR source IN (:sourcesList))
+        AND (:startDate IS NULL OR timestamp >= :startDate)
+        AND (:endDate IS NULL OR timestamp <= :endDate)
+        ORDER BY timestamp DESC
+        LIMIT :limit OFFSET :offset
+    """)
+    fun searchCaptures(
+        searchText: String,
+        types: String?,
+        typesList: List<String>?,
+        sources: String?,
+        sourcesList: List<String>?,
+        startDate: Long?,
+        endDate: Long?,
+        limit: Int,
+        offset: Int
+    ): Flow<List<CaptureQueueEntity>>
+
+    /**
+     * 모든 캡처 항목 조회 (페이징 지원)
+     */
+    @Query("SELECT * FROM capture_queue ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    fun getAllCapturesPaged(limit: Int, offset: Int): Flow<List<CaptureQueueEntity>>
+
+    /**
+     * 특정 ID로 캡처 항목 조회
+     */
+    @Query("SELECT * FROM capture_queue WHERE id = :id")
+    suspend fun getCaptureById(id: String): CaptureQueueEntity?
+
+    /**
+     * 전체 캡처 개수 조회
+     */
+    @Query("SELECT COUNT(*) FROM capture_queue")
+    fun getTotalCount(): Flow<Int>
 }

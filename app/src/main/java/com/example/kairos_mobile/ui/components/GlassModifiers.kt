@@ -13,15 +13,17 @@ import androidx.compose.ui.unit.dp
 import com.example.kairos_mobile.ui.theme.*
 
 /**
- * Glassmorphism Effect Modifiers
+ * Minimal Glassmorphism Effect Modifiers
  *
- * Compose에서 backdrop-filter를 완벽하게 구현할 수 없으므로,
- * 반투명 배경 + 테두리 + 그림자로 유사한 효과를 구현합니다.
+ * 세련된 미니멀 글래스모피즘 효과:
+ * - 정밀한 투명도 제어
+ * - 섬세한 테두리와 그림자
+ * - 계층적 깊이 표현
  */
 
 /**
  * Glass Panel Effect
- * - 가장 기본적인 glass 효과
+ * - 가벼운 글래스 효과
  * - 네비게이션 바, 작은 패널에 사용
  */
 fun Modifier.glassPanel(
@@ -29,24 +31,24 @@ fun Modifier.glassPanel(
     backgroundColor: Color = GlassSurface,
     borderColor: Color = GlassBorder,
     borderWidth: Dp = 1.dp,
-    shadowElevation: Dp = 8.dp
+    shadowElevation: Dp = 6.dp
 ) = this
-    .shadow(elevation = shadowElevation, shape = shape, ambientColor = Color.Black.copy(alpha = 0.3f))
+    .shadow(elevation = shadowElevation, shape = shape, ambientColor = Color.Black.copy(alpha = 0.25f))
     .clip(shape)
     .background(backgroundColor)
     .border(width = borderWidth, color = borderColor, shape = shape)
 
 /**
  * Glass Card Effect
- * - 메인 입력 카드용 glass 효과
- * - 더 진한 배경, 더 강한 테두리
+ * - 메인 입력 카드용 글래스 효과
+ * - 섬세하고 정제된 외형
  */
 fun Modifier.glassCard(
-    shape: Shape = RoundedCornerShape(24.dp),
+    shape: Shape = RoundedCornerShape(20.dp),
     backgroundColor: Color = GlassCard,
     borderColor: Color = GlassBorderLight,
     borderWidth: Dp = 1.dp,
-    shadowElevation: Dp = 12.dp
+    shadowElevation: Dp = 10.dp
 ) = this
     .shadow(elevation = shadowElevation, shape = shape, ambientColor = Color.Black.copy(alpha = 0.2f))
     .clip(shape)
@@ -55,8 +57,8 @@ fun Modifier.glassCard(
 
 /**
  * Glass Button Effect
- * - 버튼용 glass 효과
- * - 가벼운 배경, 얇은 테두리
+ * - 미니멀한 버튼 글래스 효과
+ * - 호버 상태 없이 정적인 외형
  */
 fun Modifier.glassButton(
     shape: Shape = RoundedCornerShape(12.dp),
@@ -68,17 +70,10 @@ fun Modifier.glassButton(
     .clip(shape)
     .background(backgroundColor)
     .border(width = borderWidth, color = borderColor, shape = shape)
-    .then(
-        if (shadowElevation > 0.dp) {
-            Modifier.shadow(elevation = shadowElevation, shape = shape)
-        } else {
-            Modifier
-        }
-    )
 
 /**
- * Glass Button Hover Effect
- * - 버튼 눌림/Hover 상태용
+ * Glass Button Pressed Effect
+ * - 버튼 눌림 상태용 글래스 효과
  */
 fun Modifier.glassButtonPressed(
     shape: Shape = RoundedCornerShape(12.dp),

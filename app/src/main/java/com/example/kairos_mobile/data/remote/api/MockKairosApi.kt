@@ -1,7 +1,10 @@
 package com.example.kairos_mobile.data.remote.api
 
+import com.example.kairos_mobile.data.remote.dto.AuthUrlResponse
 import com.example.kairos_mobile.data.remote.dto.ClassificationRequest
 import com.example.kairos_mobile.data.remote.dto.ClassificationResponse
+import com.example.kairos_mobile.data.remote.dto.OAuthCallbackRequest
+import com.example.kairos_mobile.data.remote.dto.OAuthCallbackResponse
 import com.example.kairos_mobile.data.remote.dto.ObsidianCreateRequest
 import com.example.kairos_mobile.data.remote.dto.ObsidianCreateResponse
 import com.example.kairos_mobile.data.remote.dto.OcrResponse
@@ -9,6 +12,8 @@ import com.example.kairos_mobile.data.remote.dto.SttResponse
 import com.example.kairos_mobile.data.remote.dto.SuggestedTag
 import com.example.kairos_mobile.data.remote.dto.SummarizeRequest
 import com.example.kairos_mobile.data.remote.dto.SummarizeResponse
+import com.example.kairos_mobile.data.remote.dto.SyncResponse
+import com.example.kairos_mobile.data.remote.dto.SyncStatusResponse
 import com.example.kairos_mobile.data.remote.dto.TagSuggestRequest
 import com.example.kairos_mobile.data.remote.dto.TagSuggestResponse
 import com.example.kairos_mobile.data.remote.dto.WebClipRequest
@@ -327,5 +332,203 @@ class MockKairosApi @Inject constructor() : KairosApi {
         if (lowerContent.contains("팀")) tags.add("team")
 
         return tags.distinct().take(5) // 최대 5개, 중복 제거
+    }
+
+    // ========== Phase 3: 외부 서비스 연동 ==========
+
+    // Mock 상태 저장 (실제로는 서버에서 관리)
+    private var isGoogleConnected = false
+    private var isTodoistConnected = false
+    private var googleSyncedCount = 0
+    private var todoistSyncedCount = 0
+
+    // ========== M11: Google Calendar 연동 ==========
+
+    /**
+     * Mock Google OAuth URL 조회
+     */
+    override suspend fun getGoogleAuthUrl(): Response<AuthUrlResponse> {
+        delay(300)
+        return Response.success(
+            AuthUrlResponse(
+                success = true,
+                authUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=mock&redirect_uri=kairos://oauth/google&scope=https://www.googleapis.com/auth/calendar&response_type=code",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Google OAuth 콜백 처리
+     */
+    override suspend fun handleGoogleCallback(
+        request: OAuthCallbackRequest
+    ): Response<OAuthCallbackResponse> {
+        delay(500)
+        isGoogleConnected = true
+        return Response.success(
+            OAuthCallbackResponse(
+                success = true,
+                message = "Google Calendar 연동이 완료되었습니다.",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Google Calendar 동기화 상태 조회
+     */
+    override suspend fun getGoogleSyncStatus(): Response<SyncStatusResponse> {
+        delay(200)
+        return Response.success(
+            SyncStatusResponse(
+                success = true,
+                isConnected = isGoogleConnected,
+                lastSyncTime = if (isGoogleConnected) System.currentTimeMillis() - 3600000 else null,
+                syncedCount = googleSyncedCount,
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Google Calendar 수동 동기화
+     */
+    override suspend fun triggerGoogleSync(): Response<SyncResponse> {
+        delay(Random.nextLong(1000, 3000))
+
+        if (!isGoogleConnected) {
+            return Response.success(
+                SyncResponse(
+                    success = false,
+                    syncedCount = 0,
+                    message = null,
+                    error = "Google Calendar이 연동되지 않았습니다."
+                )
+            )
+        }
+
+        val synced = Random.nextInt(1, 5)
+        googleSyncedCount += synced
+
+        return Response.success(
+            SyncResponse(
+                success = true,
+                syncedCount = synced,
+                message = "${synced}개 일정이 동기화되었습니다.",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Google Calendar 연동 해제
+     */
+    override suspend fun disconnectGoogle(): Response<OAuthCallbackResponse> {
+        delay(300)
+        isGoogleConnected = false
+        googleSyncedCount = 0
+        return Response.success(
+            OAuthCallbackResponse(
+                success = true,
+                message = "Google Calendar 연동이 해제되었습니다.",
+                error = null
+            )
+        )
+    }
+
+    // ========== M12: Todoist 연동 ==========
+
+    /**
+     * Mock Todoist OAuth URL 조회
+     */
+    override suspend fun getTodoistAuthUrl(): Response<AuthUrlResponse> {
+        delay(300)
+        return Response.success(
+            AuthUrlResponse(
+                success = true,
+                authUrl = "https://todoist.com/oauth/authorize?client_id=mock&redirect_uri=kairos://oauth/todoist&scope=data:read_write&state=mock_state",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Todoist OAuth 콜백 처리
+     */
+    override suspend fun handleTodoistCallback(
+        request: OAuthCallbackRequest
+    ): Response<OAuthCallbackResponse> {
+        delay(500)
+        isTodoistConnected = true
+        return Response.success(
+            OAuthCallbackResponse(
+                success = true,
+                message = "Todoist 연동이 완료되었습니다.",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Todoist 동기화 상태 조회
+     */
+    override suspend fun getTodoistSyncStatus(): Response<SyncStatusResponse> {
+        delay(200)
+        return Response.success(
+            SyncStatusResponse(
+                success = true,
+                isConnected = isTodoistConnected,
+                lastSyncTime = if (isTodoistConnected) System.currentTimeMillis() - 7200000 else null,
+                syncedCount = todoistSyncedCount,
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Todoist 수동 동기화
+     */
+    override suspend fun triggerTodoistSync(): Response<SyncResponse> {
+        delay(Random.nextLong(1000, 3000))
+
+        if (!isTodoistConnected) {
+            return Response.success(
+                SyncResponse(
+                    success = false,
+                    syncedCount = 0,
+                    message = null,
+                    error = "Todoist가 연동되지 않았습니다."
+                )
+            )
+        }
+
+        val synced = Random.nextInt(1, 5)
+        todoistSyncedCount += synced
+
+        return Response.success(
+            SyncResponse(
+                success = true,
+                syncedCount = synced,
+                message = "${synced}개 태스크가 동기화되었습니다.",
+                error = null
+            )
+        )
+    }
+
+    /**
+     * Mock Todoist 연동 해제
+     */
+    override suspend fun disconnectTodoist(): Response<OAuthCallbackResponse> {
+        delay(300)
+        isTodoistConnected = false
+        todoistSyncedCount = 0
+        return Response.success(
+            OAuthCallbackResponse(
+                success = true,
+                message = "Todoist 연동이 해제되었습니다.",
+                error = null
+            )
+        )
     }
 }

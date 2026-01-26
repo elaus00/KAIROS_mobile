@@ -1,6 +1,13 @@
 package com.example.kairos_mobile.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -15,13 +22,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.presentation.capture.CaptureMode
 import com.example.kairos_mobile.ui.components.glassButton
 import com.example.kairos_mobile.ui.components.glassCard
 import com.example.kairos_mobile.ui.theme.*
 
 /**
- * Glassmorphism 스타일의 메인 캡처 카드
+ * 미니멀한 글래스모피즘 메인 캡처 카드
+ * 세련된 타이포그래피와 섬세한 상호작용
+ *
+ * Phase 3 개선: 동적 QuickTypeButtons 통합
  */
 @Composable
 fun GlassCaptureCard(
@@ -29,6 +40,8 @@ fun GlassCaptureCard(
     onTextChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onModeSelected: (CaptureMode) -> Unit,
+    suggestedQuickTypes: List<CaptureType> = emptyList(),
+    onQuickTypeSelected: (CaptureType) -> Unit = {},
     enabled: Boolean = true,
     isLoading: Boolean = false,
     modifier: Modifier = Modifier
@@ -37,7 +50,7 @@ fun GlassCaptureCard(
         modifier = modifier
             .fillMaxWidth()
             .glassCard()
-            .padding(24.dp)
+            .padding(28.dp)
     ) {
         // 텍스트 입력 영역
         BasicTextField(
@@ -46,28 +59,28 @@ fun GlassCaptureCard(
             enabled = enabled && !isLoading,
             textStyle = TextStyle(
                 color = TextPrimary,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Light,
-                lineHeight = 32.sp,
-                letterSpacing = 0.5.sp
+                lineHeight = 28.sp,
+                letterSpacing = 0.3.sp
             ),
-            cursorBrush = SolidColor(PrimaryNavy),
+            cursorBrush = SolidColor(PrimaryNavy.copy(alpha = 0.8f)),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(192.dp),
+                .height(160.dp),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     if (text.isEmpty()) {
                         Text(
-                            text = "무엇이든 입력하세요...",
+                            text = "무엇이든 캡처하세요…",
                             style = TextStyle(
                                 color = TextTertiary,
-                                fontSize = 20.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Light,
-                                lineHeight = 32.sp,
-                                letterSpacing = 0.5.sp
+                                lineHeight = 28.sp,
+                                letterSpacing = 0.3.sp
                             )
                         )
                     }
@@ -76,11 +89,44 @@ fun GlassCaptureCard(
             }
         )
 
-        // 구분선
+        // QuickTypeButtons (동적 표시)
+        AnimatedVisibility(
+            visible = suggestedQuickTypes.isNotEmpty(),
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Column {
+                // 섬세한 구분선
+                Divider(
+                    color = GlassBorderDim,
+                    thickness = 0.8.dp,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                // Quick Type Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    suggestedQuickTypes.forEach { type ->
+                        QuickTypeButton(
+                            icon = getIconForType(type),
+                            label = getLabelForType(type),
+                            onClick = { onQuickTypeSelected(type) }
+                        )
+                    }
+                }
+            }
+        }
+
+        // 섬세한 구분선
         Divider(
             color = GlassBorderDim,
-            thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 16.dp)
+            thickness = 0.8.dp,
+            modifier = Modifier.padding(vertical = 20.dp)
         )
 
         // 하단 액션 바
@@ -89,28 +135,12 @@ fun GlassCaptureCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 모드 선택 버튼들
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                GlassModeButton(
-                    icon = Icons.Default.Image,
-                    contentDescription = "이미지 캡처",
-                    onClick = { onModeSelected(CaptureMode.IMAGE) }
-                )
-
-                GlassModeButton(
-                    icon = Icons.Default.Mic,
-                    contentDescription = "음성 캡처",
-                    onClick = { onModeSelected(CaptureMode.VOICE) }
-                )
-
-                GlassModeButton(
-                    icon = Icons.Default.Link,
-                    contentDescription = "웹 클립",
-                    onClick = { onModeSelected(CaptureMode.WEB_CLIP) }
-                )
-            }
+            // 이미지 모드 선택 버튼만 유지
+            GlassModeButton(
+                icon = Icons.Default.Image,
+                contentDescription = "이미지",
+                onClick = { onModeSelected(CaptureMode.IMAGE) }
+            )
 
             // Capture 버튼
             Button(
@@ -119,34 +149,34 @@ fun GlassCaptureCard(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryNavy,
                     contentColor = TextPrimary,
-                    disabledContainerColor = PrimaryNavy.copy(alpha = 0.5f),
-                    disabledContentColor = TextPrimary.copy(alpha = 0.5f)
+                    disabledContainerColor = PrimaryNavy.copy(alpha = 0.45f),
+                    disabledContentColor = TextPrimary.copy(alpha = 0.45f)
                 ),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                modifier = Modifier.height(40.dp)
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp),
+                modifier = Modifier.height(38.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(14.dp),
                         color = TextPrimary,
                         strokeWidth = 2.dp
                     )
                 } else {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "Capture",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            letterSpacing = 0.5.sp
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 0.4.sp
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowUpward,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
@@ -156,7 +186,7 @@ fun GlassCaptureCard(
 }
 
 /**
- * Glass 스타일의 모드 선택 버튼
+ * 미니멀한 모드 선택 버튼
  */
 @Composable
 private fun GlassModeButton(
@@ -168,14 +198,82 @@ private fun GlassModeButton(
     IconButton(
         onClick = onClick,
         modifier = modifier
-            .size(32.dp)
+            .size(34.dp)
             .glassButton(shape = RoundedCornerShape(50))
     ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = TextMuted,
-            modifier = Modifier.size(18.dp)
+            tint = TextTertiary,
+            modifier = Modifier.size(16.dp)
         )
+    }
+}
+
+/**
+ * 미니멀한 Quick Type 버튼
+ */
+@Composable
+private fun QuickTypeButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .glassButton(shape = RoundedCornerShape(10.dp))
+            .height(34.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+            contentColor = TextTertiary
+        ),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = TextTertiary,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = label,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = TextTertiary,
+                letterSpacing = 0.2.sp
+            )
+        }
+    }
+}
+
+/**
+ * CaptureType에 맞는 아이콘 반환
+ */
+private fun getIconForType(type: CaptureType): ImageVector {
+    return when (type) {
+        CaptureType.IDEA -> Icons.Default.Lightbulb
+        CaptureType.SCHEDULE -> Icons.Default.CalendarToday
+        CaptureType.TODO -> Icons.Default.CheckCircle
+        CaptureType.NOTE -> Icons.Default.Bookmark
+        CaptureType.QUICK_NOTE -> Icons.Default.Note
+    }
+}
+
+/**
+ * CaptureType에 맞는 라벨 반환
+ */
+private fun getLabelForType(type: CaptureType): String {
+    return when (type) {
+        CaptureType.IDEA -> "Idea"
+        CaptureType.SCHEDULE -> "Meeting"
+        CaptureType.TODO -> "To-do"
+        CaptureType.NOTE -> "Save"
+        CaptureType.QUICK_NOTE -> "Quick"
     }
 }

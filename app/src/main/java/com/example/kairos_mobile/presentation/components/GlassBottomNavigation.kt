@@ -17,7 +17,7 @@ import com.example.kairos_mobile.ui.components.glassPanel
 import com.example.kairos_mobile.ui.theme.*
 
 /**
- * Glassmorphism 스타일의 하단 네비게이션 바
+ * 미니멀한 글래스모피즘 하단 네비게이션 바
  */
 @Composable
 fun GlassBottomNavigation(
@@ -27,9 +27,9 @@ fun GlassBottomNavigation(
 ) {
     Row(
         modifier = modifier
-            .glassPanel(shape = RoundedCornerShape(50))
-            .padding(horizontal = 24.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(32.dp),
+            .glassPanel(shape = RoundedCornerShape(40))
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         NavigationTab.entries.forEach { tab ->
@@ -44,7 +44,7 @@ fun GlassBottomNavigation(
 }
 
 /**
- * 개별 네비게이션 아이템
+ * 미니멀한 네비게이션 아이템
  */
 @Composable
 private fun GlassNavItem(
@@ -56,12 +56,12 @@ private fun GlassNavItem(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = modifier.size(48.dp)
+        modifier = modifier.size(44.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp)
                 .then(
                     if (selected) {
                         Modifier
@@ -75,8 +75,8 @@ private fun GlassNavItem(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = if (selected) TextPrimary else TextQuaternary,
-                modifier = Modifier.size(24.dp)
+                tint = if (selected) TextPrimary else TextTertiary,
+                modifier = Modifier.size(20.dp)
             )
         }
     }

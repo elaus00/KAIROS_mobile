@@ -1,13 +1,18 @@
 package com.example.kairos_mobile.data.remote.api
 
+import com.example.kairos_mobile.data.remote.dto.AuthUrlResponse
 import com.example.kairos_mobile.data.remote.dto.ClassificationRequest
 import com.example.kairos_mobile.data.remote.dto.ClassificationResponse
+import com.example.kairos_mobile.data.remote.dto.OAuthCallbackRequest
+import com.example.kairos_mobile.data.remote.dto.OAuthCallbackResponse
 import com.example.kairos_mobile.data.remote.dto.ObsidianCreateRequest
 import com.example.kairos_mobile.data.remote.dto.ObsidianCreateResponse
 import com.example.kairos_mobile.data.remote.dto.OcrResponse
 import com.example.kairos_mobile.data.remote.dto.SttResponse
 import com.example.kairos_mobile.data.remote.dto.SummarizeRequest
 import com.example.kairos_mobile.data.remote.dto.SummarizeResponse
+import com.example.kairos_mobile.data.remote.dto.SyncResponse
+import com.example.kairos_mobile.data.remote.dto.SyncStatusResponse
 import com.example.kairos_mobile.data.remote.dto.TagSuggestRequest
 import com.example.kairos_mobile.data.remote.dto.TagSuggestResponse
 import com.example.kairos_mobile.data.remote.dto.WebClipRequest
@@ -101,4 +106,74 @@ interface KairosApi {
     suspend fun suggestTags(
         @Body request: TagSuggestRequest
     ): Response<TagSuggestResponse>
+
+    // ========== Phase 3: 외부 서비스 연동 ==========
+
+    // ========== M11: Google Calendar 연동 ==========
+
+    /**
+     * Google OAuth 인증 URL 조회
+     */
+    @GET("/integrations/google/auth-url")
+    suspend fun getGoogleAuthUrl(): Response<AuthUrlResponse>
+
+    /**
+     * Google OAuth 콜백 처리
+     */
+    @POST("/integrations/google/callback")
+    suspend fun handleGoogleCallback(
+        @Body request: OAuthCallbackRequest
+    ): Response<OAuthCallbackResponse>
+
+    /**
+     * Google Calendar 동기화 상태 조회
+     */
+    @GET("/integrations/google/sync-status")
+    suspend fun getGoogleSyncStatus(): Response<SyncStatusResponse>
+
+    /**
+     * Google Calendar 수동 동기화 트리거
+     */
+    @POST("/integrations/google/sync")
+    suspend fun triggerGoogleSync(): Response<SyncResponse>
+
+    /**
+     * Google Calendar 연동 해제
+     */
+    @POST("/integrations/google/disconnect")
+    suspend fun disconnectGoogle(): Response<OAuthCallbackResponse>
+
+    // ========== M12: Todoist 연동 ==========
+
+    /**
+     * Todoist OAuth 인증 URL 조회
+     */
+    @GET("/integrations/todoist/auth-url")
+    suspend fun getTodoistAuthUrl(): Response<AuthUrlResponse>
+
+    /**
+     * Todoist OAuth 콜백 처리
+     */
+    @POST("/integrations/todoist/callback")
+    suspend fun handleTodoistCallback(
+        @Body request: OAuthCallbackRequest
+    ): Response<OAuthCallbackResponse>
+
+    /**
+     * Todoist 동기화 상태 조회
+     */
+    @GET("/integrations/todoist/sync-status")
+    suspend fun getTodoistSyncStatus(): Response<SyncStatusResponse>
+
+    /**
+     * Todoist 수동 동기화 트리거
+     */
+    @POST("/integrations/todoist/sync")
+    suspend fun triggerTodoistSync(): Response<SyncResponse>
+
+    /**
+     * Todoist 연동 해제
+     */
+    @POST("/integrations/todoist/disconnect")
+    suspend fun disconnectTodoist(): Response<OAuthCallbackResponse>
 }

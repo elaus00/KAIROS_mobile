@@ -5,14 +5,19 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.kairos_mobile.data.local.database.dao.CaptureQueueDao
+import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.entities.CaptureQueueEntity
+import com.example.kairos_mobile.data.local.database.entities.NotificationEntity
 
 /**
  * KAIROS 앱의 Room Database
  */
 @Database(
-    entities = [CaptureQueueEntity::class],
-    version = 3,  // Phase 3: 스마트 처리 기능 지원으로 버전 업
+    entities = [
+        CaptureQueueEntity::class,
+        NotificationEntity::class
+    ],
+    version = 4,  // Phase 3: 알림 기능 추가로 버전 업
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -21,6 +26,11 @@ abstract class KairosDatabase : RoomDatabase() {
      * 캡처 큐 DAO
      */
     abstract fun captureQueueDao(): CaptureQueueDao
+
+    /**
+     * 알림 DAO
+     */
+    abstract fun notificationDao(): NotificationDao
 
     companion object {
         const val DATABASE_NAME = "kairos_database"
@@ -106,6 +116,39 @@ abstract class KairosDatabase : RoomDatabase() {
                 // 외부 서비스 동기화 시간
                 database.execSQL(
                     "ALTER TABLE capture_queue ADD COLUMN external_sync_time INTEGER"
+                )
+            }
+        }
+
+        /**
+         * Database v3 → v4 마이그레이션
+         * Phase 3: 알림 기능 추가
+         */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 알림 테이블 생성
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS notifications (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        title TEXT NOT NULL,
+                        message TEXT NOT NULL,
+                        timestamp INTEGER NOT NULL,
+                        is_read INTEGER NOT NULL DEFAULT 0,
+                        related_capture_id TEXT,
+                        type TEXT NOT NULL DEFAULT 'INFO'
+                    )
+                    """.trimIndent()
+                )
+
+                // 알림 timestamp 인덱스 생성 (성능 최적화)
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_notifications_timestamp ON notifications(timestamp)"
+                )
+
+                // 알림 읽음 상태 인덱스 생성 (읽지 않은 알림 빠른 조회)
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_notifications_is_read ON notifications(is_read)"
                 )
             }
         }

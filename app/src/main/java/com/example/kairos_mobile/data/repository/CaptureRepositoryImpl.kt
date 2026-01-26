@@ -17,8 +17,12 @@ import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.Result
+import com.example.kairos_mobile.domain.model.SearchQuery
 import com.example.kairos_mobile.domain.model.SyncStatus
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import com.example.kairos_mobile.domain.repository.ConfigRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -519,5 +523,136 @@ class CaptureRepositoryImpl @Inject constructor(
             Log.e(TAG, "suggestTags failed", e)
             Result.Error(e)
         }
+    }
+
+    // ========== Phase 3: 검색 및 히스토리 기능 ==========
+
+    /**
+     * 검색 쿼리로 캡처 항목 조회
+     */
+    override suspend fun searchCaptures(
+        query: SearchQuery,
+        offset: Int,
+        limit: Int
+    ): Result<List<Capture>> = withContext(dispatcher) {
+        try {
+            // 타입 필터를 문자열 리스트로 변환
+            val types = if (query.types.isEmpty()) null else ""
+            val typesList = if (query.types.isEmpty()) null else query.types.map { it.name }
+
+            // 소스 필터를 문자열 리스트로 변환
+            val sources = if (query.sources.isEmpty()) null else ""
+            val sourcesList = if (query.sources.isEmpty()) null else query.sources.map { it.name }
+
+            // 날짜 범위
+            val startDate = query.dateRange?.start
+            val endDate = query.dateRange?.end
+
+            // DAO 호출
+            var captures: List<Capture>? = null
+            dao.searchCaptures(
+                searchText = query.text,
+                types = types,
+                typesList = typesList,
+                sources = sources,
+                sourcesList = sourcesList,
+                startDate = startDate,
+                endDate = endDate,
+                limit = limit,
+                offset = offset
+            ).collect { entities ->
+                captures = entities.map { captureMapper.toDomain(it) }
+            }
+
+            Result.Success(captures ?: emptyList())
+        } catch (e: Exception) {
+            Log.e(TAG, "searchCaptures failed", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * 모든 캡처 항목 조회 (페이징 지원)
+     */
+    override fun getAllCaptures(offset: Int, limit: Int): Flow<List<Capture>> {
+        return dao.getAllCapturesPaged(limit, offset)
+            .map { entities -> entities.map { captureMapper.toDomain(it) } }
+    }
+
+    /**
+     * 날짜별로 그룹화된 캡처 조회
+     * Archive 화면에서 사용
+     */
+    override fun getCapturesGroupedByDate(): Flow<Map<String, List<Capture>>> {
+        return dao.getRecentCaptures(limit = 100)  // 최근 100개
+            .map { entities ->
+                val captures = entities.map { captureMapper.toDomain(it) }
+                groupCapturesByDate(captures)
+            }
+    }
+
+    /**
+     * 특정 ID의 캡처 조회
+     */
+    override suspend fun getCaptureById(id: String): Result<Capture?> = withContext(dispatcher) {
+        try {
+            val entity = dao.getCaptureById(id)
+            val capture = entity?.let { captureMapper.toDomain(it) }
+            Result.Success(capture)
+        } catch (e: Exception) {
+            Log.e(TAG, "getCaptureById failed", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * 전체 캡처 개수 조회
+     */
+    override fun getTotalCount(): Flow<Int> {
+        return dao.getTotalCount()
+    }
+
+    /**
+     * 캡처들을 날짜별로 그룹화
+     * "Today", "Yesterday", "2026-01-25" 등의 키 사용
+     */
+    private fun groupCapturesByDate(captures: List<Capture>): Map<String, List<Capture>> {
+        val calendar = Calendar.getInstance()
+        val todayStart = calendar.apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        val yesterdayStart = calendar.apply {
+            add(Calendar.DAY_OF_YEAR, -1)
+        }.timeInMillis
+
+        val thisWeekStart = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        return captures.groupBy { capture ->
+            when {
+                capture.timestamp >= todayStart -> "Today"
+                capture.timestamp >= yesterdayStart -> "Yesterday"
+                capture.timestamp >= thisWeekStart -> "This Week"
+                else -> dateFormat.format(capture.timestamp)
+            }
+        }.toSortedMap(compareBy { key ->
+            when (key) {
+                "Today" -> 0
+                "Yesterday" -> 1
+                "This Week" -> 2
+                else -> 3
+            }
+        })
     }
 }

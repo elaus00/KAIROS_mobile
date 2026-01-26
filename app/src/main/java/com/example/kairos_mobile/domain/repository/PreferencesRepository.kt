@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.domain.repository
 
+import com.example.kairos_mobile.domain.model.ThemePreference
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -55,4 +56,16 @@ interface PreferencesRepository {
      * Todoist 연동 활성화 설정
      */
     suspend fun setTodoistEnabled(enabled: Boolean)
+
+    // ========== 테마 설정 ==========
+
+    /**
+     * 테마 설정 조회
+     */
+    fun getThemePreference(): Flow<ThemePreference>
+
+    /**
+     * 테마 설정 변경
+     */
+    suspend fun setThemePreference(theme: ThemePreference)
 }

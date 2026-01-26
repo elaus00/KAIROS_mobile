@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.capture
 
 import android.net.Uri
 import com.example.kairos_mobile.data.remote.dto.SuggestedTag
+import com.example.kairos_mobile.domain.model.CaptureType
 
 /**
  * Phase 2: 캡처 모드
@@ -31,5 +32,6 @@ data class CaptureUiState(
     // Phase 3: 스마트 처리 기능
     val latestSummary: String? = null,           // M09: 최근 생성된 요약
     val suggestedTags: List<SuggestedTag> = emptyList(),  // M10: AI 제안 태그
-    val isSummaryExpanded: Boolean = false       // M09: 요약 펼침 상태
+    val isSummaryExpanded: Boolean = false,      // M09: 요약 펼침 상태
+    val suggestedQuickTypes: List<CaptureType> = emptyList()  // 키워드 기반 추천 타입
 )
