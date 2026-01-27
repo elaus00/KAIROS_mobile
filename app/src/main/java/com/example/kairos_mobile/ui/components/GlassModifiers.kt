@@ -84,3 +84,68 @@ fun Modifier.glassButtonPressed(
     .clip(shape)
     .background(backgroundColor)
     .border(width = borderWidth, color = borderColor, shape = shape)
+
+// ========== 테마 인식 글래스 모디파이어 (Airy Design 지원) ==========
+
+/**
+ * 테마 인식 Glass Panel Effect
+ * 라이트 테마: 부드러운 흰색 글래스 + 확산 그림자
+ * 다크 테마: 기존 어두운 글래스
+ */
+fun Modifier.glassPanelThemed(
+    isDarkTheme: Boolean,
+    shape: Shape = RoundedCornerShape(16.dp),
+    borderWidth: Dp = 1.dp,
+    shadowElevation: Dp = if (isDarkTheme) 6.dp else 8.dp
+): Modifier {
+    val backgroundColor = if (isDarkTheme) GlassSurface else AiryGlassPanel
+    val borderColor = if (isDarkTheme) GlassBorder else AiryGlassBorder
+    val shadowColor = if (isDarkTheme) Color.Black.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.08f)
+
+    return this
+        .shadow(elevation = shadowElevation, shape = shape, ambientColor = shadowColor)
+        .clip(shape)
+        .background(backgroundColor)
+        .border(width = borderWidth, color = borderColor, shape = shape)
+}
+
+/**
+ * 테마 인식 Glass Card Effect
+ * 라이트 테마: 45% 불투명도 흰색 + 부드러운 확산 그림자
+ * 다크 테마: 기존 어두운 글래스 카드
+ */
+fun Modifier.glassCardThemed(
+    isDarkTheme: Boolean,
+    shape: Shape = RoundedCornerShape(20.dp),
+    borderWidth: Dp = 1.dp,
+    shadowElevation: Dp = if (isDarkTheme) 10.dp else 12.dp
+): Modifier {
+    val backgroundColor = if (isDarkTheme) GlassCard else AiryGlassCard
+    val borderColor = if (isDarkTheme) GlassBorderLight else AiryGlassBorder
+    val shadowColor = if (isDarkTheme) Color.Black.copy(alpha = 0.2f) else Color.Black.copy(alpha = 0.06f)
+
+    return this
+        .shadow(elevation = shadowElevation, shape = shape, ambientColor = shadowColor)
+        .clip(shape)
+        .background(backgroundColor)
+        .border(width = borderWidth, color = borderColor, shape = shape)
+}
+
+/**
+ * 테마 인식 Glass Button Effect
+ * 라이트 테마: 가벼운 투명 효과
+ * 다크 테마: 기존 어두운 버튼 글래스
+ */
+fun Modifier.glassButtonThemed(
+    isDarkTheme: Boolean,
+    shape: Shape = RoundedCornerShape(12.dp),
+    borderWidth: Dp = 1.dp
+): Modifier {
+    val backgroundColor = if (isDarkTheme) GlassButton else Color.White.copy(alpha = 0.3f)
+    val borderColor = if (isDarkTheme) GlassBorderDim else AiryGlassBorder
+
+    return this
+        .clip(shape)
+        .background(backgroundColor)
+        .border(width = borderWidth, color = borderColor, shape = shape)
+}

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.ui.components.glassButton
+import com.example.kairos_mobile.ui.components.glassButtonThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -25,6 +25,7 @@ import com.example.kairos_mobile.ui.theme.*
 @Composable
 fun QuickTypeButtons(
     onTypeSelected: (CaptureType) -> Unit,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -38,28 +39,32 @@ fun QuickTypeButtons(
             icon = Icons.Default.Lightbulb,
             label = "Idea",
             captureType = CaptureType.IDEA,
-            onClick = { onTypeSelected(CaptureType.IDEA) }
+            onClick = { onTypeSelected(CaptureType.IDEA) },
+            isDarkTheme = isDarkTheme
         )
 
         QuickTypeButton(
             icon = Icons.Default.CalendarToday,
             label = "Meeting",
             captureType = CaptureType.SCHEDULE,
-            onClick = { onTypeSelected(CaptureType.SCHEDULE) }
+            onClick = { onTypeSelected(CaptureType.SCHEDULE) },
+            isDarkTheme = isDarkTheme
         )
 
         QuickTypeButton(
             icon = Icons.Default.CheckCircle,
             label = "To-do",
             captureType = CaptureType.TODO,
-            onClick = { onTypeSelected(CaptureType.TODO) }
+            onClick = { onTypeSelected(CaptureType.TODO) },
+            isDarkTheme = isDarkTheme
         )
 
         QuickTypeButton(
             icon = Icons.Default.Bookmark,
             label = "Save",
             captureType = CaptureType.NOTE,
-            onClick = { onTypeSelected(CaptureType.NOTE) }
+            onClick = { onTypeSelected(CaptureType.NOTE) },
+            isDarkTheme = isDarkTheme
         )
     }
 }
@@ -73,16 +78,19 @@ private fun QuickTypeButton(
     label: String,
     captureType: CaptureType,
     onClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val contentColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Button(
         onClick = onClick,
         modifier = modifier
-            .glassButton(shape = RoundedCornerShape(10.dp))
+            .glassButtonThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(10.dp))
             .height(34.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            contentColor = TextTertiary
+            contentColor = contentColor
         ),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
     ) {
@@ -93,14 +101,14 @@ private fun QuickTypeButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = TextTertiary,
+                tint = contentColor,
                 modifier = Modifier.size(16.dp)
             )
             Text(
                 text = label,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = TextTertiary,
+                color = contentColor,
                 letterSpacing = 0.2.sp
             )
         }

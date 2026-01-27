@@ -13,21 +13,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.kairos_mobile.ui.components.glassPanel
+import com.example.kairos_mobile.ui.components.glassPanelThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 미니멀한 글래스모피즘 하단 네비게이션 바
+ * Pill 형태 디자인 (cornerRadius: 40dp)
  */
 @Composable
 fun GlassBottomNavigation(
     selectedTab: NavigationTab = NavigationTab.CAPTURE,
     onTabSelected: (NavigationTab) -> Unit,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
-            .glassPanel(shape = RoundedCornerShape(40))
+            .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(40.dp))
             .padding(horizontal = 20.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(28.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -37,7 +39,8 @@ fun GlassBottomNavigation(
                 icon = tab.icon,
                 label = tab.label,
                 selected = selectedTab == tab,
-                onClick = { onTabSelected(tab) }
+                onClick = { onTabSelected(tab) },
+                isDarkTheme = isDarkTheme
             )
         }
     }
@@ -52,8 +55,14 @@ private fun GlassNavItem(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val selectedBgColor = if (isDarkTheme) GlassButtonHover else AiryAccentBlueLight
+    val selectedIconColor = if (isDarkTheme) TextPrimary else AiryAccentBlue
+    val unselectedIconColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     IconButton(
         onClick = onClick,
         modifier = modifier.size(44.dp)
@@ -66,7 +75,7 @@ private fun GlassNavItem(
                     if (selected) {
                         Modifier
                             .clip(CircleShape)
-                            .background(GlassButtonHover)
+                            .background(selectedBgColor)
                     } else {
                         Modifier
                     }
@@ -75,7 +84,7 @@ private fun GlassNavItem(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = if (selected) TextPrimary else TextTertiary,
+                tint = if (selected) selectedIconColor else unselectedIconColor,
                 modifier = Modifier.size(20.dp)
             )
         }

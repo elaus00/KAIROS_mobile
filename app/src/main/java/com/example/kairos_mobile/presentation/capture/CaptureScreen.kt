@@ -1,6 +1,9 @@
 package com.example.kairos_mobile.presentation.capture
 
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,7 +16,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.*
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
+import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * KAIROS Magic Inbox - Glassmorphism 메인 화면
@@ -26,10 +30,22 @@ fun CaptureScreen(
     sharedText: String? = null,       // M07: 공유된 텍스트 (URL 포함)
     sharedImageUri: Uri? = null,      // M07: 공유된 이미지 URI
     onNavigate: (String) -> Unit = {},
+    isDarkTheme: Boolean = false,     // 테마 설정
     viewModel: CaptureViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 테마에 따른 색상 설정
+    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
+    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+
+    // 이미지 선택기 런처
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onImageSelected(it) }
+    }
 
     // M07: 공유 인텐트 처리
     LaunchedEffect(sharedText, sharedImageUri) {
@@ -53,8 +69,8 @@ fun CaptureScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // 애니메이션 배경 (Blobs)
-        AnimatedGlassBackground()
+        // 테마 인식 애니메이션 배경
+        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
 
         // 메인 콘텐츠
         Scaffold(
@@ -67,8 +83,8 @@ fun CaptureScreen(
                         Snackbar(
                             snackbarData = data,
                             shape = RoundedCornerShape(12.dp),
-                            containerColor = com.example.kairos_mobile.ui.theme.GlassCard,
-                            contentColor = com.example.kairos_mobile.ui.theme.TextPrimary
+                            containerColor = snackbarBgColor,
+                            contentColor = snackbarContentColor
                         )
                     }
                 )
@@ -88,7 +104,8 @@ fun CaptureScreen(
                     GlassHeader(
                         onNotificationClick = {
                             onNavigate(NavRoutes.NOTIFICATIONS)
-                        }
+                        },
+                        isDarkTheme = isDarkTheme
                     )
 
                     // 메인 콘텐츠 영역
@@ -104,11 +121,20 @@ fun CaptureScreen(
                             text = uiState.inputText,
                             onTextChange = viewModel::onTextChanged,
                             onSubmit = viewModel::onSubmit,
-                            onModeSelected = viewModel::onCaptureModeChanged,
+                            onModeSelected = { mode ->
+                                viewModel.onCaptureModeChanged(mode)
+                                // IMAGE 모드 선택 시 갤러리 열기
+                                if (mode == CaptureMode.IMAGE) {
+                                    imagePickerLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            },
                             suggestedQuickTypes = uiState.suggestedQuickTypes,
                             onQuickTypeSelected = viewModel::onQuickTypeSelected,
                             enabled = !uiState.isLoading,
                             isLoading = uiState.isLoading,
+                            isDarkTheme = isDarkTheme,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 24.dp)
@@ -120,6 +146,7 @@ fun CaptureScreen(
                 if (uiState.showSuccessFeedback) {
                     SuccessFeedback(
                         isOffline = uiState.isOffline,
+                        isDarkTheme = isDarkTheme,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -142,7 +169,8 @@ fun CaptureScreen(
                             if (route != NavRoutes.CAPTURE) {
                                 onNavigate(route)
                             }
-                        }
+                        },
+                        isDarkTheme = isDarkTheme
                     )
                 }
 
@@ -150,6 +178,7 @@ fun CaptureScreen(
                 if (uiState.pendingCount > 0) {
                     OfflineIndicator(
                         count = uiState.pendingCount,
+                        isDarkTheme = isDarkTheme,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(top = 16.dp)

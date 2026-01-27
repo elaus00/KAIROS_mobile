@@ -12,11 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import com.example.kairos_mobile.ui.theme.BlobNavy
-import com.example.kairos_mobile.ui.theme.BlobNavyDim
-import com.example.kairos_mobile.ui.theme.BlobSlate
-import com.example.kairos_mobile.ui.theme.NavyDark
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * Glassmorphism 애니메이션 배경
@@ -203,4 +201,92 @@ private fun AnimatedBlob(
 private enum class BlobAnimationType {
     TYPE_1,  // float 애니메이션
     TYPE_2   // float-delayed 애니메이션
+}
+
+/**
+ * 에어리 디자인 애니메이션 배경 (라이트 테마)
+ *
+ * 파스텔 그라데이션 + 부드러운 파스텔 Blob
+ */
+@Composable
+fun AnimatedGlassBackgroundLight(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(AiryGradientStart, AiryGradientEnd)
+                )
+            )
+    ) {
+        // Blob 1: 좌상단 (파스텔 블루)
+        AnimatedBlob(
+            size = 500.dp,
+            color = AiryBlobBlue,
+            blurRadius = 100.dp,
+            startOffsetX = (-0.15f),
+            startOffsetY = (-0.1f),
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 16000,
+                    easing = FastOutSlowInEasing
+                ),
+                repeatMode = RepeatMode.Reverse
+            ),
+            animationType = BlobAnimationType.TYPE_1
+        )
+
+        // Blob 2: 우측 중앙 (파스텔 핑크)
+        AnimatedBlob(
+            size = 450.dp,
+            color = AiryBlobPink,
+            blurRadius = 90.dp,
+            startOffsetX = 0.9f,
+            startOffsetY = 0.25f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 18000,
+                    easing = FastOutSlowInEasing
+                ),
+                repeatMode = RepeatMode.Reverse
+            ),
+            animationType = BlobAnimationType.TYPE_2
+        )
+
+        // Blob 3: 하단 중앙 (파스텔 퍼플)
+        AnimatedBlob(
+            size = 550.dp,
+            color = AiryBlobPurple,
+            blurRadius = 110.dp,
+            startOffsetX = 0.3f,
+            startOffsetY = 0.95f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 20000,
+                    easing = LinearEasing
+                ),
+                repeatMode = RepeatMode.Reverse
+            ),
+            animationType = BlobAnimationType.TYPE_1
+        )
+    }
+}
+
+/**
+ * 테마 인식 애니메이션 배경
+ * 다크 테마: 기존 네이비 기반 배경
+ * 라이트 테마: 에어리 파스텔 그라데이션 배경
+ */
+@Composable
+fun AnimatedGlassBackgroundThemed(
+    isDarkTheme: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (isDarkTheme) {
+        AnimatedGlassBackground(modifier = modifier)
+    } else {
+        AnimatedGlassBackgroundLight(modifier = modifier)
+    }
 }

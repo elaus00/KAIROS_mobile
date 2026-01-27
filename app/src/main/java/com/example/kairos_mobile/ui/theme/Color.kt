@@ -80,3 +80,41 @@ val LightTextMuted = Color(0xCC1A1A1A)       // rgba(26,26,26,0.8)
 val LightBlobNavy = Color(0x1A1A237E)        // rgba(26,35,126,0.1)
 val LightBlobSlate = Color(0x0D475569)       // rgba(71,85,105,0.05)
 val LightBlobNavyDim = Color(0x0D1A237E)     // rgba(26,35,126,0.05)
+
+// ========== Airy Design (새로운 밝은 테마) ==========
+
+// 그라데이션 배경 색상
+val AiryGradientStart = Color(0xFF94B9E5)    // 파스텔 블루
+val AiryGradientEnd = Color(0xFFFBD1E8)      // 파스텔 핑크
+
+// 에어리 글래스 효과 (높은 불투명도)
+val AiryGlassCard = Color(0x73FFFFFF)        // 45% 흰색
+val AiryGlassBorder = Color(0x80FFFFFF)      // 50% 흰색
+val AiryGlassBorderStrong = Color(0x99FFFFFF) // 60% 흰색
+val AiryGlassPanel = Color(0x66FFFFFF)       // 40% 흰색
+
+// 에어리 텍스트 색상 (슬레이트 계열)
+val AiryTextPrimary = Color(0xFF1E293B)      // 슬레이트 900
+val AiryTextSecondary = Color(0xFF334155)    // 슬레이트 700
+val AiryTextTertiary = Color(0xFF64748B)     // 슬레이트 500
+val AiryTextQuaternary = Color(0xFF94A3B8)   // 슬레이트 400
+
+// 에어리 파스텔 Blob
+val AiryBlobBlue = Color(0x40A5C8F0)         // 파스텔 블루 25%
+val AiryBlobPink = Color(0x40F8C8E0)         // 파스텔 핑크 25%
+val AiryBlobPurple = Color(0x40D4B8F0)       // 파스텔 퍼플 25%
+
+// 에어리 액센트 색상
+val AiryAccentBlue = Color(0xFF2A86E2)       // 밝은 블루
+val AiryAccentBlueLight = Color(0x262A86E2)  // 15% 불투명도
+
+// 에어리 카테고리 색상 (파스텔)
+val AiryIdeaColor = Color(0xFFF59E0B)        // 황색
+val AiryMeetingColor = Color(0xFF3B82F6)     // 블루
+val AiryTodoColor = Color(0xFF10B981)        // 그린
+val AirySaveColor = Color(0xFFA855F7)        // 퍼플
+
+// 에어리 유틸리티 색상
+val AirySuccessColor = Color(0xFF22C55E)     // 그린
+val AiryWarningColor = Color(0xFFFBBF24)     // 노란색
+val AiryErrorColor = Color(0xFFEF4444)       // 레드

@@ -42,11 +42,9 @@ import com.example.kairos_mobile.presentation.components.GlassBottomNavigation
 import com.example.kairos_mobile.presentation.components.IntegrationCard
 import com.example.kairos_mobile.presentation.components.NavigationTab
 import com.example.kairos_mobile.presentation.components.SwitchPreference
-import com.example.kairos_mobile.ui.components.glassButton
-import com.example.kairos_mobile.ui.theme.NavyDark
-import com.example.kairos_mobile.ui.theme.TextPrimary
-import com.example.kairos_mobile.ui.theme.TextQuaternary
-import com.example.kairos_mobile.ui.theme.TextTertiary
+import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
+import com.example.kairos_mobile.ui.components.glassButtonThemed
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 글래스모피즘 스타일의 설정 화면
@@ -57,11 +55,18 @@ import com.example.kairos_mobile.ui.theme.TextTertiary
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    isDarkTheme: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val textQuaternaryColor = if (isDarkTheme) TextQuaternary else AiryTextQuaternary
+    val dividerColor = if (isDarkTheme) Color(0x20FFFFFF) else AiryGlassBorder
 
     // 이벤트 처리
     LaunchedEffect(Unit) {
@@ -89,10 +94,11 @@ fun SettingsScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(NavyDark)
+        modifier = Modifier.fillMaxSize()
     ) {
+        // 테마 인식 애니메이션 배경
+        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -101,7 +107,7 @@ fun SettingsScreen(
                             text = "설정",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Light,
-                            color = TextPrimary
+                            color = textPrimaryColor
                         )
                     },
                     navigationIcon = {
@@ -109,14 +115,14 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "뒤로",
-                                tint = TextTertiary
+                                tint = textTertiaryColor
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
                     ),
-                    modifier = Modifier.glassButton()
+                    modifier = Modifier.glassButtonThemed(isDarkTheme = isDarkTheme)
                 )
             },
             containerColor = Color.Transparent,
@@ -139,7 +145,7 @@ fun SettingsScreen(
                     text = "외부 서비스 연동",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextPrimary,
+                    color = textPrimaryColor,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -147,7 +153,7 @@ fun SettingsScreen(
                     text = "캡처한 내용을 외부 서비스와 자동으로 동기화합니다",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,
-                    color = TextTertiary,
+                    color = textTertiaryColor,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 
@@ -161,7 +167,8 @@ fun SettingsScreen(
                     onConnect = viewModel::connectGoogleCalendar,
                     onDisconnect = viewModel::disconnectGoogleCalendar,
                     onSync = viewModel::syncGoogleCalendar,
-                    isLoading = uiState.isGoogleLoading
+                    isLoading = uiState.isGoogleLoading,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -176,7 +183,8 @@ fun SettingsScreen(
                     onConnect = viewModel::connectTodoist,
                     onDisconnect = viewModel::disconnectTodoist,
                     onSync = viewModel::syncTodoist,
-                    isLoading = uiState.isTodoistLoading
+                    isLoading = uiState.isTodoistLoading,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -187,7 +195,7 @@ fun SettingsScreen(
                         .fillMaxSize(1f)
                         .height(0.8.dp)
                         .background(
-                            color = Color(0x20FFFFFF),
+                            color = dividerColor,
                             shape = RoundedCornerShape(1.dp)
                         )
                 )
@@ -199,7 +207,7 @@ fun SettingsScreen(
                     text = "AI 기능",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextPrimary,
+                    color = textPrimaryColor,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -207,7 +215,7 @@ fun SettingsScreen(
                     text = "AI 기반 자동 처리 기능을 설정합니다",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,
-                    color = TextTertiary,
+                    color = textTertiaryColor,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -216,7 +224,8 @@ fun SettingsScreen(
                     title = "자동 요약",
                     description = "긴 콘텐츠를 AI가 자동으로 요약합니다 (200자 이상)",
                     checked = uiState.autoSummarizeEnabled,
-                    onCheckedChange = viewModel::toggleAutoSummarize
+                    onCheckedChange = viewModel::toggleAutoSummarize,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -226,7 +235,8 @@ fun SettingsScreen(
                     title = "스마트 태그 제안",
                     description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
                     checked = uiState.smartTagsEnabled,
-                    onCheckedChange = viewModel::toggleSmartTags
+                    onCheckedChange = viewModel::toggleSmartTags,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -237,7 +247,7 @@ fun SettingsScreen(
                         .fillMaxSize(1f)
                         .height(0.8.dp)
                         .background(
-                            color = Color(0x20FFFFFF),
+                            color = dividerColor,
                             shape = RoundedCornerShape(1.dp)
                         )
                 )
@@ -249,7 +259,7 @@ fun SettingsScreen(
                     text = "테마",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextPrimary,
+                    color = textPrimaryColor,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -257,7 +267,7 @@ fun SettingsScreen(
                     text = "앱의 테마를 설정합니다",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,
-                    color = TextTertiary,
+                    color = textTertiaryColor,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -266,7 +276,8 @@ fun SettingsScreen(
                     title = "다크 모드",
                     description = "어두운 테마를 사용합니다",
                     checked = uiState.themePreference == com.example.kairos_mobile.domain.model.ThemePreference.DARK,
-                    onCheckedChange = viewModel::toggleDarkMode
+                    onCheckedChange = viewModel::toggleDarkMode,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -276,7 +287,7 @@ fun SettingsScreen(
                     text = "KAIROS Magic Inbox v1.0",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
-                    color = TextQuaternary,
+                    color = textQuaternaryColor,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
@@ -299,7 +310,8 @@ fun SettingsScreen(
                         if (route != NavRoutes.SETTINGS) {
                             onNavigate(route)
                         }
-                    }
+                    },
+                    isDarkTheme = isDarkTheme
                 )
             }
         }

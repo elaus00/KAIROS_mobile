@@ -48,12 +48,22 @@ data class Notification(
  */
 enum class NotificationType {
     /**
+     * 캡처 저장 완료
+     */
+    CAPTURE_SAVED,
+
+    /**
      * 캡처 완료
      */
     CAPTURE_COMPLETE,
 
     /**
      * 동기화 완료
+     */
+    SYNC_COMPLETED,
+
+    /**
+     * 동기화 완료 (별칭)
      */
     SYNC_COMPLETE,
 
@@ -63,9 +73,24 @@ enum class NotificationType {
     SYNC_FAILED,
 
     /**
+     * AI 처리 중/완료
+     */
+    AI_PROCESSING,
+
+    /**
      * AI 처리 완료
      */
     AI_PROCESSING_COMPLETE,
+
+    /**
+     * 리마인더
+     */
+    REMINDER,
+
+    /**
+     * 시스템 알림
+     */
+    SYSTEM,
 
     /**
      * 일반 정보

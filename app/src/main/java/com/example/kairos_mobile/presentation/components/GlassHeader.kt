@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassButton
+import com.example.kairos_mobile.ui.components.glassButtonThemed
 import com.example.kairos_mobile.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,8 +22,13 @@ import java.util.*
 @Composable
 fun GlassHeader(
     onNotificationClick: () -> Unit,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textSecondaryColor = if (isDarkTheme) TextQuaternary else AiryTextTertiary
+
     val dateFormat = SimpleDateFormat("EEEE, dd MMM", Locale.getDefault())
     val currentDate = dateFormat.format(Date())
 
@@ -50,7 +55,7 @@ fun GlassHeader(
                 text = currentDate,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = TextQuaternary,
+                color = textSecondaryColor,
                 letterSpacing = 1.sp,
                 modifier = Modifier.padding(bottom = 2.dp)
             )
@@ -58,7 +63,7 @@ fun GlassHeader(
                 text = greeting,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = textPrimaryColor,
                 letterSpacing = (-0.5).sp
             )
         }
@@ -68,12 +73,12 @@ fun GlassHeader(
             onClick = onNotificationClick,
             modifier = Modifier
                 .size(40.dp)
-                .glassButton(shape = CircleShape)
+                .glassButtonThemed(isDarkTheme = isDarkTheme, shape = CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = "알림",
-                tint = TextPrimary,
+                tint = textPrimaryColor,
                 modifier = Modifier.size(20.dp)
             )
         }

@@ -108,15 +108,27 @@ dependencies {
     // Browser (Chrome Custom Tabs for OAuth)
     implementation(libs.browser)
 
-    // Testing
+    // Testing - Unit Tests
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.arch.core.testing)
+
+    // Testing - Instrumented Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.navigation.testing)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.turbine)
+    kspAndroidTest(libs.hilt.compiler)
+
+    // Debug implementations
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -61,7 +61,7 @@ class NotificationRepositoryImpl @Inject constructor(
     /**
      * 알림 추가
      */
-    override suspend fun addNotification(notification: Notification) = withContext(dispatcher) {
+    override suspend fun addNotification(notification: Notification): Unit = withContext(dispatcher) {
         try {
             dao.insertNotification(domainToEntity(notification))
             Log.d(TAG, "Notification added: ${notification.id}")
@@ -71,12 +71,13 @@ class NotificationRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "addNotification failed", e)
         }
+        Unit
     }
 
     /**
      * 여러 알림 추가
      */
-    override suspend fun addNotifications(notifications: List<Notification>) = withContext(dispatcher) {
+    override suspend fun addNotifications(notifications: List<Notification>): Unit = withContext(dispatcher) {
         try {
             val entities = notifications.map { domainToEntity(it) }
             dao.insertNotifications(entities)
@@ -87,54 +88,59 @@ class NotificationRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "addNotifications failed", e)
         }
+        Unit
     }
 
     /**
      * 알림을 읽음 처리
      */
-    override suspend fun markAsRead(notificationId: String) = withContext(dispatcher) {
+    override suspend fun markAsRead(notificationId: String): Unit = withContext(dispatcher) {
         try {
             dao.markAsRead(notificationId)
             Log.d(TAG, "Notification marked as read: $notificationId")
         } catch (e: Exception) {
             Log.e(TAG, "markAsRead failed", e)
         }
+        Unit
     }
 
     /**
      * 모든 알림 읽음 처리
      */
-    override suspend fun markAllAsRead() = withContext(dispatcher) {
+    override suspend fun markAllAsRead(): Unit = withContext(dispatcher) {
         try {
             dao.markAllAsRead()
             Log.d(TAG, "All notifications marked as read")
         } catch (e: Exception) {
             Log.e(TAG, "markAllAsRead failed", e)
         }
+        Unit
     }
 
     /**
      * 알림 삭제
      */
-    override suspend fun deleteNotification(notificationId: String) = withContext(dispatcher) {
+    override suspend fun deleteNotification(notificationId: String): Unit = withContext(dispatcher) {
         try {
             dao.deleteNotification(notificationId)
             Log.d(TAG, "Notification deleted: $notificationId")
         } catch (e: Exception) {
             Log.e(TAG, "deleteNotification failed", e)
         }
+        Unit
     }
 
     /**
      * 읽은 알림 모두 삭제
      */
-    override suspend fun deleteReadNotifications() = withContext(dispatcher) {
+    override suspend fun deleteReadNotifications(): Unit = withContext(dispatcher) {
         try {
             dao.deleteReadNotifications()
             Log.d(TAG, "Read notifications deleted")
         } catch (e: Exception) {
             Log.e(TAG, "deleteReadNotifications failed", e)
         }
+        Unit
     }
 
     /**

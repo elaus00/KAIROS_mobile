@@ -1,6 +1,8 @@
 package com.example.kairos_mobile.navigation
 
 import android.net.Uri
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -33,18 +35,36 @@ fun KairosNavGraph(
     sharedImageUri: Uri? = null,
     oAuthCallback: OAuthCallback? = null
 ) {
+    // 공통 탭 네비게이션 함수
+    val navigateToTab: (String) -> Unit = { route ->
+        if (route == NavRoutes.CAPTURE) {
+            // CAPTURE로 이동할 때는 popBackStack으로 시작 화면으로 돌아감
+            navController.popBackStack(NavRoutes.CAPTURE, inclusive = false)
+        } else {
+            navController.navigate(route) {
+                // 시작 화면까지 pop하여 백스택 정리
+                popUpTo(NavRoutes.CAPTURE) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.CAPTURE
+        startDestination = NavRoutes.CAPTURE,
+        // 페이지 전환 애니메이션 제거
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
         // 캡처 화면
         composable(NavRoutes.CAPTURE) {
             CaptureScreen(
                 sharedText = sharedText,
                 sharedImageUri = sharedImageUri,
-                onNavigate = { route ->
-                    navController.navigate(route)
-                }
+                onNavigate = navigateToTab
             )
         }
 
@@ -57,13 +77,7 @@ fun KairosNavGraph(
                 onCaptureClick = { captureId ->
                     // TODO: 캡처 상세 화면으로 이동
                 },
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                onNavigate = navigateToTab
             )
         }
 
@@ -76,13 +90,7 @@ fun KairosNavGraph(
                 onCaptureClick = { captureId ->
                     // TODO: 캡처 상세 화면으로 이동
                 },
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                onNavigate = navigateToTab
             )
         }
 
@@ -108,13 +116,7 @@ fun KairosNavGraph(
                 onBack = {
                     navController.popBackStack()
                 },
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                onNavigate = navigateToTab
             )
         }
     }

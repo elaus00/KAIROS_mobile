@@ -19,8 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.*
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
-import com.example.kairos_mobile.ui.components.glassCard
+import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
+import com.example.kairos_mobile.ui.components.glassCardThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -32,11 +32,19 @@ fun SearchScreen(
     onBackClick: () -> Unit,
     onCaptureClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
+    isDarkTheme: Boolean = false,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
+
+    // 테마에 따른 색상 설정
+    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
+    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
 
     // 에러 메시지 스낵바 표시
     LaunchedEffect(uiState.errorMessage) {
@@ -66,8 +74,8 @@ fun SearchScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // 애니메이션 배경
-        AnimatedGlassBackground()
+        // 테마 인식 애니메이션 배경
+        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
 
         // 메인 콘텐츠
         Scaffold(
@@ -80,8 +88,8 @@ fun SearchScreen(
                         Snackbar(
                             snackbarData = data,
                             shape = RoundedCornerShape(12.dp),
-                            containerColor = GlassCard,
-                            contentColor = TextPrimary
+                            containerColor = snackbarBgColor,
+                            contentColor = snackbarContentColor
                         )
                     }
                 )
@@ -102,7 +110,8 @@ fun SearchScreen(
                 SearchHeader(
                     onBackClick = onBackClick,
                     onClearFilters = viewModel::onClearFilters,
-                    hasFilters = uiState.selectedTypes.isNotEmpty()
+                    hasFilters = uiState.selectedTypes.isNotEmpty(),
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -113,6 +122,7 @@ fun SearchScreen(
                     onTextChange = viewModel::onSearchTextChanged,
                     onSearch = viewModel::onSearch,
                     onClear = { viewModel.onSearchTextChanged("") },
+                    isDarkTheme = isDarkTheme,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
 
@@ -122,6 +132,7 @@ fun SearchScreen(
                 FilterChipRow(
                     selectedTypes = uiState.selectedTypes,
                     onTypeToggle = viewModel::onTypeFilterToggle,
+                    isDarkTheme = isDarkTheme,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
 
@@ -136,13 +147,14 @@ fun SearchScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryNavy,
+                                color = accentColor,
                                 strokeWidth = 2.dp
                             )
                         }
                     } else if (uiState.searchResults.isEmpty() && !uiState.isLoading) {
                         // 결과 없음
                         EmptySearchState(
+                            isDarkTheme = isDarkTheme,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 24.dp)
@@ -161,7 +173,8 @@ fun SearchScreen(
                             ) { capture ->
                                 SearchResultCard(
                                     capture = capture,
-                                    onClick = { onCaptureClick(capture.id) }
+                                    onClick = { onCaptureClick(capture.id) },
+                                    isDarkTheme = isDarkTheme
                                 )
                             }
 
@@ -176,7 +189,7 @@ fun SearchScreen(
                                     ) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(24.dp),
-                                            color = PrimaryNavy,
+                                            color = accentColor,
                                             strokeWidth = 2.dp
                                         )
                                     }
@@ -187,6 +200,7 @@ fun SearchScreen(
                 } else {
                     // 초기 상태 (검색 전)
                     InitialSearchState(
+                        isDarkTheme = isDarkTheme,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 24.dp)
@@ -212,7 +226,8 @@ fun SearchScreen(
                         if (route != NavRoutes.SEARCH) {
                             onNavigate(route)
                         }
-                    }
+                    },
+                    isDarkTheme = isDarkTheme
                 )
             }
         }
@@ -228,8 +243,12 @@ private fun SearchHeader(
     onBackClick: () -> Unit,
     onClearFilters: () -> Unit,
     hasFilters: Boolean,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -242,7 +261,7 @@ private fun SearchHeader(
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "뒤로가기",
-                tint = TextPrimary
+                tint = textPrimaryColor
             )
         }
 
@@ -251,7 +270,7 @@ private fun SearchHeader(
             text = "Search",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = TextPrimary,
+            color = textPrimaryColor,
             letterSpacing = 0.3.sp
         )
 
@@ -262,7 +281,7 @@ private fun SearchHeader(
                     text = "초기화",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextTertiary
+                    color = textTertiaryColor
                 )
             }
         } else {
@@ -277,8 +296,11 @@ private fun SearchHeader(
  */
 @Composable
 private fun InitialSearchState(
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -290,14 +312,14 @@ private fun InitialSearchState(
             Icon(
                 imageVector = Icons.Default.FilterList,
                 contentDescription = null,
-                tint = TextTertiary.copy(alpha = 0.5f),
+                tint = textTertiaryColor.copy(alpha = 0.5f),
                 modifier = Modifier.size(64.dp)
             )
             Text(
                 text = "캡처를 검색하세요",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = TextTertiary,
+                color = textTertiaryColor,
                 letterSpacing = 0.2.sp
             )
         }
@@ -309,8 +331,11 @@ private fun InitialSearchState(
  */
 @Composable
 private fun EmptySearchState(
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -327,14 +352,14 @@ private fun EmptySearchState(
                 text = "검색 결과가 없습니다",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = TextTertiary,
+                color = textTertiaryColor,
                 letterSpacing = 0.2.sp
             )
             Text(
                 text = "다른 검색어나 필터를 시도해보세요",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
-                color = TextTertiary.copy(alpha = 0.7f),
+                color = textTertiaryColor.copy(alpha = 0.7f),
                 letterSpacing = 0.2.sp
             )
         }

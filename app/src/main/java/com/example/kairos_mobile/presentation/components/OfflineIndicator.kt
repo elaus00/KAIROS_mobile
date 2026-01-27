@@ -15,9 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassPanel
-import com.example.kairos_mobile.ui.theme.TextMuted
-import com.example.kairos_mobile.ui.theme.WarningColor
+import com.example.kairos_mobile.ui.components.glassPanelThemed
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 글래스모피즘 스타일의 오프라인 인디케이터
@@ -26,11 +25,16 @@ import com.example.kairos_mobile.ui.theme.WarningColor
 @Composable
 fun OfflineIndicator(
     count: Int,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textColor = if (isDarkTheme) TextMuted else AiryTextSecondary
+    val warningColor = if (isDarkTheme) WarningColor else AiryWarningColor
+
     Row(
         modifier = modifier
-            .glassPanel(shape = RoundedCornerShape(24.dp))
+            .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(24.dp))
             .padding(horizontal = 16.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -38,14 +42,14 @@ fun OfflineIndicator(
         Icon(
             imageVector = Icons.Default.CloudQueue,
             contentDescription = "동기화 대기",
-            tint = WarningColor,
+            tint = warningColor,
             modifier = Modifier.size(18.dp)
         )
         Text(
             text = "동기화 대기: ${count}개",
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = TextMuted
+            color = textColor
         )
     }
 }

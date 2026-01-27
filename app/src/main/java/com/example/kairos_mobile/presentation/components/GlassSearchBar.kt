@@ -15,7 +15,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassCard
+import com.example.kairos_mobile.ui.components.glassCardThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -28,12 +28,20 @@ fun GlassSearchBar(
     onSearch: () -> Unit,
     onClear: () -> Unit,
     placeholder: String = "캡처 검색…",
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val cursorColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val buttonBgColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val buttonContentColor = if (isDarkTheme) TextPrimary else androidx.compose.ui.graphics.Color.White
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .glassCard()
+            .glassCardThemed(isDarkTheme = isDarkTheme)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -42,7 +50,7 @@ fun GlassSearchBar(
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "검색",
-            tint = TextTertiary,
+            tint = textTertiaryColor,
             modifier = Modifier.size(20.dp)
         )
 
@@ -51,12 +59,12 @@ fun GlassSearchBar(
             value = text,
             onValueChange = onTextChange,
             textStyle = TextStyle(
-                color = TextPrimary,
+                color = textPrimaryColor,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 letterSpacing = 0.3.sp
             ),
-            cursorBrush = SolidColor(PrimaryNavy.copy(alpha = 0.8f)),
+            cursorBrush = SolidColor(cursorColor.copy(alpha = 0.8f)),
             modifier = Modifier.weight(1f),
             singleLine = true,
             decorationBox = { innerTextField ->
@@ -65,7 +73,7 @@ fun GlassSearchBar(
                         Text(
                             text = placeholder,
                             style = TextStyle(
-                                color = TextTertiary,
+                                color = textTertiaryColor,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
                                 letterSpacing = 0.3.sp
@@ -86,7 +94,7 @@ fun GlassSearchBar(
                 Icon(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "지우기",
-                    tint = TextTertiary,
+                    tint = textTertiaryColor,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -97,10 +105,10 @@ fun GlassSearchBar(
             onClick = onSearch,
             enabled = text.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryNavy,
-                contentColor = TextPrimary,
-                disabledContainerColor = PrimaryNavy.copy(alpha = 0.45f),
-                disabledContentColor = TextPrimary.copy(alpha = 0.45f)
+                containerColor = buttonBgColor,
+                contentColor = buttonContentColor,
+                disabledContainerColor = buttonBgColor.copy(alpha = 0.45f),
+                disabledContentColor = buttonContentColor.copy(alpha = 0.45f)
             ),
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),

@@ -14,10 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassCard
-import com.example.kairos_mobile.ui.theme.PrimaryNavy
-import com.example.kairos_mobile.ui.theme.TextPrimary
-import com.example.kairos_mobile.ui.theme.TextTertiary
+import com.example.kairos_mobile.ui.components.glassCardThemed
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 글래스모피즘 스타일의 설정 스위치 컴포넌트
@@ -29,12 +27,18 @@ fun SwitchPreference(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isDarkTheme: Boolean = false
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .glassCard()
+            .glassCardThemed(isDarkTheme = isDarkTheme)
             .clickable(enabled = enabled) { onCheckedChange(!checked) }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -46,14 +50,14 @@ fun SwitchPreference(
                 text = title,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = if (enabled) TextPrimary else TextPrimary.copy(alpha = 0.4f),
+                color = if (enabled) textPrimaryColor else textPrimaryColor.copy(alpha = 0.4f),
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
                 text = description,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Light,
-                color = if (enabled) TextTertiary else TextTertiary.copy(alpha = 0.4f)
+                color = if (enabled) textTertiaryColor else textTertiaryColor.copy(alpha = 0.4f)
             )
         }
 
@@ -63,10 +67,10 @@ fun SwitchPreference(
             enabled = enabled,
             modifier = Modifier.padding(start = 12.dp),
             colors = SwitchDefaults.colors(
-                checkedThumbColor = TextPrimary,
-                checkedTrackColor = PrimaryNavy.copy(alpha = 0.6f),
-                uncheckedThumbColor = TextTertiary,
-                uncheckedTrackColor = TextTertiary.copy(alpha = 0.2f)
+                checkedThumbColor = if (isDarkTheme) TextPrimary else androidx.compose.ui.graphics.Color.White,
+                checkedTrackColor = accentColor.copy(alpha = 0.6f),
+                uncheckedThumbColor = textTertiaryColor,
+                uncheckedTrackColor = textTertiaryColor.copy(alpha = 0.2f)
             )
         )
     }

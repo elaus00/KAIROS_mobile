@@ -25,13 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassCard
-import com.example.kairos_mobile.ui.theme.ErrorColor
-import com.example.kairos_mobile.ui.theme.PrimaryNavy
-import com.example.kairos_mobile.ui.theme.SuccessColor
-import com.example.kairos_mobile.ui.theme.TextPrimary
-import com.example.kairos_mobile.ui.theme.TextQuaternary
-import com.example.kairos_mobile.ui.theme.TextTertiary
+import com.example.kairos_mobile.ui.components.glassCardThemed
+import com.example.kairos_mobile.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,12 +45,22 @@ fun IntegrationCard(
     onDisconnect: () -> Unit,
     onSync: () -> Unit,
     isLoading: Boolean,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val textQuaternaryColor = if (isDarkTheme) TextQuaternary else AiryTextQuaternary
+    val successColor = if (isDarkTheme) SuccessColor else AirySuccessColor
+    val errorColor = if (isDarkTheme) ErrorColor else AiryErrorColor
+    val buttonBgColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val buttonContentColor = if (isDarkTheme) TextPrimary else androidx.compose.ui.graphics.Color.White
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .glassCard()
+            .glassCardThemed(isDarkTheme = isDarkTheme)
             .padding(20.dp)
     ) {
         // 헤더: 타이틀 + 연결 상태
@@ -69,14 +74,14 @@ fun IntegrationCard(
                     text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary,
+                    color = textPrimaryColor,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
                     text = description,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,
-                    color = TextTertiary
+                    color = textTertiaryColor
                 )
             }
 
@@ -84,7 +89,7 @@ fun IntegrationCard(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "연동됨",
-                    tint = SuccessColor,
+                    tint = successColor,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -100,7 +105,7 @@ fun IntegrationCard(
                         text = "마지막 동기화: ${formatTimestamp(lastSyncTime)}",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Light,
-                        color = TextQuaternary
+                        color = textQuaternaryColor
                     )
                 }
 
@@ -109,7 +114,7 @@ fun IntegrationCard(
                         text = "동기화된 항목: ${syncedCount}개",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Light,
-                        color = TextQuaternary,
+                        color = textQuaternaryColor,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -128,7 +133,7 @@ fun IntegrationCard(
                 CircularProgressIndicator(
                     modifier = Modifier.size(18.dp),
                     strokeWidth = 2.dp,
-                    color = TextTertiary
+                    color = textTertiaryColor
                 )
             } else if (isConnected) {
                 // 연동된 상태: 동기화 + 연동 해제 버튼
@@ -140,7 +145,7 @@ fun IntegrationCard(
                         text = "동기화",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = TextTertiary
+                        color = textTertiaryColor
                     )
                 }
 
@@ -154,7 +159,7 @@ fun IntegrationCard(
                         text = "해제",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = ErrorColor
+                        color = errorColor
                     )
                 }
             } else {
@@ -163,8 +168,8 @@ fun IntegrationCard(
                     onClick = onConnect,
                     modifier = Modifier.height(32.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryNavy,
-                        contentColor = TextPrimary
+                        containerColor = buttonBgColor,
+                        contentColor = buttonContentColor
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {

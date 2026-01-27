@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.ui.components.glassButton
+import com.example.kairos_mobile.ui.components.glassButtonThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -23,6 +23,7 @@ import com.example.kairos_mobile.ui.theme.*
 fun FilterChipRow(
     selectedTypes: Set<CaptureType>,
     onTypeToggle: (CaptureType) -> Unit,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -37,7 +38,8 @@ fun FilterChipRow(
             FilterChip(
                 type = type,
                 isSelected = type in selectedTypes,
-                onClick = { onTypeToggle(type) }
+                onClick = { onTypeToggle(type) },
+                isDarkTheme = isDarkTheme
             )
         }
     }
@@ -51,24 +53,28 @@ private fun FilterChip(
     type: CaptureType,
     isSelected: Boolean,
     onClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val typeColor = getThemedTypeColor(type, isDarkTheme)
+    val unselectedColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     val backgroundColor = if (isSelected) {
-        type.getColor().copy(alpha = 0.2f)
+        typeColor.copy(alpha = 0.2f)
     } else {
         Color.Transparent
     }
 
     val textColor = if (isSelected) {
-        type.getColor()
+        typeColor
     } else {
-        TextTertiary
+        unselectedColor
     }
 
     Button(
         onClick = onClick,
         modifier = modifier
-            .glassButton(shape = RoundedCornerShape(20.dp))
+            .glassButtonThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(20.dp))
             .height(36.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
@@ -82,5 +88,22 @@ private fun FilterChip(
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
             letterSpacing = 0.2.sp
         )
+    }
+}
+
+/**
+ * 테마에 따른 타입 색상 반환
+ */
+private fun getThemedTypeColor(type: CaptureType, isDarkTheme: Boolean): Color {
+    return if (isDarkTheme) {
+        type.getColor()
+    } else {
+        when (type) {
+            CaptureType.IDEA -> AiryIdeaColor
+            CaptureType.SCHEDULE -> AiryMeetingColor
+            CaptureType.TODO -> AiryTodoColor
+            CaptureType.NOTE -> AirySaveColor
+            CaptureType.QUICK_NOTE -> AiryTextTertiary
+        }
     }
 }

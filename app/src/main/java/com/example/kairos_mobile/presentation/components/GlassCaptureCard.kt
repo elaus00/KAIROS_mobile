@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.presentation.capture.CaptureMode
-import com.example.kairos_mobile.ui.components.glassButton
-import com.example.kairos_mobile.ui.components.glassCard
+import com.example.kairos_mobile.ui.components.glassButtonThemed
+import com.example.kairos_mobile.ui.components.glassCardThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -44,12 +44,19 @@ fun GlassCaptureCard(
     onQuickTypeSelected: (CaptureType) -> Unit = {},
     enabled: Boolean = true,
     isLoading: Boolean = false,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val cursorColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val dividerColor = if (isDarkTheme) GlassBorderDim else AiryGlassBorder
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .glassCard()
+            .glassCardThemed(isDarkTheme = isDarkTheme)
             .padding(28.dp)
     ) {
         // 텍스트 입력 영역
@@ -58,13 +65,13 @@ fun GlassCaptureCard(
             onValueChange = onTextChange,
             enabled = enabled && !isLoading,
             textStyle = TextStyle(
-                color = TextPrimary,
+                color = textPrimaryColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Light,
                 lineHeight = 28.sp,
                 letterSpacing = 0.3.sp
             ),
-            cursorBrush = SolidColor(PrimaryNavy.copy(alpha = 0.8f)),
+            cursorBrush = SolidColor(cursorColor.copy(alpha = 0.8f)),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(160.dp),
@@ -76,7 +83,7 @@ fun GlassCaptureCard(
                         Text(
                             text = "무엇이든 캡처하세요…",
                             style = TextStyle(
-                                color = TextTertiary,
+                                color = textTertiaryColor,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Light,
                                 lineHeight = 28.sp,
@@ -97,8 +104,8 @@ fun GlassCaptureCard(
         ) {
             Column {
                 // 섬세한 구분선
-                Divider(
-                    color = GlassBorderDim,
+                HorizontalDivider(
+                    color = dividerColor,
                     thickness = 0.8.dp,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
@@ -115,7 +122,8 @@ fun GlassCaptureCard(
                         QuickTypeButton(
                             icon = getIconForType(type),
                             label = getLabelForType(type),
-                            onClick = { onQuickTypeSelected(type) }
+                            onClick = { onQuickTypeSelected(type) },
+                            isDarkTheme = isDarkTheme
                         )
                     }
                 }
@@ -123,8 +131,8 @@ fun GlassCaptureCard(
         }
 
         // 섬세한 구분선
-        Divider(
-            color = GlassBorderDim,
+        HorizontalDivider(
+            color = dividerColor,
             thickness = 0.8.dp,
             modifier = Modifier.padding(vertical = 20.dp)
         )
@@ -139,18 +147,22 @@ fun GlassCaptureCard(
             GlassModeButton(
                 icon = Icons.Default.Image,
                 contentDescription = "이미지",
-                onClick = { onModeSelected(CaptureMode.IMAGE) }
+                onClick = { onModeSelected(CaptureMode.IMAGE) },
+                isDarkTheme = isDarkTheme
             )
 
-            // Capture 버튼
+            // Capture 버튼 (테마에 따른 색상)
+            val buttonBgColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+            val buttonContentColor = if (isDarkTheme) TextPrimary else androidx.compose.ui.graphics.Color.White
+
             Button(
                 onClick = onSubmit,
                 enabled = enabled && text.isNotBlank() && !isLoading,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryNavy,
-                    contentColor = TextPrimary,
-                    disabledContainerColor = PrimaryNavy.copy(alpha = 0.45f),
-                    disabledContentColor = TextPrimary.copy(alpha = 0.45f)
+                    containerColor = buttonBgColor,
+                    contentColor = buttonContentColor,
+                    disabledContainerColor = buttonBgColor.copy(alpha = 0.45f),
+                    disabledContentColor = buttonContentColor.copy(alpha = 0.45f)
                 ),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp),
@@ -159,7 +171,7 @@ fun GlassCaptureCard(
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(14.dp),
-                        color = TextPrimary,
+                        color = buttonContentColor,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -193,18 +205,21 @@ private fun GlassModeButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val iconTint = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     IconButton(
         onClick = onClick,
         modifier = modifier
             .size(34.dp)
-            .glassButton(shape = RoundedCornerShape(50))
+            .glassButtonThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(50))
     ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = TextTertiary,
+            tint = iconTint,
             modifier = Modifier.size(16.dp)
         )
     }
@@ -218,16 +233,19 @@ private fun QuickTypeButton(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val contentColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Button(
         onClick = onClick,
         modifier = modifier
-            .glassButton(shape = RoundedCornerShape(10.dp))
+            .glassButtonThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(10.dp))
             .height(34.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            contentColor = TextTertiary
+            contentColor = contentColor
         ),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
     ) {
@@ -238,14 +256,14 @@ private fun QuickTypeButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = TextTertiary,
+                tint = contentColor,
                 modifier = Modifier.size(16.dp)
             )
             Text(
                 text = label,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = TextTertiary,
+                color = contentColor,
                 letterSpacing = 0.2.sp
             )
         }

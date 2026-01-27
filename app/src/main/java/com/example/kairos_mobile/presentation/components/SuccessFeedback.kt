@@ -24,11 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassCard
-import com.example.kairos_mobile.ui.theme.SuccessColor
-import com.example.kairos_mobile.ui.theme.TextPrimary
-import com.example.kairos_mobile.ui.theme.TextTertiary
-import com.example.kairos_mobile.ui.theme.WarningColor
+import com.example.kairos_mobile.ui.components.glassCardThemed
+import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 글래스모피즘 스타일의 성공 피드백 애니메이션
@@ -36,8 +33,15 @@ import com.example.kairos_mobile.ui.theme.WarningColor
 @Composable
 fun SuccessFeedback(
     isOffline: Boolean,
+    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // 테마에 따른 색상 설정
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val successColor = if (isDarkTheme) SuccessColor else AirySuccessColor
+    val warningColor = if (isDarkTheme) WarningColor else AiryWarningColor
+
     AnimatedVisibility(
         visible = true,
         enter = fadeIn(animationSpec = tween(300)) + scaleIn(animationSpec = tween(300)),
@@ -46,7 +50,7 @@ fun SuccessFeedback(
     ) {
         Box(
             modifier = Modifier
-                .glassCard()
+                .glassCardThemed(isDarkTheme = isDarkTheme)
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -56,7 +60,7 @@ fun SuccessFeedback(
                 Icon(
                     imageVector = if (isOffline) Icons.Default.CloudOff else Icons.Default.CheckCircle,
                     contentDescription = if (isOffline) "오프라인 저장됨" else "성공",
-                    tint = if (isOffline) WarningColor else SuccessColor,
+                    tint = if (isOffline) warningColor else successColor,
                     modifier = Modifier.size(56.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -64,7 +68,7 @@ fun SuccessFeedback(
                     text = if (isOffline) "오프라인 저장됨" else "저장 완료!",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextPrimary
+                    color = textPrimaryColor
                 )
                 if (isOffline) {
                     Spacer(modifier = Modifier.height(6.dp))
@@ -72,7 +76,7 @@ fun SuccessFeedback(
                         text = "네트워크 연결 시 자동 동기화됩니다",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light,
-                        color = TextTertiary
+                        color = textTertiaryColor
                     )
                 }
             }

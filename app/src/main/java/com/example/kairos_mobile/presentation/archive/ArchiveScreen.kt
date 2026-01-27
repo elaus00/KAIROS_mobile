@@ -22,7 +22,7 @@ import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.ArchiveCaptureCard
 import com.example.kairos_mobile.presentation.components.GlassBottomNavigation
 import com.example.kairos_mobile.presentation.components.NavigationTab
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
+import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
@@ -34,11 +34,19 @@ fun ArchiveScreen(
     onBackClick: () -> Unit,
     onCaptureClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
+    isDarkTheme: Boolean = false,
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
+
+    // 테마에 따른 색상 설정
+    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
+    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
 
     // 에러 메시지 스낵바 표시
     LaunchedEffect(uiState.errorMessage) {
@@ -54,8 +62,8 @@ fun ArchiveScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // 애니메이션 배경
-        AnimatedGlassBackground()
+        // 테마 인식 애니메이션 배경
+        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
 
         // 메인 콘텐츠
         Scaffold(
@@ -68,8 +76,8 @@ fun ArchiveScreen(
                         Snackbar(
                             snackbarData = data,
                             shape = RoundedCornerShape(12.dp),
-                            containerColor = GlassCard,
-                            contentColor = TextPrimary
+                            containerColor = snackbarBgColor,
+                            contentColor = snackbarContentColor
                         )
                     }
                 )
@@ -89,7 +97,8 @@ fun ArchiveScreen(
                 // 헤더
                 ArchiveHeader(
                     onBackClick = onBackClick,
-                    onRefreshClick = viewModel::onRefresh
+                    onRefreshClick = viewModel::onRefresh,
+                    isDarkTheme = isDarkTheme
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -102,13 +111,14 @@ fun ArchiveScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryNavy,
+                            color = accentColor,
                             strokeWidth = 2.dp
                         )
                     }
                 } else if (uiState.groupedCaptures.isEmpty() && !uiState.isLoading) {
                     // 빈 상태
                     EmptyArchiveState(
+                        isDarkTheme = isDarkTheme,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 24.dp)
@@ -124,7 +134,7 @@ fun ArchiveScreen(
                         uiState.groupedCaptures.forEach { (dateGroup, captures) ->
                             // 날짜 헤더
                             item(key = "header_$dateGroup") {
-                                DateGroupHeader(dateGroup = dateGroup)
+                                DateGroupHeader(dateGroup = dateGroup, isDarkTheme = isDarkTheme)
                             }
 
                             // 해당 날짜의 캡처들
@@ -136,7 +146,8 @@ fun ArchiveScreen(
                                     capture = capture,
                                     isExpanded = capture.id in uiState.expandedCaptureIds,
                                     onToggleExpand = { viewModel.onToggleExpand(capture.id) },
-                                    onCaptureClick = { onCaptureClick(capture.id) }
+                                    onCaptureClick = { onCaptureClick(capture.id) },
+                                    isDarkTheme = isDarkTheme
                                 )
                             }
                         }
@@ -152,7 +163,7 @@ fun ArchiveScreen(
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(24.dp),
-                                        color = PrimaryNavy,
+                                        color = accentColor,
                                         strokeWidth = 2.dp
                                     )
                                 }
@@ -180,7 +191,8 @@ fun ArchiveScreen(
                         if (route != NavRoutes.ARCHIVE) {
                             onNavigate(route)
                         }
-                    }
+                    },
+                    isDarkTheme = isDarkTheme
                 )
             }
         }
@@ -195,8 +207,11 @@ fun ArchiveScreen(
 private fun ArchiveHeader(
     onBackClick: () -> Unit,
     onRefreshClick: () -> Unit,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -209,7 +224,7 @@ private fun ArchiveHeader(
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "뒤로가기",
-                tint = TextPrimary
+                tint = textPrimaryColor
             )
         }
 
@@ -218,7 +233,7 @@ private fun ArchiveHeader(
             text = "History",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = TextPrimary,
+            color = textPrimaryColor,
             letterSpacing = 0.3.sp
         )
 
@@ -227,7 +242,7 @@ private fun ArchiveHeader(
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = "새로고침",
-                tint = TextPrimary
+                tint = textPrimaryColor
             )
         }
     }
@@ -239,13 +254,16 @@ private fun ArchiveHeader(
 @Composable
 private fun DateGroupHeader(
     dateGroup: String,
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+
     Text(
         text = dateGroup,
         fontSize = 15.sp,
         fontWeight = FontWeight.SemiBold,
-        color = TextPrimary,
+        color = textPrimaryColor,
         letterSpacing = 0.3.sp,
         modifier = modifier.padding(vertical = 8.dp)
     )
@@ -256,8 +274,11 @@ private fun DateGroupHeader(
  */
 @Composable
 private fun EmptyArchiveState(
+    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -269,21 +290,21 @@ private fun EmptyArchiveState(
             Icon(
                 imageVector = Icons.Default.History,
                 contentDescription = null,
-                tint = TextTertiary.copy(alpha = 0.5f),
+                tint = textTertiaryColor.copy(alpha = 0.5f),
                 modifier = Modifier.size(64.dp)
             )
             Text(
                 text = "저장된 캡처가 없습니다",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = TextTertiary,
+                color = textTertiaryColor,
                 letterSpacing = 0.2.sp
             )
             Text(
                 text = "캡처를 시작하여 히스토리를 만들어보세요",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
-                color = TextTertiary.copy(alpha = 0.7f),
+                color = textTertiaryColor.copy(alpha = 0.7f),
                 letterSpacing = 0.2.sp
             )
         }

@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -45,36 +46,36 @@ private val GlassmorphismDarkColorScheme = darkColorScheme(
 )
 
 /**
- * Glassmorphism Light Color Scheme
- * 네이비 포인트 + 밝은 배경 기반
+ * Glassmorphism Light Color Scheme - Airy Design
+ * 밝고 가벼운 에어리 디자인 (파스텔 그라데이션 기반)
  */
 private val GlassmorphismLightColorScheme = lightColorScheme(
-    primary = PrimaryNavy,
-    onPrimary = LightTextPrimary,
-    primaryContainer = PrimaryNavyLight,
-    onPrimaryContainer = LightTextPrimary,
+    primary = AiryAccentBlue,
+    onPrimary = Color.White,
+    primaryContainer = AiryAccentBlueLight,
+    onPrimaryContainer = AiryTextPrimary,
 
-    secondary = LightGlassButton,
-    onSecondary = LightTextSecondary,
-    secondaryContainer = LightGlassButtonHover,
-    onSecondaryContainer = LightTextSecondary,
+    secondary = AiryGlassCard,
+    onSecondary = AiryTextSecondary,
+    secondaryContainer = AiryGlassPanel,
+    onSecondaryContainer = AiryTextSecondary,
 
-    tertiary = IdeaColor,
-    onTertiary = LightBackground,
+    tertiary = AiryIdeaColor,
+    onTertiary = Color.White,
 
-    background = LightBackground,
-    onBackground = LightTextPrimary,
+    background = AiryGradientStart,
+    onBackground = AiryTextPrimary,
 
-    surface = LightGlassSurface,
-    onSurface = LightTextPrimary,
-    surfaceVariant = LightGlassCard,
-    onSurfaceVariant = LightTextSecondary,
+    surface = AiryGlassCard,
+    onSurface = AiryTextPrimary,
+    surfaceVariant = AiryGlassPanel,
+    onSurfaceVariant = AiryTextSecondary,
 
-    error = ErrorColor,
-    onError = TextPrimary,
+    error = AiryErrorColor,
+    onError = Color.White,
 
-    outline = LightGlassBorder,
-    outlineVariant = LightGlassBorderDim
+    outline = AiryGlassBorder,
+    outlineVariant = AiryGlassBorderStrong
 )
 
 /**
@@ -83,7 +84,7 @@ private val GlassmorphismLightColorScheme = lightColorScheme(
  */
 @Composable
 fun KAIROS_mobileTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = false,  // 기본값을 라이트 테마로 변경 (에어리 디자인)
     content: @Composable () -> Unit
 ) {
     // 테마에 따라 색상 스킴 선택
