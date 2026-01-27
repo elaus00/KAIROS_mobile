@@ -11,9 +11,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.domain.model.ThemePreference
-import com.example.kairos_mobile.domain.usecase.GetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.navigation.KairosNavGraph
-import com.example.kairos_mobile.navigation.OAuthCallback
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,9 +32,6 @@ class MainActivity : ComponentActivity() {
         // M07: 공유 인텐트 처리
         val sharedContent = handleShareIntent(intent)
 
-        // Phase 3: OAuth 콜백 처리
-        val oAuthCallback = handleOAuthCallback(intent)
-
         enableEdgeToEdge()
         setContent {
             // 테마 설정 수집
@@ -46,8 +42,7 @@ class MainActivity : ComponentActivity() {
                 KairosNavGraph(
                     navController = rememberNavController(),
                     sharedText = sharedContent?.text,
-                    sharedImageUri = sharedContent?.imageUri,
-                    oAuthCallback = oAuthCallback
+                    sharedImageUri = sharedContent?.imageUri
                 )
             }
         }
@@ -59,10 +54,8 @@ class MainActivity : ComponentActivity() {
 
         // 새로운 공유 인텐트 수신 시 화면 재구성
         val sharedContent = handleShareIntent(intent)
-        // OAuth 콜백도 처리
-        val oAuthCallback = handleOAuthCallback(intent)
 
-        if (sharedContent != null || oAuthCallback != null) {
+        if (sharedContent != null) {
             recreate()
         }
     }
@@ -93,34 +86,6 @@ class MainActivity : ComponentActivity() {
             }
             else -> null
         }
-    }
-
-    /**
-     * Phase 3: OAuth 콜백 Deep Link 처리
-     * kairos://oauth/google?code=xxx&state=xxx
-     * kairos://oauth/todoist?code=xxx&state=xxx
-     */
-    private fun handleOAuthCallback(intent: Intent?): OAuthCallback? {
-        if (intent?.action != Intent.ACTION_VIEW) {
-            return null
-        }
-
-        val uri = intent.data ?: return null
-
-        // kairos://oauth/xxx 형식인지 확인
-        if (uri.scheme != "kairos" || uri.host != "oauth") {
-            return null
-        }
-
-        val provider = uri.pathSegments.firstOrNull() ?: return null
-        val code = uri.getQueryParameter("code") ?: return null
-        val state = uri.getQueryParameter("state")
-
-        return OAuthCallback(
-            provider = provider,
-            code = code,
-            state = state
-        )
     }
 
     /**

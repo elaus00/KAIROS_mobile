@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.presentation.archive.ArchiveScreen
-import com.example.kairos_mobile.presentation.capture.CaptureScreen
+import com.example.kairos_mobile.presentation.insight.InsightScreen
 import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
@@ -18,7 +18,7 @@ import com.example.kairos_mobile.presentation.settings.SettingsScreen
  * Navigation 경로 정의
  */
 object NavRoutes {
-    const val CAPTURE = "capture"
+    const val INSIGHT = "insight"
     const val SEARCH = "search"
     const val ARCHIVE = "archive"
     const val SETTINGS = "settings"
@@ -32,18 +32,17 @@ object NavRoutes {
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
     sharedText: String? = null,
-    sharedImageUri: Uri? = null,
-    oAuthCallback: OAuthCallback? = null
+    sharedImageUri: Uri? = null
 ) {
     // 공통 탭 네비게이션 함수
     val navigateToTab: (String) -> Unit = { route ->
-        if (route == NavRoutes.CAPTURE) {
-            // CAPTURE로 이동할 때는 popBackStack으로 시작 화면으로 돌아감
-            navController.popBackStack(NavRoutes.CAPTURE, inclusive = false)
+        if (route == NavRoutes.INSIGHT) {
+            // INSIGHT로 이동할 때는 popBackStack으로 시작 화면으로 돌아감
+            navController.popBackStack(NavRoutes.INSIGHT, inclusive = false)
         } else {
             navController.navigate(route) {
                 // 시작 화면까지 pop하여 백스택 정리
-                popUpTo(NavRoutes.CAPTURE) { saveState = true }
+                popUpTo(NavRoutes.INSIGHT) { saveState = true }
                 launchSingleTop = true
                 restoreState = true
             }
@@ -52,16 +51,16 @@ fun KairosNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.CAPTURE,
+        startDestination = NavRoutes.INSIGHT,
         // 페이지 전환 애니메이션 제거
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        // 캡처 화면
-        composable(NavRoutes.CAPTURE) {
-            CaptureScreen(
+        // 인사이트 화면
+        composable(NavRoutes.INSIGHT) {
+            InsightScreen(
                 sharedText = sharedText,
                 sharedImageUri = sharedImageUri,
                 onNavigate = navigateToTab
@@ -74,8 +73,8 @@ fun KairosNavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onCaptureClick = { captureId ->
-                    // TODO: 캡처 상세 화면으로 이동
+                onInsightClick = { _ ->
+                    // TODO: 인사이트 상세 화면으로 이동
                 },
                 onNavigate = navigateToTab
             )
@@ -87,8 +86,8 @@ fun KairosNavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onCaptureClick = { captureId ->
-                    // TODO: 캡처 상세 화면으로 이동
+                onInsightClick = { _ ->
+                    // TODO: 인사이트 상세 화면으로 이동
                 },
                 onNavigate = navigateToTab
             )
@@ -100,9 +99,9 @@ fun KairosNavGraph(
                 onBack = {
                     navController.popBackStack()
                 },
-                onNotificationClick = { captureId ->
-                    // TODO: 캡처 상세 화면으로 이동 (현재는 뒤로가기)
-                    if (captureId != null) {
+                onNotificationClick = { insightId ->
+                    // TODO: 인사이트 상세 화면으로 이동 (현재는 뒤로가기)
+                    if (insightId != null) {
                         // 나중에 상세 화면 구현 시 네비게이션 추가
                     }
                     navController.popBackStack()
@@ -121,13 +120,3 @@ fun KairosNavGraph(
         }
     }
 }
-
-/**
- * OAuth 콜백 정보
- * Deep Link로 전달된 OAuth 인증 결과
- */
-data class OAuthCallback(
-    val provider: String,  // "google" or "todoist"
-    val code: String,
-    val state: String?
-)

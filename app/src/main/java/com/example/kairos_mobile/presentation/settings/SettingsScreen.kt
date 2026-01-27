@@ -1,8 +1,5 @@
 package com.example.kairos_mobile.presentation.settings
 
-import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,16 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.navigation.NavRoutes
-import com.example.kairos_mobile.presentation.components.GlassBottomNavigation
-import com.example.kairos_mobile.presentation.components.IntegrationCard
-import com.example.kairos_mobile.presentation.components.NavigationTab
-import com.example.kairos_mobile.presentation.components.SwitchPreference
+import com.example.kairos_mobile.presentation.components.common.GlassBottomNavigation
+import com.example.kairos_mobile.presentation.components.common.NavigationTab
+import com.example.kairos_mobile.presentation.components.settings.SwitchPreference
 import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
 import com.example.kairos_mobile.ui.components.glassButtonThemed
 import com.example.kairos_mobile.ui.theme.*
@@ -59,7 +54,6 @@ fun SettingsScreen(
     isDarkTheme: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     // 테마에 따른 색상 설정
@@ -72,17 +66,6 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                is SettingsEvent.OpenOAuthUrl -> {
-                    // Chrome Custom Tab으로 OAuth URL 열기
-                    try {
-                        val customTabsIntent = CustomTabsIntent.Builder().build()
-                        customTabsIntent.launchUrl(context, Uri.parse(event.url))
-                    } catch (e: Exception) {
-                        // Chrome Custom Tab 사용 불가 시 기본 브라우저로 열기
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.url))
-                        context.startActivity(intent)
-                    }
-                }
                 is SettingsEvent.ShowError -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
@@ -140,181 +123,119 @@ fun SettingsScreen(
                         .padding(horizontal = 20.dp)
                         .padding(top = 20.dp, bottom = 140.dp) // 하단 네비게이션 공간 확보
                 ) {
-                // ========== 외부 서비스 연동 섹션 ==========
-                Text(
-                    text = "외부 서비스 연동",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = textPrimaryColor,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                    // ========== AI 기능 설정 섹션 ==========
+                    Text(
+                        text = "AI 기능",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = textPrimaryColor,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
 
-                Text(
-                    text = "캡처한 내용을 외부 서비스와 자동으로 동기화합니다",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Light,
-                    color = textTertiaryColor,
-                    modifier = Modifier.padding(bottom = 20.dp)
-                )
+                    Text(
+                        text = "AI 기반 자동 처리 기능을 설정합니다",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Light,
+                        color = textTertiaryColor,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                // M11: Google Calendar 연동
-                IntegrationCard(
-                    title = "Google Calendar",
-                    description = "SCHEDULE 타입 캡처를 캘린더에 자동 등록",
-                    isConnected = uiState.googleCalendarConnected,
-                    lastSyncTime = uiState.googleLastSyncTime,
-                    syncedCount = uiState.googleSyncedCount,
-                    onConnect = viewModel::connectGoogleCalendar,
-                    onDisconnect = viewModel::disconnectGoogleCalendar,
-                    onSync = viewModel::syncGoogleCalendar,
-                    isLoading = uiState.isGoogleLoading,
-                    isDarkTheme = isDarkTheme
-                )
+                    // M09: 자동 요약
+                    SwitchPreference(
+                        title = "자동 요약",
+                        description = "긴 콘텐츠를 AI가 자동으로 요약합니다 (200자 이상)",
+                        checked = uiState.autoSummarizeEnabled,
+                        onCheckedChange = viewModel::toggleAutoSummarize,
+                        isDarkTheme = isDarkTheme
+                    )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                // M12: Todoist 연동
-                IntegrationCard(
-                    title = "Todoist",
-                    description = "TODO 타입 캡처를 태스크로 자동 등록",
-                    isConnected = uiState.todoistConnected,
-                    lastSyncTime = uiState.todoistLastSyncTime,
-                    syncedCount = uiState.todoistSyncedCount,
-                    onConnect = viewModel::connectTodoist,
-                    onDisconnect = viewModel::disconnectTodoist,
-                    onSync = viewModel::syncTodoist,
-                    isLoading = uiState.isTodoistLoading,
-                    isDarkTheme = isDarkTheme
-                )
+                    // M10: 스마트 태그 제안
+                    SwitchPreference(
+                        title = "스마트 태그 제안",
+                        description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
+                        checked = uiState.smartTagsEnabled,
+                        onCheckedChange = viewModel::toggleSmartTags,
+                        isDarkTheme = isDarkTheme
+                    )
 
-                Spacer(modifier = Modifier.height(36.dp))
+                    Spacer(modifier = Modifier.height(36.dp))
 
-                // 구분선
+                    // 구분선
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(1f)
+                            .height(0.8.dp)
+                            .background(
+                                color = dividerColor,
+                                shape = RoundedCornerShape(1.dp)
+                            )
+                    )
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    // ========== 테마 설정 섹션 ==========
+                    Text(
+                        text = "테마",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = textPrimaryColor,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Text(
+                        text = "앱의 테마를 설정합니다",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Light,
+                        color = textTertiaryColor,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    // 다크 모드 전환
+                    SwitchPreference(
+                        title = "다크 모드",
+                        description = "어두운 테마를 사용합니다",
+                        checked = uiState.themePreference == com.example.kairos_mobile.domain.model.ThemePreference.DARK,
+                        onCheckedChange = viewModel::toggleDarkMode,
+                        isDarkTheme = isDarkTheme
+                    )
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    // 앱 정보
+                    Text(
+                        text = "KAIROS Magic Inbox v1.0",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Light,
+                        color = textQuaternaryColor,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                // 하단 네비게이션
                 Box(
                     modifier = Modifier
-                        .fillMaxSize(1f)
-                        .height(0.8.dp)
-                        .background(
-                            color = dividerColor,
-                            shape = RoundedCornerShape(1.dp)
-                        )
-                )
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                // ========== AI 기능 설정 섹션 ==========
-                Text(
-                    text = "AI 기능",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = textPrimaryColor,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Text(
-                    text = "AI 기반 자동 처리 기능을 설정합니다",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Light,
-                    color = textTertiaryColor,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // M09: 자동 요약
-                SwitchPreference(
-                    title = "자동 요약",
-                    description = "긴 콘텐츠를 AI가 자동으로 요약합니다 (200자 이상)",
-                    checked = uiState.autoSummarizeEnabled,
-                    onCheckedChange = viewModel::toggleAutoSummarize,
-                    isDarkTheme = isDarkTheme
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // M10: 스마트 태그 제안
-                SwitchPreference(
-                    title = "스마트 태그 제안",
-                    description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
-                    checked = uiState.smartTagsEnabled,
-                    onCheckedChange = viewModel::toggleSmartTags,
-                    isDarkTheme = isDarkTheme
-                )
-
-                Spacer(modifier = Modifier.height(36.dp))
-
-                // 구분선
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(1f)
-                        .height(0.8.dp)
-                        .background(
-                            color = dividerColor,
-                            shape = RoundedCornerShape(1.dp)
-                        )
-                )
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                // ========== 테마 설정 섹션 ==========
-                Text(
-                    text = "테마",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = textPrimaryColor,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Text(
-                    text = "앱의 테마를 설정합니다",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Light,
-                    color = textTertiaryColor,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // 다크 모드 전환
-                SwitchPreference(
-                    title = "다크 모드",
-                    description = "어두운 테마를 사용합니다",
-                    checked = uiState.themePreference == com.example.kairos_mobile.domain.model.ThemePreference.DARK,
-                    onCheckedChange = viewModel::toggleDarkMode,
-                    isDarkTheme = isDarkTheme
-                )
-
-                Spacer(modifier = Modifier.height(40.dp))
-
-                // 앱 정보
-                Text(
-                    text = "KAIROS Magic Inbox v1.0",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Light,
-                    color = textQuaternaryColor,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp)
+                ) {
+                    GlassBottomNavigation(
+                        selectedTab = NavigationTab.SETTINGS,
+                        onTabSelected = { tab ->
+                            val route = when (tab) {
+                                NavigationTab.INSIGHT -> NavRoutes.INSIGHT
+                                NavigationTab.SEARCH -> NavRoutes.SEARCH
+                                NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
+                                NavigationTab.SETTINGS -> NavRoutes.SETTINGS
+                            }
+                            if (route != NavRoutes.SETTINGS) {
+                                onNavigate(route)
+                            }
+                        },
+                        isDarkTheme = isDarkTheme
+                    )
+                }
             }
-
-            // 하단 네비게이션
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
-            ) {
-                GlassBottomNavigation(
-                    selectedTab = NavigationTab.SETTINGS,
-                    onTabSelected = { tab ->
-                        val route = when (tab) {
-                            NavigationTab.CAPTURE -> NavRoutes.CAPTURE
-                            NavigationTab.SEARCH -> NavRoutes.SEARCH
-                            NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
-                            NavigationTab.SETTINGS -> NavRoutes.SETTINGS
-                        }
-                        if (route != NavRoutes.SETTINGS) {
-                            onNavigate(route)
-                        }
-                    },
-                    isDarkTheme = isDarkTheme
-                )
-            }
-        }
         }
     }
 }
