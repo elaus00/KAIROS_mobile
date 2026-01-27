@@ -3,8 +3,9 @@ package com.example.kairos_mobile.presentation.archive
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.usecase.GetAllCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.insight.GetAllInsightsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ArchiveViewModel @Inject constructor(
-    private val getAllCapturesUseCase: GetAllCapturesUseCase
+    private val getAllInsightsUseCase: GetAllInsightsUseCase
 ) : ViewModel() {
 
     companion object {
@@ -27,29 +28,35 @@ class ArchiveViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ArchiveUiState())
     val uiState: StateFlow<ArchiveUiState> = _uiState.asStateFlow()
 
+    // 중복 구독 방지를 위한 Job 관리
+    private var loadJob: Job? = null
+
     init {
-        loadCapturesGroupedByDate()
+        loadInsightsGroupedByDate()
     }
 
     /**
-     * 날짜별로 그룹화된 캡처 로드
+     * 날짜별로 그룹화된 인사이트 로드
+     * 이전 로드 작업이 있으면 취소하고 새로 시작
      */
-    private fun loadCapturesGroupedByDate() {
-        viewModelScope.launch {
+    private fun loadInsightsGroupedByDate() {
+        // 이전 Job 취소
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             // 로딩 시작
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                getAllCapturesUseCase.getCapturesGroupedByDate()
-                    .collect { groupedCaptures ->
+                getAllInsightsUseCase.getInsightsGroupedByDate()
+                    .collect { groupedInsights ->
                         _uiState.update {
                             it.copy(
-                                groupedCaptures = groupedCaptures,
+                                groupedInsights = groupedInsights,
                                 isLoading = false,
                                 hasMore = false  // 날짜 그룹화는 일단 전체 로드
                             )
                         }
-                        Log.d(TAG, "Loaded ${groupedCaptures.size} date groups")
+                        Log.d(TAG, "Loaded ${groupedInsights.size} date groups")
                     }
             } catch (e: Exception) {
                 _uiState.update {
@@ -58,22 +65,22 @@ class ArchiveViewModel @Inject constructor(
                         errorMessage = e.message ?: "로드 실패"
                     )
                 }
-                Log.e(TAG, "Failed to load grouped captures", e)
+                Log.e(TAG, "Failed to load grouped insights", e)
             }
         }
     }
 
     /**
-     * 캡처 확장/축소 토글
+     * 인사이트 확장/축소 토글
      */
-    fun onToggleExpand(captureId: String) {
+    fun onToggleExpand(insightId: String) {
         _uiState.update { state ->
-            val newExpandedIds = if (captureId in state.expandedCaptureIds) {
-                state.expandedCaptureIds - captureId
+            val newExpandedIds = if (insightId in state.expandedInsightIds) {
+                state.expandedInsightIds - insightId
             } else {
-                state.expandedCaptureIds + captureId
+                state.expandedInsightIds + insightId
             }
-            state.copy(expandedCaptureIds = newExpandedIds)
+            state.copy(expandedInsightIds = newExpandedIds)
         }
     }
 
@@ -81,7 +88,7 @@ class ArchiveViewModel @Inject constructor(
      * 새로고침
      */
     fun onRefresh() {
-        loadCapturesGroupedByDate()
+        loadInsightsGroupedByDate()
     }
 
     /**

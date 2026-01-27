@@ -1,6 +1,6 @@
 package com.example.kairos_mobile.domain.util
 
-import com.example.kairos_mobile.domain.model.CaptureType
+import com.example.kairos_mobile.domain.model.InsightType
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -8,7 +8,7 @@ import org.junit.Test
  * KeywordMatcher 유닛 테스트
  *
  * 테스트 대상:
- * - 키워드 기반 CaptureType 매칭 로직
+ * - 키워드 기반 InsightType 매칭 로직
  * - 한글/영어 키워드 지원
  * - 우선순위 정렬
  */
@@ -49,7 +49,7 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.matchTypes(text)
 
         // Then
-        assertTrue(result.contains(CaptureType.SCHEDULE))
+        assertTrue(result.contains(InsightType.SCHEDULE))
     }
 
     @Test
@@ -65,7 +65,7 @@ class KeywordMatcherTest {
             val result = KeywordMatcher.matchTypes(text)
             assertTrue(
                 "텍스트 '$text'는 SCHEDULE을 포함해야 함",
-                result.contains(CaptureType.SCHEDULE)
+                result.contains(InsightType.SCHEDULE)
             )
         }
     }
@@ -79,7 +79,7 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.matchTypes(text)
 
         // Then
-        assertTrue(result.contains(CaptureType.TODO))
+        assertTrue(result.contains(InsightType.TODO))
     }
 
     @Test
@@ -95,7 +95,7 @@ class KeywordMatcherTest {
             val result = KeywordMatcher.matchTypes(text)
             assertTrue(
                 "텍스트 '$text'는 TODO를 포함해야 함",
-                result.contains(CaptureType.TODO)
+                result.contains(InsightType.TODO)
             )
         }
     }
@@ -109,7 +109,7 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.matchTypes(text)
 
         // Then
-        assertTrue(result.contains(CaptureType.IDEA))
+        assertTrue(result.contains(InsightType.IDEA))
     }
 
     @Test
@@ -124,7 +124,7 @@ class KeywordMatcherTest {
             val result = KeywordMatcher.matchTypes(text)
             assertTrue(
                 "텍스트 '$text'는 IDEA를 포함해야 함",
-                result.contains(CaptureType.IDEA)
+                result.contains(InsightType.IDEA)
             )
         }
     }
@@ -138,16 +138,16 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.matchTypes(text)
 
         // Then
-        assertTrue(result.contains(CaptureType.NOTE))
+        assertTrue(result.contains(InsightType.NOTE))
     }
 
     @Test
     fun `영어 키워드도 정상 매칭`() {
         val testCases = mapOf(
-            "meeting tomorrow at 3pm" to CaptureType.SCHEDULE,
-            "I have an idea for improvement" to CaptureType.IDEA,
-            "todo: finish the report" to CaptureType.TODO,
-            "note this for later" to CaptureType.NOTE
+            "meeting tomorrow at 3pm" to InsightType.SCHEDULE,
+            "I have an idea for improvement" to InsightType.IDEA,
+            "todo: finish the report" to InsightType.TODO,
+            "note this for later" to InsightType.NOTE
         )
 
         testCases.forEach { (text, expectedType) ->
@@ -171,7 +171,7 @@ class KeywordMatcherTest {
             val result = KeywordMatcher.matchTypes(text)
             assertTrue(
                 "텍스트 '$text'는 SCHEDULE을 포함해야 함",
-                result.contains(CaptureType.SCHEDULE)
+                result.contains(InsightType.SCHEDULE)
             )
         }
     }
@@ -186,8 +186,8 @@ class KeywordMatcherTest {
 
         // Then
         assertTrue(result.size >= 2)
-        assertTrue(result.contains(CaptureType.SCHEDULE))
-        assertTrue(result.contains(CaptureType.TODO))
+        assertTrue(result.contains(InsightType.SCHEDULE))
+        assertTrue(result.contains(InsightType.TODO))
     }
 
     @Test
@@ -211,7 +211,7 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.matchTypes(text)
 
         // Then - SCHEDULE이 첫 번째여야 함
-        assertEquals(CaptureType.SCHEDULE, result.firstOrNull())
+        assertEquals(InsightType.SCHEDULE, result.firstOrNull())
     }
 
     @Test
@@ -234,8 +234,8 @@ class KeywordMatcherTest {
         val text = "내일 미팅 있어요"
 
         // When & Then
-        assertTrue(KeywordMatcher.matchesType(text, CaptureType.SCHEDULE))
-        assertFalse(KeywordMatcher.matchesType(text, CaptureType.IDEA))
+        assertTrue(KeywordMatcher.matchesType(text, InsightType.SCHEDULE))
+        assertFalse(KeywordMatcher.matchesType(text, InsightType.IDEA))
     }
 
     @Test
@@ -244,7 +244,7 @@ class KeywordMatcherTest {
         val text = "a"
 
         // When & Then
-        assertFalse(KeywordMatcher.matchesType(text, CaptureType.SCHEDULE))
+        assertFalse(KeywordMatcher.matchesType(text, InsightType.SCHEDULE))
     }
 
     // ==================== getBestMatch() 테스트 ====================
@@ -258,7 +258,7 @@ class KeywordMatcherTest {
         val result = KeywordMatcher.getBestMatch(text)
 
         // Then
-        assertEquals(CaptureType.SCHEDULE, result)
+        assertEquals(InsightType.SCHEDULE, result)
     }
 
     @Test

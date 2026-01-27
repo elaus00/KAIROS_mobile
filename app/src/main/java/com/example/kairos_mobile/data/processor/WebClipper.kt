@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.data.processor
 
 import com.example.kairos_mobile.data.remote.api.KairosApi
-import com.example.kairos_mobile.data.remote.dto.WebClipRequest
+import com.example.kairos_mobile.data.remote.dto.insight.WebClipRequest
 import com.example.kairos_mobile.domain.model.Result
 import com.example.kairos_mobile.domain.model.WebMetadata
 import kotlinx.coroutines.Dispatchers

@@ -1,6 +1,6 @@
 package com.example.kairos_mobile.data.processor
 
-import com.example.kairos_mobile.data.remote.dto.SttResponse
+import com.example.kairos_mobile.data.remote.dto.capture.SttResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

@@ -1,11 +1,11 @@
 package com.example.kairos_mobile.presentation.search
 
 import app.cash.turbine.test
-import com.example.kairos_mobile.domain.model.Capture
-import com.example.kairos_mobile.domain.model.CaptureSource
-import com.example.kairos_mobile.domain.model.CaptureType
+import com.example.kairos_mobile.domain.model.Insight
+import com.example.kairos_mobile.domain.model.InsightSource
+import com.example.kairos_mobile.domain.model.InsightType
 import com.example.kairos_mobile.domain.model.Result
-import com.example.kairos_mobile.domain.usecase.SearchCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.search.SearchInsightsUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -33,13 +33,13 @@ class SearchViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var searchCapturesUseCase: SearchCapturesUseCase
+    private lateinit var searchInsightsUseCase: SearchInsightsUseCase
     private lateinit var viewModel: SearchViewModel
 
     @Before
     fun setup() {
-        searchCapturesUseCase = mockk()
-        viewModel = SearchViewModel(searchCapturesUseCase)
+        searchInsightsUseCase = mockk()
+        viewModel = SearchViewModel(searchInsightsUseCase)
     }
 
     // ==================== 초기 상태 테스트 ====================
@@ -94,38 +94,38 @@ class SearchViewModelTest {
     @Test
     fun `타입 필터 토글 - 추가`() = runTest {
         // When
-        viewModel.onTypeFilterToggle(CaptureType.SCHEDULE)
+        viewModel.onTypeFilterToggle(InsightType.SCHEDULE)
 
         // Then
-        assertTrue(viewModel.uiState.value.selectedTypes.contains(CaptureType.SCHEDULE))
+        assertTrue(viewModel.uiState.value.selectedTypes.contains(InsightType.SCHEDULE))
     }
 
     @Test
     fun `타입 필터 토글 - 제거`() = runTest {
         // Given
-        viewModel.onTypeFilterToggle(CaptureType.SCHEDULE)
-        assertTrue(viewModel.uiState.value.selectedTypes.contains(CaptureType.SCHEDULE))
+        viewModel.onTypeFilterToggle(InsightType.SCHEDULE)
+        assertTrue(viewModel.uiState.value.selectedTypes.contains(InsightType.SCHEDULE))
 
         // When
-        viewModel.onTypeFilterToggle(CaptureType.SCHEDULE)
+        viewModel.onTypeFilterToggle(InsightType.SCHEDULE)
 
         // Then
-        assertFalse(viewModel.uiState.value.selectedTypes.contains(CaptureType.SCHEDULE))
+        assertFalse(viewModel.uiState.value.selectedTypes.contains(InsightType.SCHEDULE))
     }
 
     @Test
     fun `여러 타입 필터 선택 가능`() = runTest {
         // When
-        viewModel.onTypeFilterToggle(CaptureType.SCHEDULE)
-        viewModel.onTypeFilterToggle(CaptureType.TODO)
-        viewModel.onTypeFilterToggle(CaptureType.IDEA)
+        viewModel.onTypeFilterToggle(InsightType.SCHEDULE)
+        viewModel.onTypeFilterToggle(InsightType.TODO)
+        viewModel.onTypeFilterToggle(InsightType.IDEA)
 
         // Then
         val selectedTypes = viewModel.uiState.value.selectedTypes
         assertEquals(3, selectedTypes.size)
-        assertTrue(selectedTypes.contains(CaptureType.SCHEDULE))
-        assertTrue(selectedTypes.contains(CaptureType.TODO))
-        assertTrue(selectedTypes.contains(CaptureType.IDEA))
+        assertTrue(selectedTypes.contains(InsightType.SCHEDULE))
+        assertTrue(selectedTypes.contains(InsightType.TODO))
+        assertTrue(selectedTypes.contains(InsightType.IDEA))
     }
 
     // ==================== 소스 필터 테스트 ====================
@@ -133,22 +133,22 @@ class SearchViewModelTest {
     @Test
     fun `소스 필터 토글 - 추가`() = runTest {
         // When
-        viewModel.onSourceFilterToggle(CaptureSource.IMAGE)
+        viewModel.onSourceFilterToggle(InsightSource.IMAGE)
 
         // Then
-        assertTrue(viewModel.uiState.value.selectedSources.contains(CaptureSource.IMAGE))
+        assertTrue(viewModel.uiState.value.selectedSources.contains(InsightSource.IMAGE))
     }
 
     @Test
     fun `소스 필터 토글 - 제거`() = runTest {
         // Given
-        viewModel.onSourceFilterToggle(CaptureSource.IMAGE)
+        viewModel.onSourceFilterToggle(InsightSource.IMAGE)
 
         // When
-        viewModel.onSourceFilterToggle(CaptureSource.IMAGE)
+        viewModel.onSourceFilterToggle(InsightSource.IMAGE)
 
         // Then
-        assertFalse(viewModel.uiState.value.selectedSources.contains(CaptureSource.IMAGE))
+        assertFalse(viewModel.uiState.value.selectedSources.contains(InsightSource.IMAGE))
     }
 
     // ==================== 검색 실행 테스트 ====================
@@ -157,10 +157,10 @@ class SearchViewModelTest {
     fun `검색 성공 시 결과 업데이트`() = runTest {
         // Given
         val captures = listOf(
-            Capture(id = "1", content = "테스트 캡처 1"),
-            Capture(id = "2", content = "테스트 캡처 2")
+            Insight(id = "1", content = "테스트 캡처 1"),
+            Insight(id = "2", content = "테스트 캡처 2")
         )
-        coEvery { searchCapturesUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
+        coEvery { searchInsightsUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
 
         // When
         viewModel.onSearchTextChanged("테스트")
@@ -178,7 +178,7 @@ class SearchViewModelTest {
     @Test
     fun `검색 실패 시 에러 메시지 설정`() = runTest {
         // Given
-        coEvery { searchCapturesUseCase(any(), any(), any()) } returns
+        coEvery { searchInsightsUseCase(any(), any(), any()) } returns
             Result.Error(RuntimeException("검색 실패"))
 
         // When
@@ -194,8 +194,8 @@ class SearchViewModelTest {
     @Test
     fun `검색 결과가 pageSize 미만이면 hasMore false`() = runTest {
         // Given - 20개 미만 결과
-        val captures = listOf(Capture(id = "1", content = "캡처"))
-        coEvery { searchCapturesUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
+        val captures = listOf(Insight(id = "1", content = "캡처"))
+        coEvery { searchInsightsUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
 
         // When
         viewModel.onSearch()
@@ -208,8 +208,8 @@ class SearchViewModelTest {
     @Test
     fun `검색 결과가 pageSize 이상이면 hasMore true`() = runTest {
         // Given - 20개 결과
-        val captures = (1..20).map { Capture(id = "$it", content = "캡처 $it") }
-        coEvery { searchCapturesUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
+        val captures = (1..20).map { Insight(id = "$it", content = "캡처 $it") }
+        coEvery { searchInsightsUseCase(any(), eq(0), eq(20)) } returns Result.Success(captures)
 
         // When
         viewModel.onSearch()
@@ -224,16 +224,16 @@ class SearchViewModelTest {
     @Test
     fun `더 보기 시 기존 결과에 추가`() = runTest {
         // Given - 첫 검색
-        val firstPageCaptures = (1..20).map { Capture(id = "$it", content = "캡처 $it") }
-        coEvery { searchCapturesUseCase(any(), eq(0), eq(20)) } returns Result.Success(firstPageCaptures)
+        val firstPageCaptures = (1..20).map { Insight(id = "$it", content = "캡처 $it") }
+        coEvery { searchInsightsUseCase(any(), eq(0), eq(20)) } returns Result.Success(firstPageCaptures)
 
         viewModel.onSearch()
         advanceUntilIdle()
         assertEquals(20, viewModel.uiState.value.searchResults.size)
 
         // Given - 두 번째 페이지
-        val secondPageCaptures = (21..30).map { Capture(id = "$it", content = "캡처 $it") }
-        coEvery { searchCapturesUseCase(any(), eq(20), eq(20)) } returns Result.Success(secondPageCaptures)
+        val secondPageCaptures = (21..30).map { Insight(id = "$it", content = "캡처 $it") }
+        coEvery { searchInsightsUseCase(any(), eq(20), eq(20)) } returns Result.Success(secondPageCaptures)
 
         // When
         viewModel.onLoadMore()
@@ -246,8 +246,8 @@ class SearchViewModelTest {
     @Test
     fun `hasMore가 false면 더 보기 무시`() = runTest {
         // Given - 결과가 적어서 hasMore = false
-        val captures = listOf(Capture(id = "1", content = "캡처"))
-        coEvery { searchCapturesUseCase(any(), any(), any()) } returns Result.Success(captures)
+        val captures = listOf(Insight(id = "1", content = "캡처"))
+        coEvery { searchInsightsUseCase(any(), any(), any()) } returns Result.Success(captures)
 
         viewModel.onSearch()
         advanceUntilIdle()
@@ -269,8 +269,8 @@ class SearchViewModelTest {
     fun `필터 초기화 시 모든 필터 제거`() = runTest {
         // Given
         viewModel.onSearchTextChanged("테스트")
-        viewModel.onTypeFilterToggle(CaptureType.SCHEDULE)
-        viewModel.onSourceFilterToggle(CaptureSource.IMAGE)
+        viewModel.onTypeFilterToggle(InsightType.SCHEDULE)
+        viewModel.onSourceFilterToggle(InsightSource.IMAGE)
 
         // When
         viewModel.onClearFilters()
@@ -288,7 +288,7 @@ class SearchViewModelTest {
     @Test
     fun `에러 메시지 닫기`() = runTest {
         // Given
-        coEvery { searchCapturesUseCase(any(), any(), any()) } returns
+        coEvery { searchInsightsUseCase(any(), any(), any()) } returns
             Result.Error(RuntimeException("에러"))
         viewModel.onSearch()
         advanceUntilIdle()

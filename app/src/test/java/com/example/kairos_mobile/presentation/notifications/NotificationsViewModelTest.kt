@@ -3,8 +3,8 @@ package com.example.kairos_mobile.presentation.notifications
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.Notification
 import com.example.kairos_mobile.domain.model.NotificationType
-import com.example.kairos_mobile.domain.usecase.GetNotificationsUseCase
-import com.example.kairos_mobile.domain.usecase.MarkNotificationAsReadUseCase
+import com.example.kairos_mobile.domain.usecase.notifications.GetNotificationsUseCase
+import com.example.kairos_mobile.domain.usecase.notifications.MarkNotificationAsReadUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coVerify
 import io.mockk.every

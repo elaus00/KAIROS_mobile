@@ -4,9 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Notification
-import com.example.kairos_mobile.domain.usecase.GetNotificationsUseCase
-import com.example.kairos_mobile.domain.usecase.MarkNotificationAsReadUseCase
+import com.example.kairos_mobile.domain.usecase.notifications.GetNotificationsUseCase
+import com.example.kairos_mobile.domain.usecase.notifications.MarkNotificationAsReadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,24 +31,34 @@ class NotificationsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NotificationsUiState())
     val uiState: StateFlow<NotificationsUiState> = _uiState.asStateFlow()
 
+    // 중복 구독 방지를 위한 Job 관리
+    private var loadJob: Job? = null
+
+    // 원본 알림 리스트 (필터링 전)
+    private var allNotifications: List<Notification> = emptyList()
+
     init {
         loadNotifications()
     }
 
     /**
      * 알림 로드
+     * 이전 로드 작업이 있으면 취소하고 새로 시작
      */
     private fun loadNotifications() {
-        viewModelScope.launch {
+        // 이전 Job 취소
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
                 getNotificationsUseCase()
                     .collect { notifications ->
+                        allNotifications = notifications
                         val unreadCount = notifications.count { !it.isRead }
-                        _uiState.update {
-                            it.copy(
-                                notifications = filterNotifications(notifications, it.selectedFilter),
+                        _uiState.update { state ->
+                            state.copy(
+                                notifications = filterNotifications(notifications, state.selectedFilter),
                                 unreadCount = unreadCount,
                                 isLoading = false
                             )
@@ -82,17 +93,15 @@ class NotificationsViewModel @Inject constructor(
 
     /**
      * 필터 변경
+     * 로컬 캐시된 알림을 필터링하므로 새로운 Flow 구독 불필요
      */
     fun onFilterChanged(filter: NotificationFilter) {
         _uiState.update { state ->
-            // 현재 로드된 전체 알림 리스트를 가져와서 필터링
-            val allNotifications = state.notifications
             state.copy(
-                selectedFilter = filter
+                selectedFilter = filter,
+                notifications = filterNotifications(allNotifications, filter)
             )
         }
-        // 필터가 변경되면 다시 로드
-        loadNotifications()
     }
 
     /**

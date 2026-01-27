@@ -4,7 +4,7 @@ package com.example.kairos_mobile.domain.model
  * AI 분류 결과
  */
 data class Classification(
-    val type: CaptureType,                      // 분류된 타입
+    val type: InsightType,                      // 분류된 타입
     val destinationPath: String,                // 목적지 경로
     val title: String,                          // 자동 생성된 제목
     val tags: List<String>,                     // 추출된 태그

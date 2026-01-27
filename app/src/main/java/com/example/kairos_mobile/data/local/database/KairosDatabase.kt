@@ -4,9 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.kairos_mobile.data.local.database.dao.CaptureQueueDao
+import com.example.kairos_mobile.data.local.database.dao.InsightQueueDao
 import com.example.kairos_mobile.data.local.database.dao.NotificationDao
-import com.example.kairos_mobile.data.local.database.entities.CaptureQueueEntity
+import com.example.kairos_mobile.data.local.database.entities.InsightQueueEntity
 import com.example.kairos_mobile.data.local.database.entities.NotificationEntity
 
 /**
@@ -14,18 +14,18 @@ import com.example.kairos_mobile.data.local.database.entities.NotificationEntity
  */
 @Database(
     entities = [
-        CaptureQueueEntity::class,
+        InsightQueueEntity::class,
         NotificationEntity::class
     ],
-    version = 4,  // Phase 3: 알림 기능 추가로 버전 업
+    version = 5,  // Phase 4: Capture → Insight 리네이밍으로 버전 업
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
 
     /**
-     * 캡처 큐 DAO
+     * 인사이트 큐 DAO
      */
-    abstract fun captureQueueDao(): CaptureQueueDao
+    abstract fun insightQueueDao(): InsightQueueDao
 
     /**
      * 알림 DAO
@@ -149,6 +149,20 @@ abstract class KairosDatabase : RoomDatabase() {
                 // 알림 읽음 상태 인덱스 생성 (읽지 않은 알림 빠른 조회)
                 database.execSQL(
                     "CREATE INDEX IF NOT EXISTS index_notifications_is_read ON notifications(is_read)"
+                )
+            }
+        }
+
+        /**
+         * Database v4 → v5 마이그레이션
+         * Phase 4: Capture → Insight 리네이밍
+         * 테이블명 capture_queue → insight_queue 변경
+         */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 테이블명 변경
+                database.execSQL(
+                    "ALTER TABLE capture_queue RENAME TO insight_queue"
                 )
             }
         }

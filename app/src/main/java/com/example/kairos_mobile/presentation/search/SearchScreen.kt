@@ -18,7 +18,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.navigation.NavRoutes
-import com.example.kairos_mobile.presentation.components.*
+import com.example.kairos_mobile.presentation.components.common.GlassBottomNavigation
+import com.example.kairos_mobile.presentation.components.common.NavigationTab
+import com.example.kairos_mobile.presentation.components.search.FilterChipRow
+import com.example.kairos_mobile.presentation.components.search.GlassSearchBar
+import com.example.kairos_mobile.presentation.components.search.SearchResultCard
 import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
 import com.example.kairos_mobile.ui.components.glassCardThemed
 import com.example.kairos_mobile.ui.theme.*
@@ -30,7 +34,7 @@ import com.example.kairos_mobile.ui.theme.*
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    onCaptureClick: (String) -> Unit,
+    onInsightClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
     isDarkTheme: Boolean = false,
     viewModel: SearchViewModel = hiltViewModel()
@@ -58,17 +62,22 @@ fun SearchScreen(
     }
 
     // 스크롤이 끝에 도달하면 더 로드
-    LaunchedEffect(listState.canScrollForward) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleIndex ->
-                if (lastVisibleIndex != null &&
-                    lastVisibleIndex >= uiState.searchResults.size - 3 &&
-                    uiState.hasMore &&
-                    !uiState.isLoading
-                ) {
-                    viewModel.onLoadMore()
-                }
+    // snapshotFlow 내에서 현재 상태를 직접 조회하여 캡처 문제 해결
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val currentState = viewModel.uiState.value
+            Triple(lastVisibleIndex, currentState.hasMore, currentState.isLoading)
+        }.collect { (lastVisibleIndex, hasMore, isLoading) ->
+            val resultsSize = viewModel.uiState.value.searchResults.size
+            if (lastVisibleIndex != null &&
+                lastVisibleIndex >= resultsSize - 3 &&
+                hasMore &&
+                !isLoading
+            ) {
+                viewModel.onLoadMore()
             }
+        }
     }
 
     Box(
@@ -170,10 +179,10 @@ fun SearchScreen(
                             items(
                                 items = uiState.searchResults,
                                 key = { it.id }
-                            ) { capture ->
+                            ) { insight ->
                                 SearchResultCard(
-                                    capture = capture,
-                                    onClick = { onCaptureClick(capture.id) },
+                                    insight = insight,
+                                    onClick = { onInsightClick(insight.id) },
                                     isDarkTheme = isDarkTheme
                                 )
                             }
@@ -218,7 +227,7 @@ fun SearchScreen(
                     selectedTab = NavigationTab.SEARCH,
                     onTabSelected = { tab ->
                         val route = when (tab) {
-                            NavigationTab.CAPTURE -> NavRoutes.CAPTURE
+                            NavigationTab.INSIGHT -> NavRoutes.INSIGHT
                             NavigationTab.SEARCH -> NavRoutes.SEARCH
                             NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
                             NavigationTab.SETTINGS -> NavRoutes.SETTINGS

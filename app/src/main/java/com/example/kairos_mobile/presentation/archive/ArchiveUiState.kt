@@ -1,23 +1,23 @@
 package com.example.kairos_mobile.presentation.archive
 
-import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.Insight
 
 /**
  * Archive 화면 UI 상태
  */
 data class ArchiveUiState(
     /**
-     * 날짜별로 그룹화된 캡처들
+     * 날짜별로 그룹화된 인사이트들
      * 키: "Today", "Yesterday", "This Week", "2026-01-25" 등
-     * 값: 해당 날짜의 캡처 리스트
+     * 값: 해당 날짜의 인사이트 리스트
      */
-    val groupedCaptures: Map<String, List<Capture>> = emptyMap(),
+    val groupedInsights: Map<String, List<Insight>> = emptyMap(),
 
     /**
-     * 확장된 캡처 ID 집합
+     * 확장된 인사이트 ID 집합
      * 확장/축소 상태 관리
      */
-    val expandedCaptureIds: Set<String> = emptySet(),
+    val expandedInsightIds: Set<String> = emptySet(),
 
     /**
      * 로딩 중 여부

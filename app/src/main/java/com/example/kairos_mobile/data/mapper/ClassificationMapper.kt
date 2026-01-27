@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.data.mapper
 
-import com.example.kairos_mobile.data.remote.dto.ClassificationResponse
-import com.example.kairos_mobile.domain.model.CaptureType
+import com.example.kairos_mobile.data.remote.dto.ai.ClassificationResponse
+import com.example.kairos_mobile.domain.model.InsightType
 import com.example.kairos_mobile.domain.model.Classification
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +17,7 @@ class ClassificationMapper @Inject constructor() {
      */
     fun toDomain(response: ClassificationResponse): Classification {
         return Classification(
-            type = CaptureType.valueOf(response.type),
+            type = InsightType.valueOf(response.type),
             destinationPath = response.destinationPath,
             title = response.title,
             tags = response.tags,

@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.navigation.NavRoutes
-import com.example.kairos_mobile.presentation.components.ArchiveCaptureCard
-import com.example.kairos_mobile.presentation.components.GlassBottomNavigation
-import com.example.kairos_mobile.presentation.components.NavigationTab
+import com.example.kairos_mobile.presentation.components.archive.ArchiveInsightCard
+import com.example.kairos_mobile.presentation.components.common.GlassBottomNavigation
+import com.example.kairos_mobile.presentation.components.common.NavigationTab
 import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
 import com.example.kairos_mobile.ui.theme.*
 
@@ -32,7 +32,7 @@ import com.example.kairos_mobile.ui.theme.*
 @Composable
 fun ArchiveScreen(
     onBackClick: () -> Unit,
-    onCaptureClick: (String) -> Unit,
+    onInsightClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
     isDarkTheme: Boolean = false,
     viewModel: ArchiveViewModel = hiltViewModel()
@@ -104,7 +104,7 @@ fun ArchiveScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // 캡처 리스트
-                if (uiState.isLoading && uiState.groupedCaptures.isEmpty()) {
+                if (uiState.isLoading && uiState.groupedInsights.isEmpty()) {
                     // 초기 로딩
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -115,7 +115,7 @@ fun ArchiveScreen(
                             strokeWidth = 2.dp
                         )
                     }
-                } else if (uiState.groupedCaptures.isEmpty() && !uiState.isLoading) {
+                } else if (uiState.groupedInsights.isEmpty() && !uiState.isLoading) {
                     // 빈 상태
                     EmptyArchiveState(
                         isDarkTheme = isDarkTheme,
@@ -131,29 +131,29 @@ fun ArchiveScreen(
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        uiState.groupedCaptures.forEach { (dateGroup, captures) ->
+                        uiState.groupedInsights.forEach { (dateGroup, insights) ->
                             // 날짜 헤더
                             item(key = "header_$dateGroup") {
                                 DateGroupHeader(dateGroup = dateGroup, isDarkTheme = isDarkTheme)
                             }
 
-                            // 해당 날짜의 캡처들
+                            // 해당 날짜의 인사이트들
                             items(
-                                items = captures,
+                                items = insights,
                                 key = { it.id }
-                            ) { capture ->
-                                ArchiveCaptureCard(
-                                    capture = capture,
-                                    isExpanded = capture.id in uiState.expandedCaptureIds,
-                                    onToggleExpand = { viewModel.onToggleExpand(capture.id) },
-                                    onCaptureClick = { onCaptureClick(capture.id) },
+                            ) { insight ->
+                                ArchiveInsightCard(
+                                    insight = insight,
+                                    isExpanded = insight.id in uiState.expandedInsightIds,
+                                    onToggleExpand = { viewModel.onToggleExpand(insight.id) },
+                                    onInsightClick = { onInsightClick(insight.id) },
                                     isDarkTheme = isDarkTheme
                                 )
                             }
                         }
 
                         // 로딩 인디케이터
-                        if (uiState.isLoading && uiState.groupedCaptures.isNotEmpty()) {
+                        if (uiState.isLoading && uiState.groupedInsights.isNotEmpty()) {
                             item {
                                 Box(
                                     modifier = Modifier
@@ -183,7 +183,7 @@ fun ArchiveScreen(
                     selectedTab = NavigationTab.ARCHIVE,
                     onTabSelected = { tab ->
                         val route = when (tab) {
-                            NavigationTab.CAPTURE -> NavRoutes.CAPTURE
+                            NavigationTab.INSIGHT -> NavRoutes.INSIGHT
                             NavigationTab.SEARCH -> NavRoutes.SEARCH
                             NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
                             NavigationTab.SETTINGS -> NavRoutes.SETTINGS
