@@ -1,0 +1,116 @@
+package com.example.kairos_mobile.data.worker
+
+import android.content.Context
+import android.util.Log
+import androidx.hilt.work.HiltWorker
+import androidx.work.*
+import com.example.kairos_mobile.domain.model.Result
+import com.example.kairos_mobile.domain.repository.ConfigRepository
+import com.example.kairos_mobile.domain.usecase.SyncOfflineQueueUseCase
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import java.util.concurrent.TimeUnit
+
+/**
+ * 오프라인 캡처 동기화 Worker
+ * 15분마다 또는 네트워크 연결 시 자동 실행
+ */
+@HiltWorker
+class SyncCaptureWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val syncOfflineQueueUseCase: SyncOfflineQueueUseCase,
+    private val configRepository: ConfigRepository
+) : CoroutineWorker(appContext, workerParams) {
+
+    companion object {
+        private const val TAG = "SyncCaptureWorker"
+        const val WORK_NAME = "sync_capture_work"
+
+        /**
+         * 주기적 동기화 작업 예약
+         * 앱 시작 시 한 번만 호출
+         */
+        fun enqueuePeriodicSync(workManager: WorkManager) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val syncRequest = PeriodicWorkRequestBuilder<SyncCaptureWorker>(
+                repeatInterval = 15,
+                repeatIntervalTimeUnit = TimeUnit.MINUTES
+            )
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .build()
+
+            workManager.enqueueUniquePeriodicWork(
+                WORK_NAME,
+                ExistingPeriodicWorkPolicy.KEEP,
+                syncRequest
+            )
+
+            Log.d(TAG, "Periodic sync work enqueued")
+        }
+
+        /**
+         * 즉시 동기화 작업 예약
+         * 사용자가 수동으로 동기화 요청 시 사용
+         */
+        fun enqueueImmediateSync(workManager: WorkManager) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val syncRequest = OneTimeWorkRequestBuilder<SyncCaptureWorker>()
+                .setConstraints(constraints)
+                .build()
+
+            workManager.enqueueUniqueWork(
+                "${WORK_NAME}_immediate",
+                ExistingWorkPolicy.REPLACE,
+                syncRequest
+            )
+
+            Log.d(TAG, "Immediate sync work enqueued")
+        }
+    }
+
+    override suspend fun doWork(): androidx.work.Result {
+        Log.d(TAG, "Sync work started")
+
+        // 네트워크 연결 확인
+        if (!configRepository.isNetworkAvailable()) {
+            Log.d(TAG, "No network available, will retry later")
+            return androidx.work.Result.retry()
+        }
+
+        // 동기화 실행
+        return when (val result = syncOfflineQueueUseCase()) {
+            is Result.Success -> {
+                val syncedCount = result.data
+                Log.d(TAG, "Sync completed successfully: $syncedCount captures synced")
+                androidx.work.Result.success()
+            }
+            is Result.Error -> {
+                Log.e(TAG, "Sync failed", result.exception)
+                // 재시도 횟수 확인
+                if (runAttemptCount < 3) {
+                    Log.d(TAG, "Will retry (attempt ${runAttemptCount + 1}/3)")
+                    androidx.work.Result.retry()
+                } else {
+                    Log.e(TAG, "Max retry attempts reached, marking as failure")
+                    androidx.work.Result.failure()
+                }
+            }
+            is Result.Loading -> {
+                Log.d(TAG, "Unexpected loading state, will retry")
+                androidx.work.Result.retry()
+            }
+        }
+    }
+}
