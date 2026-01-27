@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.presentation.archive.ArchiveScreen
 import com.example.kairos_mobile.presentation.capture.CaptureScreen
+import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
 
@@ -73,7 +74,18 @@ fun KairosNavGraph(
 
         // 알림 화면
         composable(NavRoutes.NOTIFICATIONS) {
-            // TODO: NotificationsScreen 구현 후 추가
+            NotificationsScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNotificationClick = { captureId ->
+                    // TODO: 캡처 상세 화면으로 이동 (현재는 뒤로가기)
+                    if (captureId != null) {
+                        // 나중에 상세 화면 구현 시 네비게이션 추가
+                    }
+                    navController.popBackStack()
+                }
+            )
         }
 
         // 설정 화면

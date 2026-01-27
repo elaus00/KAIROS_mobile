@@ -3,7 +3,7 @@ package com.example.kairos_mobile.presentation.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +21,7 @@ import java.util.*
  */
 @Composable
 fun GlassHeader(
-    onProfileClick: () -> Unit,
+    onNotificationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dateFormat = SimpleDateFormat("EEEE, dd MMM", Locale.getDefault())
@@ -63,16 +63,16 @@ fun GlassHeader(
             )
         }
 
-        // 프로필 버튼
+        // 알림 버튼
         IconButton(
-            onClick = onProfileClick,
+            onClick = onNotificationClick,
             modifier = Modifier
                 .size(40.dp)
                 .glassButton(shape = CircleShape)
         ) {
             Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Profile",
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "알림",
                 tint = TextPrimary,
                 modifier = Modifier.size(20.dp)
             )

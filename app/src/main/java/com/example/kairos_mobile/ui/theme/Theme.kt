@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
  * Glassmorphism Dark Color Scheme
  * 네이비 포인트 + 무채색 기반
  */
-private val GlassmorphismColorScheme = darkColorScheme(
+private val GlassmorphismDarkColorScheme = darkColorScheme(
     primary = PrimaryNavy,
     onPrimary = TextPrimary,
     primaryContainer = PrimaryNavyLight,
@@ -45,15 +45,53 @@ private val GlassmorphismColorScheme = darkColorScheme(
 )
 
 /**
+ * Glassmorphism Light Color Scheme
+ * 네이비 포인트 + 밝은 배경 기반
+ */
+private val GlassmorphismLightColorScheme = lightColorScheme(
+    primary = PrimaryNavy,
+    onPrimary = LightTextPrimary,
+    primaryContainer = PrimaryNavyLight,
+    onPrimaryContainer = LightTextPrimary,
+
+    secondary = LightGlassButton,
+    onSecondary = LightTextSecondary,
+    secondaryContainer = LightGlassButtonHover,
+    onSecondaryContainer = LightTextSecondary,
+
+    tertiary = IdeaColor,
+    onTertiary = LightBackground,
+
+    background = LightBackground,
+    onBackground = LightTextPrimary,
+
+    surface = LightGlassSurface,
+    onSurface = LightTextPrimary,
+    surfaceVariant = LightGlassCard,
+    onSurfaceVariant = LightTextSecondary,
+
+    error = ErrorColor,
+    onError = TextPrimary,
+
+    outline = LightGlassBorder,
+    outlineVariant = LightGlassBorderDim
+)
+
+/**
  * KAIROS Glassmorphism Theme
- * 항상 다크 모드 + Glassmorphism 스타일 사용
+ * 다크/라이트 모드 전환 지원 + Glassmorphism 스타일 사용
  */
 @Composable
 fun KAIROS_mobileTheme(
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    // Glassmorphism은 항상 다크 모드 기반
-    val colorScheme = GlassmorphismColorScheme
+    // 테마에 따라 색상 스킴 선택
+    val colorScheme = if (darkTheme) {
+        GlassmorphismDarkColorScheme
+    } else {
+        GlassmorphismLightColorScheme
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,

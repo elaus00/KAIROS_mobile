@@ -86,7 +86,7 @@ fun CaptureScreen(
                 ) {
                     // 헤더
                     GlassHeader(
-                        onProfileClick = {
+                        onNotificationClick = {
                             onNavigate(NavRoutes.NOTIFICATIONS)
                         }
                     )

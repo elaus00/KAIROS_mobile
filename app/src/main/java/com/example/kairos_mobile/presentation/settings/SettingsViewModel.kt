@@ -7,6 +7,9 @@ import com.example.kairos_mobile.domain.repository.PreferencesRepository
 import com.example.kairos_mobile.domain.usecase.ConnectGoogleCalendarUseCase
 import com.example.kairos_mobile.domain.usecase.ConnectTodoistUseCase
 import com.example.kairos_mobile.domain.usecase.GetSyncStatusUseCase
+import com.example.kairos_mobile.domain.usecase.GetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.SetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.model.ThemePreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +30,8 @@ class SettingsViewModel @Inject constructor(
     private val connectGoogleCalendarUseCase: ConnectGoogleCalendarUseCase,
     private val connectTodoistUseCase: ConnectTodoistUseCase,
     private val getSyncStatusUseCase: GetSyncStatusUseCase,
+    private val getThemePreferenceUseCase: GetThemePreferenceUseCase,
+    private val setThemePreferenceUseCase: SetThemePreferenceUseCase,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
@@ -104,6 +109,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             preferencesRepository.getSmartTagsEnabled().collect { enabled ->
                 _uiState.update { it.copy(smartTagsEnabled = enabled) }
+            }
+        }
+
+        viewModelScope.launch {
+            getThemePreferenceUseCase().collect { theme ->
+                _uiState.update { it.copy(themePreference = theme) }
             }
         }
     }
@@ -414,6 +425,26 @@ class SettingsViewModel @Inject constructor(
             preferencesRepository.setSmartTagsEnabled(enabled)
             _uiState.update { it.copy(smartTagsEnabled = enabled) }
         }
+    }
+
+    // ========== 테마 설정 ==========
+
+    /**
+     * 테마 변경
+     */
+    fun setTheme(theme: ThemePreference) {
+        viewModelScope.launch {
+            setThemePreferenceUseCase(theme)
+            _uiState.update { it.copy(themePreference = theme) }
+        }
+    }
+
+    /**
+     * 다크 모드 토글
+     */
+    fun toggleDarkMode(enabled: Boolean) {
+        val theme = if (enabled) ThemePreference.DARK else ThemePreference.LIGHT
+        setTheme(theme)
     }
 
     // ========== UI 이벤트 처리 ==========

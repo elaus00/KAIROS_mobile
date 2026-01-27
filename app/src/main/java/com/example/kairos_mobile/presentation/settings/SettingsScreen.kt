@@ -221,6 +221,46 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::toggleSmartTags
                 )
 
+                Spacer(modifier = Modifier.height(36.dp))
+
+                // 구분선
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(1f)
+                        .height(0.8.dp)
+                        .background(
+                            color = Color(0x20FFFFFF),
+                            shape = RoundedCornerShape(1.dp)
+                        )
+                )
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // ========== 테마 설정 섹션 ==========
+                Text(
+                    text = "테마",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextPrimary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Text(
+                    text = "앱의 테마를 설정합니다",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Light,
+                    color = TextTertiary,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // 다크 모드 전환
+                SwitchPreference(
+                    title = "다크 모드",
+                    description = "어두운 테마를 사용합니다",
+                    checked = uiState.themePreference == com.example.kairos_mobile.domain.model.ThemePreference.DARK,
+                    onCheckedChange = viewModel::toggleDarkMode
+                )
+
                 Spacer(modifier = Modifier.height(40.dp))
 
                 // 앱 정보

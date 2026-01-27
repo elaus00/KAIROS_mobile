@@ -6,17 +6,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.rememberNavController
+import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.usecase.GetThemePreferenceUseCase
 import com.example.kairos_mobile.navigation.KairosNavGraph
 import com.example.kairos_mobile.navigation.OAuthCallback
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * KAIROS Magic Inbox 메인 액티비티
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var getThemePreferenceUseCase: GetThemePreferenceUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +37,11 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            KAIROS_mobileTheme {
+            // 테마 설정 수집
+            val themePreference by getThemePreferenceUseCase().collectAsState(initial = ThemePreference.DARK)
+            val isDarkTheme = themePreference == ThemePreference.DARK
+
+            KAIROS_mobileTheme(darkTheme = isDarkTheme) {
                 KairosNavGraph(
                     navController = rememberNavController(),
                     sharedText = sharedContent?.text,

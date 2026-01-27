@@ -1,5 +1,7 @@
 package com.example.kairos_mobile.presentation.settings
 
+import com.example.kairos_mobile.domain.model.ThemePreference
+
 /**
  * Settings 화면 UI 상태
  * Phase 3: 외부 서비스 연동 및 AI 기능 설정
@@ -20,6 +22,9 @@ data class SettingsUiState(
     // ========== AI 기능 설정 ==========
     val autoSummarizeEnabled: Boolean = true,
     val smartTagsEnabled: Boolean = true,
+
+    // ========== 테마 설정 ==========
+    val themePreference: ThemePreference = ThemePreference.DARK,
 
     // ========== UI 이벤트 ==========
     val errorMessage: String? = null,
