@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Label
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -60,7 +60,7 @@ fun TagSuggestionChips(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.Label,
+                    imageVector = Icons.AutoMirrored.Filled.Label,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.onTertiaryContainer
@@ -109,7 +109,7 @@ fun TagSuggestionChips(
                             // 신뢰도에 따른 아이콘 (높은 신뢰도만 표시)
                             if (tag.confidence >= 0.85f) {
                                 Icon(
-                                    imageVector = Icons.Default.Label,
+                                    imageVector = Icons.AutoMirrored.Filled.Label,
                                     contentDescription = null,
                                     modifier = Modifier.size(14.dp)
                                 )

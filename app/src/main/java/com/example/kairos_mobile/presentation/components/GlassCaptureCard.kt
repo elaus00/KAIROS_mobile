@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -279,7 +280,7 @@ private fun getIconForType(type: CaptureType): ImageVector {
         CaptureType.SCHEDULE -> Icons.Default.CalendarToday
         CaptureType.TODO -> Icons.Default.CheckCircle
         CaptureType.NOTE -> Icons.Default.Bookmark
-        CaptureType.QUICK_NOTE -> Icons.Default.Note
+        CaptureType.QUICK_NOTE -> Icons.AutoMirrored.Filled.Note
     }
 }
 

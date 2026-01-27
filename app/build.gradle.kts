@@ -17,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.kairos_mobile.HiltTestRunner"
     }
 
     buildTypes {
@@ -39,6 +39,11 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    // Unit 테스트에서 Android 프레임워크 메서드 호출 시 기본값 반환
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -110,8 +115,7 @@ dependencies {
 
     // Testing - Unit Tests
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockk)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.arch.core.testing)

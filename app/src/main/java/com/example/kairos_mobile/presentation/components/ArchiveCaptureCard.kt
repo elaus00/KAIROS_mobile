@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -218,7 +219,7 @@ private fun TypeIcon(
         CaptureType.SCHEDULE -> Icons.Default.CalendarToday
         CaptureType.TODO -> Icons.Default.CheckCircle
         CaptureType.NOTE -> Icons.Default.Bookmark
-        CaptureType.QUICK_NOTE -> Icons.Default.Note
+        CaptureType.QUICK_NOTE -> Icons.AutoMirrored.Filled.Note
     }
 
     Icon(
