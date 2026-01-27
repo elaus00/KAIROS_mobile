@@ -1,9 +1,9 @@
 package com.example.kairos_mobile.presentation.search
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -129,9 +129,10 @@ class SearchScreenTest {
             }
         }
 
-        // Then
-        composeTestRule.onNodeWithContentDescription("지우기")
-            .assertDoesNotExist()
+        // Then - 클리어 버튼이 없어야 함
+        val clearNodes = composeTestRule.onAllNodesWithContentDescription("지우기")
+            .fetchSemanticsNodes()
+        assert(clearNodes.isEmpty()) { "Clear button should not be visible when text is empty" }
     }
 
     @Test
