@@ -37,7 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.kairos_mobile.navigation.NavRoutes
+import com.example.kairos_mobile.presentation.components.GlassBottomNavigation
 import com.example.kairos_mobile.presentation.components.IntegrationCard
+import com.example.kairos_mobile.presentation.components.NavigationTab
 import com.example.kairos_mobile.presentation.components.SwitchPreference
 import com.example.kairos_mobile.ui.components.glassButton
 import com.example.kairos_mobile.ui.theme.NavyDark
@@ -53,7 +56,8 @@ import com.example.kairos_mobile.ui.theme.TextTertiary
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigate: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -118,14 +122,18 @@ fun SettingsScreen(
             containerColor = Color.Transparent,
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { paddingValues ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 20.dp, bottom = 40.dp)
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 20.dp, bottom = 140.dp) // 하단 네비게이션 공간 확보
+                ) {
                 // ========== 외부 서비스 연동 섹션 ==========
                 Text(
                     text = "외부 서비스 연동",
@@ -272,6 +280,29 @@ fun SettingsScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
+
+            // 하단 네비게이션
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
+            ) {
+                GlassBottomNavigation(
+                    selectedTab = NavigationTab.SETTINGS,
+                    onTabSelected = { tab ->
+                        val route = when (tab) {
+                            NavigationTab.CAPTURE -> NavRoutes.CAPTURE
+                            NavigationTab.SEARCH -> NavRoutes.SEARCH
+                            NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
+                            NavigationTab.SETTINGS -> NavRoutes.SETTINGS
+                        }
+                        if (route != NavRoutes.SETTINGS) {
+                            onNavigate(route)
+                        }
+                    }
+                )
+            }
+        }
         }
     }
 }

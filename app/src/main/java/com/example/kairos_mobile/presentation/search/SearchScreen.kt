@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.*
 import com.example.kairos_mobile.ui.components.AnimatedGlassBackground
 import com.example.kairos_mobile.ui.components.glassCard
@@ -30,6 +31,7 @@ import com.example.kairos_mobile.ui.theme.*
 fun SearchScreen(
     onBackClick: () -> Unit,
     onCaptureClick: (String) -> Unit,
+    onNavigate: (String) -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -85,12 +87,17 @@ fun SearchScreen(
                 )
             }
         ) { paddingValues ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .statusBarsPadding()
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(bottom = 100.dp) // 하단 네비게이션 공간 확보
+                ) {
                 // 헤더
                 SearchHeader(
                     onBackClick = onBackClick,
@@ -186,6 +193,29 @@ fun SearchScreen(
                     )
                 }
             }
+
+            // 하단 네비게이션
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
+            ) {
+                GlassBottomNavigation(
+                    selectedTab = NavigationTab.SEARCH,
+                    onTabSelected = { tab ->
+                        val route = when (tab) {
+                            NavigationTab.CAPTURE -> NavRoutes.CAPTURE
+                            NavigationTab.SEARCH -> NavRoutes.SEARCH
+                            NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
+                            NavigationTab.SETTINGS -> NavRoutes.SETTINGS
+                        }
+                        if (route != NavRoutes.SEARCH) {
+                            onNavigate(route)
+                        }
+                    }
+                )
+            }
+        }
         }
     }
 }

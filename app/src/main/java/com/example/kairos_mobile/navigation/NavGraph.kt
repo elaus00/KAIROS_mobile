@@ -56,6 +56,13 @@ fun KairosNavGraph(
                 },
                 onCaptureClick = { captureId ->
                     // TODO: 캡처 상세 화면으로 이동
+                },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
@@ -68,6 +75,13 @@ fun KairosNavGraph(
                 },
                 onCaptureClick = { captureId ->
                     // TODO: 캡처 상세 화면으로 이동
+                },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
@@ -93,6 +107,13 @@ fun KairosNavGraph(
             SettingsScreen(
                 onBack = {
                     navController.popBackStack()
+                },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(NavRoutes.CAPTURE) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }
