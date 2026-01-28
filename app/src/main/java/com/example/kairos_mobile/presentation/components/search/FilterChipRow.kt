@@ -104,6 +104,7 @@ private fun getThemedTypeColor(type: InsightType, isDarkTheme: Boolean): Color {
             InsightType.TODO -> AiryTodoColor
             InsightType.NOTE -> AirySaveColor
             InsightType.QUICK_NOTE -> AiryTextTertiary
+            InsightType.CLIP -> AiryMeetingColor
         }
     }
 }

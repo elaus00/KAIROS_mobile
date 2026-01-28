@@ -1,104 +1,75 @@
 package com.example.kairos_mobile.data.remote.api
 
-import com.example.kairos_mobile.data.remote.dto.ai.ClassificationRequest
-import com.example.kairos_mobile.data.remote.dto.ai.ClassificationResponse
-import com.example.kairos_mobile.data.remote.dto.obsidian.ObsidianCreateRequest
-import com.example.kairos_mobile.data.remote.dto.obsidian.ObsidianCreateResponse
-import com.example.kairos_mobile.data.remote.dto.insight.OcrResponse
-import com.example.kairos_mobile.data.remote.dto.insight.SttResponse
-import com.example.kairos_mobile.data.remote.dto.ai.SummarizeRequest
-import com.example.kairos_mobile.data.remote.dto.ai.SummarizeResponse
-import com.example.kairos_mobile.data.remote.dto.ai.TagSuggestRequest
-import com.example.kairos_mobile.data.remote.dto.ai.TagSuggestResponse
-import com.example.kairos_mobile.data.remote.dto.insight.WebClipRequest
-import com.example.kairos_mobile.data.remote.dto.insight.WebClipResponse
-import okhttp3.MultipartBody
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyRequest
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
+import com.example.kairos_mobile.data.remote.dto.v2.ClipRequest
+import com.example.kairos_mobile.data.remote.dto.v2.ClipResponse
+import com.example.kairos_mobile.data.remote.dto.v2.HealthResponse
+import com.example.kairos_mobile.data.remote.dto.v2.NoteCreateRequest
+import com.example.kairos_mobile.data.remote.dto.v2.NoteCreateResponse
+import com.example.kairos_mobile.data.remote.dto.v2.OcrRequest
+import com.example.kairos_mobile.data.remote.dto.v2.OcrResponse
+import com.example.kairos_mobile.data.remote.dto.v2.SttRequest
+import com.example.kairos_mobile.data.remote.dto.v2.SttResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.Part
 
 /**
- * KAIROS API 인터페이스
+ * KAIROS API 인터페이스 (API v2.1)
+ * Base URL: http://localhost:8000 (에뮬레이터: http://10.0.2.2:8000)
  */
 interface KairosApi {
 
     /**
-     * 캡처 내용 분류
-     * AI 추론 (1-3초)
+     * 콘텐츠 분류
+     * AI가 입력 내용을 분석하여 타입과 목적지를 결정
      */
     @POST("/classify")
-    suspend fun classifyCapture(
-        @Body request: ClassificationRequest
-    ): Response<ClassificationResponse>
+    suspend fun classify(
+        @Body request: ClassifyRequest
+    ): Response<ClassifyResponse>
 
     /**
      * Obsidian 노트 생성
-     * 파일 I/O (빠름)
+     * 분류된 콘텐츠를 Obsidian vault에 저장
      */
     @POST("/notes")
-    suspend fun createObsidianNote(
-        @Body request: ObsidianCreateRequest
-    ): Response<ObsidianCreateResponse>
+    suspend fun createNote(
+        @Body request: NoteCreateRequest
+    ): Response<NoteCreateResponse>
 
     /**
      * 이미지 텍스트 추출 (OCR)
-     * AI Vision (2-5초)
+     * Base64 인코딩된 이미지에서 텍스트 추출
      */
-    @Multipart
     @POST("/ocr")
-    suspend fun extractTextFromImage(
-        @Part image: MultipartBody.Part
+    suspend fun ocr(
+        @Body request: OcrRequest
     ): Response<OcrResponse>
 
     /**
      * 음성 텍스트 추출 (STT)
-     * 오디오 파일을 서버로 업로드하여 텍스트로 변환
-     * AI 음성인식 (2-5초)
+     * Base64 인코딩된 오디오에서 텍스트 추출
      */
-    @Multipart
     @POST("/stt")
-    suspend fun extractTextFromAudio(
-        @Part audioFile: MultipartBody.Part
+    suspend fun stt(
+        @Body request: SttRequest
     ): Response<SttResponse>
 
     /**
-     * URL 크롤링 + AI 요약 (웹 클립)
-     * 크롤링+AI (5-10초)
+     * 웹 클립
+     * URL에서 콘텐츠와 메타데이터 추출
      */
-    @POST("/webclip")
-    suspend fun extractWebClip(
-        @Body request: WebClipRequest
-    ): Response<WebClipResponse>
+    @POST("/clip")
+    suspend fun clip(
+        @Body request: ClipRequest
+    ): Response<ClipResponse>
 
     /**
      * 서버 상태 확인
-     * 즉시 응답
      */
     @GET("/health")
-    suspend fun healthCheck(): Response<Unit>
-
-    // ========== Phase 3: 스마트 처리 기능 ==========
-
-    /**
-     * M09: AI 요약 생성
-     * 긴 콘텐츠를 자동으로 요약
-     * AI 추론 (2-5초)
-     */
-    @POST("/summarize")
-    suspend fun generateSummary(
-        @Body request: SummarizeRequest
-    ): Response<SummarizeResponse>
-
-    /**
-     * M10: 스마트 태그 제안
-     * 과거 패턴 기반 태그 자동 제안
-     * AI 추론 (1-3초)
-     */
-    @POST("/tags/suggest")
-    suspend fun suggestTags(
-        @Body request: TagSuggestRequest
-    ): Response<TagSuggestResponse>
+    suspend fun health(): Response<HealthResponse>
 }

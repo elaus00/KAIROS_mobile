@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.data.processor
 
 import com.example.kairos_mobile.data.remote.api.KairosApi
-import com.example.kairos_mobile.data.remote.dto.insight.WebClipRequest
+import com.example.kairos_mobile.data.remote.dto.v2.ClipRequest
 import com.example.kairos_mobile.domain.model.Result
 import com.example.kairos_mobile.domain.model.WebMetadata
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * M08: 웹 클립 프로세서
+ * M08: 웹 클립 프로세서 (API v2.1)
  *
  * 서버 API를 사용하여 웹 페이지에서 메타데이터를 추출합니다.
  */
@@ -32,23 +32,27 @@ class WebClipper @Inject constructor(
                 return@withContext Result.Error(Exception("유효하지 않은 URL입니다"))
             }
 
-            // 서버 API 호출
-            val request = WebClipRequest(url = url)
-            val response = api.extractWebClip(request)
+            // 서버 API 호출 (API v2.1)
+            val request = ClipRequest(
+                url = url,
+                includeImages = false,
+                summarize = true
+            )
+            val response = api.clip(request)
 
             if (response.isSuccessful && response.body() != null) {
-                val webClipResponse = response.body()!!
-                if (webClipResponse.success) {
+                val clipResponse = response.body()!!
+                if (clipResponse.success) {
                     Result.Success(
                         WebMetadata(
                             url = url,
-                            title = webClipResponse.title,
-                            description = webClipResponse.description ?: webClipResponse.content,
-                            imageUrl = webClipResponse.imageUrl
+                            title = clipResponse.title,
+                            description = clipResponse.summary ?: clipResponse.content,
+                            imageUrl = clipResponse.metadata?.imageUrl
                         )
                     )
                 } else {
-                    val errorMsg = webClipResponse.error ?: "웹 페이지 정보를 가져올 수 없습니다"
+                    val errorMsg = clipResponse.error ?: "웹 페이지 정보를 가져올 수 없습니다"
                     Result.Error(Exception(errorMsg))
                 }
             } else {

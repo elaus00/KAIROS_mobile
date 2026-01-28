@@ -1,10 +1,11 @@
 package com.example.kairos_mobile.data.mapper
 
 import com.example.kairos_mobile.data.local.database.entities.InsightQueueEntity
+import com.example.kairos_mobile.domain.model.Classification
+import com.example.kairos_mobile.domain.model.Destination
 import com.example.kairos_mobile.domain.model.Insight
 import com.example.kairos_mobile.domain.model.InsightSource
 import com.example.kairos_mobile.domain.model.InsightType
-import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.SyncStatus
 import com.example.kairos_mobile.domain.model.WebMetadata
 import com.google.gson.Gson
@@ -58,17 +59,22 @@ class InsightMapper @Inject constructor(
      */
     fun toDomain(entity: InsightQueueEntity): Insight {
         val classification = if (entity.classificationType != null) {
+            val insightType = InsightType.valueOf(entity.classificationType)
+            // destination 결정: TODO 타입이면 TODO, 그 외는 OBSIDIAN
+            val destination = if (insightType == InsightType.TODO) {
+                Destination.TODO
+            } else {
+                Destination.OBSIDIAN
+            }
             Classification(
-                type = InsightType.valueOf(entity.classificationType),
-                destinationPath = entity.destinationPath ?: "",
+                type = insightType,
+                destination = destination,
+                confidence = entity.confidence ?: 0f,
                 title = entity.title ?: "",
                 tags = entity.tags?.let {
                     gson.fromJson(it, object : TypeToken<List<String>>() {}.type)
                 } ?: emptyList(),
-                confidence = entity.confidence ?: 0f,
-                metadata = entity.metadata?.let {
-                    gson.fromJson(it, object : TypeToken<Map<String, String>>() {}.type)
-                } ?: emptyMap()
+                suggestedPath = entity.destinationPath
             )
         } else null
 

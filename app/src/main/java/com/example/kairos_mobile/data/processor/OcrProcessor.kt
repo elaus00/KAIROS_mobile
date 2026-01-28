@@ -2,21 +2,20 @@ package com.example.kairos_mobile.data.processor
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import com.example.kairos_mobile.data.remote.api.KairosApi
+import com.example.kairos_mobile.data.remote.dto.v2.OcrRequest
 import com.example.kairos_mobile.domain.model.Result
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * M05: OCR 처리 프로세서
+ * M05: OCR 처리 프로세서 (API v2.1)
  *
  * 서버 API를 사용하여 이미지에서 텍스트를 추출합니다.
  */
@@ -34,23 +33,25 @@ class OcrProcessor @Inject constructor(
      */
     suspend fun extractText(imageUri: Uri): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // URI에서 임시 파일 생성
-            val tempFile = createTempFileFromUri(imageUri)
+            // URI에서 이미지 데이터 읽기
+            val imageBytes = readImageBytes(imageUri)
                 ?: return@withContext Result.Error(Exception("이미지 파일을 읽을 수 없습니다"))
 
-            // Multipart 요청 생성
-            val requestBody = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
-            val multipartBody = MultipartBody.Part.createFormData(
-                "image",
-                tempFile.name,
-                requestBody
+            // Base64 인코딩
+            val base64Data = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
+
+            // 이미지 타입 추출
+            val imageType = getImageType(imageUri)
+
+            // OCR 요청 생성 (API v2.1)
+            val request = OcrRequest(
+                imageData = base64Data,
+                imageType = imageType,
+                languageHint = "ko"  // 기본 언어 힌트: 한국어
             )
 
             // 서버 API 호출
-            val response = api.extractTextFromImage(multipartBody)
-
-            // 임시 파일 삭제
-            tempFile.delete()
+            val response = api.ocr(request)
 
             if (response.isSuccessful && response.body() != null) {
                 val ocrResponse = response.body()!!
@@ -69,19 +70,27 @@ class OcrProcessor @Inject constructor(
     }
 
     /**
-     * URI에서 임시 파일 생성
+     * URI에서 이미지 바이트 배열 읽기
      */
-    private fun createTempFileFromUri(uri: Uri): File? {
+    private fun readImageBytes(uri: Uri): ByteArray? {
         return try {
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            val tempFile = File.createTempFile("ocr_", ".jpg", context.cacheDir)
-            FileOutputStream(tempFile).use { outputStream ->
-                inputStream.copyTo(outputStream)
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                inputStream.readBytes()
             }
-            inputStream.close()
-            tempFile
         } catch (e: Exception) {
             null
+        }
+    }
+
+    /**
+     * URI에서 이미지 타입 추출
+     */
+    private fun getImageType(uri: Uri): String {
+        val mimeType = context.contentResolver.getType(uri)
+        return when {
+            mimeType?.contains("png") == true -> "png"
+            mimeType?.contains("webp") == true -> "webp"
+            else -> "jpeg"
         }
     }
 }

@@ -3,20 +3,19 @@ package com.example.kairos_mobile.data.processor
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
+import android.util.Base64
 import com.example.kairos_mobile.data.remote.api.KairosApi
+import com.example.kairos_mobile.data.remote.dto.v2.SttRequest
 import com.example.kairos_mobile.domain.model.Result
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * M06: 음성 인식 프로세서 (서버 중심 아키텍처)
+ * M06: 음성 인식 프로세서 (API v2.1)
  *
  * MediaRecorder를 사용하여 음성을 녹음하고,
  * 서버 STT API로 업로드하여 텍스트를 추출합니다.
@@ -104,7 +103,7 @@ class VoiceRecognizer @Inject constructor(
     }
 
     /**
-     * 녹음된 오디오 파일을 서버로 업로드하고 STT 처리
+     * 녹음된 오디오 파일을 서버로 업로드하고 STT 처리 (API v2.1)
      *
      * @return 변환된 텍스트 또는 에러
      */
@@ -115,16 +114,19 @@ class VoiceRecognizer @Inject constructor(
                 return@withContext Result.Error(Exception("오디오 파일이 없습니다"))
             }
 
-            // Multipart 요청 생성
-            val requestBody = file.asRequestBody("audio/m4a".toMediaTypeOrNull())
-            val multipartBody = MultipartBody.Part.createFormData(
-                "audioFile",
-                file.name,
-                requestBody
+            // 오디오 파일을 Base64로 인코딩
+            val audioBytes = file.readBytes()
+            val base64Data = Base64.encodeToString(audioBytes, Base64.NO_WRAP)
+
+            // STT 요청 생성 (API v2.1)
+            val request = SttRequest(
+                audioData = base64Data,
+                audioType = "m4a",
+                language = "ko"  // 기본 언어: 한국어
             )
 
             // 서버 STT API 호출
-            val response = api.extractTextFromAudio(multipartBody)
+            val response = api.stt(request)
 
             if (response.isSuccessful && response.body()?.success == true) {
                 val text = response.body()?.text ?: ""

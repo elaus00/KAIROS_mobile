@@ -21,12 +21,18 @@ android {
     }
 
     buildTypes {
+        debug {
+            // 에뮬레이터에서 localhost 접근을 위해 10.0.2.2 사용
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Production 서버 URL (설정 필요)
+            buildConfigField("String", "API_BASE_URL", "\"http://your-production-server.com\"")
         }
     }
     compileOptions {

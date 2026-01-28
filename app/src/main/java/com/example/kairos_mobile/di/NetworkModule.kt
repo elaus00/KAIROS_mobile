@@ -13,14 +13,29 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 /**
- * Network Hilt 모듈
+ * Mock API 사용 여부 Qualifier
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UseMockApi
+
+/**
+ * Network Hilt 모듈 (API v2.1)
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    /**
+     * Mock API 사용 여부 플래그
+     * true: MockKairosApi 사용 (로컬 테스트)
+     * false: 실제 API 사용 (서버 연동)
+     */
+    private const val USE_MOCK_API = true
 
     /**
      * OkHttpClient 제공
@@ -44,6 +59,7 @@ object NetworkModule {
 
     /**
      * Retrofit 제공
+     * Base URL: BuildConfig.API_BASE_URL (debug: 10.0.2.2:8000, release: production URL)
      */
     @Provides
     @Singleton
@@ -52,7 +68,7 @@ object NetworkModule {
         gson: Gson
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.kairos.mock/")  // Mock URL
+            .baseUrl(BuildConfig.API_BASE_URL + "/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
@@ -60,18 +76,19 @@ object NetworkModule {
 
     /**
      * KairosApi 제공
-     * Phase 1: Mock API 사용
-     * Phase 2: 실제 API로 전환 시 주석 변경
+     * USE_MOCK_API 플래그에 따라 Mock/실제 API 선택
      */
     @Provides
     @Singleton
     fun provideKairosApi(
-        // retrofit: Retrofit  // 실제 API 사용 시 필요
+        retrofit: Retrofit
     ): KairosApi {
-        // Phase 1: Mock API 사용
-        return MockKairosApi()
-
-        // Phase 2: 실제 API 사용 시
-        // return retrofit.create(KairosApi::class.java)
+        return if (USE_MOCK_API) {
+            // Mock API 사용 (로컬 테스트용)
+            MockKairosApi()
+        } else {
+            // 실제 API 사용 (서버 연동)
+            retrofit.create(KairosApi::class.java)
+        }
     }
 }

@@ -201,6 +201,7 @@ private fun getThemedTypeColor(type: InsightType, isDarkTheme: Boolean): android
             InsightType.TODO -> AiryTodoColor
             InsightType.NOTE -> AirySaveColor
             InsightType.QUICK_NOTE -> AiryTextTertiary
+            InsightType.CLIP -> AiryMeetingColor  // 웹 클립은 파란색 계열
         }
     }
 }
@@ -220,6 +221,7 @@ private fun TypeIcon(
         InsightType.TODO -> Icons.Default.CheckCircle
         InsightType.NOTE -> Icons.Default.Bookmark
         InsightType.QUICK_NOTE -> Icons.AutoMirrored.Filled.Note
+        InsightType.CLIP -> Icons.Default.Link
     }
 
     Icon(

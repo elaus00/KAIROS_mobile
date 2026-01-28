@@ -1,6 +1,6 @@
 package com.example.kairos_mobile.data.processor
 
-import com.example.kairos_mobile.data.remote.dto.capture.SttResponse
+import com.example.kairos_mobile.data.remote.dto.v2.SttResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -8,7 +8,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * VoiceRecognizer 관련 단위 테스트
+ * VoiceRecognizer 관련 단위 테스트 (API v2.1)
  *
  * 서버 중심 아키텍처:
  * - 클라이언트는 오디오 녹음만 담당 (MediaRecorder - Instrumented 테스트 필요)
@@ -28,7 +28,7 @@ class VoiceRecognizerTest {
             success = true,
             text = "음성에서 추출된 텍스트입니다",
             confidence = 0.95f,
-            language = "ko",
+            durationSeconds = 5.5f,
             error = null
         )
 
@@ -36,7 +36,7 @@ class VoiceRecognizerTest {
         assertTrue(sttResponse.success)
         assertEquals("음성에서 추출된 텍스트입니다", sttResponse.text)
         assertEquals(0.95f, sttResponse.confidence)
-        assertEquals("ko", sttResponse.language)
+        assertEquals(5.5f, sttResponse.durationSeconds)
         assertNull(sttResponse.error)
     }
 
@@ -50,7 +50,7 @@ class VoiceRecognizerTest {
             success = false,
             text = null,
             confidence = null,
-            language = null,
+            durationSeconds = null,
             error = "음성을 인식할 수 없습니다"
         )
 
@@ -58,36 +58,36 @@ class VoiceRecognizerTest {
         assertFalse(sttResponse.success)
         assertNull(sttResponse.text)
         assertNull(sttResponse.confidence)
-        assertNull(sttResponse.language)
+        assertNull(sttResponse.durationSeconds)
         assertEquals("음성을 인식할 수 없습니다", sttResponse.error)
     }
 
     /**
-     * 테스트: 다양한 언어 응답 확인
+     * 테스트: 오디오 길이 정보 확인
      */
     @Test
-    fun `SttResponse supports multiple languages`() {
-        // Given - 한국어 응답
-        val koreanResponse = SttResponse(
+    fun `SttResponse contains duration information`() {
+        // Given - 짧은 오디오
+        val shortAudio = SttResponse(
             success = true,
-            text = "한국어 텍스트",
+            text = "짧은 음성",
             confidence = 0.9f,
-            language = "ko",
+            durationSeconds = 2.5f,
             error = null
         )
 
-        // Given - 영어 응답
-        val englishResponse = SttResponse(
+        // Given - 긴 오디오
+        val longAudio = SttResponse(
             success = true,
-            text = "English text",
+            text = "긴 음성 파일의 텍스트입니다",
             confidence = 0.95f,
-            language = "en",
+            durationSeconds = 30.0f,
             error = null
         )
 
         // Then
-        assertEquals("ko", koreanResponse.language)
-        assertEquals("en", englishResponse.language)
+        assertEquals(2.5f, shortAudio.durationSeconds)
+        assertEquals(30.0f, longAudio.durationSeconds)
     }
 
     /**
@@ -100,7 +100,7 @@ class VoiceRecognizerTest {
             success = true,
             text = "높은 신뢰도",
             confidence = 0.99f,
-            language = "ko",
+            durationSeconds = 3.0f,
             error = null
         )
 
@@ -109,7 +109,7 @@ class VoiceRecognizerTest {
             success = true,
             text = "낮은 신뢰도",
             confidence = 0.5f,
-            language = "ko",
+            durationSeconds = 3.0f,
             error = null
         )
 
@@ -129,7 +129,7 @@ class VoiceRecognizerTest {
             success = true,
             text = "   ",  // 공백만
             confidence = 0.5f,
-            language = "ko",
+            durationSeconds = 1.0f,
             error = null
         )
 
@@ -147,7 +147,7 @@ class VoiceRecognizerTest {
             success = true,
             text = null,
             confidence = 0.5f,
-            language = "ko",
+            durationSeconds = 1.0f,
             error = null
         )
 
@@ -166,7 +166,7 @@ class VoiceRecognizerTest {
             success = true,
             text = "내일 오후 3시에 팀 미팅이 있습니다.",
             confidence = 0.92f,
-            language = "ko",
+            durationSeconds = 4.5f,
             error = null
         )
 
@@ -186,7 +186,7 @@ class VoiceRecognizerTest {
             success = false,
             text = null,
             confidence = null,
-            language = null,
+            durationSeconds = null,
             error = "오디오 파일을 읽을 수 없습니다"
         )
 
@@ -194,7 +194,7 @@ class VoiceRecognizerTest {
             success = false,
             text = null,
             confidence = null,
-            language = null,
+            durationSeconds = null,
             error = "음성이 감지되지 않았습니다"
         )
 
