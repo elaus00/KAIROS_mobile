@@ -42,6 +42,12 @@ val ErrorColor = Color(0xFFD32F2F)
 val SuccessColor = Color(0xFF388E3C)
 val WarningColor = Color(0xFFFFA726)
 
+// Semantic Colors (다크 테마)
+val ErrorRed = Color(0xFFE57373)            // 에러/위험 (밝은 레드)
+val SuccessGreen = Color(0xFF81C784)        // 성공 (밝은 그린)
+val WarningOrange = Color(0xFFFFB74D)       // 경고 (오렌지)
+val GlassBackground = Color(0xFF0A0E17)     // 다크 배경
+
 // Category Colors (Quick Type Buttons)
 val IdeaColor = Color(0xFFFFB74D)            // Amber
 val MeetingColor = Color(0xFF64B5F6)         // Blue
@@ -104,6 +110,11 @@ val AiryBlobBlue = Color(0x40A5C8F0)         // 파스텔 블루 25%
 val AiryBlobPink = Color(0x40F8C8E0)         // 파스텔 핑크 25%
 val AiryBlobPurple = Color(0x40D4B8F0)       // 파스텔 퍼플 25%
 
+// 에어리 디자인 v2 (SVG 스펙 기반)
+val AiryBackgroundV2 = Color(0xFFF4F6F8)     // 밝은 회색 배경
+val AiryBlobNavyDark = Color(0x261A1A40)     // 상단 Blob - 어두운 남색 15%
+val AiryBlobSkyBlue = Color(0x33BFDBFE)      // 하단 Blob - 연한 파란색 20%
+
 // 에어리 액센트 색상
 val AiryAccentBlue = Color(0xFF2A86E2)       // 밝은 블루
 val AiryAccentBlueLight = Color(0x262A86E2)  // 15% 불투명도
@@ -118,3 +129,57 @@ val AirySaveColor = Color(0xFFA855F7)        // 퍼플
 val AirySuccessColor = Color(0xFF22C55E)     // 그린
 val AiryWarningColor = Color(0xFFFBBF24)     // 노란색
 val AiryErrorColor = Color(0xFFEF4444)       // 레드
+
+// 에어리 Semantic Colors (라이트 테마)
+val AiryErrorRed = Color(0xFFEF4444)         // 에러/위험 (레드)
+val AirySuccessGreen = Color(0xFF22C55E)     // 성공 (그린)
+val AiryWarningOrange = Color(0xFFF97316)    // 경고 (오렌지)
+val AiryGlassBackground = Color(0xFFF5F7FA)  // 라이트 배경
+
+// ========== Minimalist Monochrome Design (PRD v4.0) ==========
+
+/**
+ * 라이트 테마 색상 팔레트
+ * 무채색 기조, danger만 예외
+ */
+object KairosLight {
+    val background = Color(0xFFFAFAFA)       // 메인 배경
+    val card = Color(0xFFFFFFFF)             // 카드 배경
+    val border = Color(0xFFEEEEEE)           // 기본 보더
+    val borderLight = Color(0xFFF0F0F0)      // 연한 보더
+    val text = Color(0xFF111111)             // 기본 텍스트
+    val textSecondary = Color(0xFF888888)    // 보조 텍스트
+    val textMuted = Color(0xFFAAAAAA)        // 희미한 텍스트
+    val placeholder = Color(0xFFCCCCCC)      // 플레이스홀더
+    val accent = Color(0xFF111111)           // 강조 색상
+    val accentBg = Color(0xFFF5F5F5)         // 강조 배경
+    val chipBg = Color(0xFFF0F0F0)           // 칩 배경
+    val chipText = Color(0xFF666666)         // 칩 텍스트
+    val danger = Color(0xFFEF4444)           // 위험/삭제 (유일한 컬러)
+    val icon = Color(0xFF555555)             // 아이콘 색상
+    val iconMuted = Color(0xFFAAAAAA)        // 비활성 아이콘
+    val divider = Color(0xFFF0F0F0)          // 구분선
+}
+
+/**
+ * 다크 테마 색상 팔레트
+ * 무채색 기조, danger만 예외
+ */
+object KairosDark {
+    val background = Color(0xFF0A0A0A)       // 메인 배경
+    val card = Color(0xFF1A1A1A)             // 카드 배경
+    val border = Color(0xFF2A2A2A)           // 기본 보더
+    val borderLight = Color(0xFF222222)      // 연한 보더
+    val text = Color(0xCCFFFFFF)             // 기본 텍스트 (80% white)
+    val textSecondary = Color(0xFF888888)    // 보조 텍스트
+    val textMuted = Color(0xFF555555)        // 희미한 텍스트
+    val placeholder = Color(0xFF444444)      // 플레이스홀더
+    val accent = Color(0xCCFFFFFF)           // 강조 색상
+    val accentBg = Color(0xFF252525)         // 강조 배경
+    val chipBg = Color(0xFF2A2A2A)           // 칩 배경
+    val chipText = Color(0xFF999999)         // 칩 텍스트
+    val danger = Color(0xFFEF4444)           // 위험/삭제 (유일한 컬러)
+    val icon = Color(0xFFAAAAAA)             // 아이콘 색상
+    val iconMuted = Color(0xFF555555)        // 비활성 아이콘
+    val divider = Color(0xFF2A2A2A)          // 구분선
+}

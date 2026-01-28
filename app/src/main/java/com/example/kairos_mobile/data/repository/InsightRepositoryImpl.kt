@@ -620,6 +620,47 @@ class InsightRepositoryImpl @Inject constructor(
         return dao.getTotalCount()
     }
 
+    // ========== PRD v4.0: 추가 기능 ==========
+
+    /**
+     * 최근 인사이트 조회 (Home 화면용)
+     */
+    override fun getRecentInsights(limit: Int): Flow<List<Insight>> {
+        return dao.getRecentInsights(limit)
+            .map { entities -> entities.map { insightMapper.toDomain(it) } }
+    }
+
+    /**
+     * 인사이트 저장 (타입 자동 분류)
+     */
+    override suspend fun saveInsight(content: String): Result<Insight> {
+        return submitInsight(content)
+    }
+
+    /**
+     * 인사이트 저장 (타입 지정)
+     */
+    override suspend fun saveInsightWithType(content: String, type: InsightType): Result<Insight> = withContext(dispatcher) {
+        try {
+            // 1. 인사이트 객체 생성
+            val insight = Insight(
+                content = content,
+                syncStatus = SyncStatus.PENDING
+            )
+
+            // 2. 로컬에 저장
+            dao.insertInsight(insightMapper.toEntity(insight))
+            Log.d(TAG, "Insight saved locally with type $type: ${insight.id}")
+
+            // 3. 네트워크 확인 없이 로컬 저장만 (타입이 이미 지정됨)
+            // 나중에 백그라운드에서 동기화
+            Result.Success(insight)
+        } catch (e: Exception) {
+            Log.e(TAG, "saveInsightWithType failed", e)
+            Result.Error(e)
+        }
+    }
+
     /**
      * 인사이트들을 날짜별로 그룹화
      */

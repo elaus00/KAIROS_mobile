@@ -137,4 +137,31 @@ interface InsightRepository {
      * 전체 인사이트 개수 조회
      */
     fun getTotalCount(): Flow<Int>
+
+    // ========== PRD v4.0: 추가 기능 ==========
+
+    /**
+     * 최근 인사이트 조회 (Home 화면용)
+     *
+     * @param limit 최대 개수
+     * @return 최근 인사이트 리스트
+     */
+    fun getRecentInsights(limit: Int = 6): Flow<List<Insight>>
+
+    /**
+     * 인사이트 저장 (타입 자동 분류)
+     *
+     * @param content 캡처 내용
+     * @return 저장된 인사이트
+     */
+    suspend fun saveInsight(content: String): Result<Insight>
+
+    /**
+     * 인사이트 저장 (타입 지정)
+     *
+     * @param content 캡처 내용
+     * @param type 인사이트 타입
+     * @return 저장된 인사이트
+     */
+    suspend fun saveInsightWithType(content: String, type: com.example.kairos_mobile.domain.model.InsightType): Result<Insight>
 }

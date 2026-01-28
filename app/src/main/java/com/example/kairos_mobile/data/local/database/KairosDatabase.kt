@@ -4,20 +4,32 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.kairos_mobile.data.local.database.dao.BookmarkDao
 import com.example.kairos_mobile.data.local.database.dao.InsightQueueDao
+import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.local.database.dao.NotificationDao
+import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
+import com.example.kairos_mobile.data.local.database.dao.TodoDao
+import com.example.kairos_mobile.data.local.database.entities.BookmarkEntity
 import com.example.kairos_mobile.data.local.database.entities.InsightQueueEntity
+import com.example.kairos_mobile.data.local.database.entities.NoteEntity
 import com.example.kairos_mobile.data.local.database.entities.NotificationEntity
+import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
+import com.example.kairos_mobile.data.local.database.entities.TodoEntity
 
 /**
- * KAIROS 앱의 Room Database
+ * KAIROS 앱의 Room Database (PRD v4.0)
  */
 @Database(
     entities = [
         InsightQueueEntity::class,
-        NotificationEntity::class
+        NotificationEntity::class,
+        TodoEntity::class,
+        ScheduleEntity::class,
+        NoteEntity::class,
+        BookmarkEntity::class
     ],
-    version = 5,  // Phase 4: Capture → Insight 리네이밍으로 버전 업
+    version = 7,  // PRD v4.0: Schedule, Note, Bookmark 테이블 추가
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -31,6 +43,26 @@ abstract class KairosDatabase : RoomDatabase() {
      * 알림 DAO
      */
     abstract fun notificationDao(): NotificationDao
+
+    /**
+     * 투두 DAO
+     */
+    abstract fun todoDao(): TodoDao
+
+    /**
+     * 일정 DAO (PRD v4.0)
+     */
+    abstract fun scheduleDao(): ScheduleDao
+
+    /**
+     * 노트 DAO (PRD v4.0)
+     */
+    abstract fun noteDao(): NoteDao
+
+    /**
+     * 북마크 DAO (PRD v4.0)
+     */
+    abstract fun bookmarkDao(): BookmarkDao
 
     companion object {
         const val DATABASE_NAME = "kairos_database"
@@ -163,6 +195,142 @@ abstract class KairosDatabase : RoomDatabase() {
                 // 테이블명 변경
                 database.execSQL(
                     "ALTER TABLE capture_queue RENAME TO insight_queue"
+                )
+            }
+        }
+
+        /**
+         * Database v5 → v6 마이그레이션
+         * Phase 5: Todo 테이블 추가 및 SCHEDULE → NOTE 타입 변환
+         */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 1. todos 테이블 생성
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS todos (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        content TEXT NOT NULL,
+                        title TEXT,
+                        source_insight_id TEXT,
+                        due_date INTEGER,
+                        due_time TEXT,
+                        priority INTEGER NOT NULL DEFAULT 0,
+                        labels TEXT,
+                        manual_order INTEGER NOT NULL DEFAULT 0,
+                        is_completed INTEGER NOT NULL DEFAULT 0,
+                        completed_at INTEGER,
+                        created_at INTEGER NOT NULL,
+                        updated_at INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+
+                // 2. todos 인덱스 생성 (마감일 조회 성능 최적화)
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_todos_due_date ON todos(due_date)"
+                )
+
+                // 3. todos 완료 상태 인덱스 생성
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_todos_is_completed ON todos(is_completed)"
+                )
+
+                // 4. SCHEDULE 타입을 NOTE로 변환
+                database.execSQL(
+                    """
+                    UPDATE insight_queue
+                    SET classification_type = 'NOTE'
+                    WHERE classification_type = 'SCHEDULE'
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Database v6 → v7 마이그레이션
+         * PRD v4.0: Schedule, Note, Bookmark 테이블 추가
+         */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 1. schedules 테이블 생성
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS schedules (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        title TEXT NOT NULL,
+                        time TEXT NOT NULL,
+                        date INTEGER NOT NULL,
+                        location TEXT,
+                        category TEXT NOT NULL,
+                        google_calendar_id TEXT,
+                        source_insight_id TEXT,
+                        created_at INTEGER NOT NULL,
+                        updated_at INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+
+                // schedules 인덱스 생성
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_schedules_date ON schedules(date)"
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_schedules_category ON schedules(category)"
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_schedules_google_calendar_id ON schedules(google_calendar_id)"
+                )
+
+                // 2. notes 테이블 생성
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS notes (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        title TEXT NOT NULL,
+                        content TEXT NOT NULL,
+                        folder TEXT NOT NULL DEFAULT 'INBOX',
+                        tags TEXT,
+                        source_insight_id TEXT,
+                        created_at INTEGER NOT NULL,
+                        updated_at INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+
+                // notes 인덱스 생성
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_notes_folder ON notes(folder)"
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_notes_created_at ON notes(created_at)"
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_notes_updated_at ON notes(updated_at)"
+                )
+
+                // 3. bookmarks 테이블 생성
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS bookmarks (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        title TEXT NOT NULL,
+                        url TEXT NOT NULL,
+                        summary TEXT,
+                        tags TEXT,
+                        favicon_url TEXT,
+                        source_insight_id TEXT,
+                        created_at INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+
+                // bookmarks 인덱스 생성
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_bookmarks_created_at ON bookmarks(created_at)"
+                )
+                database.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS index_bookmarks_url ON bookmarks(url)"
                 )
             }
         }
