@@ -2,7 +2,6 @@ package com.example.kairos_mobile.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.repository.PreferencesRepository
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.model.ThemePreference
@@ -24,8 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getThemePreferenceUseCase: GetThemePreferenceUseCase,
-    private val setThemePreferenceUseCase: SetThemePreferenceUseCase,
-    private val preferencesRepository: PreferencesRepository
+    private val setThemePreferenceUseCase: SetThemePreferenceUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -43,18 +41,6 @@ class SettingsViewModel @Inject constructor(
      */
     private fun loadPreferences() {
         viewModelScope.launch {
-            preferencesRepository.getAutoSummarizeEnabled().collect { enabled ->
-                _uiState.update { it.copy(autoSummarizeEnabled = enabled) }
-            }
-        }
-
-        viewModelScope.launch {
-            preferencesRepository.getSmartTagsEnabled().collect { enabled ->
-                _uiState.update { it.copy(smartTagsEnabled = enabled) }
-            }
-        }
-
-        viewModelScope.launch {
             getThemePreferenceUseCase().collect { theme ->
                 _uiState.update { it.copy(themePreference = theme) }
             }
@@ -64,33 +50,46 @@ class SettingsViewModel @Inject constructor(
     // ========== AI 기능 설정 ==========
 
     /**
-     * 자동 요약 활성화 토글
-     */
-    fun toggleAutoSummarize(enabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.setAutoSummarizeEnabled(enabled)
-            _uiState.update { it.copy(autoSummarizeEnabled = enabled) }
-        }
-    }
-
-    /**
-     * 스마트 태그 제안 활성화 토글
-     */
-    fun toggleSmartTags(enabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.setSmartTagsEnabled(enabled)
-            _uiState.update { it.copy(smartTagsEnabled = enabled) }
-        }
-    }
-
-    /**
      * 자동 분류 활성화 토글
      */
     fun toggleAutoClassify(enabled: Boolean) {
         viewModelScope.launch {
-            // TODO: preferencesRepository에 setAutoClassifyEnabled 추가
             _uiState.update { it.copy(autoClassifyEnabled = enabled) }
         }
+    }
+
+    /**
+     * 스마트 배치 활성화 토글
+     */
+    fun toggleSmartSchedule(enabled: Boolean) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(smartScheduleEnabled = enabled) }
+        }
+    }
+
+    // ========== 화면 설정 ==========
+
+    /**
+     * 노트 보기 방식 변경
+     */
+    fun setViewMode(mode: ViewMode) {
+        _uiState.update { it.copy(viewMode = mode) }
+    }
+
+    // ========== 연동 설정 ==========
+
+    /**
+     * Google Calendar 연동 토글
+     */
+    fun toggleGoogleCalendar() {
+        _uiState.update { it.copy(googleCalendarConnected = !it.googleCalendarConnected) }
+    }
+
+    /**
+     * Obsidian 연동 토글
+     */
+    fun toggleObsidian() {
+        _uiState.update { it.copy(obsidianConnected = !it.obsidianConnected) }
     }
 
     // ========== 테마 설정 ==========

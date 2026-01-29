@@ -3,20 +3,31 @@ package com.example.kairos_mobile.presentation.settings
 import com.example.kairos_mobile.domain.model.ThemePreference
 
 /**
+ * 노트 보기 방식
+ */
+enum class ViewMode {
+    DETAIL,  // 자세히
+    GRID,    // 그리드
+    LIST     // 리스트
+}
+
+/**
  * Settings 화면 UI 상태
  * AI 기능 및 테마 설정
  */
 data class SettingsUiState(
     // ========== AI 기능 설정 ==========
-    val autoSummarizeEnabled: Boolean = true,
-    val smartTagsEnabled: Boolean = true,
     val autoClassifyEnabled: Boolean = true,
+    val smartScheduleEnabled: Boolean = true,
 
     // ========== 테마 설정 ==========
     val themePreference: ThemePreference = ThemePreference.DARK,
 
+    // ========== 화면 설정 ==========
+    val viewMode: ViewMode = ViewMode.LIST,
+
     // ========== 연동 설정 ==========
-    val googleCalendarConnected: Boolean = false,
+    val googleCalendarConnected: Boolean = true,
     val obsidianConnected: Boolean = false,
 
     // ========== UI 이벤트 ==========

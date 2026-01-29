@@ -2,13 +2,13 @@ package com.example.kairos_mobile
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.content.IntentCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
@@ -76,12 +76,11 @@ class MainActivity : ComponentActivity() {
             }
             // 이미지 공유
             intent.type?.startsWith("image/") == true -> {
-                val imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(Intent.EXTRA_STREAM)
-                }
+                val imageUri = IntentCompat.getParcelableExtra(
+                    intent,
+                    Intent.EXTRA_STREAM,
+                    Uri::class.java
+                )
                 imageUri?.let { SharedContent(imageUri = it) }
             }
             else -> null

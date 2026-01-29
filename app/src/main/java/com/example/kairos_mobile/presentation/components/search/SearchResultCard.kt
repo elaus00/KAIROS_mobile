@@ -170,6 +170,7 @@ private fun getThemedTypeColor(type: CaptureType, isDarkTheme: Boolean): android
     } else {
         when (type) {
             CaptureType.IDEA -> AiryIdeaColor
+            CaptureType.SCHEDULE -> AiryMeetingColor
             CaptureType.TODO -> AiryTodoColor
             CaptureType.NOTE -> AirySaveColor
             CaptureType.QUICK_NOTE -> AiryTextTertiary

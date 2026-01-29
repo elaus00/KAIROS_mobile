@@ -154,32 +154,3 @@ private fun WeekDayItem(
         )
     }
 }
-
-/**
- * 요일 헤더 Row
- */
-@Composable
-fun WeekDayHeader(
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-    val dayNames = listOf("일", "월", "화", "수", "목", "금", "토")
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        dayNames.forEach { day ->
-            Text(
-                text = day,
-                color = colors.textMuted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.width(40.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        }
-    }
-}

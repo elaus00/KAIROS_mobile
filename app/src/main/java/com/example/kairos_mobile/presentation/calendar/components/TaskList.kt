@@ -3,23 +3,16 @@ package com.example.kairos_mobile.presentation.calendar.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DragHandle
-import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,17 +27,11 @@ import com.example.kairos_mobile.domain.model.Todo
 import com.example.kairos_mobile.domain.model.TodoPriority
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.presentation.components.common.SwipeableCard
-import com.example.kairos_mobile.ui.components.kairosCard
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * TaskList 컴포넌트 (PRD v4.0)
+ * TaskList 컴포넌트 (Reference 디자인)
  * 할 일 목록 (드래그 핸들, 체크박스, 스와이프 삭제)
- *
- * @param tasks 할 일 목록
- * @param onTaskClick 할 일 클릭 콜백
- * @param onTaskComplete 완료 토글 콜백
- * @param onTaskDelete 삭제 콜백
  */
 @Composable
 fun TaskList(
@@ -62,15 +49,13 @@ fun TaskList(
         if (tasks.isEmpty()) {
             TaskEmptyState()
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(
-                    items = tasks,
-                    key = { it.id }
-                ) { task ->
+                tasks.forEach { task ->
                     SwipeableCard(
                         onDismiss = { onTaskDelete(task.id) }
                     ) {
@@ -87,7 +72,7 @@ fun TaskList(
 }
 
 /**
- * 할 일 아이템
+ * 할 일 아이템 (Reference 디자인)
  */
 @Composable
 private fun TaskItem(
@@ -102,80 +87,62 @@ private fun TaskItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .kairosCard()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .alpha(alpha)
-            .padding(12.dp)
+            .padding(12.dp, 14.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 드래그 핸들
-            Icon(
-                imageVector = Icons.Default.DragHandle,
-                contentDescription = "정렬",
-                tint = colors.textMuted,
-                modifier = Modifier.size(20.dp)
-            )
+            DragHandle()
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             // 내용
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // 제목
-                Text(
-                    text = task.title ?: task.content,
-                    color = colors.text,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
-                )
+                // 제목 + 카테고리 chip (있는 경우)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = task.title ?: task.content,
+                        color = colors.text,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
 
-                // 마감일/시간 (있는 경우)
-                if (task.dueDate != null || task.dueTime != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        task.dueTime?.let { time ->
-                            Text(
-                                text = String.format("%02d:%02d", time.hour, time.minute),
-                                color = if (task.isOverdue()) colors.danger else colors.textMuted,
-                                fontSize = 12.sp
-                            )
-                        }
-                        if (task.dueTime != null && task.dueDate != null) {
-                            Text(
-                                text = " · ",
-                                color = colors.textMuted,
-                                fontSize = 12.sp
-                            )
-                        }
-                        task.dueDate?.let { date ->
-                            Text(
-                                text = "${date.monthValue}/${date.dayOfMonth}",
-                                color = if (task.isOverdue()) colors.danger else colors.textMuted,
-                                fontSize = 12.sp
-                            )
-                        }
+                    // 카테고리 표시 (우선순위로 대체)
+                    if (task.priority != TodoPriority.NONE) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        PriorityChip(priority = task.priority)
                     }
                 }
 
-                // 우선순위 표시
-                if (task.priority != TodoPriority.NONE) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    PriorityIndicator(priority = task.priority)
+                // 마감 시간 (있는 경우)
+                task.dueTime?.let { time ->
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "마감 ${String.format("%02d:%02d", time.hour, time.minute)}",
+                        color = if (task.isOverdue()) colors.danger else colors.danger,
+                        fontSize = 12.sp
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
-            // 체크박스
+            // 체크박스 (둥근 사각형)
             TaskCheckbox(
                 isChecked = task.isCompleted,
                 onToggle = onToggleComplete
@@ -185,7 +152,32 @@ private fun TaskItem(
 }
 
 /**
- * 커스텀 체크박스
+ * 드래그 핸들 (Reference 디자인)
+ */
+@Composable
+private fun DragHandle(
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        repeat(2) {
+            Box(
+                modifier = Modifier
+                    .width(12.dp)
+                    .height(2.dp)
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(colors.textMuted.copy(alpha = 0.3f))
+            )
+        }
+    }
+}
+
+/**
+ * 커스텀 체크박스 (둥근 사각형 - Reference 디자인)
  */
 @Composable
 private fun TaskCheckbox(
@@ -195,55 +187,60 @@ private fun TaskCheckbox(
 ) {
     val colors = KairosTheme.colors
 
-    val iconColor by animateColorAsState(
-        targetValue = if (isChecked) colors.accent else colors.textMuted,
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isChecked) colors.accent else Color.Transparent,
         animationSpec = tween(durationMillis = 200),
-        label = "iconColor"
+        label = "bgColor"
+    )
+
+    val borderColor by animateColorAsState(
+        targetValue = if (isChecked) colors.accent else colors.border,
+        animationSpec = tween(durationMillis = 200),
+        label = "borderColor"
     )
 
     Box(
         modifier = modifier
-            .size(28.dp)
-            .clip(CircleShape)
+            .size(22.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(backgroundColor)
+            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp))
             .clickable { onToggle() },
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = if (isChecked) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-            contentDescription = if (isChecked) "완료됨" else "미완료",
-            tint = iconColor,
-            modifier = Modifier.size(24.dp)
-        )
+        if (isChecked) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "완료됨",
+                tint = if (colors.isDark) colors.background else Color.White,
+                modifier = Modifier.size(12.dp)
+            )
+        }
     }
 }
 
 /**
- * 우선순위 표시
+ * 우선순위 Chip (Reference 디자인)
  */
 @Composable
-private fun PriorityIndicator(
+private fun PriorityChip(
     priority: TodoPriority,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
 
-    val (text, bgColor) = when (priority) {
-        TodoPriority.HIGH -> "높음" to colors.danger.copy(alpha = 0.1f)
-        TodoPriority.MEDIUM -> "중간" to colors.chipBg
-        TodoPriority.LOW -> "낮음" to colors.chipBg
+    val (text, bgColor, textColor) = when (priority) {
+        TodoPriority.HIGH -> Triple("Work", colors.chipBg, colors.chipText)
+        TodoPriority.MEDIUM -> Triple("Work", colors.chipBg, colors.chipText)
+        TodoPriority.LOW -> Triple("Personal", colors.chipBg, colors.chipText)
         TodoPriority.NONE -> return
-    }
-
-    val textColor = when (priority) {
-        TodoPriority.HIGH -> colors.danger
-        else -> colors.chipText
     }
 
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(4.dp))
             .background(bgColor)
-            .padding(horizontal = 6.dp, vertical = 2.dp)
+            .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
             text = text,
@@ -274,58 +271,5 @@ private fun TaskEmptyState(
             color = colors.textMuted,
             fontSize = 14.sp
         )
-    }
-}
-
-/**
- * 간단한 할 일 아이템 (드래그 핸들 없음)
- */
-@Composable
-fun SimpleTaskItem(
-    task: Todo,
-    onClick: () -> Unit,
-    onToggleComplete: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-    val alpha = if (task.isCompleted) 0.6f else 1f
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() }
-            .alpha(alpha)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // 체크박스
-        TaskCheckbox(
-            isChecked = task.isCompleted,
-            onToggle = onToggleComplete
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // 내용
-        Text(
-            text = task.title ?: task.content,
-            color = colors.text,
-            fontSize = 14.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
-            modifier = Modifier.weight(1f)
-        )
-
-        // 마감 시간
-        task.dueTime?.let { time ->
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = String.format("%02d:%02d", time.hour, time.minute),
-                color = if (task.isOverdue()) colors.danger else colors.textMuted,
-                fontSize = 12.sp
-            )
-        }
     }
 }

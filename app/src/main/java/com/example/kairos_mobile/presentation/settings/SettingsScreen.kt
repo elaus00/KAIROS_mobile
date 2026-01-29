@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +32,6 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
-    onBack: () -> Unit,
     onNavigate: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,36 +82,33 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // AI 기능 섹션
-            SectionHeader(title = "AI 기능")
+            // 프로필 섹션
+            ProfileSection(
+                userName = "사용자",
+                userEmail = "user@email.com",
+                onClick = { /* TODO: 프로필 상세 */ }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 연동 섹션
+            SectionHeader(title = "연동")
 
             SettingsCard {
-                // 자동 요약
-                SwitchSettingItem(
-                    title = "자동 요약",
-                    description = "긴 콘텐츠를 AI가 자동으로 요약합니다",
-                    checked = uiState.autoSummarizeEnabled,
-                    onCheckedChange = viewModel::toggleAutoSummarize
+                // Google Calendar
+                IntegrationSettingItem(
+                    title = "Google Calendar",
+                    isConnected = uiState.googleCalendarConnected,
+                    onToggle = { viewModel.toggleGoogleCalendar() }
                 )
 
                 SettingsDivider()
 
-                // 스마트 태그 제안
-                SwitchSettingItem(
-                    title = "스마트 태그 제안",
-                    description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
-                    checked = uiState.smartTagsEnabled,
-                    onCheckedChange = viewModel::toggleSmartTags
-                )
-
-                SettingsDivider()
-
-                // 자동 분류
-                SwitchSettingItem(
-                    title = "자동 분류",
-                    description = "캡처 내용을 AI가 자동으로 분류합니다",
-                    checked = uiState.autoClassifyEnabled,
-                    onCheckedChange = viewModel::toggleAutoClassify
+                // Obsidian
+                IntegrationSettingItem(
+                    title = "Obsidian",
+                    isConnected = uiState.obsidianConnected,
+                    onToggle = { viewModel.toggleObsidian() }
                 )
             }
 
@@ -123,32 +121,41 @@ fun SettingsScreen(
                 // 다크 모드
                 SwitchSettingItem(
                     title = "다크 모드",
-                    description = "어두운 테마를 사용합니다",
                     checked = uiState.themePreference == ThemePreference.DARK,
                     onCheckedChange = viewModel::toggleDarkMode
+                )
+
+                SettingsDivider()
+
+                // 노트 보기 방식
+                ViewModeSettingItem(
+                    selectedMode = uiState.viewMode,
+                    onModeSelected = viewModel::setViewMode
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 연동 섹션
-            SectionHeader(title = "연동")
+            // AI 설정 섹션
+            SectionHeader(title = "AI 설정")
 
             SettingsCard {
-                // Google Calendar
-                NavigationSettingItem(
-                    title = "Google Calendar",
-                    description = if (uiState.googleCalendarConnected) "연결됨" else "연결 안됨",
-                    onClick = { /* TODO: Google Calendar 연동 */ }
+                // 자동 분류
+                SwitchSettingItem(
+                    title = "자동 분류",
+                    description = "입력 내용을 자동으로 분류",
+                    checked = uiState.autoClassifyEnabled,
+                    onCheckedChange = viewModel::toggleAutoClassify
                 )
 
                 SettingsDivider()
 
-                // Obsidian
-                NavigationSettingItem(
-                    title = "Obsidian",
-                    description = if (uiState.obsidianConnected) "연결됨" else "연결 안됨",
-                    onClick = { /* TODO: Obsidian 연동 */ }
+                // 스마트 배치
+                SwitchSettingItem(
+                    title = "스마트 배치",
+                    description = "할 일 시간대 자동 추천",
+                    checked = uiState.smartScheduleEnabled,
+                    onCheckedChange = viewModel::toggleSmartSchedule
                 )
             }
 
@@ -171,27 +178,75 @@ fun SettingsScreen(
                     title = "개인정보 처리방침",
                     onClick = { /* TODO: 개인정보 처리방침 */ }
                 )
-
-                SettingsDivider()
-
-                NavigationSettingItem(
-                    title = "이용약관",
-                    onClick = { /* TODO: 이용약관 */ }
-                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
 
-            // 앱 정보
-            Text(
-                text = "KAIROS v1.0",
-                color = colors.textMuted,
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 16.dp)
+/**
+ * 프로필 섹션
+ */
+@Composable
+private fun ProfileSection(
+    userName: String,
+    userEmail: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 프로필 아이콘
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(colors.chipBg),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                tint = colors.textMuted,
+                modifier = Modifier.size(28.dp)
             )
         }
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        // 사용자 정보
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = userName,
+                color = colors.text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = userEmail,
+                color = colors.textSecondary,
+                fontSize = 13.sp
+            )
+        }
+
+        // 화살표
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = colors.textMuted,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 
@@ -216,12 +271,66 @@ private fun SettingsCard(
 }
 
 /**
+ * 연동 설정 아이템
+ */
+@Composable
+private fun IntegrationSettingItem(
+    title: String,
+    isConnected: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = title,
+                color = colors.text,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = if (isConnected) "연동됨" else "연동 안됨",
+                color = if (isConnected) colors.success else colors.textSecondary,
+                fontSize = 13.sp
+            )
+        }
+
+        // 연동/해제 버튼
+        Button(
+            onClick = onToggle,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isConnected) colors.chipBg else colors.accent,
+                contentColor = if (isConnected) colors.textSecondary else colors.card
+            ),
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.height(36.dp)
+        ) {
+            Text(
+                text = if (isConnected) "해제" else "연동",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+/**
  * 스위치 설정 아이템
  */
 @Composable
 private fun SwitchSettingItem(
     title: String,
-    description: String,
+    description: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -243,12 +352,14 @@ private fun SwitchSettingItem(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = description,
-                color = colors.textMuted,
-                fontSize = 13.sp
-            )
+            if (description != null) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = description,
+                    color = colors.textMuted,
+                    fontSize = 13.sp
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -263,6 +374,65 @@ private fun SwitchSettingItem(
                 uncheckedTrackColor = colors.chipBg
             )
         )
+    }
+}
+
+/**
+ * 노트 보기 방식 설정 아이템
+ */
+@Composable
+private fun ViewModeSettingItem(
+    selectedMode: ViewMode,
+    onModeSelected: (ViewMode) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+    ) {
+        Text(
+            text = "노트 보기 방식",
+            color = colors.text,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 버튼 그룹 (크기 축소)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ViewMode.entries.forEach { mode ->
+                val isSelected = selectedMode == mode
+                Button(
+                    onClick = { onModeSelected(mode) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSelected) colors.accent else colors.chipBg,
+                        contentColor = if (isSelected) colors.card else colors.textSecondary
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
+                ) {
+                    Text(
+                        text = when (mode) {
+                            ViewMode.DETAIL -> "자세히"
+                            ViewMode.GRID -> "그리드"
+                            ViewMode.LIST -> "리스트"
+                        },
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
     }
 }
 

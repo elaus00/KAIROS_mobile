@@ -3,8 +3,6 @@ package com.example.kairos_mobile.presentation.home.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,12 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,10 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import androidx.compose.material3.Text
 
 /**
  * 캡처 입력 영역 컴포넌트 (PRD v4.0)
- * 하단 고정 입력창 + AI 분류 chip + 카메라 버튼
+ * 디자인 시안 반영: 전체 너비 입력창, 버튼 숨김/표시
  */
 @Composable
 fun CaptureInputArea(
@@ -55,131 +52,108 @@ fun CaptureInputArea(
 ) {
     val colors = KairosTheme.colors
     var isFocused by remember { mutableStateOf(false) }
+    val hasText = inputText.isNotEmpty()
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(colors.card)
+            .background(colors.background)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // 상단: 글자수 + AI 분류 chip (입력 시작 시에만 표시)
-        AnimatedVisibility(
-            visible = inputText.isNotEmpty(),
-            enter = fadeIn() + slideInVertically { -it },
-            exit = fadeOut() + slideOutVertically { -it }
+        // 입력 상자 (디자인: 전체 너비, 큰 영역)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 120.dp, max = 180.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(colors.card)
+                .border(
+                    width = 1.dp,
+                    color = if (isFocused) colors.border else colors.borderLight,
+                    shape = RoundedCornerShape(12.dp)
+                )
         ) {
+            // 텍스트 입력 영역
+            BasicTextField(
+                value = inputText,
+                onValueChange = onInputChange,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 56.dp)
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        onFocusChange(focusState.isFocused)
+                    },
+                textStyle = TextStyle(
+                    color = colors.text,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = 24.sp
+                ),
+                cursorBrush = SolidColor(colors.accent),
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (inputText.isEmpty()) {
+                            Text(
+                                text = "떠오르는 생각을 캡처하세요...",
+                                color = colors.placeholder,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+
+            // 하단 영역: AI 분류칩 + 버튼들 (항상 표시, 디자인 시안 반영)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 글자 수
-                Text(
-                    text = "$characterCount / $maxCharacterCount",
-                    color = if (characterCount > maxCharacterCount * 0.9)
-                        colors.danger else colors.textMuted,
-                    fontSize = 12.sp
-                )
-
-                // AI 분류 chip
+                // 왼쪽: AI 분류 칩 또는 로딩 (입력 시에만)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (isClassifying) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = colors.textMuted
-                        )
-                    } else if (suggestedType != null) {
-                        KairosChip(
-                            text = getTypeDisplayName(suggestedType),
-                            selected = true
-                        )
-                    }
-                }
-            }
-        }
+                    if (hasText) {
+                        if (isClassifying) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = colors.textMuted
+                            )
+                        } else if (suggestedType != null) {
+                            KairosChip(
+                                text = getTypeDisplayName(suggestedType),
+                                selected = true
+                            )
+                        }
 
-        // 입력 필드
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // 카메라 버튼
-            IconButton(
-                onClick = onCameraClick,
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(colors.accentBg)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CameraAlt,
-                    contentDescription = "카메라",
-                    tint = colors.icon,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            // 텍스트 입력
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 44.dp, max = 120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.accentBg)
-                    .border(
-                        width = 1.dp,
-                        color = if (isFocused) colors.accent else colors.borderLight,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            ) {
-                BasicTextField(
-                    value = inputText,
-                    onValueChange = onInputChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            isFocused = focusState.isFocused
-                            onFocusChange(focusState.isFocused)
-                        },
-                    textStyle = TextStyle(
-                        color = colors.text,
-                        fontSize = 16.sp
-                    ),
-                    cursorBrush = SolidColor(colors.accent),
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (inputText.isEmpty()) {
-                                Text(
-                                    text = "떠오르는 생각을 캡처...",
-                                    color = colors.placeholder,
-                                    fontSize = 16.sp
-                                )
-                            }
-                            innerTextField()
+                        // 글자수 (90% 이상일 때만 표시)
+                        if (characterCount > maxCharacterCount * 0.9) {
+                            Text(
+                                text = "$characterCount/$maxCharacterCount",
+                                color = colors.danger,
+                                fontSize = 11.sp
+                            )
                         }
                     }
-                )
-            }
+                }
 
-            // 전송 버튼
-            AnimatedVisibility(
-                visible = inputText.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
+                // 오른쪽: 전송 버튼 (항상 표시)
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
-                        .background(colors.accent)
+                        .background(
+                            if (inputText.isNotBlank()) colors.accent
+                            else colors.accentBg
+                        )
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -195,9 +169,11 @@ fun CaptureInputArea(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "전송",
-                            tint = if (colors.isDark) colors.background else Color.White,
+                            tint = if (inputText.isNotBlank()) {
+                                if (colors.isDark) colors.background else Color.White
+                            } else colors.textMuted,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -212,8 +188,9 @@ fun CaptureInputArea(
  */
 private fun getTypeDisplayName(type: CaptureType): String {
     return when (type) {
-        CaptureType.TODO -> "할 일"
         CaptureType.IDEA -> "아이디어"
+        CaptureType.SCHEDULE -> "일정"
+        CaptureType.TODO -> "할 일"
         CaptureType.NOTE -> "노트"
         CaptureType.QUICK_NOTE -> "메모"
         CaptureType.CLIP -> "클립"

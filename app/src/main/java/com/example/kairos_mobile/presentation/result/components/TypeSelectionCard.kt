@@ -213,6 +213,7 @@ private fun TypeSelectionButton(
 private fun CaptureType.getIcon(): ImageVector {
     return when (this) {
         CaptureType.IDEA -> Icons.Default.Lightbulb
+        CaptureType.SCHEDULE -> Icons.Default.Event
         CaptureType.TODO -> Icons.Default.CheckCircle
         CaptureType.NOTE -> Icons.Default.Description
         CaptureType.QUICK_NOTE -> Icons.Default.FlashOn

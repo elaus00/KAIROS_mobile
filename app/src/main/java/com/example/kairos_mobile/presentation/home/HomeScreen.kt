@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
 import com.example.kairos_mobile.presentation.components.common.KairosTab
-import com.example.kairos_mobile.presentation.components.common.SectionHeader
+import com.example.kairos_mobile.presentation.components.common.SectionHeaderKorean
 import com.example.kairos_mobile.presentation.home.components.AIRecommendationCard
 import com.example.kairos_mobile.presentation.home.components.CaptureGrid
 import com.example.kairos_mobile.presentation.home.components.CaptureGridEmpty
@@ -117,7 +117,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 최근 캡처 섹션
-            SectionHeader(title = "Recent Captures")
+            SectionHeaderKorean(title = "최근 캡처")
 
             if (uiState.recentCaptures.isEmpty() && !uiState.isLoadingCaptures) {
                 CaptureGridEmpty()

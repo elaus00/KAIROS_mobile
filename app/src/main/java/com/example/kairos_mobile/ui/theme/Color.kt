@@ -156,6 +156,7 @@ object KairosLight {
     val chipBg = Color(0xFFF0F0F0)           // 칩 배경
     val chipText = Color(0xFF666666)         // 칩 텍스트
     val danger = Color(0xFFEF4444)           // 위험/삭제 (유일한 컬러)
+    val success = Color(0xFF10B981)          // 성공/연동됨 (녹색)
     val icon = Color(0xFF555555)             // 아이콘 색상
     val iconMuted = Color(0xFFAAAAAA)        // 비활성 아이콘
     val divider = Color(0xFFF0F0F0)          // 구분선
@@ -179,6 +180,7 @@ object KairosDark {
     val chipBg = Color(0xFF2A2A2A)           // 칩 배경
     val chipText = Color(0xFF999999)         // 칩 텍스트
     val danger = Color(0xFFEF4444)           // 위험/삭제 (유일한 컬러)
+    val success = Color(0xFF10B981)          // 성공/연동됨 (녹색)
     val icon = Color(0xFFAAAAAA)             // 아이콘 색상
     val iconMuted = Color(0xFF555555)        // 비활성 아이콘
     val divider = Color(0xFF2A2A2A)          // 구분선

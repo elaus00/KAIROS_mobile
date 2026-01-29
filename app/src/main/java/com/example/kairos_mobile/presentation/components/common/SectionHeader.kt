@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 섹션 헤더 컴포넌트 (PRD v4.0)
- * 12px 대문자, 0.5px letter-spacing
+ * 섹션 헤더 컴포넌트 (Reference 디자인)
+ * 12px, fontWeight 600, textSecondary, letterSpacing 0.5px
  */
 @Composable
 fun SectionHeader(
@@ -27,14 +27,14 @@ fun SectionHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = title.uppercase(),
-            color = colors.textMuted,
+            text = title,
+            color = colors.textSecondary,
             fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.5.sp,
             modifier = Modifier.weight(1f)
         )

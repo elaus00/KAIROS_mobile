@@ -180,9 +180,6 @@ fun KairosNavGraph(
         // 설정 화면 (SETTINGS)
         composable(NavRoutes.SETTINGS) {
             SettingsScreen(
-                onBack = {
-                    navController.popBackStack()
-                },
                 onNavigate = navigateToTab
             )
         }

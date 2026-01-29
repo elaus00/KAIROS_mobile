@@ -19,15 +19,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.domain.model.Schedule
 import com.example.kairos_mobile.domain.model.Todo
-import com.example.kairos_mobile.presentation.calendar.components.MonthView
+import com.example.kairos_mobile.presentation.calendar.components.CalendarCard
 import com.example.kairos_mobile.presentation.calendar.components.ScheduleTimeline
 import com.example.kairos_mobile.presentation.calendar.components.TaskList
 import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
 import com.example.kairos_mobile.presentation.components.common.KairosTab
 import com.example.kairos_mobile.ui.theme.KairosTheme
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * CalendarScreen (PRD v4.0)
@@ -43,11 +40,6 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
-
-    // 날짜 포맷터
-    val dateFormatter = remember {
-        DateTimeFormatter.ofPattern("M월 d일")
-    }
 
     Scaffold(
         bottomBar = {
@@ -66,16 +58,17 @@ fun CalendarScreen(
                 .padding(paddingValues)
                 .background(colors.background)
         ) {
-            // 상단 날짜 표시
-            DateHeader(
-                dateText = "${uiState.selectedDate.format(dateFormatter)} ${
-                    uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN)
-                }",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            // 화면 타이틀
+            Text(
+                text = "Calendar",
+                color = colors.text,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
             )
 
-            // 월간/주간 뷰
-            MonthView(
+            // 캘린더 카드 (날짜 헤더 + 주간/월간 뷰 포함)
+            CalendarCard(
                 selectedDate = uiState.selectedDate,
                 datesWithSchedules = uiState.datesWithSchedules,
                 isExpanded = uiState.isMonthExpanded,
@@ -85,9 +78,7 @@ fun CalendarScreen(
                 onToggleExpand = {
                     viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
                 },
-                onMonthChange = { yearMonth ->
-                    viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
-                }
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
 
             // 로딩 상태
@@ -110,7 +101,7 @@ fun CalendarScreen(
                         .weight(1f)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // 일정 타임라인
                     ScheduleTimeline(
@@ -144,23 +135,4 @@ fun CalendarScreen(
             }
         }
     }
-}
-
-/**
- * 날짜 헤더
- */
-@Composable
-private fun DateHeader(
-    dateText: String,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-
-    Text(
-        text = dateText,
-        color = colors.text,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
-        modifier = modifier
-    )
 }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,12 +20,10 @@ import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.ui.components.kairosCard
 import com.example.kairos_mobile.ui.theme.KairosTheme
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 /**
  * 캡처 그리드 컴포넌트 (PRD v4.0)
- * 최근 캡처 3열 그리드
+ * 디자인 시안 반영: 3열 그리드, 제목 상단, 타입칩 하단 좌측
  */
 @Composable
 fun CaptureGrid(
@@ -34,8 +31,6 @@ fun CaptureGrid(
     onCaptureClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = KairosTheme.colors
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier,
@@ -57,6 +52,7 @@ fun CaptureGrid(
 
 /**
  * 캡처 그리드 아이템
+ * 디자인: 제목 상단, 타입칩 하단 좌측
  */
 @Composable
 private fun CaptureGridItem(
@@ -65,11 +61,10 @@ private fun CaptureGridItem(
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
-    val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
 
     Box(
         modifier = modifier
-            .aspectRatio(1f)
+            .aspectRatio(0.85f)  // 디자인에 맞게 세로로 더 긴 비율
             .kairosCard()
             .clickable { onClick() }
             .padding(12.dp)
@@ -78,53 +73,48 @@ private fun CaptureGridItem(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 타입 표시
+            // 상단: 내용 (제목)
+            Text(
+                text = capture.content.take(50),
+                color = colors.text,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 18.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // 하단: 타입 칩
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .background(colors.chipBg)
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = getTypeShortName(capture.classification?.type),
+                    text = getTypeDisplayName(capture.classification?.type),
                     color = colors.chipText,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal
                 )
             }
-
-            // 내용 미리보기
-            Text(
-                text = capture.content.take(40),
-                color = colors.text,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-
-            // 시간
-            Text(
-                text = timeFormat.format(capture.timestamp),
-                color = colors.textMuted,
-                fontSize = 10.sp
-            )
         }
     }
 }
 
 /**
- * CaptureType의 짧은 이름
+ * CaptureType 표시 이름
+ * 디자인 시안: "일정", "할 일", "아이디어", "노트"
  */
-private fun getTypeShortName(type: CaptureType?): String {
+private fun getTypeDisplayName(type: CaptureType?): String {
     return when (type) {
-        CaptureType.TODO -> "할일"
         CaptureType.IDEA -> "아이디어"
+        CaptureType.SCHEDULE -> "일정"
+        CaptureType.TODO -> "할 일"
         CaptureType.NOTE -> "노트"
         CaptureType.QUICK_NOTE -> "메모"
         CaptureType.CLIP -> "클립"
-        else -> "노트"
+        null -> "노트"
     }
 }
 
