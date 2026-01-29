@@ -14,6 +14,8 @@ import com.example.kairos_mobile.presentation.archive.ArchiveScreen
 import com.example.kairos_mobile.presentation.calendar.CalendarScreen
 import com.example.kairos_mobile.presentation.home.HomeScreen
 import com.example.kairos_mobile.presentation.insight.InsightScreen
+import com.example.kairos_mobile.presentation.notes.NotesScreen
+import com.example.kairos_mobile.presentation.notes.edit.NoteEditScreen
 import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
 import com.example.kairos_mobile.presentation.result.ResultScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
@@ -134,18 +136,13 @@ fun KairosNavGraph(
         }
 
         // 노트 화면 (NOTES) - PRD v4.0
-        // TODO: NotesScreen 구현 후 교체
         composable(NavRoutes.NOTES) {
-            // 임시로 ArchiveScreen 사용
-            ArchiveScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onInsightClick = navigateToResult,
+            NotesScreen(
                 onNavigate = navigateToTab,
-                onSearchClick = {
-                    navController.navigate(NavRoutes.SEARCH)
-                }
+                onNoteClick = { note ->
+                    navigateToNoteEdit(note.id)
+                },
+                onBookmarkClick = { /* TODO: 북마크 상세/웹뷰 */ }
             )
         }
 
@@ -156,9 +153,11 @@ fun KairosNavGraph(
                 navArgument("noteId") { type = NavType.StringType }
             )
         ) {
-            // TODO: NoteEditScreen 구현 후 교체
-            // 임시로 뒤로가기
-            navController.popBackStack()
+            NoteEditScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // 검색 화면 (SEARCH)
