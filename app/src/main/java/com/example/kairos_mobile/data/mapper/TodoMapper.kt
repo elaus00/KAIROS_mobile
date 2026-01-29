@@ -27,7 +27,7 @@ object TodoMapper {
             id = entity.id,
             content = entity.content,
             title = entity.title,
-            sourceInsightId = entity.sourceInsightId,
+            sourceCaptureId = entity.sourceCaptureId,
             dueDate = entity.dueDate?.let {
                 Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
             },
@@ -56,7 +56,7 @@ object TodoMapper {
             id = domain.id,
             content = domain.content,
             title = domain.title,
-            sourceInsightId = domain.sourceInsightId,
+            sourceCaptureId = domain.sourceCaptureId,
             dueDate = domain.dueDate?.let {
                 it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             },

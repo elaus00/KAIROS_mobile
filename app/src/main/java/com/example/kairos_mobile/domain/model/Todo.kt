@@ -12,7 +12,7 @@ data class Todo(
     val id: String,
     val content: String,
     val title: String? = null,
-    val sourceInsightId: String? = null,
+    val sourceCaptureId: String? = null,
     val dueDate: LocalDate? = null,
     val dueTime: LocalTime? = null,
     val priority: TodoPriority = TodoPriority.NONE,

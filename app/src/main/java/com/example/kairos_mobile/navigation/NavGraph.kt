@@ -10,10 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.kairos_mobile.presentation.archive.ArchiveScreen
 import com.example.kairos_mobile.presentation.calendar.CalendarScreen
 import com.example.kairos_mobile.presentation.home.HomeScreen
-import com.example.kairos_mobile.presentation.insight.InsightScreen
 import com.example.kairos_mobile.presentation.notes.NotesScreen
 import com.example.kairos_mobile.presentation.notes.edit.NoteEditScreen
 import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
@@ -33,23 +31,15 @@ object NavRoutes {
     const val SETTINGS = "settings"
 
     // 보조 화면
-    const val RESULT = "result/{insightId}"
+    const val RESULT = "result/{captureId}"
     const val NOTE_EDIT = "notes/{noteId}"
     const val SEARCH = "search"
     const val NOTIFICATIONS = "notifications"
 
-    // 레거시 호환성 (기존 코드 지원)
-    @Deprecated("Use HOME instead")
-    const val CAPTURE = "home"
-    @Deprecated("Use CALENDAR instead")
-    const val TODO = "calendar"
-    @Deprecated("Use NOTES instead")
-    const val HISTORY = "notes"
-
     /**
      * ResultScreen 라우트 생성
      */
-    fun result(insightId: String): String = "result/$insightId"
+    fun result(captureId: String): String = "result/$captureId"
 
     /**
      * NoteEditScreen 라우트 생성
@@ -83,8 +73,8 @@ fun KairosNavGraph(
     }
 
     // ResultScreen으로 네비게이션
-    val navigateToResult: (String) -> Unit = { insightId ->
-        navController.navigate(NavRoutes.result(insightId))
+    val navigateToResult: (String) -> Unit = { captureId ->
+        navController.navigate(NavRoutes.result(captureId))
     }
 
     // NoteEditScreen으로 네비게이션
@@ -116,7 +106,7 @@ fun KairosNavGraph(
         composable(
             route = NavRoutes.RESULT,
             arguments = listOf(
-                navArgument("insightId") { type = NavType.StringType }
+                navArgument("captureId") { type = NavType.StringType }
             )
         ) {
             ResultScreen(
@@ -166,7 +156,7 @@ fun KairosNavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onInsightClick = navigateToResult,
+                onCaptureClick = navigateToResult,
                 onNavigate = navigateToTab
             )
         }
@@ -177,9 +167,9 @@ fun KairosNavGraph(
                 onBack = {
                     navController.popBackStack()
                 },
-                onNotificationClick = { insightId ->
-                    if (insightId != null) {
-                        navigateToResult(insightId)
+                onNotificationClick = { captureId ->
+                    if (captureId != null) {
+                        navigateToResult(captureId)
                     } else {
                         navController.popBackStack()
                     }

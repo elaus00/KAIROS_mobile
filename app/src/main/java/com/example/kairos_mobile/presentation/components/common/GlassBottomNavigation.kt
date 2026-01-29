@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,11 +25,19 @@ import com.example.kairos_mobile.ui.theme.*
  */
 @Composable
 fun GlassBottomNavigation(
-    selectedTab: NavigationTab = NavigationTab.INSIGHT,
+    selectedTab: NavigationTab = NavigationTab.HOME,
     onTabSelected: (NavigationTab) -> Unit,
     isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    // PRD 기준 4개 탭만 표시
+    val visibleTabs = listOf(
+        NavigationTab.HOME,
+        NavigationTab.CALENDAR,
+        NavigationTab.NOTES,
+        NavigationTab.SETTINGS
+    )
+
     Row(
         modifier = modifier
             .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(40.dp))
@@ -34,7 +45,7 @@ fun GlassBottomNavigation(
         horizontalArrangement = Arrangement.spacedBy(28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        NavigationTab.entries.forEach { tab ->
+        visibleTabs.forEach { tab ->
             GlassNavItem(
                 icon = tab.icon,
                 label = tab.label,
@@ -93,10 +104,11 @@ private fun GlassNavItem(
 
 /**
  * 네비게이션 탭 정의
+ * PRD 기준: HOME / CALENDAR / NOTES / SETTINGS
  */
 enum class NavigationTab(val icon: ImageVector, val label: String) {
-    INSIGHT(Icons.Default.EditNote, "Insight"),
-    SEARCH(Icons.Default.Search, "Search"),
-    ARCHIVE(Icons.Default.Inventory2, "Archive"),
+    HOME(Icons.Default.Home, "Home"),
+    CALENDAR(Icons.Default.Event, "Calendar"),
+    NOTES(Icons.Default.Description, "Notes"),
     SETTINGS(Icons.Default.Settings, "Settings")
 }

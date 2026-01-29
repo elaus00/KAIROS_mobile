@@ -35,10 +35,10 @@ interface BookmarkRepository {
     suspend fun createBookmark(bookmark: Bookmark): Result<Bookmark>
 
     /**
-     * 인사이트에서 북마크 생성
+     * 캡처에서 북마크 생성
      */
-    suspend fun createBookmarkFromInsight(
-        insightId: String,
+    suspend fun createBookmarkFromCapture(
+        captureId: String,
         title: String,
         url: String,
         summary: String? = null,

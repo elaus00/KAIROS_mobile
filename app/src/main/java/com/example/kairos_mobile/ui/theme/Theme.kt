@@ -154,72 +154,6 @@ private val MinimalistDarkColorScheme = darkColorScheme(
     outlineVariant = KairosDark.borderLight
 )
 
-// ========== Legacy Color Schemes (기존 호환성) ==========
-
-/**
- * Glassmorphism Dark Color Scheme (레거시)
- */
-private val GlassmorphismDarkColorScheme = darkColorScheme(
-    primary = PrimaryNavy,
-    onPrimary = TextPrimary,
-    primaryContainer = PrimaryNavyLight,
-    onPrimaryContainer = TextPrimary,
-
-    secondary = GlassButton,
-    onSecondary = TextSecondary,
-    secondaryContainer = GlassButtonHover,
-    onSecondaryContainer = TextSecondary,
-
-    tertiary = IdeaColor,
-    onTertiary = Charcoal,
-
-    background = NavyDark,
-    onBackground = TextPrimary,
-
-    surface = GlassSurface,
-    onSurface = TextPrimary,
-    surfaceVariant = GlassCard,
-    onSurfaceVariant = TextSecondary,
-
-    error = ErrorColor,
-    onError = TextPrimary,
-
-    outline = GlassBorder,
-    outlineVariant = GlassBorderDim
-)
-
-/**
- * Glassmorphism Light Color Scheme (레거시)
- */
-private val GlassmorphismLightColorScheme = lightColorScheme(
-    primary = AiryAccentBlue,
-    onPrimary = Color.White,
-    primaryContainer = AiryAccentBlueLight,
-    onPrimaryContainer = AiryTextPrimary,
-
-    secondary = AiryGlassCard,
-    onSecondary = AiryTextSecondary,
-    secondaryContainer = AiryGlassPanel,
-    onSecondaryContainer = AiryTextSecondary,
-
-    tertiary = AiryIdeaColor,
-    onTertiary = Color.White,
-
-    background = AiryGradientStart,
-    onBackground = AiryTextPrimary,
-
-    surface = AiryGlassCard,
-    onSurface = AiryTextPrimary,
-    surfaceVariant = AiryGlassPanel,
-    onSurfaceVariant = AiryTextSecondary,
-
-    error = AiryErrorColor,
-    onError = Color.White,
-
-    outline = AiryGlassBorder,
-    outlineVariant = AiryGlassBorderStrong
-)
-
 // ========== Theme Composable ==========
 
 /**
@@ -227,19 +161,15 @@ private val GlassmorphismLightColorScheme = lightColorScheme(
  * Minimalist Monochrome 디자인 적용
  *
  * @param darkTheme 다크 모드 여부 (기본: 시스템 설정 따름)
- * @param useLegacyTheme 레거시 Glassmorphism 테마 사용 여부
  * @param content 콘텐츠
  */
 @Composable
 fun KAIROS_mobileTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    useLegacyTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     // 색상 스킴 선택
     val colorScheme = when {
-        useLegacyTheme && darkTheme -> GlassmorphismDarkColorScheme
-        useLegacyTheme && !darkTheme -> GlassmorphismLightColorScheme
         darkTheme -> MinimalistDarkColorScheme
         else -> MinimalistLightColorScheme
     }

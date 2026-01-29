@@ -40,9 +40,9 @@ data class ScheduleEntity(
     @ColumnInfo(name = "google_calendar_id")
     val googleCalendarId: String? = null,
 
-    // 원본 인사이트 ID (인사이트에서 생성된 경우)
-    @ColumnInfo(name = "source_insight_id")
-    val sourceInsightId: String? = null,
+    // 원본 캡처 ID (캡처에서 생성된 경우)
+    @ColumnInfo(name = "source_capture_id")
+    val sourceCaptureId: String? = null,
 
     // 생성 시간 (epoch millis)
     @ColumnInfo(name = "created_at")

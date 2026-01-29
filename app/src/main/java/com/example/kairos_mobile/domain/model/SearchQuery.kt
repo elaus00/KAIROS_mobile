@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.domain.model
 
 /**
- * 인사이트 검색 쿼리
+ * 캡처 검색 쿼리
  *
  * 사용자가 입력한 검색 조건을 담는 데이터 클래스
  */
@@ -12,16 +12,16 @@ data class SearchQuery(
     val text: String = "",
 
     /**
-     * 필터링할 인사이트 타입들
+     * 필터링할 캡처 타입들
      * 비어있으면 모든 타입 포함
      */
-    val types: Set<InsightType> = emptySet(),
+    val types: Set<CaptureType> = emptySet(),
 
     /**
-     * 필터링할 인사이트 소스들
+     * 필터링할 캡처 소스들
      * 비어있으면 모든 소스 포함
      */
-    val sources: Set<InsightSource> = emptySet(),
+    val sources: Set<CaptureSource> = emptySet(),
 
     /**
      * 날짜 범위 필터

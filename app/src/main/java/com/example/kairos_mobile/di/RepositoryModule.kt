@@ -2,7 +2,7 @@ package com.example.kairos_mobile.di
 
 import com.example.kairos_mobile.data.repository.BookmarkRepositoryImpl
 import com.example.kairos_mobile.data.repository.ConfigRepositoryImpl
-import com.example.kairos_mobile.data.repository.InsightRepositoryImpl
+import com.example.kairos_mobile.data.repository.CaptureRepositoryImpl
 import com.example.kairos_mobile.data.repository.NoteRepositoryImpl
 import com.example.kairos_mobile.data.repository.NotificationRepositoryImpl
 import com.example.kairos_mobile.data.repository.PreferencesRepositoryImpl
@@ -10,7 +10,7 @@ import com.example.kairos_mobile.data.repository.ScheduleRepositoryImpl
 import com.example.kairos_mobile.data.repository.TodoRepositoryImpl
 import com.example.kairos_mobile.domain.repository.BookmarkRepository
 import com.example.kairos_mobile.domain.repository.ConfigRepository
-import com.example.kairos_mobile.domain.repository.InsightRepository
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.NotificationRepository
 import com.example.kairos_mobile.domain.repository.PreferencesRepository
@@ -30,13 +30,13 @@ import javax.inject.Singleton
 abstract class RepositoryModule {
 
     /**
-     * InsightRepository 바인딩
+     * CaptureRepository 바인딩
      */
     @Binds
     @Singleton
-    abstract fun bindInsightRepository(
-        impl: InsightRepositoryImpl
-    ): InsightRepository
+    abstract fun bindCaptureRepository(
+        impl: CaptureRepositoryImpl
+    ): CaptureRepository
 
     /**
      * ConfigRepository 바인딩

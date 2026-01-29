@@ -94,10 +94,10 @@ interface ScheduleDao {
     suspend fun getByGoogleCalendarId(googleCalendarId: String): ScheduleEntity?
 
     /**
-     * 인사이트 ID로 연결된 일정 조회
+     * 캡처 ID로 연결된 일정 조회
      */
-    @Query("SELECT * FROM schedules WHERE source_insight_id = :insightId")
-    suspend fun getScheduleByInsightId(insightId: String): ScheduleEntity?
+    @Query("SELECT * FROM schedules WHERE source_capture_id = :captureId")
+    suspend fun getScheduleByCaptureId(captureId: String): ScheduleEntity?
 
     /**
      * 특정 날짜의 일정 개수 조회

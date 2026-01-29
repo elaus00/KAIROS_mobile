@@ -10,9 +10,14 @@ data class SettingsUiState(
     // ========== AI 기능 설정 ==========
     val autoSummarizeEnabled: Boolean = true,
     val smartTagsEnabled: Boolean = true,
+    val autoClassifyEnabled: Boolean = true,
 
     // ========== 테마 설정 ==========
     val themePreference: ThemePreference = ThemePreference.DARK,
+
+    // ========== 연동 설정 ==========
+    val googleCalendarConnected: Boolean = false,
+    val obsidianConnected: Boolean = false,
 
     // ========== UI 이벤트 ==========
     val errorMessage: String? = null,

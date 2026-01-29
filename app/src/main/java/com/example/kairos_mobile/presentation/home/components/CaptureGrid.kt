@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.Insight
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.ui.components.kairosCard
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.text.SimpleDateFormat
@@ -30,7 +30,7 @@ import java.util.Locale
  */
 @Composable
 fun CaptureGrid(
-    captures: List<Insight>,
+    captures: List<Capture>,
     onCaptureClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -60,7 +60,7 @@ fun CaptureGrid(
  */
 @Composable
 private fun CaptureGridItem(
-    capture: Insight,
+    capture: Capture,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -115,15 +115,15 @@ private fun CaptureGridItem(
 }
 
 /**
- * InsightType의 짧은 이름
+ * CaptureType의 짧은 이름
  */
-private fun getTypeShortName(type: InsightType?): String {
+private fun getTypeShortName(type: CaptureType?): String {
     return when (type) {
-        InsightType.TODO -> "할일"
-        InsightType.IDEA -> "아이디어"
-        InsightType.NOTE -> "노트"
-        InsightType.QUICK_NOTE -> "메모"
-        InsightType.CLIP -> "클립"
+        CaptureType.TODO -> "할일"
+        CaptureType.IDEA -> "아이디어"
+        CaptureType.NOTE -> "노트"
+        CaptureType.QUICK_NOTE -> "메모"
+        CaptureType.CLIP -> "클립"
         else -> "노트"
     }
 }

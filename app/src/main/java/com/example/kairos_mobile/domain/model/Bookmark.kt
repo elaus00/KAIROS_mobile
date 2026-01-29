@@ -12,7 +12,7 @@ data class Bookmark(
     val summary: String? = null,
     val tags: List<String> = emptyList(),
     val faviconUrl: String? = null,
-    val sourceInsightId: String? = null,
+    val sourceCaptureId: String? = null,
     val createdAt: Instant
 ) {
     /**

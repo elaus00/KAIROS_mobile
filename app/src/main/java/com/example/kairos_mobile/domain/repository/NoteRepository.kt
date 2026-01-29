@@ -41,10 +41,10 @@ interface NoteRepository {
     suspend fun createNote(note: Note): Result<Note>
 
     /**
-     * 인사이트에서 노트 생성
+     * 캡처에서 노트 생성
      */
-    suspend fun createNoteFromInsight(
-        insightId: String,
+    suspend fun createNoteFromCapture(
+        captureId: String,
         title: String,
         content: String,
         folder: NoteFolder = NoteFolder.INBOX,

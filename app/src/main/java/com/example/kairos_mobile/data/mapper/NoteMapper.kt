@@ -28,7 +28,7 @@ object NoteMapper {
                 NoteFolder.INBOX
             },
             tags = parseTags(entity.tags),
-            sourceInsightId = entity.sourceInsightId,
+            sourceCaptureId = entity.sourceCaptureId,
             createdAt = Instant.ofEpochMilli(entity.createdAt),
             updatedAt = Instant.ofEpochMilli(entity.updatedAt)
         )
@@ -44,7 +44,7 @@ object NoteMapper {
             content = domain.content,
             folder = domain.folder.name,
             tags = serializeTags(domain.tags),
-            sourceInsightId = domain.sourceInsightId,
+            sourceCaptureId = domain.sourceCaptureId,
             createdAt = domain.createdAt.toEpochMilli(),
             updatedAt = domain.updatedAt.toEpochMilli()
         )

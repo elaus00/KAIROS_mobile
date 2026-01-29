@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "5149f90c073f50580eae000bedb1a28e",
+    "identityHash": "df1df0fc9161e8df562345d1d3a6dda7",
     "entities": [
       {
         "tableName": "insight_queue",
@@ -246,7 +246,7 @@
       },
       {
         "tableName": "todos",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `content` TEXT NOT NULL, `title` TEXT, `source_insight_id` TEXT, `due_date` INTEGER, `due_time` TEXT, `priority` INTEGER NOT NULL, `labels` TEXT, `manual_order` INTEGER NOT NULL, `is_completed` INTEGER NOT NULL, `completed_at` INTEGER, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `content` TEXT NOT NULL, `title` TEXT, `source_capture_id` TEXT, `due_date` INTEGER, `due_time` TEXT, `priority` INTEGER NOT NULL, `labels` TEXT, `manual_order` INTEGER NOT NULL, `is_completed` INTEGER NOT NULL, `completed_at` INTEGER, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -267,8 +267,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "sourceInsightId",
-            "columnName": "source_insight_id",
+            "fieldPath": "sourceCaptureId",
+            "columnName": "source_capture_id",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -632,7 +632,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5149f90c073f50580eae000bedb1a28e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'df1df0fc9161e8df562345d1d3a6dda7')"
     ]
   }
 }

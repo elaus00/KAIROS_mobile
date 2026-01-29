@@ -12,9 +12,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.Insight
-import com.example.kairos_mobile.domain.model.InsightSource
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.CaptureSource
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.ui.components.glassCardThemed
 import com.example.kairos_mobile.ui.theme.*
 import java.text.SimpleDateFormat
@@ -25,7 +25,7 @@ import java.util.*
  */
 @Composable
 fun SearchResultCard(
-    insight: Insight,
+    capture: Capture,
     onClick: () -> Unit,
     isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
@@ -49,13 +49,13 @@ fun SearchResultCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 타입 뱃지
-            insight.classification?.type?.let { type ->
+            capture.classification?.type?.let { type ->
                 TypeBadge(type = type, isDarkTheme = isDarkTheme)
             }
 
             // 시간
             Text(
-                text = formatTimestamp(insight.timestamp),
+                text = formatTimestamp(capture.timestamp),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
                 color = textTertiaryColor,
@@ -65,7 +65,7 @@ fun SearchResultCard(
 
         // 내용
         Text(
-            text = insight.content,
+            text = capture.content,
             fontSize = 15.sp,
             fontWeight = FontWeight.Normal,
             color = textPrimaryColor,
@@ -87,13 +87,13 @@ fun SearchResultCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = getSourceIcon(insight.source),
-                    contentDescription = insight.source.name,
+                    imageVector = getSourceIcon(capture.source),
+                    contentDescription = capture.source.name,
                     tint = textTertiaryColor,
                     modifier = Modifier.size(14.dp)
                 )
                 Text(
-                    text = getSourceLabel(insight.source),
+                    text = getSourceLabel(capture.source),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
                     color = textTertiaryColor,
@@ -102,7 +102,7 @@ fun SearchResultCard(
             }
 
             // 동기화 상태
-            SyncStatusBadge(syncStatus = insight.syncStatus.name, isDarkTheme = isDarkTheme)
+            SyncStatusBadge(syncStatus = capture.syncStatus.name, isDarkTheme = isDarkTheme)
         }
     }
 }
@@ -112,7 +112,7 @@ fun SearchResultCard(
  */
 @Composable
 private fun TypeBadge(
-    type: InsightType,
+    type: CaptureType,
     isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -164,17 +164,16 @@ private fun SyncStatusBadge(
 /**
  * 테마에 따른 타입 색상 반환
  */
-private fun getThemedTypeColor(type: InsightType, isDarkTheme: Boolean): androidx.compose.ui.graphics.Color {
+private fun getThemedTypeColor(type: CaptureType, isDarkTheme: Boolean): androidx.compose.ui.graphics.Color {
     return if (isDarkTheme) {
         type.getColor()
     } else {
         when (type) {
-            InsightType.IDEA -> AiryIdeaColor
-            InsightType.SCHEDULE -> AiryMeetingColor
-            InsightType.TODO -> AiryTodoColor
-            InsightType.NOTE -> AirySaveColor
-            InsightType.QUICK_NOTE -> AiryTextTertiary
-            InsightType.CLIP -> AiryMeetingColor
+            CaptureType.IDEA -> AiryIdeaColor
+            CaptureType.TODO -> AiryTodoColor
+            CaptureType.NOTE -> AirySaveColor
+            CaptureType.QUICK_NOTE -> AiryTextTertiary
+            CaptureType.CLIP -> AiryMeetingColor
         }
     }
 }
@@ -201,21 +200,21 @@ private fun formatTimestamp(timestamp: Long): String {
 /**
  * 소스별 아이콘 반환
  */
-private fun getSourceIcon(source: InsightSource) = when (source) {
-    InsightSource.TEXT -> Icons.Default.TextFields
-    InsightSource.IMAGE -> Icons.Default.Image
-    InsightSource.VOICE -> Icons.Default.Mic
-    InsightSource.SHARE -> Icons.Default.Share
-    InsightSource.WEB_CLIP -> Icons.Default.Link
+private fun getSourceIcon(source: CaptureSource) = when (source) {
+    CaptureSource.TEXT -> Icons.Default.TextFields
+    CaptureSource.IMAGE -> Icons.Default.Image
+    CaptureSource.VOICE -> Icons.Default.Mic
+    CaptureSource.SHARE -> Icons.Default.Share
+    CaptureSource.WEB_CLIP -> Icons.Default.Link
 }
 
 /**
  * 소스별 라벨 반환
  */
-private fun getSourceLabel(source: InsightSource) = when (source) {
-    InsightSource.TEXT -> "텍스트"
-    InsightSource.IMAGE -> "이미지"
-    InsightSource.VOICE -> "음성"
-    InsightSource.SHARE -> "공유"
-    InsightSource.WEB_CLIP -> "웹"
+private fun getSourceLabel(source: CaptureSource) = when (source) {
+    CaptureSource.TEXT -> "텍스트"
+    CaptureSource.IMAGE -> "이미지"
+    CaptureSource.VOICE -> "음성"
+    CaptureSource.SHARE -> "공유"
+    CaptureSource.WEB_CLIP -> "웹"
 }

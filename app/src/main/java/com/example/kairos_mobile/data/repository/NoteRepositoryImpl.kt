@@ -61,16 +61,16 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createNoteFromInsight(
-        insightId: String,
+    override suspend fun createNoteFromCapture(
+        captureId: String,
         title: String,
         content: String,
         folder: NoteFolder,
         tags: List<String>
     ): Result<Note> {
         return try {
-            // 이미 해당 인사이트로 생성된 노트가 있는지 확인
-            val existing = noteDao.getNoteByInsightId(insightId)
+            // 이미 해당 캡처로 생성된 노트가 있는지 확인
+            val existing = noteDao.getNoteByCaptureId(captureId)
             if (existing != null) {
                 return Result.Success(NoteMapper.toDomain(existing))
             }
@@ -82,7 +82,7 @@ class NoteRepositoryImpl @Inject constructor(
                 content = content,
                 folder = folder,
                 tags = tags,
-                sourceInsightId = insightId,
+                sourceCaptureId = captureId,
                 createdAt = now,
                 updatedAt = now
             )

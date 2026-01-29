@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -31,7 +31,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
@@ -44,7 +44,7 @@ fun CaptureInputArea(
     inputText: String,
     characterCount: Int,
     maxCharacterCount: Int,
-    suggestedType: InsightType?,
+    suggestedType: CaptureType?,
     isClassifying: Boolean,
     isSubmitting: Boolean,
     onInputChange: (String) -> Unit,
@@ -195,7 +195,7 @@ fun CaptureInputArea(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.ArrowForward,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = "전송",
                             tint = if (colors.isDark) colors.background else Color.White,
                             modifier = Modifier.size(20.dp)
@@ -208,15 +208,14 @@ fun CaptureInputArea(
 }
 
 /**
- * InsightType에 따른 표시 이름
+ * CaptureType에 따른 표시 이름
  */
-private fun getTypeDisplayName(type: InsightType): String {
+private fun getTypeDisplayName(type: CaptureType): String {
     return when (type) {
-        InsightType.TODO -> "할 일"
-        InsightType.IDEA -> "아이디어"
-        InsightType.NOTE -> "노트"
-        InsightType.QUICK_NOTE -> "메모"
-        InsightType.CLIP -> "클립"
-        else -> "노트"
+        CaptureType.TODO -> "할 일"
+        CaptureType.IDEA -> "아이디어"
+        CaptureType.NOTE -> "노트"
+        CaptureType.QUICK_NOTE -> "메모"
+        CaptureType.CLIP -> "클립"
     }
 }

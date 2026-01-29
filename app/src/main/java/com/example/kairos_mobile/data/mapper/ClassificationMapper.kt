@@ -4,7 +4,7 @@ import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
 import com.example.kairos_mobile.data.remote.dto.v2.TodoMetadataDto
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.Destination
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.model.TodoMetadata
 import com.example.kairos_mobile.domain.model.TodoPriority
 import java.time.LocalDate
@@ -23,7 +23,7 @@ class ClassificationMapper @Inject constructor() {
      */
     fun toDomain(response: ClassifyResponse): Classification {
         return Classification(
-            type = InsightType.fromApiValue(response.type),
+            type = CaptureType.fromApiValue(response.type),
             destination = Destination.fromApiValue(response.destination),
             confidence = response.confidence,
             reasoning = response.reasoning,

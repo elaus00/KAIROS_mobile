@@ -2,9 +2,9 @@ package com.example.kairos_mobile.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.model.Result
-import com.example.kairos_mobile.domain.repository.InsightRepository
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.util.KeywordMatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val insightRepository: InsightRepository,
+    private val captureRepository: CaptureRepository,
     private val scheduleRepository: ScheduleRepository
 ) : ViewModel() {
 
@@ -62,9 +62,9 @@ class HomeViewModel @Inject constructor(
     private fun loadRecentCaptures() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingCaptures = true) }
-            insightRepository.getRecentInsights(6).collect { insights ->
+            captureRepository.getRecentCaptures(6).collect { captures ->
                 _uiState.update { it.copy(
-                    recentCaptures = insights,
+                    recentCaptures = captures,
                     isLoadingCaptures = false
                 ) }
             }
@@ -156,7 +156,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
 
-            val result = insightRepository.saveInsight(currentText)
+            val result = captureRepository.saveCapture(currentText)
             when (result) {
                 is Result.Success -> {
                     _uiState.update { it.copy(
@@ -184,14 +184,14 @@ class HomeViewModel @Inject constructor(
     /**
      * 특정 타입으로 캡처 제출
      */
-    private fun submitWithType(type: InsightType) {
+    private fun submitWithType(type: CaptureType) {
         val currentText = _uiState.value.inputText
         if (currentText.isBlank()) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
 
-            val result = insightRepository.saveInsightWithType(currentText, type)
+            val result = captureRepository.saveCaptureWithType(currentText, type)
             when (result) {
                 is Result.Success -> {
                     _uiState.update { it.copy(

@@ -65,13 +65,13 @@ class TodoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createTodoFromInsight(
-        insightId: String,
+    override suspend fun createTodoFromCapture(
+        captureId: String,
         classification: Classification
     ): Result<Todo> {
         return try {
-            // 이미 해당 인사이트로 생성된 투두가 있는지 확인
-            val existing = todoDao.getTodoByInsightId(insightId)
+            // 이미 해당 캡처로 생성된 투두가 있는지 확인
+            val existing = todoDao.getTodoByCaptureId(captureId)
             if (existing != null) {
                 return Result.Success(TodoMapper.toDomain(existing))
             }
@@ -91,7 +91,7 @@ class TodoRepositoryImpl @Inject constructor(
                     classification.suggestedPath?.substringAfterLast("/") ?: "Untitled"
                 },
                 title = classification.title.takeIf { it.isNotBlank() },
-                sourceInsightId = insightId,
+                sourceCaptureId = captureId,
                 dueDate = dueDate,
                 dueTime = dueTime,
                 priority = priority,

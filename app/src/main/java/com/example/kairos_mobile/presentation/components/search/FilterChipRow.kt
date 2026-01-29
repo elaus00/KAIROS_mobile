@@ -11,18 +11,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.ui.components.glassButtonThemed
 import com.example.kairos_mobile.ui.theme.*
 
 /**
  * 필터 칩 행
- * InsightType 필터를 표시
+ * CaptureType 필터를 표시
  */
 @Composable
 fun FilterChipRow(
-    selectedTypes: Set<InsightType>,
-    onTypeToggle: (InsightType) -> Unit,
+    selectedTypes: Set<CaptureType>,
+    onTypeToggle: (CaptureType) -> Unit,
     isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -33,8 +33,8 @@ fun FilterChipRow(
             .padding(horizontal = 1.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // 모든 InsightType에 대한 칩
-        InsightType.values().forEach { type ->
+        // 모든 CaptureType에 대한 칩
+        CaptureType.values().forEach { type ->
             FilterChip(
                 type = type,
                 isSelected = type in selectedTypes,
@@ -50,7 +50,7 @@ fun FilterChipRow(
  */
 @Composable
 private fun FilterChip(
-    type: InsightType,
+    type: CaptureType,
     isSelected: Boolean,
     onClick: () -> Unit,
     isDarkTheme: Boolean,
@@ -94,17 +94,16 @@ private fun FilterChip(
 /**
  * 테마에 따른 타입 색상 반환
  */
-private fun getThemedTypeColor(type: InsightType, isDarkTheme: Boolean): Color {
+private fun getThemedTypeColor(type: CaptureType, isDarkTheme: Boolean): Color {
     return if (isDarkTheme) {
         type.getColor()
     } else {
         when (type) {
-            InsightType.IDEA -> AiryIdeaColor
-            InsightType.SCHEDULE -> AiryMeetingColor
-            InsightType.TODO -> AiryTodoColor
-            InsightType.NOTE -> AirySaveColor
-            InsightType.QUICK_NOTE -> AiryTextTertiary
-            InsightType.CLIP -> AiryMeetingColor
+            CaptureType.IDEA -> AiryIdeaColor
+            CaptureType.TODO -> AiryTodoColor
+            CaptureType.NOTE -> AirySaveColor
+            CaptureType.QUICK_NOTE -> AiryTextTertiary
+            CaptureType.CLIP -> AiryMeetingColor
         }
     }
 }

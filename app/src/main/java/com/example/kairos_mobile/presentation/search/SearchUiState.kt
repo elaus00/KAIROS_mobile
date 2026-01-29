@@ -1,8 +1,8 @@
 package com.example.kairos_mobile.presentation.search
 
-import com.example.kairos_mobile.domain.model.Insight
-import com.example.kairos_mobile.domain.model.InsightSource
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.CaptureSource
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.model.DateRange
 
 /**
@@ -17,12 +17,12 @@ data class SearchUiState(
     /**
      * 선택된 타입 필터
      */
-    val selectedTypes: Set<InsightType> = emptySet(),
+    val selectedTypes: Set<CaptureType> = emptySet(),
 
     /**
      * 선택된 소스 필터
      */
-    val selectedSources: Set<InsightSource> = emptySet(),
+    val selectedSources: Set<CaptureSource> = emptySet(),
 
     /**
      * 날짜 범위 필터
@@ -32,7 +32,7 @@ data class SearchUiState(
     /**
      * 검색 결과 리스트
      */
-    val searchResults: List<Insight> = emptyList(),
+    val searchResults: List<Capture> = emptyList(),
 
     /**
      * 로딩 중 여부

@@ -81,8 +81,8 @@ class ScheduleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createScheduleFromInsight(
-        insightId: String,
+    override suspend fun createScheduleFromCapture(
+        captureId: String,
         title: String,
         date: LocalDate,
         time: LocalTime,
@@ -90,8 +90,8 @@ class ScheduleRepositoryImpl @Inject constructor(
         category: ScheduleCategory
     ): Result<Schedule> {
         return try {
-            // 이미 해당 인사이트로 생성된 일정이 있는지 확인
-            val existing = scheduleDao.getScheduleByInsightId(insightId)
+            // 이미 해당 캡처로 생성된 일정이 있는지 확인
+            val existing = scheduleDao.getScheduleByCaptureId(captureId)
             if (existing != null) {
                 return Result.Success(ScheduleMapper.toDomain(existing))
             }
@@ -105,7 +105,7 @@ class ScheduleRepositoryImpl @Inject constructor(
                 location = location,
                 category = category,
                 googleCalendarId = null,
-                sourceInsightId = insightId,
+                sourceCaptureId = captureId,
                 createdAt = now,
                 updatedAt = now
             )

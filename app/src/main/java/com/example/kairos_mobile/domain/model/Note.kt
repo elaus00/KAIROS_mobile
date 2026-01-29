@@ -11,7 +11,7 @@ data class Note(
     val content: String,
     val folder: NoteFolder = NoteFolder.INBOX,
     val tags: List<String> = emptyList(),
-    val sourceInsightId: String? = null,
+    val sourceCaptureId: String? = null,
     val createdAt: Instant,
     val updatedAt: Instant = createdAt
 ) {

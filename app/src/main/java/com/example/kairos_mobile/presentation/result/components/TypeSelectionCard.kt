@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.ui.components.glassPanelThemed
 import com.example.kairos_mobile.ui.theme.*
 
@@ -25,8 +26,8 @@ import com.example.kairos_mobile.ui.theme.*
 @Composable
 fun TypeSelectionCard(
     content: String,
-    selectedType: InsightType?,
-    onTypeSelected: (InsightType) -> Unit,
+    selectedType: CaptureType?,
+    onTypeSelected: (CaptureType) -> Unit,
     onConfirm: () -> Unit,
     isSaving: Boolean = false,
     isDarkTheme: Boolean = false,
@@ -39,10 +40,10 @@ fun TypeSelectionCard(
 
     // PRD에서 정의된 타입들 (SCHEDULE 제외)
     val availableTypes = listOf(
-        InsightType.IDEA,
-        InsightType.TODO,
-        InsightType.NOTE,
-        InsightType.QUICK_NOTE
+        CaptureType.IDEA,
+        CaptureType.TODO,
+        CaptureType.NOTE,
+        CaptureType.QUICK_NOTE
     )
 
     Column(
@@ -58,7 +59,7 @@ fun TypeSelectionCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.HelpOutline,
+                imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                 contentDescription = null,
                 tint = errorColor,
                 modifier = Modifier.size(20.dp)
@@ -155,7 +156,7 @@ fun TypeSelectionCard(
  */
 @Composable
 private fun TypeSelectionButton(
-    type: InsightType,
+    type: CaptureType,
     isSelected: Boolean,
     onClick: () -> Unit,
     isDarkTheme: Boolean,
@@ -207,15 +208,14 @@ private fun TypeSelectionButton(
 }
 
 /**
- * InsightType에 대한 아이콘 확장 함수
+ * CaptureType에 대한 아이콘 확장 함수
  */
-private fun InsightType.getIcon(): ImageVector {
+private fun CaptureType.getIcon(): ImageVector {
     return when (this) {
-        InsightType.IDEA -> Icons.Default.Lightbulb
-        InsightType.TODO -> Icons.Default.CheckCircle
-        InsightType.NOTE -> Icons.Default.Description
-        InsightType.QUICK_NOTE -> Icons.Default.FlashOn
-        InsightType.CLIP -> Icons.Default.Link
-        InsightType.SCHEDULE -> Icons.Default.Event  // 하위 호환성용
+        CaptureType.IDEA -> Icons.Default.Lightbulb
+        CaptureType.TODO -> Icons.Default.CheckCircle
+        CaptureType.NOTE -> Icons.Default.Description
+        CaptureType.QUICK_NOTE -> Icons.Default.FlashOn
+        CaptureType.CLIP -> Icons.Default.Link
     }
 }

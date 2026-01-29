@@ -2,7 +2,7 @@ package com.example.kairos_mobile.domain.usecase.ai
 
 import com.example.kairos_mobile.data.remote.dto.ai.SuggestedTag
 import com.example.kairos_mobile.domain.model.Result
-import com.example.kairos_mobile.domain.repository.InsightRepository
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +16,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class SuggestTagsUseCase @Inject constructor(
-    private val repository: InsightRepository
+    private val repository: CaptureRepository
 ) {
     companion object {
         /**

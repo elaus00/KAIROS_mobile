@@ -74,10 +74,10 @@ interface BookmarkDao {
     fun getBookmarksByTag(tag: String): Flow<List<BookmarkEntity>>
 
     /**
-     * 인사이트 ID로 연결된 북마크 조회
+     * 캡처 ID로 연결된 북마크 조회
      */
-    @Query("SELECT * FROM bookmarks WHERE source_insight_id = :insightId")
-    suspend fun getBookmarkByInsightId(insightId: String): BookmarkEntity?
+    @Query("SELECT * FROM bookmarks WHERE source_capture_id = :captureId")
+    suspend fun getBookmarkByCaptureId(captureId: String): BookmarkEntity?
 
     /**
      * 북마크 개수 조회

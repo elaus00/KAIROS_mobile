@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.local.database.dao.BookmarkDao
-import com.example.kairos_mobile.data.local.database.dao.InsightQueueDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureQueueDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
@@ -37,24 +37,25 @@ object DatabaseModule {
             KairosDatabase.DATABASE_NAME
         )
             .addMigrations(
-                KairosDatabase.MIGRATION_1_2,  // Phase 2: 멀티모달 캡처
-                KairosDatabase.MIGRATION_2_3,  // Phase 3: 스마트 처리 기능
-                KairosDatabase.MIGRATION_3_4,  // Phase 3: 알림 기능
-                KairosDatabase.MIGRATION_4_5,  // Phase 4: Capture → Insight 리네이밍
-                KairosDatabase.MIGRATION_5_6,  // Phase 5: Todo 테이블, SCHEDULE → NOTE
-                KairosDatabase.MIGRATION_6_7   // PRD v4.0: Schedule, Note, Bookmark 테이블
+                KairosDatabase.MIGRATION_1_2,  // 멀티모달 캡처
+                KairosDatabase.MIGRATION_2_3,  // 스마트 처리 기능
+                KairosDatabase.MIGRATION_3_4,  // 알림 기능
+                KairosDatabase.MIGRATION_4_5,  // Capture → Insight 리네이밍
+                KairosDatabase.MIGRATION_5_6,  // Todo 테이블, SCHEDULE → NOTE
+                KairosDatabase.MIGRATION_6_7,  // PRD v4.0: Schedule, Note, Bookmark 테이블
+                KairosDatabase.MIGRATION_7_8   // Insight → Capture 리네이밍 완료
             )
             .fallbackToDestructiveMigration()  // 마이그레이션 실패 시 폴백
             .build()
     }
 
     /**
-     * InsightQueueDao 제공
+     * CaptureQueueDao 제공
      */
     @Provides
     @Singleton
-    fun provideInsightQueueDao(database: KairosDatabase): InsightQueueDao {
-        return database.insightQueueDao()
+    fun provideCaptureQueueDao(database: KairosDatabase): CaptureQueueDao {
+        return database.captureQueueDao()
     }
 
     /**

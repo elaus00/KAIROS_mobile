@@ -83,6 +83,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 자동 분류 활성화 토글
+     */
+    fun toggleAutoClassify(enabled: Boolean) {
+        viewModelScope.launch {
+            // TODO: preferencesRepository에 setAutoClassifyEnabled 추가
+            _uiState.update { it.copy(autoClassifyEnabled = enabled) }
+        }
+    }
+
     // ========== 테마 설정 ==========
 
     /**

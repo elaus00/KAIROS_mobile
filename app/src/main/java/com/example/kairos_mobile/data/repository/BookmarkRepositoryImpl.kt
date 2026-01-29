@@ -59,16 +59,16 @@ class BookmarkRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createBookmarkFromInsight(
-        insightId: String,
+    override suspend fun createBookmarkFromCapture(
+        captureId: String,
         title: String,
         url: String,
         summary: String?,
         tags: List<String>
     ): Result<Bookmark> {
         return try {
-            // 이미 해당 인사이트로 생성된 북마크가 있는지 확인
-            val existing = bookmarkDao.getBookmarkByInsightId(insightId)
+            // 이미 해당 캡처로 생성된 북마크가 있는지 확인
+            val existing = bookmarkDao.getBookmarkByCaptureId(captureId)
             if (existing != null) {
                 return Result.Success(BookmarkMapper.toDomain(existing))
             }
@@ -88,7 +88,7 @@ class BookmarkRepositoryImpl @Inject constructor(
                 summary = summary,
                 tags = tags,
                 faviconUrl = null,
-                sourceInsightId = insightId,
+                sourceCaptureId = captureId,
                 createdAt = Instant.now()
             )
 

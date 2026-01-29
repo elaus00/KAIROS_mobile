@@ -1,66 +1,41 @@
 package com.example.kairos_mobile.presentation.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.kairos_mobile.navigation.NavRoutes
-import com.example.kairos_mobile.presentation.components.common.GlassBottomNavigation
-import com.example.kairos_mobile.presentation.components.common.NavigationTab
-import com.example.kairos_mobile.presentation.components.settings.SwitchPreference
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
-import com.example.kairos_mobile.ui.components.glassButtonThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
+import com.example.kairos_mobile.presentation.components.common.KairosTab
+import com.example.kairos_mobile.presentation.components.common.SectionHeader
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 글래스모피즘 스타일의 설정 화면
- * 세련된 디자인과 일관된 미니멀 미학
+ * SettingsScreen (PRD v4.0)
+ * 미니멀 모노크롬 디자인 설정 화면
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onNavigate: (String) -> Unit = {},
-    isDarkTheme: Boolean = false
+    onNavigate: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val colors = KairosTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // 테마에 따른 색상 설정
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
-    val textQuaternaryColor = if (isDarkTheme) TextQuaternary else AiryTextQuaternary
-    val dividerColor = if (isDarkTheme) Color(0x20FFFFFF) else AiryGlassBorder
 
     // 이벤트 처리
     LaunchedEffect(Unit) {
@@ -76,166 +51,283 @@ fun SettingsScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 테마 인식 애니메이션 배경
-        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
+    Scaffold(
+        bottomBar = {
+            KairosBottomNav(
+                selectedTab = KairosTab.SETTINGS,
+                onTabSelected = { tab ->
+                    onNavigate(tab.route)
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = colors.background
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(colors.background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // 헤더
+            Text(
+                text = "Settings",
+                color = colors.text,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            )
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "설정",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light,
-                            color = textPrimaryColor
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "뒤로",
-                                tint = textTertiaryColor
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent
-                    ),
-                    modifier = Modifier.glassButtonThemed(isDarkTheme = isDarkTheme)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // AI 기능 섹션
+            SectionHeader(title = "AI 기능")
+
+            SettingsCard {
+                // 자동 요약
+                SwitchSettingItem(
+                    title = "자동 요약",
+                    description = "긴 콘텐츠를 AI가 자동으로 요약합니다",
+                    checked = uiState.autoSummarizeEnabled,
+                    onCheckedChange = viewModel::toggleAutoSummarize
                 )
-            },
-            containerColor = Color.Transparent,
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { paddingValues ->
-            Box(
+
+                SettingsDivider()
+
+                // 스마트 태그 제안
+                SwitchSettingItem(
+                    title = "스마트 태그 제안",
+                    description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
+                    checked = uiState.smartTagsEnabled,
+                    onCheckedChange = viewModel::toggleSmartTags
+                )
+
+                SettingsDivider()
+
+                // 자동 분류
+                SwitchSettingItem(
+                    title = "자동 분류",
+                    description = "캡처 내용을 AI가 자동으로 분류합니다",
+                    checked = uiState.autoClassifyEnabled,
+                    onCheckedChange = viewModel::toggleAutoClassify
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 화면 설정 섹션
+            SectionHeader(title = "화면")
+
+            SettingsCard {
+                // 다크 모드
+                SwitchSettingItem(
+                    title = "다크 모드",
+                    description = "어두운 테마를 사용합니다",
+                    checked = uiState.themePreference == ThemePreference.DARK,
+                    onCheckedChange = viewModel::toggleDarkMode
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 연동 섹션
+            SectionHeader(title = "연동")
+
+            SettingsCard {
+                // Google Calendar
+                NavigationSettingItem(
+                    title = "Google Calendar",
+                    description = if (uiState.googleCalendarConnected) "연결됨" else "연결 안됨",
+                    onClick = { /* TODO: Google Calendar 연동 */ }
+                )
+
+                SettingsDivider()
+
+                // Obsidian
+                NavigationSettingItem(
+                    title = "Obsidian",
+                    description = if (uiState.obsidianConnected) "연결됨" else "연결 안됨",
+                    onClick = { /* TODO: Obsidian 연동 */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 정보 섹션
+            SectionHeader(title = "정보")
+
+            SettingsCard {
+                NavigationSettingItem(
+                    title = "버전",
+                    description = "1.0.0",
+                    showArrow = false,
+                    onClick = { }
+                )
+
+                SettingsDivider()
+
+                NavigationSettingItem(
+                    title = "개인정보 처리방침",
+                    onClick = { /* TODO: 개인정보 처리방침 */ }
+                )
+
+                SettingsDivider()
+
+                NavigationSettingItem(
+                    title = "이용약관",
+                    onClick = { /* TODO: 이용약관 */ }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 앱 정보
+            Text(
+                text = "KAIROS v1.0",
+                color = colors.textMuted,
+                fontSize = 12.sp,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 20.dp, bottom = 140.dp) // 하단 네비게이션 공간 확보
-                ) {
-                    // ========== AI 기능 설정 섹션 ==========
-                    Text(
-                        text = "AI 기능",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = textPrimaryColor,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
+            )
+        }
+    }
+}
 
-                    Text(
-                        text = "AI 기반 자동 처리 기능을 설정합니다",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Light,
-                        color = textTertiaryColor,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+/**
+ * 설정 카드 컨테이너
+ */
+@Composable
+private fun SettingsCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val colors = KairosTheme.colors
 
-                    // M09: 자동 요약
-                    SwitchPreference(
-                        title = "자동 요약",
-                        description = "긴 콘텐츠를 AI가 자동으로 요약합니다 (200자 이상)",
-                        checked = uiState.autoSummarizeEnabled,
-                        onCheckedChange = viewModel::toggleAutoSummarize,
-                        isDarkTheme = isDarkTheme
-                    )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card),
+        content = content
+    )
+}
 
-                    Spacer(modifier = Modifier.height(12.dp))
+/**
+ * 스위치 설정 아이템
+ */
+@Composable
+private fun SwitchSettingItem(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
 
-                    // M10: 스마트 태그 제안
-                    SwitchPreference(
-                        title = "스마트 태그 제안",
-                        description = "과거 패턴을 학습하여 태그를 자동 제안합니다",
-                        checked = uiState.smartTagsEnabled,
-                        onCheckedChange = viewModel::toggleSmartTags,
-                        isDarkTheme = isDarkTheme
-                    )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = colors.text,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = description,
+                color = colors.textMuted,
+                fontSize = 13.sp
+            )
+        }
 
-                    Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.width(16.dp))
 
-                    // 구분선
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(1f)
-                            .height(0.8.dp)
-                            .background(
-                                color = dividerColor,
-                                shape = RoundedCornerShape(1.dp)
-                            )
-                    )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = if (colors.isDark) colors.background else colors.card,
+                checkedTrackColor = colors.accent,
+                uncheckedThumbColor = colors.card,
+                uncheckedTrackColor = colors.chipBg
+            )
+        )
+    }
+}
 
-                    Spacer(modifier = Modifier.height(28.dp))
+/**
+ * 네비게이션 설정 아이템
+ */
+@Composable
+private fun NavigationSettingItem(
+    title: String,
+    description: String? = null,
+    showArrow: Boolean = true,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
 
-                    // ========== 테마 설정 섹션 ==========
-                    Text(
-                        text = "테마",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = textPrimaryColor,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            color = colors.text,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium
+        )
 
-                    Text(
-                        text = "앱의 테마를 설정합니다",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Light,
-                        color = textTertiaryColor,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            description?.let {
+                Text(
+                    text = it,
+                    color = colors.textMuted,
+                    fontSize = 14.sp
+                )
+            }
 
-                    // 다크 모드 전환
-                    SwitchPreference(
-                        title = "다크 모드",
-                        description = "어두운 테마를 사용합니다",
-                        checked = uiState.themePreference == com.example.kairos_mobile.domain.model.ThemePreference.DARK,
-                        onCheckedChange = viewModel::toggleDarkMode,
-                        isDarkTheme = isDarkTheme
-                    )
-
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    // 앱 정보
-                    Text(
-                        text = "KAIROS Magic Inbox v1.0",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Light,
-                        color = textQuaternaryColor,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                }
-
-                // 하단 네비게이션
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 32.dp)
-                ) {
-                    GlassBottomNavigation(
-                        selectedTab = NavigationTab.SETTINGS,
-                        onTabSelected = { tab ->
-                            val route = when (tab) {
-                                NavigationTab.INSIGHT -> NavRoutes.INSIGHT
-                                NavigationTab.SEARCH -> NavRoutes.SEARCH
-                                NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
-                                NavigationTab.SETTINGS -> NavRoutes.SETTINGS
-                            }
-                            if (route != NavRoutes.SETTINGS) {
-                                onNavigate(route)
-                            }
-                        },
-                        isDarkTheme = isDarkTheme
-                    )
-                }
+            if (showArrow) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = colors.textMuted,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
+}
+
+/**
+ * 설정 구분선
+ */
+@Composable
+private fun SettingsDivider(
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    HorizontalDivider(
+        modifier = modifier.padding(horizontal = 16.dp),
+        thickness = 0.5.dp,
+        color = colors.borderLight
+    )
 }

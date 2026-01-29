@@ -77,10 +77,10 @@ interface NoteDao {
     fun getNotesByTag(tag: String): Flow<List<NoteEntity>>
 
     /**
-     * 인사이트 ID로 연결된 노트 조회
+     * 캡처 ID로 연결된 노트 조회
      */
-    @Query("SELECT * FROM notes WHERE source_insight_id = :insightId")
-    suspend fun getNoteByInsightId(insightId: String): NoteEntity?
+    @Query("SELECT * FROM notes WHERE source_capture_id = :captureId")
+    suspend fun getNoteByCaptureId(captureId: String): NoteEntity?
 
     /**
      * 노트 개수 조회

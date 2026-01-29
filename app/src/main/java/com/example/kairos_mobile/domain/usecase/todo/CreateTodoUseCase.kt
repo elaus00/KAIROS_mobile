@@ -42,7 +42,7 @@ class CreateTodoUseCase @Inject constructor(
             id = UUID.randomUUID().toString(),
             content = content,
             title = title,
-            sourceInsightId = null,
+            sourceCaptureId = null,
             dueDate = dueDate,
             dueTime = dueTime,
             priority = priority,

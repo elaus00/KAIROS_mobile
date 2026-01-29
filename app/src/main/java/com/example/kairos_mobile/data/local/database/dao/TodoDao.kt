@@ -117,8 +117,8 @@ interface TodoDao {
     fun getCompletedCount(): Flow<Int>
 
     /**
-     * 인사이트 ID로 연결된 투두 조회
+     * 캡처 ID로 연결된 투두 조회
      */
-    @Query("SELECT * FROM todos WHERE source_insight_id = :insightId")
-    suspend fun getTodoByInsightId(insightId: String): TodoEntity?
+    @Query("SELECT * FROM todos WHERE source_capture_id = :captureId")
+    suspend fun getTodoByCaptureId(captureId: String): TodoEntity?
 }

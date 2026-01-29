@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.navigation.NavRoutes
-import com.example.kairos_mobile.presentation.components.common.GlassBottomNavigation
-import com.example.kairos_mobile.presentation.components.common.NavigationTab
+import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
+import com.example.kairos_mobile.presentation.components.common.KairosTab
 import com.example.kairos_mobile.presentation.components.search.FilterChipRow
 import com.example.kairos_mobile.presentation.components.search.GlassSearchBar
 import com.example.kairos_mobile.presentation.components.search.SearchResultCard
@@ -34,7 +34,7 @@ import com.example.kairos_mobile.ui.theme.*
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    onInsightClick: (String) -> Unit,
+    onCaptureClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
     isDarkTheme: Boolean = false,
     viewModel: SearchViewModel = hiltViewModel()
@@ -179,10 +179,10 @@ fun SearchScreen(
                             items(
                                 items = uiState.searchResults,
                                 key = { it.id }
-                            ) { insight ->
+                            ) { capture ->
                                 SearchResultCard(
-                                    insight = insight,
-                                    onClick = { onInsightClick(insight.id) },
+                                    capture = capture,
+                                    onClick = { onCaptureClick(capture.id) },
                                     isDarkTheme = isDarkTheme
                                 )
                             }
@@ -221,22 +221,12 @@ fun SearchScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
             ) {
-                GlassBottomNavigation(
-                    selectedTab = NavigationTab.SEARCH,
+                KairosBottomNav(
+                    selectedTab = KairosTab.HOME,  // 검색은 Home에서 접근
                     onTabSelected = { tab ->
-                        val route = when (tab) {
-                            NavigationTab.INSIGHT -> NavRoutes.INSIGHT
-                            NavigationTab.SEARCH -> NavRoutes.SEARCH
-                            NavigationTab.ARCHIVE -> NavRoutes.ARCHIVE
-                            NavigationTab.SETTINGS -> NavRoutes.SETTINGS
-                        }
-                        if (route != NavRoutes.SEARCH) {
-                            onNavigate(route)
-                        }
-                    },
-                    isDarkTheme = isDarkTheme
+                        onNavigate(tab.route)
+                    }
                 )
             }
         }

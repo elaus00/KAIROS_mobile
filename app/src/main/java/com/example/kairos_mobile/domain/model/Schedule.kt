@@ -15,7 +15,7 @@ data class Schedule(
     val location: String? = null,
     val category: ScheduleCategory = ScheduleCategory.PERSONAL,
     val googleCalendarId: String? = null,
-    val sourceInsightId: String? = null,
+    val sourceCaptureId: String? = null,
     val createdAt: Instant,
     val updatedAt: Instant = createdAt
 ) {

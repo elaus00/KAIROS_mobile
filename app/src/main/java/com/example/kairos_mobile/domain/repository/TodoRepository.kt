@@ -33,12 +33,12 @@ interface TodoRepository {
     suspend fun createTodo(todo: Todo): Result<Todo>
 
     /**
-     * 인사이트에서 투두 생성
-     * @param insightId 원본 인사이트 ID
+     * 캡처에서 투두 생성
+     * @param captureId 원본 캡처 ID
      * @param classification AI 분류 결과
      */
-    suspend fun createTodoFromInsight(
-        insightId: String,
+    suspend fun createTodoFromCapture(
+        captureId: String,
         classification: Classification
     ): Result<Todo>
 

@@ -24,7 +24,7 @@ object BookmarkMapper {
             summary = entity.summary,
             tags = parseTags(entity.tags),
             faviconUrl = entity.faviconUrl,
-            sourceInsightId = entity.sourceInsightId,
+            sourceCaptureId = entity.sourceCaptureId,
             createdAt = Instant.ofEpochMilli(entity.createdAt)
         )
     }
@@ -40,7 +40,7 @@ object BookmarkMapper {
             summary = domain.summary,
             tags = serializeTags(domain.tags),
             faviconUrl = domain.faviconUrl,
-            sourceInsightId = domain.sourceInsightId,
+            sourceCaptureId = domain.sourceCaptureId,
             createdAt = domain.createdAt.toEpochMilli()
         )
     }

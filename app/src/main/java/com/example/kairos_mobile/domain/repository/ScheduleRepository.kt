@@ -47,10 +47,10 @@ interface ScheduleRepository {
     suspend fun createSchedule(schedule: Schedule): Result<Schedule>
 
     /**
-     * 인사이트에서 일정 생성
+     * 캡처에서 일정 생성
      */
-    suspend fun createScheduleFromInsight(
-        insightId: String,
+    suspend fun createScheduleFromCapture(
+        captureId: String,
         title: String,
         date: LocalDate,
         time: java.time.LocalTime,

@@ -3,11 +3,11 @@ package com.example.kairos_mobile.presentation.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.InsightSource
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.CaptureSource
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.model.Result
 import com.example.kairos_mobile.domain.model.SearchQuery
-import com.example.kairos_mobile.domain.usecase.search.SearchInsightsUseCase
+import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchInsightsUseCase: SearchInsightsUseCase
+    private val searchCapturesUseCase: SearchCapturesUseCase
 ) : ViewModel() {
 
     companion object {
@@ -41,7 +41,7 @@ class SearchViewModel @Inject constructor(
     /**
      * 타입 필터 토글
      */
-    fun onTypeFilterToggle(type: InsightType) {
+    fun onTypeFilterToggle(type: CaptureType) {
         _uiState.update { state ->
             val newTypes = if (type in state.selectedTypes) {
                 state.selectedTypes - type
@@ -55,7 +55,7 @@ class SearchViewModel @Inject constructor(
     /**
      * 소스 필터 토글
      */
-    fun onSourceFilterToggle(source: InsightSource) {
+    fun onSourceFilterToggle(source: CaptureSource) {
         _uiState.update { state ->
             val newSources = if (source in state.selectedSources) {
                 state.selectedSources - source
@@ -93,7 +93,7 @@ class SearchViewModel @Inject constructor(
             }
 
             // 검색 수행
-            when (val result = searchInsightsUseCase(query, offset = 0, limit = state.pageSize)) {
+            when (val result = searchCapturesUseCase(query, offset = 0, limit = state.pageSize)) {
                 is Result.Success -> {
                     val results = result.data
                     _uiState.update {
@@ -146,7 +146,7 @@ class SearchViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             // 추가 결과 로드
-            when (val result = searchInsightsUseCase(
+            when (val result = searchCapturesUseCase(
                 query,
                 offset = state.currentOffset,
                 limit = state.pageSize

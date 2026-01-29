@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.presentation.home
 
-import com.example.kairos_mobile.domain.model.Insight
-import com.example.kairos_mobile.domain.model.InsightType
+import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.CaptureType
 import com.example.kairos_mobile.domain.model.Schedule
 
 /**
@@ -15,12 +15,12 @@ data class HomeUiState(
     val maxCharacterCount: Int = 500,
 
     // AI 분류
-    val suggestedType: InsightType? = null,
+    val suggestedType: CaptureType? = null,
     val isClassifying: Boolean = false,
     val classificationConfidence: Float = 0f,
 
     // 최근 캡처 그리드
-    val recentCaptures: List<Insight> = emptyList(),
+    val recentCaptures: List<Capture> = emptyList(),
     val isLoadingCaptures: Boolean = false,
 
     // AI 추천 일정
@@ -44,7 +44,7 @@ sealed class HomeEvent {
 
     // 제출 관련
     data object Submit : HomeEvent()
-    data class SubmitWithType(val type: InsightType) : HomeEvent()
+    data class SubmitWithType(val type: CaptureType) : HomeEvent()
 
     // 캡처 관련
     data object OpenCamera : HomeEvent()

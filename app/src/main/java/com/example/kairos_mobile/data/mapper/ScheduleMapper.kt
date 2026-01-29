@@ -35,7 +35,7 @@ object ScheduleMapper {
                 ScheduleCategory.PERSONAL
             },
             googleCalendarId = entity.googleCalendarId,
-            sourceInsightId = entity.sourceInsightId,
+            sourceCaptureId = entity.sourceCaptureId,
             createdAt = Instant.ofEpochMilli(entity.createdAt),
             updatedAt = Instant.ofEpochMilli(entity.updatedAt)
         )
@@ -53,7 +53,7 @@ object ScheduleMapper {
             location = domain.location,
             category = domain.category.name,
             googleCalendarId = domain.googleCalendarId,
-            sourceInsightId = domain.sourceInsightId,
+            sourceCaptureId = domain.sourceCaptureId,
             createdAt = domain.createdAt.toEpochMilli(),
             updatedAt = domain.updatedAt.toEpochMilli()
         )
