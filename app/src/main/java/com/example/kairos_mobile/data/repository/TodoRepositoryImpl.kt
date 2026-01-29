@@ -150,6 +150,21 @@ class TodoRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getTodosByDate(date: LocalDate): Flow<List<Todo>> {
+        val startOfDay = date.atStartOfDay()
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+        val endOfDay = date.plusDays(1).atStartOfDay()
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
+        return todoDao.getTodosByDueDate(startOfDay, endOfDay).map { entities ->
+            entities.map { TodoMapper.toDomain(it) }
+        }
+    }
+
     override fun getActiveCount(): Flow<Int> {
         return todoDao.getActiveCount()
     }

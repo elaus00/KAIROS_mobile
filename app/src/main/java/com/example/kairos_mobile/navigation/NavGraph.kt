@@ -11,13 +11,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kairos_mobile.presentation.archive.ArchiveScreen
+import com.example.kairos_mobile.presentation.calendar.CalendarScreen
 import com.example.kairos_mobile.presentation.home.HomeScreen
 import com.example.kairos_mobile.presentation.insight.InsightScreen
 import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
 import com.example.kairos_mobile.presentation.result.ResultScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
-import com.example.kairos_mobile.presentation.todo.TodoScreen
 
 /**
  * Navigation 경로 정의 (PRD v4.0)
@@ -125,11 +125,11 @@ fun KairosNavGraph(
         }
 
         // 캘린더 화면 (CALENDAR) - PRD v4.0
-        // TODO: CalendarScreen 구현 후 교체
         composable(NavRoutes.CALENDAR) {
-            // 임시로 TodoScreen 사용
-            TodoScreen(
-                onNavigate = navigateToTab
+            CalendarScreen(
+                onNavigate = navigateToTab,
+                onScheduleClick = { /* TODO: 일정 상세 화면 */ },
+                onTaskClick = { /* TODO: 할 일 상세 화면 */ }
             )
         }
 
