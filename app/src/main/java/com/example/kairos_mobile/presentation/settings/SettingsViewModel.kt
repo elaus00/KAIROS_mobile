@@ -2,7 +2,9 @@ package com.example.kairos_mobile.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.usecase.settings.GetShowOverlayOnLaunchUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.settings.SetShowOverlayOnLaunchUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.model.ThemePreference
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getThemePreferenceUseCase: GetThemePreferenceUseCase,
-    private val setThemePreferenceUseCase: SetThemePreferenceUseCase
+    private val setThemePreferenceUseCase: SetThemePreferenceUseCase,
+    private val getShowOverlayOnLaunchUseCase: GetShowOverlayOnLaunchUseCase,
+    private val setShowOverlayOnLaunchUseCase: SetShowOverlayOnLaunchUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -43,6 +47,11 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             getThemePreferenceUseCase().collect { theme ->
                 _uiState.update { it.copy(themePreference = theme) }
+            }
+        }
+        viewModelScope.launch {
+            getShowOverlayOnLaunchUseCase().collect { enabled ->
+                _uiState.update { it.copy(showOverlayOnLaunch = enabled) }
             }
         }
     }
@@ -74,6 +83,16 @@ class SettingsViewModel @Inject constructor(
      */
     fun setViewMode(mode: ViewMode) {
         _uiState.update { it.copy(viewMode = mode) }
+    }
+
+    /**
+     * 앱 시작 시 빠른 메모 표시 토글
+     */
+    fun toggleShowOverlayOnLaunch(enabled: Boolean) {
+        viewModelScope.launch {
+            setShowOverlayOnLaunchUseCase(enabled)
+            _uiState.update { it.copy(showOverlayOnLaunch = enabled) }
+        }
     }
 
     // ========== 연동 설정 ==========

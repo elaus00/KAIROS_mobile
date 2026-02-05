@@ -13,17 +13,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 결과 수정 바텀시트
+ * 결과 수정 바텀시트 (PRD v4.0)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,16 +36,11 @@ fun ResultEditBottomSheet(
     onTagRemoved: (String) -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
-    isSaving: Boolean = false,
-    isDarkTheme: Boolean = false
+    isSaving: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
     var newTagInput by remember { mutableStateOf("") }
-
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val sheetBackground = if (isDarkTheme) GlassBackground else AiryGlassBackground
+    val colors = KairosTheme.colors
 
     val availableTypes = listOf(
         CaptureType.IDEA,
@@ -57,7 +51,7 @@ fun ResultEditBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = sheetBackground,
+        containerColor = colors.background,
         dragHandle = {
             Box(
                 modifier = Modifier
@@ -68,7 +62,7 @@ fun ResultEditBottomSheet(
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     shape = RoundedCornerShape(2.dp),
-                    color = textSecondaryColor.copy(alpha = 0.3f)
+                    color = colors.textMuted.copy(alpha = 0.3f)
                 ) {}
             }
         }
@@ -76,10 +70,10 @@ fun ResultEditBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 20.dp)
                 .padding(bottom = 32.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // 헤더
             Row(
@@ -91,14 +85,14 @@ fun ResultEditBottomSheet(
                     text = "분류 결과 수정",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = textPrimaryColor
+                    color = colors.text
                 )
 
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "닫기",
-                        tint = textSecondaryColor
+                        tint = colors.textSecondary
                     )
                 }
             }
@@ -111,7 +105,7 @@ fun ResultEditBottomSheet(
                     text = "유형",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = textSecondaryColor
+                    color = colors.textSecondary
                 )
 
                 Row(
@@ -130,13 +124,15 @@ fun ResultEditBottomSheet(
                                 )
                             },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = type.getColor().copy(alpha = 0.2f),
-                                selectedLabelColor = type.getColor()
+                                selectedContainerColor = colors.accent,
+                                selectedLabelColor = colors.card,
+                                containerColor = colors.chipBg,
+                                labelColor = colors.chipText
                             ),
                             border = if (isSelected) {
                                 FilterChipDefaults.filterChipBorder(
-                                    borderColor = type.getColor(),
-                                    selectedBorderColor = type.getColor(),
+                                    borderColor = colors.accent,
+                                    selectedBorderColor = colors.accent,
                                     enabled = true,
                                     selected = true
                                 )
@@ -154,7 +150,7 @@ fun ResultEditBottomSheet(
                     text = "제목",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = textSecondaryColor
+                    color = colors.textSecondary
                 )
 
                 OutlinedTextField(
@@ -164,16 +160,16 @@ fun ResultEditBottomSheet(
                     placeholder = {
                         Text(
                             text = "제목을 입력하세요",
-                            color = textSecondaryColor.copy(alpha = 0.5f)
+                            color = colors.placeholder
                         )
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = accentColor,
-                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
+                        focusedBorderColor = colors.accent,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.text,
+                        unfocusedTextColor = colors.text
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
@@ -190,7 +186,7 @@ fun ResultEditBottomSheet(
                     text = "태그",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = textSecondaryColor
+                    color = colors.textSecondary
                 )
 
                 // 현재 태그들
@@ -217,8 +213,8 @@ fun ResultEditBottomSheet(
                                     }
                                 },
                                 colors = InputChipDefaults.inputChipColors(
-                                    containerColor = accentColor.copy(alpha = 0.1f),
-                                    labelColor = accentColor
+                                    containerColor = colors.accentBg,
+                                    labelColor = colors.textSecondary
                                 )
                             )
                         }
@@ -233,22 +229,22 @@ fun ResultEditBottomSheet(
                     placeholder = {
                         Text(
                             text = "새 태그 입력 후 Enter",
-                            color = textSecondaryColor.copy(alpha = 0.5f)
+                            color = colors.placeholder
                         )
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = accentColor,
-                        unfocusedBorderColor = textSecondaryColor.copy(alpha = 0.3f),
-                        focusedTextColor = textPrimaryColor,
-                        unfocusedTextColor = textPrimaryColor
+                        focusedBorderColor = colors.accent,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.text,
+                        unfocusedTextColor = colors.text
                     ),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Tag,
                             contentDescription = null,
-                            tint = textSecondaryColor
+                            tint = colors.textMuted
                         )
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -268,17 +264,18 @@ fun ResultEditBottomSheet(
                 onClick = onSave,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(16.dp),
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = accentColor
+                    containerColor = colors.accent,
+                    contentColor = colors.card
                 ),
                 enabled = currentType != null && !isSaving
             ) {
                 if (isSaving) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(22.dp),
-                        color = Color.White,
+                        color = colors.card,
                         strokeWidth = 2.dp
                     )
                 } else {

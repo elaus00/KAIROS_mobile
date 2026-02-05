@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.notifications
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,29 +19,20 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.presentation.components.notifications.NotificationCard
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 알림 화면
+ * 알림 화면 (PRD v4.0)
  */
 @Composable
 fun NotificationsScreen(
     onBack: () -> Unit,
     onNotificationClick: (String?) -> Unit,
-    isDarkTheme: Boolean = false,
     viewModel: NotificationsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // 테마에 따른 색상 설정
-    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
-    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val accentColor = if (isDarkTheme) AccentBlue else AiryAccentBlue
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     // 에러 메시지 스낵바 표시
     LaunchedEffect(uiState.errorMessage) {
@@ -53,96 +45,85 @@ fun NotificationsScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 테마 인식 애니메이션 배경
-        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
-
-        // 메인 콘텐츠
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    snackbar = { data ->
-                        Snackbar(
-                            snackbarData = data,
-                            shape = RoundedCornerShape(12.dp),
-                            containerColor = snackbarBgColor,
-                            contentColor = snackbarContentColor
-                        )
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .statusBarsPadding()
-            ) {
-                // 헤더
-                NotificationsHeader(
-                    onBackClick = onBack,
-                    onRefreshClick = viewModel::onRefresh,
-                    unreadCount = uiState.unreadCount,
-                    isDarkTheme = isDarkTheme
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 필터 탭
-                FilterTabs(
-                    selectedFilter = uiState.selectedFilter,
-                    onFilterChanged = viewModel::onFilterChanged,
-                    isDarkTheme = isDarkTheme
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 알림 리스트
-                if (uiState.isLoading && uiState.notifications.isEmpty()) {
-                    // 초기 로딩
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = accentColor,
-                            strokeWidth = 2.dp
-                        )
-                    }
-                } else if (uiState.notifications.isEmpty() && !uiState.isLoading) {
-                    // 빈 상태
-                    EmptyNotificationsState(
-                        filter = uiState.selectedFilter,
-                        isDarkTheme = isDarkTheme,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 24.dp)
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = colors.background,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = colors.card,
+                        contentColor = colors.text
                     )
-                } else {
-                    // 알림 리스트
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = uiState.notifications,
-                            key = { it.id }
-                        ) { notification ->
-                            NotificationCard(
-                                notification = notification,
-                                onClick = {
-                                    viewModel.onNotificationClick(notification.id)
-                                    onNotificationClick(notification.relatedCaptureId)
-                                },
-                                isDarkTheme = isDarkTheme
-                            )
-                        }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(colors.background)
+                .statusBarsPadding()
+        ) {
+            // 헤더
+            NotificationsHeader(
+                onBackClick = onBack,
+                onRefreshClick = viewModel::onRefresh,
+                unreadCount = uiState.unreadCount
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 필터 탭
+            FilterTabs(
+                selectedFilter = uiState.selectedFilter,
+                onFilterChanged = viewModel::onFilterChanged
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 알림 리스트
+            if (uiState.isLoading && uiState.notifications.isEmpty()) {
+                // 초기 로딩
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = colors.accent,
+                        strokeWidth = 2.dp
+                    )
+                }
+            } else if (uiState.notifications.isEmpty() && !uiState.isLoading) {
+                // 빈 상태
+                EmptyNotificationsState(
+                    filter = uiState.selectedFilter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                )
+            } else {
+                // 알림 리스트
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(
+                        items = uiState.notifications,
+                        key = { it.id }
+                    ) { notification ->
+                        NotificationCard(
+                            notification = notification,
+                            onClick = {
+                                viewModel.onNotificationClick(notification.id)
+                                onNotificationClick(notification.relatedCaptureId)
+                            }
+                        )
                     }
                 }
             }
@@ -158,11 +139,9 @@ private fun NotificationsHeader(
     onBackClick: () -> Unit,
     onRefreshClick: () -> Unit,
     unreadCount: Int,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val accentColor = if (isDarkTheme) AccentBlue else AiryAccentBlue
+    val colors = KairosTheme.colors
 
     Row(
         modifier = modifier
@@ -176,7 +155,7 @@ private fun NotificationsHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "뒤로가기",
-                tint = textPrimaryColor
+                tint = colors.text
             )
         }
 
@@ -189,19 +168,19 @@ private fun NotificationsHeader(
                 text = "알림",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                color = textPrimaryColor,
+                color = colors.text,
                 letterSpacing = 0.3.sp
             )
             if (unreadCount > 0) {
                 Surface(
-                    color = accentColor,
+                    color = colors.accent,
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         text = unreadCount.toString(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = colors.card,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
@@ -213,7 +192,7 @@ private fun NotificationsHeader(
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = "새로고침",
-                tint = textPrimaryColor
+                tint = colors.text
             )
         }
     }
@@ -226,32 +205,28 @@ private fun NotificationsHeader(
 private fun FilterTabs(
     selectedFilter: NotificationFilter,
     onFilterChanged: (NotificationFilter) -> Unit,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         FilterTab(
             text = "전체",
             isSelected = selectedFilter == NotificationFilter.ALL,
-            onClick = { onFilterChanged(NotificationFilter.ALL) },
-            isDarkTheme = isDarkTheme
+            onClick = { onFilterChanged(NotificationFilter.ALL) }
         )
         FilterTab(
             text = "읽지 않음",
             isSelected = selectedFilter == NotificationFilter.UNREAD,
-            onClick = { onFilterChanged(NotificationFilter.UNREAD) },
-            isDarkTheme = isDarkTheme
+            onClick = { onFilterChanged(NotificationFilter.UNREAD) }
         )
         FilterTab(
             text = "읽음",
             isSelected = selectedFilter == NotificationFilter.READ,
-            onClick = { onFilterChanged(NotificationFilter.READ) },
-            isDarkTheme = isDarkTheme
+            onClick = { onFilterChanged(NotificationFilter.READ) }
         )
     }
 }
@@ -264,25 +239,21 @@ private fun FilterTab(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val cardColor = if (isDarkTheme) GlassCard else AiryGlassCard
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
+    val colors = KairosTheme.colors
 
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(8.dp),
-        color = if (isSelected) accentColor.copy(alpha = 0.3f) else cardColor.copy(alpha = 0.5f),
+        color = if (isSelected) colors.accent else colors.chipBg,
         modifier = modifier
     ) {
         Text(
             text = text,
             fontSize = 13.sp,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (isSelected) textPrimaryColor else textSecondaryColor,
+            color = if (isSelected) colors.card else colors.textSecondary,
             letterSpacing = 0.2.sp,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
@@ -295,10 +266,9 @@ private fun FilterTab(
 @Composable
 private fun EmptyNotificationsState(
     filter: NotificationFilter,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     Box(
         modifier = modifier,
@@ -311,7 +281,7 @@ private fun EmptyNotificationsState(
             Icon(
                 imageVector = Icons.Default.NotificationsNone,
                 contentDescription = null,
-                tint = textTertiaryColor.copy(alpha = 0.5f),
+                tint = colors.textMuted.copy(alpha = 0.5f),
                 modifier = Modifier.size(64.dp)
             )
             Text(
@@ -322,7 +292,7 @@ private fun EmptyNotificationsState(
                 },
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = textTertiaryColor,
+                color = colors.textMuted,
                 letterSpacing = 0.2.sp
             )
         }

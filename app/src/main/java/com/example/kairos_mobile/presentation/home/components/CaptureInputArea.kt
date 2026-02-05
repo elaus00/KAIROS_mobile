@@ -12,9 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,13 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import androidx.compose.material3.Text
 
 /**
  * 캡처 입력 영역 컴포넌트 (PRD v4.0)
- * 디자인 시안 반영: 전체 너비 입력창, 버튼 숨김/표시
+ * 디자인 시안 반영: 글자수 왼쪽 상단, 태그 오른쪽 상단
  */
 @Composable
 fun CaptureInputArea(
@@ -60,11 +60,11 @@ fun CaptureInputArea(
             .background(colors.background)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // 입력 상자 (디자인: 전체 너비, 큰 영역)
+        // 입력 상자
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 120.dp, max = 180.dp)
+                .heightIn(min = 160.dp, max = 220.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(colors.card)
                 .border(
@@ -73,53 +73,26 @@ fun CaptureInputArea(
                     shape = RoundedCornerShape(12.dp)
                 )
         ) {
-            // 텍스트 입력 영역
-            BasicTextField(
-                value = inputText,
-                onValueChange = onInputChange,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 56.dp)
-                    .onFocusChanged { focusState ->
-                        isFocused = focusState.isFocused
-                        onFocusChange(focusState.isFocused)
-                    },
-                textStyle = TextStyle(
-                    color = colors.text,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = 24.sp
-                ),
-                cursorBrush = SolidColor(colors.accent),
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (inputText.isEmpty()) {
-                            Text(
-                                text = "떠오르는 생각을 캡처하세요...",
-                                color = colors.placeholder,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
-
-            // 하단 영역: AI 분류칩 + 버튼들 (항상 표시, 디자인 시안 반영)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                // 왼쪽: AI 분류 칩 또는 로딩 (입력 시에만)
+                // 상단 영역: 글자수(왼쪽) + 태그(오른쪽)
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // 왼쪽: 글자수 (항상 표시)
+                    Text(
+                        text = "$characterCount",
+                        color = colors.textMuted,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    // 오른쪽: 실시간 태그
                     if (hasText) {
                         if (isClassifying) {
                             CircularProgressIndicator(
@@ -128,54 +101,124 @@ fun CaptureInputArea(
                                 color = colors.textMuted
                             )
                         } else if (suggestedType != null) {
-                            KairosChip(
-                                text = getTypeDisplayName(suggestedType),
-                                selected = true
-                            )
-                        }
-
-                        // 글자수 (90% 이상일 때만 표시)
-                        if (characterCount > maxCharacterCount * 0.9) {
-                            Text(
-                                text = "$characterCount/$maxCharacterCount",
-                                color = colors.danger,
-                                fontSize = 11.sp
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(colors.chipBg)
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = getTypeDisplayName(suggestedType),
+                                    color = colors.text,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
                         }
                     }
                 }
 
-                // 오른쪽: 전송 버튼 (항상 표시)
-                Box(
+                // 구분선
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = colors.borderLight
+                )
+
+                // 텍스트 입력 영역
+                BasicTextField(
+                    value = inputText,
+                    onValueChange = onInputChange,
                     modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (inputText.isNotBlank()) colors.accent
-                            else colors.accentBg
-                        )
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            enabled = !isSubmitting && inputText.isNotBlank()
-                        ) { onSubmit() },
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .onFocusChanged { focusState ->
+                            isFocused = focusState.isFocused
+                            onFocusChange(focusState.isFocused)
+                        },
+                    textStyle = TextStyle(
+                        color = colors.text,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        lineHeight = 24.sp
+                    ),
+                    cursorBrush = SolidColor(colors.accent),
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (inputText.isEmpty()) {
+                                Text(
+                                    text = "떠오르는 생각을 캡처하세요...",
+                                    color = colors.placeholder,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+
+                // 구분선
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = colors.borderLight
+                )
+
+                // 하단 영역: 이미지 버튼 + 전송 버튼
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (isSubmitting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = if (colors.isDark) colors.background else Color.White
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "전송",
-                            tint = if (inputText.isNotBlank()) {
-                                if (colors.isDark) colors.background else Color.White
-                            } else colors.textMuted,
-                            modifier = Modifier.size(20.dp)
-                        )
+                    // 왼쪽: 이미지 첨부 버튼
+                    Icon(
+                        imageVector = Icons.Outlined.Image,
+                        contentDescription = "이미지 첨부",
+                        tint = colors.textMuted,
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) { onCameraClick() }
+                    )
+
+                    // 오른쪽: 전송 버튼
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (inputText.isNotBlank()) colors.accent
+                                else colors.accentBg
+                            )
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                enabled = !isSubmitting && inputText.isNotBlank()
+                            ) { onSubmit() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSubmitting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = if (colors.isDark) colors.background else Color.White
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "전송",
+                                tint = if (inputText.isNotBlank()) {
+                                    if (colors.isDark) colors.background else Color.White
+                                } else colors.textMuted,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
                     }
                 }
             }

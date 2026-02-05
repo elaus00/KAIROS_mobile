@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.presentation.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -32,7 +33,9 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToPrivacyPolicy: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
@@ -86,7 +89,7 @@ fun SettingsScreen(
             ProfileSection(
                 userName = "사용자",
                 userEmail = "user@email.com",
-                onClick = { /* TODO: 프로필 상세 */ }
+                onClick = onNavigateToProfile
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -123,6 +126,16 @@ fun SettingsScreen(
                     title = "다크 모드",
                     checked = uiState.themePreference == ThemePreference.DARK,
                     onCheckedChange = viewModel::toggleDarkMode
+                )
+
+                SettingsDivider()
+
+                // 앱 시작 시 빠른 메모 표시
+                SwitchSettingItem(
+                    title = "앱 시작 시 빠른 메모",
+                    description = "앱 실행 시 바로 메모 입력 화면 표시",
+                    checked = uiState.showOverlayOnLaunch,
+                    onCheckedChange = viewModel::toggleShowOverlayOnLaunch
                 )
 
                 SettingsDivider()
@@ -176,7 +189,7 @@ fun SettingsScreen(
 
                 NavigationSettingItem(
                     title = "개인정보 처리방침",
-                    onClick = { /* TODO: 개인정보 처리방침 */ }
+                    onClick = onNavigateToPrivacyPolicy
                 )
             }
 
@@ -203,6 +216,11 @@ private fun ProfileSection(
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(colors.card)
+            .border(
+                width = 0.5.dp,
+                color = colors.borderLight,
+                shape = RoundedCornerShape(12.dp)
+            )
             .clickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -251,7 +269,7 @@ private fun ProfileSection(
 }
 
 /**
- * 설정 카드 컨테이너
+ * 설정 카드 컨테이너 (외곽선 포함)
  */
 @Composable
 private fun SettingsCard(
@@ -265,7 +283,12 @@ private fun SettingsCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(colors.card),
+            .background(colors.card)
+            .border(
+                width = 0.5.dp,
+                color = colors.borderLight,
+                shape = RoundedCornerShape(12.dp)
+            ),
         content = content
     )
 }
@@ -405,7 +428,7 @@ private fun ViewModeSettingItem(
         // 버튼 그룹 (크기 축소)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             ViewMode.entries.forEach { mode ->
                 val isSelected = selectedMode == mode
@@ -415,11 +438,11 @@ private fun ViewModeSettingItem(
                         containerColor = if (isSelected) colors.accent else colors.chipBg,
                         contentColor = if (isSelected) colors.card else colors.textSecondary
                     ),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .height(36.dp)
+                        .height(30.dp)
                 ) {
                     Text(
                         text = when (mode) {
@@ -427,7 +450,7 @@ private fun ViewModeSettingItem(
                             ViewMode.GRID -> "그리드"
                             ViewMode.LIST -> "리스트"
                         },
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -500,4 +523,162 @@ private fun SettingsDivider(
         thickness = 0.5.dp,
         color = colors.borderLight
     )
+}
+
+/**
+ * Settings 화면 내용 (Scaffold 없이)
+ * MainScreen의 HorizontalPager에서 사용
+ */
+@Composable
+fun SettingsContent(
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToPrivacyPolicy: () -> Unit = {},
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val colors = KairosTheme.colors
+
+    // 이벤트 처리
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is SettingsEvent.ShowError -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+                is SettingsEvent.ShowSuccess -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .verticalScroll(rememberScrollState())
+    ) {
+        // 헤더
+        Text(
+            text = "Settings",
+            color = colors.text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 프로필 섹션
+        ProfileSection(
+            userName = "사용자",
+            userEmail = "user@email.com",
+            onClick = onNavigateToProfile
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // 연동 섹션
+        SectionHeader(title = "연동")
+
+        SettingsCard {
+            // Google Calendar
+            IntegrationSettingItem(
+                title = "Google Calendar",
+                isConnected = uiState.googleCalendarConnected,
+                onToggle = { viewModel.toggleGoogleCalendar() }
+            )
+
+            SettingsDivider()
+
+            // Obsidian
+            IntegrationSettingItem(
+                title = "Obsidian",
+                isConnected = uiState.obsidianConnected,
+                onToggle = { viewModel.toggleObsidian() }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 화면 설정 섹션
+        SectionHeader(title = "화면")
+
+        SettingsCard {
+            // 다크 모드
+            SwitchSettingItem(
+                title = "다크 모드",
+                checked = uiState.themePreference == ThemePreference.DARK,
+                onCheckedChange = viewModel::toggleDarkMode
+            )
+
+            SettingsDivider()
+
+            // 앱 시작 시 빠른 메모 표시
+            SwitchSettingItem(
+                title = "앱 시작 시 빠른 메모",
+                description = "앱 실행 시 바로 메모 입력 화면 표시",
+                checked = uiState.showOverlayOnLaunch,
+                onCheckedChange = viewModel::toggleShowOverlayOnLaunch
+            )
+
+            SettingsDivider()
+
+            // 노트 보기 방식
+            ViewModeSettingItem(
+                selectedMode = uiState.viewMode,
+                onModeSelected = viewModel::setViewMode
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // AI 설정 섹션
+        SectionHeader(title = "AI 설정")
+
+        SettingsCard {
+            // 자동 분류
+            SwitchSettingItem(
+                title = "자동 분류",
+                description = "입력 내용을 자동으로 분류",
+                checked = uiState.autoClassifyEnabled,
+                onCheckedChange = viewModel::toggleAutoClassify
+            )
+
+            SettingsDivider()
+
+            // 스마트 배치
+            SwitchSettingItem(
+                title = "스마트 배치",
+                description = "할 일 시간대 자동 추천",
+                checked = uiState.smartScheduleEnabled,
+                onCheckedChange = viewModel::toggleSmartSchedule
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 정보 섹션
+        SectionHeader(title = "정보")
+
+        SettingsCard {
+            NavigationSettingItem(
+                title = "버전",
+                description = "1.0.0",
+                showArrow = false,
+                onClick = { }
+            )
+
+            SettingsDivider()
+
+            NavigationSettingItem(
+                title = "개인정보 처리방침",
+                onClick = onNavigateToPrivacyPolicy
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+    }
 }

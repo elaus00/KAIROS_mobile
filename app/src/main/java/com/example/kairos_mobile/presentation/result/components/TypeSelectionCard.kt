@@ -16,8 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.ui.components.glassPanelThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosElevatedCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
  * 타입 선택 카드 (신뢰도 80% 미만)
@@ -30,13 +30,9 @@ fun TypeSelectionCard(
     onTypeSelected: (CaptureType) -> Unit,
     onConfirm: () -> Unit,
     isSaving: Boolean = false,
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val errorColor = if (isDarkTheme) ErrorRed else AiryErrorRed
+    val colors = KairosTheme.colors
 
     // PRD에서 정의된 타입들 (SCHEDULE 제외)
     val availableTypes = listOf(
@@ -48,9 +44,9 @@ fun TypeSelectionCard(
 
     Column(
         modifier = modifier
-            .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(24.dp))
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .kairosElevatedCard(shape = RoundedCornerShape(16.dp))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // 상단: 안내 메시지
         Row(
@@ -61,28 +57,28 @@ fun TypeSelectionCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                 contentDescription = null,
-                tint = errorColor,
+                tint = colors.warning,
                 modifier = Modifier.size(20.dp)
             )
             Text(
                 text = "유형을 선택해주세요",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = textPrimaryColor
+                color = colors.text
             )
         }
 
         // 원본 콘텐츠 미리보기
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = if (isDarkTheme) GlassCard.copy(alpha = 0.5f) else AiryGlassCard.copy(alpha = 0.5f)
+            color = colors.accentBg
         ) {
             Text(
                 text = content,
                 fontSize = 14.sp,
-                color = textSecondaryColor,
+                color = colors.textSecondary,
                 maxLines = 4,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(12.dp)
             )
         }
 
@@ -99,7 +95,6 @@ fun TypeSelectionCard(
                         type = type,
                         isSelected = selectedType == type,
                         onClick = { onTypeSelected(type) },
-                        isDarkTheme = isDarkTheme,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -114,7 +109,6 @@ fun TypeSelectionCard(
                         type = type,
                         isSelected = selectedType == type,
                         onClick = { onTypeSelected(type) },
-                        isDarkTheme = isDarkTheme,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -126,18 +120,20 @@ fun TypeSelectionCard(
             onClick = onConfirm,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(16.dp),
+                .height(48.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = accentColor,
-                disabledContainerColor = accentColor.copy(alpha = 0.4f)
+                containerColor = colors.accent,
+                contentColor = colors.card,
+                disabledContainerColor = colors.accentBg,
+                disabledContentColor = colors.textMuted
             ),
             enabled = selectedType != null && !isSaving
         ) {
             if (isSaving) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(22.dp),
-                    color = TextPrimary,
+                    color = colors.card,
                     strokeWidth = 2.dp
                 )
             } else {
@@ -159,28 +155,19 @@ private fun TypeSelectionButton(
     type: CaptureType,
     isSelected: Boolean,
     onClick: () -> Unit,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val typeColor = type.getColor()
-    val backgroundColor = if (isSelected) {
-        typeColor.copy(alpha = 0.15f)
-    } else {
-        if (isDarkTheme) GlassCard.copy(alpha = 0.3f) else AiryGlassCard.copy(alpha = 0.3f)
-    }
+    val colors = KairosTheme.colors
 
-    val textColor = if (isSelected) {
-        typeColor
-    } else {
-        if (isDarkTheme) TextSecondary else AiryTextSecondary
-    }
+    val backgroundColor = if (isSelected) colors.accentBg else colors.chipBg
+    val textColor = if (isSelected) colors.text else colors.textSecondary
 
     Surface(
         onClick = onClick,
-        modifier = modifier.height(80.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.height(72.dp),
+        shape = RoundedCornerShape(12.dp),
         color = backgroundColor,
-        border = if (isSelected) BorderStroke(2.dp, typeColor) else null
+        border = if (isSelected) BorderStroke(2.dp, colors.accent) else null
     ) {
         Column(
             modifier = Modifier
@@ -193,7 +180,7 @@ private fun TypeSelectionButton(
                 imageVector = type.getIcon(),
                 contentDescription = null,
                 tint = textColor,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(

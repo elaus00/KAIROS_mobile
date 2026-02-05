@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.presentation.result
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,21 +20,20 @@ import com.example.kairos_mobile.presentation.result.components.AutoSaveResultCa
 import com.example.kairos_mobile.presentation.result.components.ConfirmResultCard
 import com.example.kairos_mobile.presentation.result.components.ResultEditBottomSheet
 import com.example.kairos_mobile.presentation.result.components.TypeSelectionCard
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 결과 화면
+ * 결과 화면 (PRD v4.0)
  * 신뢰도 기반 UI 분기: 자동저장/확인/선택 모드
  */
 @Composable
 fun ResultScreen(
     onNavigateBack: () -> Unit,
-    isDarkTheme: Boolean = false,
     viewModel: ResultViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val colors = KairosTheme.colors
 
     // 이벤트 처리
     LaunchedEffect(Unit) {
@@ -55,102 +55,88 @@ fun ResultScreen(
         }
     }
 
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
-    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = colors.background,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = colors.card,
+                        contentColor = colors.text
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(colors.background)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+        ) {
+            // 헤더
+            ResultHeader(onBackClick = onNavigateBack)
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 테마 인식 애니메이션 배경
-        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    snackbar = { data ->
-                        Snackbar(
-                            snackbarData = data,
-                            shape = RoundedCornerShape(12.dp),
-                            containerColor = snackbarBgColor,
-                            contentColor = snackbarContentColor
-                        )
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(
+            // 메인 콘텐츠
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .statusBarsPadding()
-                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
             ) {
-                // 헤더
-                ResultHeader(
-                    onBackClick = onNavigateBack,
-                    isDarkTheme = isDarkTheme
-                )
+                AnimatedContent(
+                    targetState = uiState.isLoading,
+                    transitionSpec = {
+                        fadeIn() togetherWith fadeOut()
+                    },
+                    label = "resultContent"
+                ) { isLoading ->
+                    when {
+                        isLoading -> {
+                            // 로딩 상태
+                            CircularProgressIndicator(
+                                color = colors.accent,
+                                strokeWidth = 3.dp
+                            )
+                        }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // 메인 콘텐츠
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AnimatedContent(
-                        targetState = uiState.isLoading,
-                        transitionSpec = {
-                            fadeIn() togetherWith fadeOut()
-                        },
-                        label = "resultContent"
-                    ) { isLoading ->
-                        when {
-                            isLoading -> {
-                                // 로딩 상태
-                                CircularProgressIndicator(
-                                    color = if (isDarkTheme) PrimaryNavy else AiryAccentBlue,
-                                    strokeWidth = 3.dp
+                        uiState.isSaved -> {
+                            // 저장 완료 상태
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Text(
+                                    text = "✓",
+                                    fontSize = 48.sp,
+                                    color = colors.success
+                                )
+                                Text(
+                                    text = "저장되었습니다",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = colors.text
                                 )
                             }
+                        }
 
-                            uiState.isSaved -> {
-                                // 저장 완료 상태
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    Text(
-                                        text = "✓",
-                                        fontSize = 48.sp,
-                                        color = if (isDarkTheme) SuccessGreen else AirySuccessGreen
-                                    )
-                                    Text(
-                                        text = "저장되었습니다",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = textPrimaryColor
-                                    )
-                                }
-                            }
-
-                            else -> {
-                                // 신뢰도 기반 UI 분기
-                                ResultContent(
-                                    uiState = uiState,
-                                    onStopAutoSave = viewModel::onStopAutoSave,
-                                    onEnterEditMode = viewModel::onEnterEditMode,
-                                    onTypeSelected = viewModel::onTypeSelected,
-                                    onConfirmSave = viewModel::onConfirmSave,
-                                    isDarkTheme = isDarkTheme
-                                )
-                            }
+                        else -> {
+                            // 신뢰도 기반 UI 분기
+                            ResultContent(
+                                uiState = uiState,
+                                onStopAutoSave = viewModel::onStopAutoSave,
+                                onEnterEditMode = viewModel::onEnterEditMode,
+                                onTypeSelected = viewModel::onTypeSelected,
+                                onConfirmSave = viewModel::onConfirmSave
+                            )
                         }
                     }
                 }
@@ -169,8 +155,7 @@ fun ResultScreen(
                 onTagRemoved = viewModel::onTagRemoved,
                 onSave = viewModel::onConfirmSave,
                 onDismiss = viewModel::onExitEditMode,
-                isSaving = uiState.isSaving,
-                isDarkTheme = isDarkTheme
+                isSaving = uiState.isSaving
             )
         }
     }
@@ -182,10 +167,9 @@ fun ResultScreen(
 @Composable
 private fun ResultHeader(
     onBackClick: () -> Unit,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
+    val colors = KairosTheme.colors
 
     Row(
         modifier = modifier
@@ -197,7 +181,7 @@ private fun ResultHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "뒤로가기",
-                tint = textPrimaryColor
+                tint = colors.text
             )
         }
 
@@ -207,7 +191,7 @@ private fun ResultHeader(
             text = "분류 결과",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = textPrimaryColor
+            color = colors.text
         )
     }
 }
@@ -221,8 +205,7 @@ private fun ResultContent(
     onStopAutoSave: () -> Unit,
     onEnterEditMode: () -> Unit,
     onTypeSelected: (com.example.kairos_mobile.domain.model.CaptureType) -> Unit,
-    onConfirmSave: () -> Unit,
-    isDarkTheme: Boolean
+    onConfirmSave: () -> Unit
 ) {
     val classification = uiState.classification
 
@@ -235,8 +218,7 @@ private fun ResultContent(
                     content = uiState.content,
                     progress = uiState.autoSaveProgress,
                     countdown = uiState.autoSaveCountdown,
-                    onEdit = onStopAutoSave,
-                    isDarkTheme = isDarkTheme
+                    onEdit = onStopAutoSave
                 )
             } else if (classification != null) {
                 // 자동저장 중지됨 → 확인 모드로 전환
@@ -245,8 +227,7 @@ private fun ResultContent(
                     content = uiState.content,
                     onConfirm = onConfirmSave,
                     onEdit = onEnterEditMode,
-                    isSaving = uiState.isSaving,
-                    isDarkTheme = isDarkTheme
+                    isSaving = uiState.isSaving
                 )
             }
         }
@@ -259,8 +240,7 @@ private fun ResultContent(
                     content = uiState.content,
                     onConfirm = onConfirmSave,
                     onEdit = onEnterEditMode,
-                    isSaving = uiState.isSaving,
-                    isDarkTheme = isDarkTheme
+                    isSaving = uiState.isSaving
                 )
             }
         }
@@ -272,8 +252,7 @@ private fun ResultContent(
                 selectedType = uiState.editedType,
                 onTypeSelected = onTypeSelected,
                 onConfirm = onConfirmSave,
-                isSaving = uiState.isSaving,
-                isDarkTheme = isDarkTheme
+                isSaving = uiState.isSaving
             )
         }
     }

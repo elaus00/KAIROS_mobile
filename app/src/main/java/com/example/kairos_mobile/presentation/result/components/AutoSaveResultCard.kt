@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.Classification
-import com.example.kairos_mobile.ui.components.glassPanelThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosElevatedCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
  * 자동저장 결과 카드 (신뢰도 95% 이상)
@@ -31,7 +31,6 @@ fun AutoSaveResultCard(
     progress: Float,
     countdown: Int,
     onEdit: () -> Unit,
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val animatedProgress by animateFloatAsState(
@@ -40,16 +39,13 @@ fun AutoSaveResultCard(
         label = "autoSaveProgress"
     )
 
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val successColor = if (isDarkTheme) SuccessGreen else AirySuccessGreen
+    val colors = KairosTheme.colors
 
     Column(
         modifier = modifier
-            .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(24.dp))
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .kairosElevatedCard(shape = RoundedCornerShape(16.dp))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // 상단: 신뢰도 표시
         Row(
@@ -64,14 +60,14 @@ fun AutoSaveResultCard(
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
-                    tint = successColor,
+                    tint = colors.success,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = "높은 신뢰도",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = successColor
+                    color = colors.success
                 )
             }
 
@@ -79,7 +75,7 @@ fun AutoSaveResultCard(
                 text = "${(classification.confidence * 100).toInt()}%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = successColor
+                color = colors.success
             )
         }
 
@@ -91,14 +87,14 @@ fun AutoSaveResultCard(
                 text = classification.type.getDisplayName(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = textPrimaryColor
+                color = colors.text
             )
 
             Text(
                 text = classification.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = textSecondaryColor,
+                color = colors.textSecondary,
                 maxLines = 2
             )
 
@@ -110,14 +106,14 @@ fun AutoSaveResultCard(
                 ) {
                     classification.tags.take(3).forEach { tag ->
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = accentColor.copy(alpha = 0.15f)
+                            shape = RoundedCornerShape(8.dp),
+                            color = colors.accentBg
                         ) {
                             Text(
                                 text = "#$tag",
                                 fontSize = 12.sp,
-                                color = accentColor,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                color = colors.textSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
                     }
@@ -128,12 +124,12 @@ fun AutoSaveResultCard(
         // 원본 콘텐츠 미리보기
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = if (isDarkTheme) GlassCard.copy(alpha = 0.5f) else AiryGlassCard.copy(alpha = 0.5f)
+            color = colors.accentBg
         ) {
             Text(
                 text = content,
                 fontSize = 13.sp,
-                color = textSecondaryColor,
+                color = colors.textSecondary,
                 maxLines = 3,
                 modifier = Modifier.padding(12.dp)
             )
@@ -149,14 +145,14 @@ fun AutoSaveResultCard(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = successColor,
-                trackColor = successColor.copy(alpha = 0.2f)
+                color = colors.success,
+                trackColor = colors.success.copy(alpha = 0.2f)
             )
 
             Text(
                 text = "${countdown}초 후 자동 저장",
                 fontSize = 13.sp,
-                color = textSecondaryColor,
+                color = colors.textSecondary,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
@@ -165,9 +161,9 @@ fun AutoSaveResultCard(
         OutlinedButton(
             onClick = onEdit,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = textPrimaryColor
+                contentColor = colors.text
             )
         ) {
             Icon(

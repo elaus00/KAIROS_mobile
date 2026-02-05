@@ -44,8 +44,7 @@ fun NotesTabRow(
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(colors.chipBg)
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(4.dp)
     ) {
         NotesTab.entries.forEach { tab ->
             val count = when (tab) {

@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.components.notifications
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,31 +14,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.Notification
 import com.example.kairos_mobile.domain.model.NotificationType
-import com.example.kairos_mobile.ui.components.glassCardThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * 알림 카드 컴포넌트
+ * 알림 카드 컴포넌트 (PRD v4.0)
  */
 @Composable
 fun NotificationCard(
     notification: Notification,
     onClick: () -> Unit,
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    // 테마에 따른 색상 설정
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
-    val accentColor = if (isDarkTheme) AccentBlue else AiryAccentBlue
+    val colors = KairosTheme.colors
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .glassCardThemed(isDarkTheme = isDarkTheme)
+            .kairosCard()
             .clickable(onClick = onClick)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -57,7 +53,7 @@ fun NotificationCard(
                 Icon(
                     imageVector = getNotificationIcon(notification.type),
                     contentDescription = null,
-                    tint = getNotificationColor(notification.type, isDarkTheme),
+                    tint = getNotificationColor(notification.type),
                     modifier = Modifier.size(20.dp)
                 )
 
@@ -66,25 +62,18 @@ fun NotificationCard(
                     text = notification.title,
                     fontSize = 14.sp,
                     fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.SemiBold,
-                    color = if (notification.isRead) textSecondaryColor else textPrimaryColor,
+                    color = if (notification.isRead) colors.textSecondary else colors.text,
                     letterSpacing = 0.2.sp
                 )
             }
 
             // 읽지 않음 표시
             if (!notification.isRead) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .padding(2.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        color = accentColor,
-                        shape = androidx.compose.foundation.shape.CircleShape,
-                        modifier = Modifier.size(6.dp)
-                    ) {}
-                }
+                Surface(
+                    color = colors.accent,
+                    shape = CircleShape,
+                    modifier = Modifier.size(6.dp)
+                ) {}
             }
         }
 
@@ -93,7 +82,7 @@ fun NotificationCard(
             text = notification.message,
             fontSize = 13.sp,
             fontWeight = FontWeight.Normal,
-            color = if (notification.isRead) textTertiaryColor else textSecondaryColor,
+            color = if (notification.isRead) colors.textMuted else colors.textSecondary,
             lineHeight = 18.sp,
             letterSpacing = 0.2.sp
         )
@@ -103,7 +92,7 @@ fun NotificationCard(
             text = formatNotificationTime(notification.timestamp),
             fontSize = 11.sp,
             fontWeight = FontWeight.Normal,
-            color = textTertiaryColor.copy(alpha = 0.7f),
+            color = colors.textMuted.copy(alpha = 0.7f),
             letterSpacing = 0.1.sp
         )
     }
@@ -122,27 +111,27 @@ private fun getNotificationIcon(type: NotificationType) = when (type) {
 }
 
 /**
- * 알림 타입별 색상 반환 (테마 인식)
+ * 알림 타입별 색상 반환
  */
 @Composable
-private fun getNotificationColor(type: NotificationType, isDarkTheme: Boolean) = when (type) {
-    NotificationType.CAPTURE_SAVED, NotificationType.CAPTURE_COMPLETE ->
-        if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFF81C784) else AirySuccessColor
+private fun getNotificationColor(type: NotificationType) = when (type) {
+    NotificationType.CAPTURE_SAVED, NotificationType.CAPTURE_COMPLETE,
     NotificationType.SYNC_COMPLETED, NotificationType.SYNC_COMPLETE ->
-        if (isDarkTheme) AccentBlue else AiryAccentBlue
+        KairosTheme.colors.success
+
     NotificationType.SYNC_FAILED ->
-        if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFFE57373) else AiryErrorColor
-    NotificationType.AI_PROCESSING, NotificationType.AI_PROCESSING_COMPLETE ->
-        if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFFBA68C8) else AirySaveColor
+        KairosTheme.colors.danger
+
+    NotificationType.AI_PROCESSING, NotificationType.AI_PROCESSING_COMPLETE,
     NotificationType.REMINDER ->
-        if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFFFFB74D) else AiryWarningColor
+        KairosTheme.colors.warning
+
     NotificationType.SYSTEM, NotificationType.INFO ->
-        if (isDarkTheme) TextSecondary else AiryTextSecondary
+        KairosTheme.colors.textSecondary
 }
 
 /**
  * 알림 시간 포맷팅
- * "방금 전", "5분 전", "1시간 전", "어제", "2026-01-23"
  */
 private fun formatNotificationTime(timestamp: Long): String {
     val now = System.currentTimeMillis()

@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.Classification
-import com.example.kairos_mobile.ui.components.glassPanelThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosElevatedCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
  * 확인 결과 카드 (신뢰도 80-95%)
@@ -28,19 +28,15 @@ fun ConfirmResultCard(
     onConfirm: () -> Unit,
     onEdit: () -> Unit,
     isSaving: Boolean = false,
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textSecondaryColor = if (isDarkTheme) TextSecondary else AiryTextSecondary
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val warningColor = if (isDarkTheme) WarningOrange else AiryWarningOrange
+    val colors = KairosTheme.colors
 
     Column(
         modifier = modifier
-            .glassPanelThemed(isDarkTheme = isDarkTheme, shape = RoundedCornerShape(24.dp))
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .kairosElevatedCard(shape = RoundedCornerShape(16.dp))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // 상단: 신뢰도 표시
         Row(
@@ -55,14 +51,14 @@ fun ConfirmResultCard(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    tint = warningColor,
+                    tint = colors.warning,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = "분류 결과 확인",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = warningColor
+                    color = colors.warning
                 )
             }
 
@@ -70,7 +66,7 @@ fun ConfirmResultCard(
                 text = "${(classification.confidence * 100).toInt()}%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = warningColor
+                color = colors.warning
             )
         }
 
@@ -80,15 +76,15 @@ fun ConfirmResultCard(
         ) {
             // 타입 칩
             Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = classification.type.getColor().copy(alpha = 0.15f)
+                shape = RoundedCornerShape(8.dp),
+                color = colors.chipBg
             ) {
                 Text(
                     text = classification.type.getDisplayName(),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = classification.type.getColor(),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    color = colors.text,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
 
@@ -96,7 +92,7 @@ fun ConfirmResultCard(
                 text = classification.title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = textPrimaryColor
+                color = colors.text
             )
 
             // 태그
@@ -107,14 +103,14 @@ fun ConfirmResultCard(
                 ) {
                     classification.tags.take(4).forEach { tag ->
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = accentColor.copy(alpha = 0.15f)
+                            shape = RoundedCornerShape(8.dp),
+                            color = colors.accentBg
                         ) {
                             Text(
                                 text = "#$tag",
                                 fontSize = 12.sp,
-                                color = accentColor,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                color = colors.textSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
                     }
@@ -125,12 +121,12 @@ fun ConfirmResultCard(
         // 원본 콘텐츠 미리보기
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = if (isDarkTheme) GlassCard.copy(alpha = 0.5f) else AiryGlassCard.copy(alpha = 0.5f)
+            color = colors.accentBg
         ) {
             Text(
                 text = content,
                 fontSize = 13.sp,
-                color = textSecondaryColor,
+                color = colors.textSecondary,
                 maxLines = 3,
                 modifier = Modifier.padding(12.dp)
             )
@@ -145,9 +141,9 @@ fun ConfirmResultCard(
             OutlinedButton(
                 onClick = onEdit,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = textPrimaryColor
+                    contentColor = colors.text
                 ),
                 enabled = !isSaving
             ) {
@@ -168,16 +164,17 @@ fun ConfirmResultCard(
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = accentColor
+                    containerColor = colors.accent,
+                    contentColor = colors.card
                 ),
                 enabled = !isSaving
             ) {
                 if (isSaving) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = TextPrimary,
+                        color = colors.card,
                         strokeWidth = 2.dp
                     )
                 } else {

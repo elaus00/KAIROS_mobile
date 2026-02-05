@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,7 +8,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,15 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
 import com.example.kairos_mobile.presentation.components.common.KairosTab
 import com.example.kairos_mobile.presentation.components.search.FilterChipRow
-import com.example.kairos_mobile.presentation.components.search.GlassSearchBar
+import com.example.kairos_mobile.presentation.components.search.SearchBar
 import com.example.kairos_mobile.presentation.components.search.SearchResultCard
-import com.example.kairos_mobile.ui.components.AnimatedGlassBackgroundThemed
-import com.example.kairos_mobile.ui.components.glassCardThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
  * Search 화면
@@ -36,19 +34,12 @@ fun SearchScreen(
     onBackClick: () -> Unit,
     onCaptureClick: (String) -> Unit,
     onNavigate: (String) -> Unit = {},
-    isDarkTheme: Boolean = false,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-
-    // 테마에 따른 색상 설정
-    val snackbarBgColor = if (isDarkTheme) GlassCard else AiryGlassCard
-    val snackbarContentColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val accentColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     // 에러 메시지 스낵바 표시
     LaunchedEffect(uiState.errorMessage) {
@@ -62,7 +53,6 @@ fun SearchScreen(
     }
 
     // 스크롤이 끝에 도달하면 더 로드
-    // snapshotFlow 내에서 현재 상태를 직접 조회하여 캡처 문제 해결
     LaunchedEffect(Unit) {
         snapshotFlow {
             val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
@@ -80,59 +70,51 @@ fun SearchScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 테마 인식 애니메이션 배경
-        AnimatedGlassBackgroundThemed(isDarkTheme = isDarkTheme)
-
-        // 메인 콘텐츠
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    snackbar = { data ->
-                        Snackbar(
-                            snackbarData = data,
-                            shape = RoundedCornerShape(12.dp),
-                            containerColor = snackbarBgColor,
-                            contentColor = snackbarContentColor
-                        )
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Box(
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = colors.background,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = colors.card,
+                        contentColor = colors.text
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(colors.background)
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .statusBarsPadding()
+                    .padding(bottom = 80.dp) // 하단 네비게이션 공간 확보
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .statusBarsPadding()
-                        .padding(bottom = 100.dp) // 하단 네비게이션 공간 확보
-                ) {
                 // 헤더
                 SearchHeader(
                     onBackClick = onBackClick,
                     onClearFilters = viewModel::onClearFilters,
-                    hasFilters = uiState.selectedTypes.isNotEmpty(),
-                    isDarkTheme = isDarkTheme
+                    hasFilters = uiState.selectedTypes.isNotEmpty()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // 검색 바
-                GlassSearchBar(
+                SearchBar(
                     text = uiState.searchText,
                     onTextChange = viewModel::onSearchTextChanged,
                     onSearch = viewModel::onSearch,
                     onClear = { viewModel.onSearchTextChanged("") },
-                    isDarkTheme = isDarkTheme,
-                    modifier = Modifier.padding(horizontal = 24.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -141,8 +123,7 @@ fun SearchScreen(
                 FilterChipRow(
                     selectedTypes = uiState.selectedTypes,
                     onTypeToggle = viewModel::onTypeFilterToggle,
-                    isDarkTheme = isDarkTheme,
-                    modifier = Modifier.padding(horizontal = 24.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -156,24 +137,23 @@ fun SearchScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = accentColor,
+                                color = colors.accent,
                                 strokeWidth = 2.dp
                             )
                         }
                     } else if (uiState.searchResults.isEmpty() && !uiState.isLoading) {
                         // 결과 없음
                         EmptySearchState(
-                            isDarkTheme = isDarkTheme,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 24.dp)
+                                .padding(horizontal = 16.dp)
                         )
                     } else {
                         // 검색 결과 리스트
                         LazyColumn(
                             state = listState,
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
@@ -182,8 +162,7 @@ fun SearchScreen(
                             ) { capture ->
                                 SearchResultCard(
                                     capture = capture,
-                                    onClick = { onCaptureClick(capture.id) },
-                                    isDarkTheme = isDarkTheme
+                                    onClick = { onCaptureClick(capture.id) }
                                 )
                             }
 
@@ -198,7 +177,7 @@ fun SearchScreen(
                                     ) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(24.dp),
-                                            color = accentColor,
+                                            color = colors.accent,
                                             strokeWidth = 2.dp
                                         )
                                     }
@@ -209,27 +188,24 @@ fun SearchScreen(
                 } else {
                     // 초기 상태 (검색 전)
                     InitialSearchState(
-                        isDarkTheme = isDarkTheme,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 24.dp)
+                            .padding(horizontal = 16.dp)
                     )
                 }
             }
 
             // 하단 네비게이션
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 KairosBottomNav(
-                    selectedTab = KairosTab.HOME,  // 검색은 Home에서 접근
+                    selectedTab = KairosTab.HOME,
                     onTabSelected = { tab ->
                         onNavigate(tab.route)
                     }
                 )
             }
-        }
         }
     }
 }
@@ -242,11 +218,9 @@ private fun SearchHeader(
     onBackClick: () -> Unit,
     onClearFilters: () -> Unit,
     hasFilters: Boolean,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     Row(
         modifier = modifier
@@ -260,7 +234,7 @@ private fun SearchHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "뒤로가기",
-                tint = textPrimaryColor
+                tint = colors.text
             )
         }
 
@@ -269,7 +243,7 @@ private fun SearchHeader(
             text = "Search",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = textPrimaryColor,
+            color = colors.text,
             letterSpacing = 0.3.sp
         )
 
@@ -280,7 +254,7 @@ private fun SearchHeader(
                     text = "초기화",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
-                    color = textTertiaryColor
+                    color = colors.textMuted
                 )
             }
         } else {
@@ -295,10 +269,9 @@ private fun SearchHeader(
  */
 @Composable
 private fun InitialSearchState(
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     Box(
         modifier = modifier,
@@ -309,16 +282,16 @@ private fun InitialSearchState(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.FilterList,
+                imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = textTertiaryColor.copy(alpha = 0.5f),
+                tint = colors.textMuted.copy(alpha = 0.5f),
                 modifier = Modifier.size(64.dp)
             )
             Text(
                 text = "캡처를 검색하세요",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = textTertiaryColor,
+                color = colors.textMuted,
                 letterSpacing = 0.2.sp
             )
         }
@@ -330,10 +303,9 @@ private fun InitialSearchState(
  */
 @Composable
 private fun EmptySearchState(
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     Box(
         modifier = modifier,
@@ -343,22 +315,24 @@ private fun EmptySearchState(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "🔍",
-                fontSize = 48.sp
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = colors.textMuted.copy(alpha = 0.5f),
+                modifier = Modifier.size(48.dp)
             )
             Text(
                 text = "검색 결과가 없습니다",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = textTertiaryColor,
+                color = colors.textMuted,
                 letterSpacing = 0.2.sp
             )
             Text(
                 text = "다른 검색어나 필터를 시도해보세요",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
-                color = textTertiaryColor.copy(alpha = 0.7f),
+                color = colors.textMuted.copy(alpha = 0.7f),
                 letterSpacing = 0.2.sp
             )
         }

@@ -65,7 +65,7 @@ private fun CaptureGridItem(
     Box(
         modifier = modifier
             .aspectRatio(0.85f)  // 디자인에 맞게 세로로 더 긴 비율
-            .kairosCard()
+            .kairosCard(elevation = 0.dp)  // shadow 제거
             .clickable { onClick() }
             .padding(12.dp)
     ) {

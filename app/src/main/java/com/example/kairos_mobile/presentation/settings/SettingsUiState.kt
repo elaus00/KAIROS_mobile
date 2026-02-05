@@ -25,6 +25,7 @@ data class SettingsUiState(
 
     // ========== 화면 설정 ==========
     val viewMode: ViewMode = ViewMode.LIST,
+    val showOverlayOnLaunch: Boolean = true,
 
     // ========== 연동 설정 ==========
     val googleCalendarConnected: Boolean = true,

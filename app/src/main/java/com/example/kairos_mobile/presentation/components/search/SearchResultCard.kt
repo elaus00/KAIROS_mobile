@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.components.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,32 +16,30 @@ import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.ui.components.glassCardThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * 검색 결과 카드
+ * 검색 결과 카드 (PRD v4.0)
+ * 미니멀 모노크롬 디자인
  */
 @Composable
 fun SearchResultCard(
     capture: Capture,
     onClick: () -> Unit,
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    // 테마에 따른 색상 설정
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .glassCardThemed(isDarkTheme = isDarkTheme)
+            .kairosCard()
             .clickable(onClick = onClick)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         // 헤더: 타입 + 시간
         Row(
@@ -50,7 +49,7 @@ fun SearchResultCard(
         ) {
             // 타입 뱃지
             capture.classification?.type?.let { type ->
-                TypeBadge(type = type, isDarkTheme = isDarkTheme)
+                TypeBadge(type = type)
             }
 
             // 시간
@@ -58,7 +57,7 @@ fun SearchResultCard(
                 text = formatTimestamp(capture.timestamp),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = textTertiaryColor,
+                color = colors.textMuted,
                 letterSpacing = 0.2.sp
             )
         }
@@ -68,7 +67,7 @@ fun SearchResultCard(
             text = capture.content,
             fontSize = 15.sp,
             fontWeight = FontWeight.Normal,
-            color = textPrimaryColor,
+            color = colors.text,
             lineHeight = 22.sp,
             letterSpacing = 0.2.sp,
             maxLines = 3,
@@ -89,45 +88,44 @@ fun SearchResultCard(
                 Icon(
                     imageVector = getSourceIcon(capture.source),
                     contentDescription = capture.source.name,
-                    tint = textTertiaryColor,
+                    tint = colors.textMuted,
                     modifier = Modifier.size(14.dp)
                 )
                 Text(
                     text = getSourceLabel(capture.source),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
-                    color = textTertiaryColor,
+                    color = colors.textMuted,
                     letterSpacing = 0.1.sp
                 )
             }
 
             // 동기화 상태
-            SyncStatusBadge(syncStatus = capture.syncStatus.name, isDarkTheme = isDarkTheme)
+            SyncStatusBadge(syncStatus = capture.syncStatus.name)
         }
     }
 }
 
 /**
- * 타입 뱃지 (테마 인식)
+ * 타입 뱃지
  */
 @Composable
 private fun TypeBadge(
     type: CaptureType,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val typeColor = getThemedTypeColor(type, isDarkTheme)
+    val colors = KairosTheme.colors
 
     Surface(
         modifier = modifier,
-        color = typeColor.copy(alpha = 0.15f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)
+        color = colors.chipBg,
+        shape = RoundedCornerShape(6.dp)
     ) {
         Text(
             text = type.getDisplayName(),
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
-            color = typeColor,
+            color = colors.text,
             letterSpacing = 0.2.sp,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
@@ -135,20 +133,20 @@ private fun TypeBadge(
 }
 
 /**
- * 동기화 상태 뱃지 (테마 인식)
+ * 동기화 상태 뱃지
  */
 @Composable
 private fun SyncStatusBadge(
     syncStatus: String,
-    isDarkTheme: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val defaultColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
+    val colors = KairosTheme.colors
+
     val (text, color) = when (syncStatus) {
-        "SYNCED" -> "동기화됨" to if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFF81C784) else AirySuccessColor
-        "PENDING" -> "대기 중" to if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFFFFB74D) else AiryWarningColor
-        "FAILED" -> "실패" to if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFFE57373) else AiryErrorColor
-        else -> syncStatus to defaultColor
+        "SYNCED" -> "동기화됨" to colors.success
+        "PENDING" -> "대기 중" to colors.warning
+        "FAILED" -> "실패" to colors.danger
+        else -> syncStatus to colors.textMuted
     }
 
     Text(
@@ -159,24 +157,6 @@ private fun SyncStatusBadge(
         letterSpacing = 0.1.sp,
         modifier = modifier
     )
-}
-
-/**
- * 테마에 따른 타입 색상 반환
- */
-private fun getThemedTypeColor(type: CaptureType, isDarkTheme: Boolean): androidx.compose.ui.graphics.Color {
-    return if (isDarkTheme) {
-        type.getColor()
-    } else {
-        when (type) {
-            CaptureType.IDEA -> AiryIdeaColor
-            CaptureType.SCHEDULE -> AiryMeetingColor
-            CaptureType.TODO -> AiryTodoColor
-            CaptureType.NOTE -> AirySaveColor
-            CaptureType.QUICK_NOTE -> AiryTextTertiary
-            CaptureType.CLIP -> AiryMeetingColor
-        }
-    }
 }
 
 /**

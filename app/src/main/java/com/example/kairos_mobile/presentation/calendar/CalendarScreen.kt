@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -132,6 +131,103 @@ fun CalendarScreen(
                     // 하단 여백
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Calendar 화면 내용 (Scaffold 없이)
+ * MainScreen의 HorizontalPager에서 사용
+ */
+@Composable
+fun CalendarContent(
+    onScheduleClick: (Schedule) -> Unit = {},
+    onTaskClick: (Todo) -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: CalendarViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val colors = KairosTheme.colors
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colors.background)
+    ) {
+        // 화면 타이틀
+        Text(
+            text = "Calendar",
+            color = colors.text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+        )
+
+        // 캘린더 카드 (날짜 헤더 + 주간/월간 뷰 포함)
+        CalendarCard(
+            selectedDate = uiState.selectedDate,
+            datesWithSchedules = uiState.datesWithSchedules,
+            isExpanded = uiState.isMonthExpanded,
+            onDateSelected = { date ->
+                viewModel.onEvent(CalendarEvent.SelectDate(date))
+            },
+            onToggleExpand = {
+                viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
+            },
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+
+        // 로딩 상태
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = colors.accent,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        } else {
+            // 스크롤 가능한 컨텐츠
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 일정 타임라인
+                ScheduleTimeline(
+                    schedules = uiState.schedules,
+                    onScheduleClick = { schedule ->
+                        viewModel.onEvent(CalendarEvent.ClickSchedule(schedule))
+                        onScheduleClick(schedule)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 할 일 목록
+                TaskList(
+                    tasks = uiState.tasks,
+                    onTaskClick = { task ->
+                        viewModel.onEvent(CalendarEvent.ClickTask(task))
+                        onTaskClick(task)
+                    },
+                    onTaskComplete = { taskId ->
+                        viewModel.onEvent(CalendarEvent.ToggleTaskComplete(taskId))
+                    },
+                    onTaskDelete = { taskId ->
+                        viewModel.onEvent(CalendarEvent.DeleteTask(taskId))
+                    }
+                )
+
+                // 하단 여백
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

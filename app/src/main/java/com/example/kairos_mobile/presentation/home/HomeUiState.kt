@@ -6,19 +6,9 @@ import com.example.kairos_mobile.domain.model.Schedule
 
 /**
  * Home 화면 UI 상태 (PRD v4.0)
+ * 입력 관련 상태는 QuickCaptureUiState로 분리됨
  */
 data class HomeUiState(
-    // 캡처 입력
-    val inputText: String = "",
-    val isInputFocused: Boolean = false,
-    val characterCount: Int = 0,
-    val maxCharacterCount: Int = 500,
-
-    // AI 분류
-    val suggestedType: CaptureType? = null,
-    val isClassifying: Boolean = false,
-    val classificationConfidence: Float = 0f,
-
     // 최근 캡처 그리드
     val recentCaptures: List<Capture> = emptyList(),
     val isLoadingCaptures: Boolean = false,
@@ -28,7 +18,6 @@ data class HomeUiState(
     val todayScheduleCount: Int = 0,
 
     // 처리 상태
-    val isSubmitting: Boolean = false,
     val submitSuccess: Boolean = false,
     val errorMessage: String? = null
 )
@@ -37,12 +26,12 @@ data class HomeUiState(
  * Home 화면 이벤트
  */
 sealed class HomeEvent {
-    // 입력 관련
+    // 입력 관련 (QuickCapture로 이동됨, 호환성 유지)
     data class UpdateInput(val text: String) : HomeEvent()
     data class SetInputFocused(val focused: Boolean) : HomeEvent()
     data object ClearInput : HomeEvent()
 
-    // 제출 관련
+    // 제출 관련 (QuickCapture로 이동됨, 호환성 유지)
     data object Submit : HomeEvent()
     data class SubmitWithType(val type: CaptureType) : HomeEvent()
 

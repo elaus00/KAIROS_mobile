@@ -1,11 +1,13 @@
 package com.example.kairos_mobile.presentation.calendar.components
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -103,35 +105,38 @@ fun CalendarCard(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 주간 뷰 (기본 상태)
-        AnimatedVisibility(
-            visible = !isExpanded,
-            enter = expandVertically(animationSpec = tween(200)),
-            exit = shrinkVertically(animationSpec = tween(200))
-        ) {
-            CalendarWeekRow(
-                selectedDate = selectedDate,
-                today = today,
-                datesWithSchedules = datesWithSchedules,
-                onDateSelected = onDateSelected
-            )
-        }
+        // 주간/월간 뷰 전환 애니메이션
+        AnimatedContent(
+            targetState = isExpanded,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith
+                    fadeOut(animationSpec = tween(200)) using
+                    SizeTransform(clip = false) { _, _ ->
+                        tween(350)
+                    }
+            },
+            label = "calendarExpand"
+        ) { expanded ->
+            if (expanded) {
+                // 월간 뷰 (펼침 상태)
+                Column {
+                    // 요일 헤더
+                    CalendarDayHeader()
 
-        // 월간 뷰 (펼침 상태)
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = expandVertically(animationSpec = tween(200)),
-            exit = shrinkVertically(animationSpec = tween(200))
-        ) {
-            Column {
-                // 요일 헤더
-                CalendarDayHeader()
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 월간 그리드
-                CalendarMonthGrid(
-                    yearMonth = currentMonth,
+                    // 월간 그리드
+                    CalendarMonthGrid(
+                        yearMonth = currentMonth,
+                        selectedDate = selectedDate,
+                        today = today,
+                        datesWithSchedules = datesWithSchedules,
+                        onDateSelected = onDateSelected
+                    )
+                }
+            } else {
+                // 주간 뷰 (기본 상태)
+                CalendarWeekRow(
                     selectedDate = selectedDate,
                     today = today,
                     datesWithSchedules = datesWithSchedules,

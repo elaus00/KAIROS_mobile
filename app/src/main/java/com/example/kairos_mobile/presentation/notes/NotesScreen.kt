@@ -212,3 +212,102 @@ private fun BookmarksList(
         }
     }
 }
+
+/**
+ * Notes 화면 내용 (Scaffold 없이)
+ * MainScreen의 HorizontalPager에서 사용
+ */
+@Composable
+fun NotesContent(
+    onNoteClick: (Note) -> Unit = {},
+    onBookmarkClick: (Bookmark) -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: NotesViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val colors = KairosTheme.colors
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colors.background)
+    ) {
+        // 상단 헤더
+        Text(
+            text = "Notes",
+            color = colors.text,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        )
+
+        // 검색 바
+        NotesSearchBar(
+            query = uiState.searchQuery,
+            onQueryChange = { viewModel.onEvent(NotesEvent.UpdateSearchQuery(it)) },
+            onClear = { viewModel.onEvent(NotesEvent.ClearSearch) }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 탭 (노트/북마크)
+        NotesTabRow(
+            selectedTab = uiState.selectedTab,
+            noteCount = uiState.totalNoteCount,
+            bookmarkCount = uiState.totalBookmarkCount,
+            onTabSelected = { viewModel.onEvent(NotesEvent.SelectTab(it)) }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 폴더 Chips (노트 탭일 때만 표시)
+        AnimatedVisibility(
+            visible = uiState.selectedTab == NotesTab.NOTES,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            FolderChips(
+                selectedFolder = uiState.selectedFolder,
+                noteCountByFolder = uiState.noteCountByFolder,
+                totalCount = uiState.totalNoteCount,
+                onFolderSelected = { viewModel.onEvent(NotesEvent.SelectFolder(it)) }
+            )
+        }
+
+        // 로딩 상태
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = colors.accent,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        } else {
+            // 컨텐츠
+            when (uiState.selectedTab) {
+                NotesTab.NOTES -> NotesList(
+                    notes = uiState.notes,
+                    onNoteClick = onNoteClick,
+                    onNoteDelete = { noteId ->
+                        viewModel.onEvent(NotesEvent.DeleteNote(noteId))
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                NotesTab.BOOKMARKS -> BookmarksList(
+                    bookmarks = uiState.bookmarks,
+                    onBookmarkClick = onBookmarkClick,
+                    onBookmarkDelete = { bookmarkId ->
+                        viewModel.onEvent(NotesEvent.DeleteBookmark(bookmarkId))
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
