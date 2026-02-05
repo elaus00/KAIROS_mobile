@@ -15,34 +15,29 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.ui.components.glassCardThemed
-import com.example.kairos_mobile.ui.theme.*
+import com.example.kairos_mobile.ui.components.kairosCard
+import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * 글래스모피즘 검색 바
+ * 검색 바 (PRD v4.0)
+ * 미니멀 모노크롬 디자인
  */
 @Composable
-fun GlassSearchBar(
+fun SearchBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSearch: () -> Unit,
     onClear: () -> Unit,
     placeholder: String = "캡처 검색…",
-    isDarkTheme: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    // 테마에 따른 색상 설정
-    val textPrimaryColor = if (isDarkTheme) TextPrimary else AiryTextPrimary
-    val textTertiaryColor = if (isDarkTheme) TextTertiary else AiryTextTertiary
-    val cursorColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val buttonBgColor = if (isDarkTheme) PrimaryNavy else AiryAccentBlue
-    val buttonContentColor = if (isDarkTheme) TextPrimary else androidx.compose.ui.graphics.Color.White
+    val colors = KairosTheme.colors
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .glassCardThemed(isDarkTheme = isDarkTheme)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .kairosCard(shape = RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -50,7 +45,7 @@ fun GlassSearchBar(
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "검색",
-            tint = textTertiaryColor,
+            tint = colors.textMuted,
             modifier = Modifier.size(20.dp)
         )
 
@@ -59,12 +54,12 @@ fun GlassSearchBar(
             value = text,
             onValueChange = onTextChange,
             textStyle = TextStyle(
-                color = textPrimaryColor,
+                color = colors.text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 letterSpacing = 0.3.sp
             ),
-            cursorBrush = SolidColor(cursorColor.copy(alpha = 0.8f)),
+            cursorBrush = SolidColor(colors.accent),
             modifier = Modifier.weight(1f),
             singleLine = true,
             decorationBox = { innerTextField ->
@@ -73,7 +68,7 @@ fun GlassSearchBar(
                         Text(
                             text = placeholder,
                             style = TextStyle(
-                                color = textTertiaryColor,
+                                color = colors.placeholder,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
                                 letterSpacing = 0.3.sp
@@ -94,7 +89,7 @@ fun GlassSearchBar(
                 Icon(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "지우기",
-                    tint = textTertiaryColor,
+                    tint = colors.textMuted,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -105,10 +100,10 @@ fun GlassSearchBar(
             onClick = onSearch,
             enabled = text.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = buttonBgColor,
-                contentColor = buttonContentColor,
-                disabledContainerColor = buttonBgColor.copy(alpha = 0.45f),
-                disabledContentColor = buttonContentColor.copy(alpha = 0.45f)
+                containerColor = colors.accent,
+                contentColor = colors.card,
+                disabledContainerColor = colors.accentBg,
+                disabledContentColor = colors.textMuted
             ),
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
