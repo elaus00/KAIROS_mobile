@@ -68,4 +68,16 @@ interface PreferencesRepository {
      * 테마 설정 변경
      */
     suspend fun setThemePreference(theme: ThemePreference)
+
+    // ========== QuickCapture Overlay 설정 ==========
+
+    /**
+     * 앱 시작 시 QuickCapture 오버레이 표시 여부 조회
+     */
+    fun getShowOverlayOnLaunch(): Flow<Boolean>
+
+    /**
+     * 앱 시작 시 QuickCapture 오버레이 표시 여부 설정
+     */
+    suspend fun setShowOverlayOnLaunch(enabled: Boolean)
 }

@@ -44,6 +44,9 @@ class PreferencesRepositoryImpl @Inject constructor(
 
         // 테마 설정 키
         private val KEY_THEME_PREFERENCE = stringPreferencesKey("theme_preference")
+
+        // QuickCapture 오버레이 설정 키
+        private val KEY_SHOW_OVERLAY_ON_LAUNCH = booleanPreferencesKey("show_overlay_on_launch")
     }
 
     // ========== M09: AI 요약 설정 ==========
@@ -118,6 +121,20 @@ class PreferencesRepositoryImpl @Inject constructor(
     override suspend fun setThemePreference(theme: ThemePreference) {
         context.dataStore.edit { preferences ->
             preferences[KEY_THEME_PREFERENCE] = theme.name
+        }
+    }
+
+    // ========== QuickCapture Overlay 설정 ==========
+
+    override fun getShowOverlayOnLaunch(): Flow<Boolean> {
+        return context.dataStore.data.map { preferences ->
+            preferences[KEY_SHOW_OVERLAY_ON_LAUNCH] ?: true  // 기본값: 활성화
+        }
+    }
+
+    override suspend fun setShowOverlayOnLaunch(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_SHOW_OVERLAY_ON_LAUNCH] = enabled
         }
     }
 }
