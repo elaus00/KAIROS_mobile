@@ -132,4 +132,10 @@ interface CaptureQueueDao {
      */
     @Query("SELECT COUNT(*) FROM capture_queue")
     fun getTotalCount(): Flow<Int>
+
+    /**
+     * Draft(임시저장) 목록 조회
+     */
+    @Query("SELECT * FROM capture_queue WHERE sync_status = 'DRAFT' ORDER BY timestamp DESC")
+    fun getDrafts(): Flow<List<CaptureQueueEntity>>
 }

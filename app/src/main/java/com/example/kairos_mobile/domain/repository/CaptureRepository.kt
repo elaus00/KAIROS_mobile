@@ -165,4 +165,30 @@ interface CaptureRepository {
      * @return 저장된 캡처
      */
     suspend fun saveCaptureWithType(content: String, type: CaptureType): Result<Capture>
+
+    // ========== Draft (임시저장) 기능 ==========
+
+    /**
+     * Draft 저장 (QuickCapture 축소 시)
+     *
+     * @param content 캡처 내용
+     * @param suggestedType 추천된 타입 (선택)
+     * @return 저장된 Draft
+     */
+    suspend fun saveDraft(content: String, suggestedType: CaptureType?): Result<Capture>
+
+    /**
+     * Draft 목록 조회
+     *
+     * @return Draft 리스트 Flow
+     */
+    fun getDrafts(): Flow<List<Capture>>
+
+    /**
+     * Draft 삭제
+     *
+     * @param captureId 삭제할 Draft ID
+     * @return 삭제 결과
+     */
+    suspend fun deleteDraft(captureId: String): Result<Unit>
 }

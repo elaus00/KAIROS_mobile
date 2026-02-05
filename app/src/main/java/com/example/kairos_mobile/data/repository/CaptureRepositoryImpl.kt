@@ -657,6 +657,49 @@ class CaptureRepositoryImpl @Inject constructor(
         }
     }
 
+    // ========== Draft (임시저장) 기능 ==========
+
+    /**
+     * Draft 저장 (QuickCapture 축소 시)
+     */
+    override suspend fun saveDraft(content: String, suggestedType: CaptureType?): Result<Capture> = withContext(dispatcher) {
+        try {
+            val capture = Capture(
+                content = content,
+                syncStatus = SyncStatus.DRAFT
+            )
+
+            dao.insertCapture(captureMapper.toEntity(capture))
+            Log.d(TAG, "Draft saved: ${capture.id}")
+            Result.Success(capture)
+        } catch (e: Exception) {
+            Log.e(TAG, "saveDraft failed", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * Draft 목록 조회
+     */
+    override fun getDrafts(): Flow<List<Capture>> {
+        return dao.getDrafts()
+            .map { entities -> entities.map { captureMapper.toDomain(it) } }
+    }
+
+    /**
+     * Draft 삭제
+     */
+    override suspend fun deleteDraft(captureId: String): Result<Unit> = withContext(dispatcher) {
+        try {
+            dao.deleteCapture(captureId)
+            Log.d(TAG, "Draft deleted: $captureId")
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "deleteDraft failed", e)
+            Result.Error(e)
+        }
+    }
+
     /**
      * 캡처들을 날짜별로 그룹화
      */
