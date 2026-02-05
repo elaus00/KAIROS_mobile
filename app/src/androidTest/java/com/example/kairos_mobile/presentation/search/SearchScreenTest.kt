@@ -9,7 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.kairos_mobile.presentation.components.GlassSearchBar
+import com.example.kairos_mobile.presentation.components.search.SearchBar
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
 import org.junit.Rule
 import org.junit.Test
@@ -29,14 +29,14 @@ class SearchScreenTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    // ==================== GlassSearchBar 테스트 ====================
+    // ==================== SearchBar 테스트 ====================
 
     @Test
     fun 검색바_플레이스홀더_표시() {
         // Given
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = "",
                     onTextChange = {},
                     onSearch = {},
@@ -56,7 +56,7 @@ class SearchScreenTest {
         var searchText = ""
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = searchText,
                     onTextChange = { searchText = it },
                     onSearch = {},
@@ -79,7 +79,7 @@ class SearchScreenTest {
         var searchCalled = false
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = "테스트",
                     onTextChange = {},
                     onSearch = { searchCalled = true },
@@ -101,7 +101,7 @@ class SearchScreenTest {
         // Given
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = "테스트",
                     onTextChange = {},
                     onSearch = {},
@@ -120,7 +120,7 @@ class SearchScreenTest {
         // Given
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = "",
                     onTextChange = {},
                     onSearch = {},
@@ -141,7 +141,7 @@ class SearchScreenTest {
         var clearCalled = false
         composeTestRule.setContent {
             KAIROS_mobileTheme {
-                GlassSearchBar(
+                SearchBar(
                     text = "테스트",
                     onTextChange = {},
                     onSearch = {},
