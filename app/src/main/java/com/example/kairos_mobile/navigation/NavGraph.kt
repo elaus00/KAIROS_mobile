@@ -10,14 +10,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.kairos_mobile.presentation.calendar.CalendarScreen
-import com.example.kairos_mobile.presentation.home.HomeScreen
-import com.example.kairos_mobile.presentation.notes.NotesScreen
+import com.example.kairos_mobile.presentation.capture.QuickCaptureOverlay
+import com.example.kairos_mobile.presentation.components.common.KairosTab
+import com.example.kairos_mobile.presentation.main.MainScreen
 import com.example.kairos_mobile.presentation.notes.edit.NoteEditScreen
 import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
 import com.example.kairos_mobile.presentation.result.ResultScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
-import com.example.kairos_mobile.presentation.settings.SettingsScreen
+import com.example.kairos_mobile.presentation.settings.PrivacyPolicyScreen
+import com.example.kairos_mobile.presentation.settings.ProfileScreen
 
 /**
  * Navigation 경로 정의 (PRD v4.0)
@@ -35,6 +36,9 @@ object NavRoutes {
     const val NOTE_EDIT = "notes/{noteId}"
     const val SEARCH = "search"
     const val NOTIFICATIONS = "notifications"
+    const val PROFILE = "profile"
+    const val PRIVACY_POLICY = "privacy-policy"
+    const val QUICK_CAPTURE = "quick-capture"
 
     /**
      * ResultScreen 라우트 생성
@@ -54,24 +58,10 @@ object NavRoutes {
 @Composable
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
+    startDestination: String = NavRoutes.HOME,
     sharedText: String? = null,
     sharedImageUri: Uri? = null
 ) {
-    // 공통 탭 네비게이션 함수
-    val navigateToTab: (String) -> Unit = { route ->
-        if (route == NavRoutes.HOME) {
-            // HOME으로 이동할 때는 popBackStack으로 시작 화면으로 돌아감
-            navController.popBackStack(NavRoutes.HOME, inclusive = false)
-        } else {
-            navController.navigate(route) {
-                // 시작 화면까지 pop하여 백스택 정리
-                popUpTo(NavRoutes.HOME) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
-    }
-
     // ResultScreen으로 네비게이션
     val navigateToResult: (String) -> Unit = { captureId ->
         navController.navigate(NavRoutes.result(captureId))
@@ -84,18 +74,25 @@ fun KairosNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.HOME,
+        startDestination = startDestination,
         // 페이지 전환 애니메이션 제거
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        // 홈 화면 (HOME) - PRD v4.0
+        // 메인 화면 (HOME) - 스와이프 네비게이션 포함
         composable(NavRoutes.HOME) {
-            HomeScreen(
-                onNavigate = navigateToTab,
+            MainScreen(
+                initialTab = KairosTab.HOME,
                 onNavigateToCapture = navigateToResult,
+                onNavigateToNoteEdit = navigateToNoteEdit,
+                onNavigateToProfile = {
+                    navController.navigate(NavRoutes.PROFILE)
+                },
+                onNavigateToPrivacyPolicy = {
+                    navController.navigate(NavRoutes.PRIVACY_POLICY)
+                },
                 onOpenCamera = {
                     // TODO: 카메라 열기 구현
                 }
@@ -113,26 +110,6 @@ fun KairosNavGraph(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
-            )
-        }
-
-        // 캘린더 화면 (CALENDAR) - PRD v4.0
-        composable(NavRoutes.CALENDAR) {
-            CalendarScreen(
-                onNavigate = navigateToTab,
-                onScheduleClick = { /* TODO: 일정 상세 화면 */ },
-                onTaskClick = { /* TODO: 할 일 상세 화면 */ }
-            )
-        }
-
-        // 노트 화면 (NOTES) - PRD v4.0
-        composable(NavRoutes.NOTES) {
-            NotesScreen(
-                onNavigate = navigateToTab,
-                onNoteClick = { note ->
-                    navigateToNoteEdit(note.id)
-                },
-                onBookmarkClick = { /* TODO: 북마크 상세/웹뷰 */ }
             )
         }
 
@@ -157,7 +134,7 @@ fun KairosNavGraph(
                     navController.popBackStack()
                 },
                 onCaptureClick = navigateToResult,
-                onNavigate = navigateToTab
+                onNavigate = { navController.popBackStack() }
             )
         }
 
@@ -177,10 +154,37 @@ fun KairosNavGraph(
             )
         }
 
-        // 설정 화면 (SETTINGS)
-        composable(NavRoutes.SETTINGS) {
-            SettingsScreen(
-                onNavigate = navigateToTab
+        // 프로필 화면 (PROFILE)
+        composable(NavRoutes.PROFILE) {
+            ProfileScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // 개인정보 처리방침 화면 (PRIVACY_POLICY)
+        composable(NavRoutes.PRIVACY_POLICY) {
+            PrivacyPolicyScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // QuickCapture 오버레이 화면 (앱 시작 시)
+        composable(NavRoutes.QUICK_CAPTURE) {
+            QuickCaptureOverlay(
+                onDismiss = {
+                    // HOME으로 이동 (백스택 정리)
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.QUICK_CAPTURE) { inclusive = true }
+                    }
+                },
+                onOpenCamera = {
+                    // TODO: 카메라 열기 구현
+                },
+                initialText = sharedText
             )
         }
     }

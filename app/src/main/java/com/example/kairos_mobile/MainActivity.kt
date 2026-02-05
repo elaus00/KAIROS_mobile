@@ -11,8 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.core.content.IntentCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.usecase.settings.GetShowOverlayOnLaunchUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.navigation.KairosNavGraph
+import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -26,6 +28,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var getThemePreferenceUseCase: GetThemePreferenceUseCase
 
+    @Inject
+    lateinit var getShowOverlayOnLaunchUseCase: GetShowOverlayOnLaunchUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,9 +43,21 @@ class MainActivity : ComponentActivity() {
             val themePreference by getThemePreferenceUseCase().collectAsState(initial = ThemePreference.DARK)
             val isDarkTheme = themePreference == ThemePreference.DARK
 
+            // 앱 시작 시 오버레이 표시 설정 수집
+            val showOverlayOnLaunch by getShowOverlayOnLaunchUseCase().collectAsState(initial = false)
+
+            // 시작 화면 결정
+            // 공유 인텐트가 있으면 QuickCapture로, 그렇지 않으면 설정에 따라 결정
+            val startDestination = when {
+                sharedContent != null -> NavRoutes.QUICK_CAPTURE
+                showOverlayOnLaunch -> NavRoutes.QUICK_CAPTURE
+                else -> NavRoutes.HOME
+            }
+
             KAIROS_mobileTheme(darkTheme = isDarkTheme) {
                 KairosNavGraph(
                     navController = rememberNavController(),
+                    startDestination = startDestination,
                     sharedText = sharedContent?.text,
                     sharedImageUri = sharedContent?.imageUri
                 )
