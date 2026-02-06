@@ -1,68 +1,50 @@
 package com.example.kairos_mobile.data.mapper
 
 import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
+import com.example.kairos_mobile.domain.model.ConfidenceLevel
 import com.example.kairos_mobile.domain.model.Schedule
-import com.example.kairos_mobile.domain.model.ScheduleCategory
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * Schedule Entity <-> Domain 변환 매퍼 (PRD v4.0)
+ * Schedule Entity ↔ Domain 변환 Mapper
  */
-object ScheduleMapper {
+@Singleton
+class ScheduleMapper @Inject constructor() {
 
-    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
-    /**
-     * Entity -> Domain 변환
-     */
     fun toDomain(entity: ScheduleEntity): Schedule {
         return Schedule(
             id = entity.id,
-            title = entity.title,
-            time = try {
-                LocalTime.parse(entity.time, timeFormatter)
-            } catch (e: Exception) {
-                LocalTime.NOON
-            },
-            date = LocalDate.ofEpochDay(entity.date),
+            captureId = entity.captureId,
+            startTime = entity.startTime,
+            endTime = entity.endTime,
             location = entity.location,
-            category = try {
-                ScheduleCategory.valueOf(entity.category)
-            } catch (e: Exception) {
-                ScheduleCategory.PERSONAL
-            },
-            googleCalendarId = entity.googleCalendarId,
-            sourceCaptureId = entity.sourceCaptureId,
-            createdAt = Instant.ofEpochMilli(entity.createdAt),
-            updatedAt = Instant.ofEpochMilli(entity.updatedAt)
+            isAllDay = entity.isAllDay,
+            confidence = parseConfidenceLevel(entity.confidence),
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt
         )
     }
 
-    /**
-     * Domain -> Entity 변환
-     */
-    fun toEntity(domain: Schedule): ScheduleEntity {
+    private fun parseConfidenceLevel(value: String): ConfidenceLevel {
+        return try {
+            ConfidenceLevel.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            ConfidenceLevel.MEDIUM
+        }
+    }
+
+    fun toEntity(schedule: Schedule): ScheduleEntity {
         return ScheduleEntity(
-            id = domain.id,
-            title = domain.title,
-            time = domain.time.format(timeFormatter),
-            date = domain.date.toEpochDay(),
-            location = domain.location,
-            category = domain.category.name,
-            googleCalendarId = domain.googleCalendarId,
-            sourceCaptureId = domain.sourceCaptureId,
-            createdAt = domain.createdAt.toEpochMilli(),
-            updatedAt = domain.updatedAt.toEpochMilli()
+            id = schedule.id,
+            captureId = schedule.captureId,
+            startTime = schedule.startTime,
+            endTime = schedule.endTime,
+            location = schedule.location,
+            isAllDay = schedule.isAllDay,
+            confidence = schedule.confidence.name,
+            createdAt = schedule.createdAt,
+            updatedAt = schedule.updatedAt
         )
-    }
-
-    /**
-     * Entity 리스트 -> Domain 리스트 변환
-     */
-    fun toDomainList(entities: List<ScheduleEntity>): List<Schedule> {
-        return entities.map { toDomain(it) }
     }
 }

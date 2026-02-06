@@ -2,65 +2,59 @@ package com.example.kairos_mobile.data.local.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Todo Room Entity
- * 앱 내 투두리스트 항목 저장
+ * 할 일 Room Entity
+ * Capture가 TODO로 분류될 때 생성되는 파생 엔티티.
  */
 @Entity(
     tableName = "todos",
+    foreignKeys = [
+        ForeignKey(
+            entity = CaptureEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["capture_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
     indices = [
-        Index(value = ["due_date"]),
-        Index(value = ["is_completed"])
+        Index(value = ["capture_id"], unique = true),
+        Index(value = ["is_completed"]),
+        Index(value = ["deadline"]),
+        Index(value = ["sort_order"])
     ]
 )
 data class TodoEntity(
     @PrimaryKey
     val id: String,
 
-    // 투두 내용
-    val content: String,
+    // FK → captures.id (UNIQUE)
+    @ColumnInfo(name = "capture_id")
+    val captureId: String,
 
-    // 제목 (선택)
-    val title: String? = null,
-
-    // 원본 캡처 ID (캡처에서 생성된 경우)
-    @ColumnInfo(name = "source_capture_id")
-    val sourceCaptureId: String? = null,
-
-    // 마감일 (epoch millis, 선택)
-    @ColumnInfo(name = "due_date")
-    val dueDate: Long? = null,
-
-    // 마감 시간 (HH:mm 형식, 선택)
-    @ColumnInfo(name = "due_time")
-    val dueTime: String? = null,
-
-    // 우선순위: 0=없음, 1=낮음, 2=중간, 3=높음
-    val priority: Int = 0,
-
-    // 라벨 (JSON 배열 문자열)
-    val labels: String? = null,
-
-    // 수동 정렬 순서
-    @ColumnInfo(name = "manual_order")
-    val manualOrder: Int = 0,
+    // 마감 일시 (epoch ms)
+    val deadline: Long? = null,
 
     // 완료 여부
-    @ColumnInfo(name = "is_completed")
+    @ColumnInfo(name = "is_completed", defaultValue = "0")
     val isCompleted: Boolean = false,
 
-    // 완료 시간 (epoch millis)
+    // 완료 처리 시각
     @ColumnInfo(name = "completed_at")
     val completedAt: Long? = null,
 
-    // 생성 시간
+    // 리스트 내 정렬 순서
+    @ColumnInfo(name = "sort_order")
+    val sortOrder: Int,
+
+    // 생성 시각 (epoch ms)
     @ColumnInfo(name = "created_at")
     val createdAt: Long,
 
-    // 수정 시간
+    // 최종 수정 시각
     @ColumnInfo(name = "updated_at")
     val updatedAt: Long
 )

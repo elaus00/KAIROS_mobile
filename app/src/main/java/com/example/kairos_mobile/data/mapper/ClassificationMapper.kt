@@ -1,19 +1,22 @@
 package com.example.kairos_mobile.data.mapper
 
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
-import com.example.kairos_mobile.data.remote.dto.v2.TodoMetadataDto
+import com.example.kairos_mobile.data.remote.dto.v2.EntityDto
+import com.example.kairos_mobile.data.remote.dto.v2.ScheduleInfoDto
+import com.example.kairos_mobile.data.remote.dto.v2.TodoInfoDto
 import com.example.kairos_mobile.domain.model.Classification
-import com.example.kairos_mobile.domain.model.Destination
-import com.example.kairos_mobile.domain.model.CaptureType
-import com.example.kairos_mobile.domain.model.TodoMetadata
-import com.example.kairos_mobile.domain.model.TodoPriority
-import java.time.LocalDate
-import java.time.LocalTime
+import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.ConfidenceLevel
+import com.example.kairos_mobile.domain.model.EntityType
+import com.example.kairos_mobile.domain.model.ExtractedEntity
+import com.example.kairos_mobile.domain.model.NoteSubType
+import com.example.kairos_mobile.domain.model.ScheduleInfo
+import com.example.kairos_mobile.domain.model.TodoInfo
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Classification DTO <-> Domain 변환 Mapper (API v2.1)
+ * Classification DTO → Domain 변환 Mapper
  */
 @Singleton
 class ClassificationMapper @Inject constructor() {
@@ -23,61 +26,74 @@ class ClassificationMapper @Inject constructor() {
      */
     fun toDomain(response: ClassifyResponse): Classification {
         return Classification(
-            type = CaptureType.fromApiValue(response.type),
-            destination = Destination.fromApiValue(response.destination),
-            confidence = response.confidence,
-            reasoning = response.reasoning,
-            title = response.title,
+            type = parseClassifiedType(response.classifiedType),
+            subType = response.noteSubType?.let { parseNoteSubType(it) },
+            confidence = parseConfidence(response.confidence),
+            aiTitle = response.aiTitle,
             tags = response.tags,
-            suggestedFilename = response.suggestedFilename,
-            suggestedPath = response.suggestedPath,
-            todoMetadata = response.todoMetadata?.let { toDomain(it) }
+            entities = response.entities.map { toDomain(it) },
+            scheduleInfo = response.scheduleInfo?.let { toDomain(it) },
+            todoInfo = response.todoInfo?.let { toDomain(it) }
         )
     }
 
-    /**
-     * TodoMetadataDto → TodoMetadata (Domain)
-     */
-    private fun toDomain(dto: TodoMetadataDto): TodoMetadata {
-        return TodoMetadata(
-            dueDate = dto.dueDate?.let { parseDateSafe(it) },
-            dueTime = dto.dueTime?.let { parseTimeSafe(it) },
-            priority = parsePriority(dto.priority),
-            labels = dto.labels
+    private fun toDomain(dto: EntityDto): ExtractedEntity {
+        return ExtractedEntity(
+            captureId = "",  // 호출자가 설정
+            type = parseEntityType(dto.type),
+            value = dto.value,
+            normalizedValue = dto.normalizedValue
         )
     }
 
-    /**
-     * 우선순위 문자열 → TodoPriority
-     */
-    private fun parsePriority(value: String): TodoPriority {
-        return when (value.lowercase()) {
-            "high" -> TodoPriority.HIGH
-            "medium" -> TodoPriority.MEDIUM
-            "low" -> TodoPriority.LOW
-            else -> TodoPriority.NONE
+    private fun toDomain(dto: ScheduleInfoDto): ScheduleInfo {
+        return ScheduleInfo(
+            startTime = dto.startTime,
+            endTime = dto.endTime,
+            location = dto.location,
+            isAllDay = dto.isAllDay
+        )
+    }
+
+    private fun toDomain(dto: TodoInfoDto): TodoInfo {
+        return TodoInfo(deadline = dto.deadline)
+    }
+
+    private fun parseClassifiedType(value: String): ClassifiedType {
+        return try {
+            ClassifiedType.valueOf(value.uppercase())
+        } catch (e: Exception) {
+            ClassifiedType.TEMP
         }
     }
 
-    /**
-     * ISO 날짜 문자열을 LocalDate로 안전하게 파싱
-     */
-    private fun parseDateSafe(dateStr: String): LocalDate? {
+    private fun parseNoteSubType(value: String): NoteSubType {
         return try {
-            LocalDate.parse(dateStr)
+            NoteSubType.valueOf(value.uppercase())
         } catch (e: Exception) {
-            null
+            NoteSubType.INBOX
         }
     }
 
-    /**
-     * ISO 시간 문자열을 LocalTime으로 안전하게 파싱
-     */
-    private fun parseTimeSafe(timeStr: String): LocalTime? {
+    private fun parseConfidence(value: String): ConfidenceLevel {
         return try {
-            LocalTime.parse(timeStr)
+            ConfidenceLevel.valueOf(value.uppercase())
         } catch (e: Exception) {
-            null
+            ConfidenceLevel.MEDIUM
+        }
+    }
+
+    private fun parseEntityType(value: String): EntityType {
+        val normalized = value.trim().uppercase()
+        return when (normalized) {
+            "LOCATION" -> EntityType.PLACE
+            else -> {
+                try {
+                    EntityType.valueOf(normalized)
+                } catch (e: Exception) {
+                    EntityType.OTHER
+                }
+            }
         }
     }
 }

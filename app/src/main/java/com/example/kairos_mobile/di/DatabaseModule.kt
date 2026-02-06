@@ -3,12 +3,17 @@ package com.example.kairos_mobile.di
 import android.content.Context
 import androidx.room.Room
 import com.example.kairos_mobile.data.local.database.KairosDatabase
-import com.example.kairos_mobile.data.local.database.dao.BookmarkDao
-import com.example.kairos_mobile.data.local.database.dao.CaptureQueueDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
+import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
+import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
-import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
+import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
+import com.example.kairos_mobile.data.local.database.dao.TagDao
 import com.example.kairos_mobile.data.local.database.dao.TodoDao
+import com.example.kairos_mobile.data.local.database.dao.UserPreferenceDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +22,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Database Hilt 모듈 (PRD v4.0)
+ * Database Hilt 모듈 (Data Model Spec v2.0)
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -36,70 +41,74 @@ object DatabaseModule {
             KairosDatabase::class.java,
             KairosDatabase.DATABASE_NAME
         )
-            .addMigrations(
-                KairosDatabase.MIGRATION_1_2,  // 멀티모달 캡처
-                KairosDatabase.MIGRATION_2_3,  // 스마트 처리 기능
-                KairosDatabase.MIGRATION_3_4,  // 알림 기능
-                KairosDatabase.MIGRATION_4_5,  // Capture → Insight 리네이밍
-                KairosDatabase.MIGRATION_5_6,  // Todo 테이블, SCHEDULE → NOTE
-                KairosDatabase.MIGRATION_6_7,  // PRD v4.0: Schedule, Note, Bookmark 테이블
-                KairosDatabase.MIGRATION_7_8   // Insight → Capture 리네이밍 완료
-            )
-            .fallbackToDestructiveMigration()  // 마이그레이션 실패 시 폴백
+            .addCallback(KairosDatabase.SEED_SYSTEM_FOLDERS)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
-    /**
-     * CaptureQueueDao 제공
-     */
     @Provides
     @Singleton
-    fun provideCaptureQueueDao(database: KairosDatabase): CaptureQueueDao {
-        return database.captureQueueDao()
+    fun provideCaptureDao(database: KairosDatabase): CaptureDao {
+        return database.captureDao()
     }
 
-    /**
-     * NotificationDao 제공
-     */
-    @Provides
-    @Singleton
-    fun provideNotificationDao(database: KairosDatabase): NotificationDao {
-        return database.notificationDao()
-    }
-
-    /**
-     * TodoDao 제공
-     */
     @Provides
     @Singleton
     fun provideTodoDao(database: KairosDatabase): TodoDao {
         return database.todoDao()
     }
 
-    /**
-     * ScheduleDao 제공 (PRD v4.0)
-     */
     @Provides
     @Singleton
     fun provideScheduleDao(database: KairosDatabase): ScheduleDao {
         return database.scheduleDao()
     }
 
-    /**
-     * NoteDao 제공 (PRD v4.0)
-     */
     @Provides
     @Singleton
     fun provideNoteDao(database: KairosDatabase): NoteDao {
         return database.noteDao()
     }
 
-    /**
-     * BookmarkDao 제공 (PRD v4.0)
-     */
     @Provides
     @Singleton
-    fun provideBookmarkDao(database: KairosDatabase): BookmarkDao {
-        return database.bookmarkDao()
+    fun provideFolderDao(database: KairosDatabase): FolderDao {
+        return database.folderDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTagDao(database: KairosDatabase): TagDao {
+        return database.tagDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCaptureTagDao(database: KairosDatabase): CaptureTagDao {
+        return database.captureTagDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideExtractedEntityDao(database: KairosDatabase): ExtractedEntityDao {
+        return database.extractedEntityDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSyncQueueDao(database: KairosDatabase): SyncQueueDao {
+        return database.syncQueueDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserPreferenceDao(database: KairosDatabase): UserPreferenceDao {
+        return database.userPreferenceDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCaptureSearchDao(database: KairosDatabase): CaptureSearchDao {
+        return database.captureSearchDao()
     }
 }

@@ -3,36 +3,69 @@ package com.example.kairos_mobile.data.remote.dto.v2
 import com.google.gson.annotations.SerializedName
 
 /**
- * AI 분류 응답 DTO (API v2.1)
+ * AI 분류 응답 DTO
  */
 data class ClassifyResponse(
-    @SerializedName("success")
-    val success: Boolean,
+    @SerializedName("classified_type")
+    val classifiedType: String,
 
-    @SerializedName("type")
-    val type: String,                              // "todo", "idea", "note", "quick_note", "clip"
-
-    @SerializedName("destination")
-    val destination: String,                       // "todo", "obsidian"
+    @SerializedName("note_sub_type")
+    val noteSubType: String? = null,
 
     @SerializedName("confidence")
-    val confidence: Float,                         // 0.0 ~ 1.0
+    val confidence: String,
 
-    @SerializedName("reasoning")
-    val reasoning: String? = null,                 // AI 분류 근거
-
-    @SerializedName("title")
-    val title: String,                             // 자동 생성된 제목
+    @SerializedName("ai_title")
+    val aiTitle: String,
 
     @SerializedName("tags")
-    val tags: List<String> = emptyList(),          // 추출된 태그
+    val tags: List<String> = emptyList(),
 
-    @SerializedName("suggested_filename")
-    val suggestedFilename: String? = null,         // 제안 파일명 (Obsidian용)
+    @SerializedName("entities")
+    val entities: List<EntityDto> = emptyList(),
 
-    @SerializedName("suggested_path")
-    val suggestedPath: String? = null,             // 제안 경로 (Obsidian용)
+    @SerializedName("schedule_info")
+    val scheduleInfo: ScheduleInfoDto? = null,
 
-    @SerializedName("todo_metadata")
-    val todoMetadata: TodoMetadataDto? = null      // Todo 메타데이터 (destination이 todo인 경우)
+    @SerializedName("todo_info")
+    val todoInfo: TodoInfoDto? = null
+)
+
+/**
+ * 추출된 엔티티 DTO
+ */
+data class EntityDto(
+    @SerializedName("type")
+    val type: String,
+
+    @SerializedName("value")
+    val value: String,
+
+    @SerializedName("normalized_value")
+    val normalizedValue: String? = null
+)
+
+/**
+ * 일정 정보 DTO
+ */
+data class ScheduleInfoDto(
+    @SerializedName("start_time")
+    val startTime: Long,
+
+    @SerializedName("end_time")
+    val endTime: Long? = null,
+
+    @SerializedName("location")
+    val location: String? = null,
+
+    @SerializedName("is_all_day")
+    val isAllDay: Boolean = false
+)
+
+/**
+ * 할 일 정보 DTO
+ */
+data class TodoInfoDto(
+    @SerializedName("deadline")
+    val deadline: Long? = null
 )
