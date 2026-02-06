@@ -1,32 +1,18 @@
 package com.example.kairos_mobile.domain.model
 
 /**
- * 캡처 소스 타입
- * 멀티모달 캡처 지원
+ * 캡처 입력 소스
  */
 enum class CaptureSource {
-    /**
-     * 텍스트 입력
-     */
-    TEXT,
+    /** 앱 내 직접 입력 */
+    APP,
 
-    /**
-     * 이미지 + OCR
-     */
-    IMAGE,
+    /** 외부 앱 공유 인텐트 */
+    SHARE_INTENT,
 
-    /**
-     * 음성 입력 + STT
-     */
-    VOICE,
+    /** 홈 화면 위젯 (Phase 2a) */
+    WIDGET,
 
-    /**
-     * 공유 인텐트
-     */
-    SHARE,
-
-    /**
-     * 웹 클립 + 메타데이터 추출
-     */
-    WEB_CLIP
+    /** 멀티 인텐트 분할 (Phase 2b) */
+    SPLIT
 }

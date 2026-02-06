@@ -1,82 +1,27 @@
 package com.example.kairos_mobile.domain.model
 
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
+import java.util.UUID
 
 /**
- * 일정 도메인 모델 (PRD v4.0)
+ * 일정 도메인 모델
+ * Capture가 SCHEDULE로 분류될 때 생성되는 파생 엔티티
  */
 data class Schedule(
-    val id: String,
-    val title: String,
-    val time: LocalTime,
-    val date: LocalDate,
+    val id: String = UUID.randomUUID().toString(),
+    /** FK → Capture.id (1:1) */
+    val captureId: String,
+    /** 시작 일시 (epoch ms) */
+    val startTime: Long? = null,
+    /** 종료 일시 (epoch ms) */
+    val endTime: Long? = null,
+    /** 장소 */
     val location: String? = null,
-    val category: ScheduleCategory = ScheduleCategory.PERSONAL,
-    val googleCalendarId: String? = null,
-    val sourceCaptureId: String? = null,
-    val createdAt: Instant,
-    val updatedAt: Instant = createdAt
-) {
-    /**
-     * 오늘 일정인지 확인
-     */
-    fun isToday(): Boolean {
-        return date == LocalDate.now()
-    }
-
-    /**
-     * 내일 일정인지 확인
-     */
-    fun isTomorrow(): Boolean {
-        return date == LocalDate.now().plusDays(1)
-    }
-
-    /**
-     * 이번 주 일정인지 확인
-     */
-    fun isThisWeek(): Boolean {
-        val today = LocalDate.now()
-        val endOfWeek = today.plusDays((7 - today.dayOfWeek.value).toLong())
-        return date in today..endOfWeek
-    }
-
-    /**
-     * 일정이 지났는지 확인
-     */
-    fun isPast(): Boolean {
-        val now = LocalDate.now()
-        val currentTime = LocalTime.now()
-        return date.isBefore(now) || (date == now && time.isBefore(currentTime))
-    }
-
-    /**
-     * 시간 포맷 (예: "10:00")
-     */
-    fun getFormattedTime(): String {
-        return String.format("%02d:%02d", time.hour, time.minute)
-    }
-
-    /**
-     * Google Calendar 연동 여부
-     */
-    fun isSyncedWithGoogle(): Boolean {
-        return googleCalendarId != null
-    }
-}
-
-/**
- * 일정 카테고리
- */
-enum class ScheduleCategory {
-    WORK,       // 업무
-    PERSONAL;   // 개인
-
-    fun getDisplayName(): String {
-        return when (this) {
-            WORK -> "업무"
-            PERSONAL -> "개인"
-        }
-    }
-}
+    /** 종일 이벤트 여부 */
+    val isAllDay: Boolean = false,
+    /** 일정 신뢰도 */
+    val confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM,
+    /** 생성 시각 */
+    val createdAt: Long = System.currentTimeMillis(),
+    /** 최종 수정 시각 */
+    val updatedAt: Long = createdAt
+)

@@ -5,14 +5,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 임시 저장 삭제 UseCase
- * QuickCapture 닫기 또는 제출 완료 시
+ * 임시 저장 텍스트 조회 UseCase
+ * QuickCapture 복귀 시 저장된 텍스트 로드
  */
 @Singleton
-class DeleteDraftUseCase @Inject constructor(
+class GetDraftUseCase @Inject constructor(
     private val preferenceRepository: UserPreferenceRepository
 ) {
-    suspend operator fun invoke() {
-        preferenceRepository.setString(SaveDraftUseCase.KEY_DRAFT_TEXT, "")
+    suspend operator fun invoke(): String {
+        return preferenceRepository.getString(SaveDraftUseCase.KEY_DRAFT_TEXT, "")
     }
 }
