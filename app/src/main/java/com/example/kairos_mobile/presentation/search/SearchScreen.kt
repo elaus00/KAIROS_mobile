@@ -1,33 +1,38 @@
 package com.example.kairos_mobile.presentation.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.kairos_mobile.presentation.components.common.KairosBottomNav
-import com.example.kairos_mobile.presentation.components.common.KairosTab
-import com.example.kairos_mobile.presentation.components.search.FilterChipRow
-import com.example.kairos_mobile.presentation.components.search.SearchBar
-import com.example.kairos_mobile.presentation.components.search.SearchResultCard
+import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * Search 화면
- * 캡처 검색 기능 제공
+ * 검색 화면
+ * FTS 기반 전체 캡처 검색 (실시간 결과)
  */
 @Composable
 fun SearchScreen(
@@ -37,304 +42,249 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val listState = rememberLazyListState()
     val colors = KairosTheme.colors
+    val focusRequester = remember { FocusRequester() }
 
-    // 에러 메시지 스낵바 표시
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { error ->
-            snackbarHostState.showSnackbar(
-                message = error,
-                duration = SnackbarDuration.Short
-            )
-            viewModel.onErrorDismissed()
-        }
+    // 자동 포커스
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
-    // 스크롤이 끝에 도달하면 더 로드
-    LaunchedEffect(Unit) {
-        snapshotFlow {
-            val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-            val currentState = viewModel.uiState.value
-            Triple(lastVisibleIndex, currentState.hasMore, currentState.isLoading)
-        }.collect { (lastVisibleIndex, hasMore, isLoading) ->
-            val resultsSize = viewModel.uiState.value.searchResults.size
-            if (lastVisibleIndex != null &&
-                lastVisibleIndex >= resultsSize - 3 &&
-                hasMore &&
-                !isLoading
-            ) {
-                viewModel.onLoadMore()
-            }
+    // 에러 스낵바
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
+            viewModel.onErrorDismissed()
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = colors.background,
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        shape = RoundedCornerShape(12.dp),
-                        containerColor = colors.card,
-                        contentColor = colors.text
-                    )
-                }
-            )
-        }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(colors.background)
         ) {
-            Column(
+            // 헤더: 뒤로가기 + 검색 입력
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(bottom = 80.dp) // 하단 네비게이션 공간 확보
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // 헤더
-                SearchHeader(
-                    onBackClick = onBackClick,
-                    onClearFilters = viewModel::onClearFilters,
-                    hasFilters = uiState.selectedTypes.isNotEmpty()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 검색 바
-                SearchBar(
-                    text = uiState.searchText,
-                    onTextChange = viewModel::onSearchTextChanged,
-                    onSearch = viewModel::onSearch,
-                    onClear = { viewModel.onSearchTextChanged("") },
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 필터 칩
-                FilterChipRow(
-                    selectedTypes = uiState.selectedTypes,
-                    onTypeToggle = viewModel::onTypeFilterToggle,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // 검색 결과
-                if (uiState.hasSearched) {
-                    if (uiState.isLoading && uiState.searchResults.isEmpty()) {
-                        // 초기 로딩
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = colors.accent,
-                                strokeWidth = 2.dp
-                            )
-                        }
-                    } else if (uiState.searchResults.isEmpty() && !uiState.isLoading) {
-                        // 결과 없음
-                        EmptySearchState(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp)
-                        )
-                    } else {
-                        // 검색 결과 리스트
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(
-                                items = uiState.searchResults,
-                                key = { it.id }
-                            ) { capture ->
-                                SearchResultCard(
-                                    capture = capture,
-                                    onClick = { onCaptureClick(capture.id) }
-                                )
-                            }
-
-                            // 페이징 로딩 인디케이터
-                            if (uiState.isLoading && uiState.searchResults.isNotEmpty()) {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp),
-                                            color = colors.accent,
-                                            strokeWidth = 2.dp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // 초기 상태 (검색 전)
-                    InitialSearchState(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "뒤로가기",
+                        tint = colors.text
                     )
                 }
+
+                // 검색 입력 필드
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(colors.card)
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = colors.textMuted,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (uiState.searchText.isEmpty()) {
+                                Text(
+                                    text = "캡처 검색",
+                                    color = colors.placeholder,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            BasicTextField(
+                                value = uiState.searchText,
+                                onValueChange = viewModel::onSearchTextChanged,
+                                singleLine = true,
+                                textStyle = TextStyle(
+                                    color = colors.text,
+                                    fontSize = 15.sp
+                                ),
+                                cursorBrush = SolidColor(colors.accent),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester)
+                            )
+                        }
+                        if (uiState.searchText.isNotEmpty()) {
+                            IconButton(
+                                onClick = { viewModel.onSearchTextChanged("") },
+                                modifier = Modifier.size(20.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "지우기",
+                                    tint = colors.textMuted,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
             }
 
-            // 하단 네비게이션
-            Box(
-                modifier = Modifier.align(Alignment.BottomCenter)
-            ) {
-                KairosBottomNav(
-                    selectedTab = KairosTab.HOME,
-                    onTabSelected = { tab ->
-                        onNavigate(tab.route)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 검색 결과
+            when {
+                !uiState.hasSearched -> {
+                    // 초기 상태
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = colors.textMuted.copy(alpha = 0.5f),
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Text(
+                                text = "캡처를 검색하세요",
+                                color = colors.textMuted,
+                                fontSize = 15.sp
+                            )
+                        }
                     }
-                )
+                }
+                uiState.searchResults.isEmpty() -> {
+                    // 결과 없음
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "결과 없음",
+                                color = colors.textMuted,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "다른 키워드로 검색해보세요",
+                                color = colors.textMuted.copy(alpha = 0.7f),
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+                else -> {
+                    // 검색 결과 리스트
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(
+                            items = uiState.searchResults,
+                            key = { it.id }
+                        ) { capture ->
+                            SearchResultItem(
+                                capture = capture,
+                                onClick = { onCaptureClick(capture.id) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 /**
- * 검색 헤더
+ * 검색 결과 아이템
  */
 @Composable
-private fun SearchHeader(
-    onBackClick: () -> Unit,
-    onClearFilters: () -> Unit,
-    hasFilters: Boolean,
+private fun SearchResultItem(
+    capture: Capture,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
+    val title = capture.aiTitle ?: capture.originalText.take(30)
+    val preview = if (capture.aiTitle != null && capture.aiTitle != capture.originalText) {
+        capture.originalText
+    } else null
 
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        // 뒤로가기 버튼
-        IconButton(onClick = onBackClick) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "뒤로가기",
-                tint = colors.text
-            )
-        }
-
-        // 제목
-        Text(
-            text = "Search",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            color = colors.text,
-            letterSpacing = 0.3.sp
-        )
-
-        // 필터 초기화 버튼
-        if (hasFilters) {
-            TextButton(onClick = onClearFilters) {
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // 제목
                 Text(
-                    text = "초기화",
-                    fontSize = 13.sp,
+                    text = title,
+                    color = colors.text,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = colors.textMuted
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // 분류 칩
+                if (capture.classifiedType != ClassifiedType.TEMP) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (capture.classifiedType) {
+                            ClassifiedType.TODO -> "할 일"
+                            ClassifiedType.SCHEDULE -> "일정"
+                            ClassifiedType.NOTES -> "노트"
+                            ClassifiedType.TEMP -> ""
+                        },
+                        color = colors.chipText,
+                        fontSize = 11.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.chipBg)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+            }
+
+            // 미리보기
+            if (preview != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = preview,
+                    color = colors.textMuted,
+                    fontSize = 13.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-        } else {
-            // 공간 유지
-            Spacer(modifier = Modifier.width(48.dp))
-        }
-    }
-}
-
-/**
- * 초기 상태 (검색 전)
- */
-@Composable
-private fun InitialSearchState(
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                tint = colors.textMuted.copy(alpha = 0.5f),
-                modifier = Modifier.size(64.dp)
-            )
-            Text(
-                text = "캡처를 검색하세요",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = colors.textMuted,
-                letterSpacing = 0.2.sp
-            )
-        }
-    }
-}
-
-/**
- * 빈 검색 결과 상태
- */
-@Composable
-private fun EmptySearchState(
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                tint = colors.textMuted.copy(alpha = 0.5f),
-                modifier = Modifier.size(48.dp)
-            )
-            Text(
-                text = "검색 결과가 없습니다",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = colors.textMuted,
-                letterSpacing = 0.2.sp
-            )
-            Text(
-                text = "다른 검색어나 필터를 시도해보세요",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Normal,
-                color = colors.textMuted.copy(alpha = 0.7f),
-                letterSpacing = 0.2.sp
-            )
         }
     }
 }

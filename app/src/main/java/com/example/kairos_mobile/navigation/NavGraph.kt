@@ -1,6 +1,5 @@
 package com.example.kairos_mobile.navigation
 
-import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
@@ -10,66 +9,62 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.kairos_mobile.presentation.capture.QuickCaptureOverlay
 import com.example.kairos_mobile.presentation.components.common.KairosTab
+import com.example.kairos_mobile.presentation.detail.CaptureDetailScreen
+import com.example.kairos_mobile.presentation.history.HistoryScreen
 import com.example.kairos_mobile.presentation.main.MainScreen
-import com.example.kairos_mobile.presentation.notes.edit.NoteEditScreen
-import com.example.kairos_mobile.presentation.notifications.NotificationsScreen
-import com.example.kairos_mobile.presentation.result.ResultScreen
+import com.example.kairos_mobile.presentation.onboarding.OnboardingScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.PrivacyPolicyScreen
-import com.example.kairos_mobile.presentation.settings.ProfileScreen
+import com.example.kairos_mobile.presentation.settings.SettingsScreen
+import com.example.kairos_mobile.presentation.settings.TermsOfServiceScreen
 
 /**
- * Navigation 경로 정의 (PRD v4.0)
- * HOME / CALENDAR / NOTES / SETTINGS
+ * Navigation 경로 정의
+ * NOTES ← HOME → CALENDAR (3탭)
+ * SETTINGS는 독립 화면
  */
 object NavRoutes {
-    // PRD v4.0 메인 탭
+    // 메인 탭
     const val HOME = "home"
     const val CALENDAR = "calendar"
     const val NOTES = "notes"
+
+    // 독립 화면
     const val SETTINGS = "settings"
+    const val ONBOARDING = "onboarding"
 
     // 보조 화면
-    const val RESULT = "result/{captureId}"
-    const val NOTE_EDIT = "notes/{noteId}"
+    const val DETAIL = "detail/{captureId}"
     const val SEARCH = "search"
-    const val NOTIFICATIONS = "notifications"
-    const val PROFILE = "profile"
+    const val HISTORY = "history"
     const val PRIVACY_POLICY = "privacy-policy"
-    const val QUICK_CAPTURE = "quick-capture"
+    const val TERMS_OF_SERVICE = "terms-of-service"
 
     /**
-     * ResultScreen 라우트 생성
+     * CaptureDetailScreen 라우트 생성
      */
-    fun result(captureId: String): String = "result/$captureId"
-
-    /**
-     * NoteEditScreen 라우트 생성
-     */
-    fun noteEdit(noteId: String): String = "notes/$noteId"
+    fun detail(captureId: String): String = "detail/$captureId"
 }
 
 /**
- * KAIROS Navigation Graph (PRD v4.0)
- * 4개 탭: HOME / CALENDAR / NOTES / SETTINGS
+ * KAIROS Navigation Graph
+ * 3개 탭: NOTES ← HOME → CALENDAR
+ * SETTINGS는 독립 화면
  */
 @Composable
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavRoutes.HOME,
-    sharedText: String? = null,
-    sharedImageUri: Uri? = null
+    startDestination: String = NavRoutes.HOME
 ) {
-    // ResultScreen으로 네비게이션
-    val navigateToResult: (String) -> Unit = { captureId ->
-        navController.navigate(NavRoutes.result(captureId))
+    // 캡처 상세 화면으로 네비게이션
+    val navigateToDetail: (String) -> Unit = { captureId ->
+        navController.navigate(NavRoutes.detail(captureId))
     }
 
-    // NoteEditScreen으로 네비게이션
-    val navigateToNoteEdit: (String) -> Unit = { noteId ->
-        navController.navigate(NavRoutes.noteEdit(noteId))
+    // 검색 화면으로 네비게이션
+    val navigateToSearch: () -> Unit = {
+        navController.navigate(NavRoutes.SEARCH)
     }
 
     NavHost(
@@ -81,46 +76,55 @@ fun KairosNavGraph(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
+        // 온보딩 화면 (ONBOARDING) — 첫 실행 시만 표시
+        composable(NavRoutes.ONBOARDING) {
+            OnboardingScreen(
+                onComplete = {
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.ONBOARDING) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         // 메인 화면 (HOME) - 스와이프 네비게이션 포함
         composable(NavRoutes.HOME) {
             MainScreen(
                 initialTab = KairosTab.HOME,
-                onNavigateToCapture = navigateToResult,
-                onNavigateToNoteEdit = navigateToNoteEdit,
-                onNavigateToProfile = {
-                    navController.navigate(NavRoutes.PROFILE)
+                onNavigateToCapture = navigateToDetail,
+                onNavigateToSearch = navigateToSearch,
+                onNavigateToSettings = {
+                    navController.navigate(NavRoutes.SETTINGS)
+                },
+                onNavigateToHistory = {
+                    navController.navigate(NavRoutes.HISTORY)
+                }
+            )
+        }
+
+        // 설정 화면 (SETTINGS) - 독립 화면
+        composable(NavRoutes.SETTINGS) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 },
                 onNavigateToPrivacyPolicy = {
                     navController.navigate(NavRoutes.PRIVACY_POLICY)
                 },
-                onOpenCamera = {
-                    // TODO: 카메라 열기 구현
+                onNavigateToTermsOfService = {
+                    navController.navigate(NavRoutes.TERMS_OF_SERVICE)
                 }
             )
         }
 
-        // 결과 화면 (RESULT)
+        // 캡처 상세 화면 (DETAIL)
         composable(
-            route = NavRoutes.RESULT,
+            route = NavRoutes.DETAIL,
             arguments = listOf(
                 navArgument("captureId") { type = NavType.StringType }
             )
         ) {
-            ResultScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // 노트 편집 화면 (NOTE_EDIT)
-        composable(
-            route = NavRoutes.NOTE_EDIT,
-            arguments = listOf(
-                navArgument("noteId") { type = NavType.StringType }
-            )
-        ) {
-            NoteEditScreen(
+            CaptureDetailScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -133,33 +137,18 @@ fun KairosNavGraph(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onCaptureClick = navigateToResult,
+                onCaptureClick = navigateToDetail,
                 onNavigate = { navController.popBackStack() }
             )
         }
 
-        // 알림 화면 (NOTIFICATIONS)
-        composable(NavRoutes.NOTIFICATIONS) {
-            NotificationsScreen(
-                onBack = {
-                    navController.popBackStack()
-                },
-                onNotificationClick = { captureId ->
-                    if (captureId != null) {
-                        navigateToResult(captureId)
-                    } else {
-                        navController.popBackStack()
-                    }
-                }
-            )
-        }
-
-        // 프로필 화면 (PROFILE)
-        composable(NavRoutes.PROFILE) {
-            ProfileScreen(
+        // 전체 기록 화면 (HISTORY)
+        composable(NavRoutes.HISTORY) {
+            HistoryScreen(
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                onCaptureClick = navigateToDetail
             )
         }
 
@@ -172,19 +161,12 @@ fun KairosNavGraph(
             )
         }
 
-        // QuickCapture 오버레이 화면 (앱 시작 시)
-        composable(NavRoutes.QUICK_CAPTURE) {
-            QuickCaptureOverlay(
-                onDismiss = {
-                    // HOME으로 이동 (백스택 정리)
-                    navController.navigate(NavRoutes.HOME) {
-                        popUpTo(NavRoutes.QUICK_CAPTURE) { inclusive = true }
-                    }
-                },
-                onOpenCamera = {
-                    // TODO: 카메라 열기 구현
-                },
-                initialText = sharedText
+        // 이용약관 화면 (TERMS_OF_SERVICE)
+        composable(NavRoutes.TERMS_OF_SERVICE) {
+            TermsOfServiceScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }

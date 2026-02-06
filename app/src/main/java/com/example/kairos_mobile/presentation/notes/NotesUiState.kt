@@ -1,72 +1,69 @@
 package com.example.kairos_mobile.presentation.notes
 
-import com.example.kairos_mobile.domain.model.Bookmark
-import com.example.kairos_mobile.domain.model.Note
-import com.example.kairos_mobile.domain.model.NoteFolder
+import com.example.kairos_mobile.domain.model.Folder
 
 /**
- * NotesScreen UI 상태 (PRD v4.0)
+ * 노트 탭 UI 상태
+ * 폴더 기반 노트 관리 (Inbox/Ideas/Bookmarks + 사용자 폴더)
  */
 data class NotesUiState(
-    // 현재 탭 (노트/북마크)
-    val selectedTab: NotesTab = NotesTab.NOTES,
-
-    // 선택된 폴더 (null = 전체)
-    val selectedFolder: NoteFolder? = null,
-
-    // 검색어
-    val searchQuery: String = "",
-
-    // 노트 목록
-    val notes: List<Note> = emptyList(),
-
-    // 북마크 목록
-    val bookmarks: List<Bookmark> = emptyList(),
-
-    // 노트 개수 (폴더별)
-    val noteCountByFolder: Map<NoteFolder, Int> = emptyMap(),
-
-    // 전체 노트 개수
-    val totalNoteCount: Int = 0,
-
-    // 전체 북마크 개수
-    val totalBookmarkCount: Int = 0,
-
-    // 로딩 상태
+    /** 폴더 목록 (시스템 + 사용자) */
+    val folders: List<FolderWithCount> = emptyList(),
+    /** 현재 선택된 폴더 (null = 메인 폴더 리스트) */
+    val selectedFolder: Folder? = null,
+    /** 선택된 폴더의 노트 목록 */
+    val notes: List<NoteWithCapture> = emptyList(),
+    /** 로딩 상태 */
     val isLoading: Boolean = false,
-
-    // 검색 중 상태
-    val isSearching: Boolean = false,
-
-    // 에러 메시지
+    /** 폴더 생성 다이얼로그 표시 */
+    val showCreateFolderDialog: Boolean = false,
+    /** 폴더 이름 변경 다이얼로그 대상 */
+    val renamingFolder: Folder? = null,
+    /** 에러 메시지 */
     val errorMessage: String? = null
 )
 
 /**
- * 노트/북마크 탭
+ * 폴더 + 노트 수
  */
-enum class NotesTab {
-    NOTES,
-    BOOKMARKS;
-
-    fun getDisplayName(): String {
-        return when (this) {
-            NOTES -> "노트"
-            BOOKMARKS -> "북마크"
-        }
-    }
-}
+data class FolderWithCount(
+    val folder: Folder,
+    val noteCount: Int
+)
 
 /**
- * Notes 화면 이벤트
+ * 노트 + 캡처 정보 (표시용)
+ */
+data class NoteWithCapture(
+    val noteId: String,
+    val captureId: String,
+    val aiTitle: String?,
+    val originalText: String,
+    val createdAt: Long
+)
+
+/**
+ * 노트 화면 이벤트
  */
 sealed interface NotesEvent {
-    data class SelectTab(val tab: NotesTab) : NotesEvent
-    data class SelectFolder(val folder: NoteFolder?) : NotesEvent
-    data class UpdateSearchQuery(val query: String) : NotesEvent
-    data object ClearSearch : NotesEvent
-    data class DeleteNote(val noteId: String) : NotesEvent
-    data class DeleteBookmark(val bookmarkId: String) : NotesEvent
-    data class MoveNoteToFolder(val noteId: String, val folder: NoteFolder) : NotesEvent
+    /** 폴더 선택 (노트 목록으로 이동) */
+    data class SelectFolder(val folder: Folder) : NotesEvent
+    /** 폴더 목록으로 돌아가기 */
+    data object BackToFolders : NotesEvent
+    /** 폴더 생성 다이얼로그 표시 */
+    data object ShowCreateFolderDialog : NotesEvent
+    /** 폴더 생성 다이얼로그 닫기 */
+    data object DismissCreateFolderDialog : NotesEvent
+    /** 폴더 생성 */
+    data class CreateFolder(val name: String) : NotesEvent
+    /** 폴더 이름 변경 다이얼로그 표시 */
+    data class ShowRenameFolderDialog(val folder: Folder) : NotesEvent
+    /** 폴더 이름 변경 다이얼로그 닫기 */
+    data object DismissRenameFolderDialog : NotesEvent
+    /** 폴더 이름 변경 */
+    data class RenameFolder(val folderId: String, val newName: String) : NotesEvent
+    /** 폴더 삭제 */
+    data class DeleteFolder(val folderId: String) : NotesEvent
+    /** 에러 메시지 닫기 */
     data object DismissError : NotesEvent
 }

@@ -2,18 +2,19 @@ package com.example.kairos_mobile.presentation.settings
 
 import androidx.compose.runtime.Composable
 
-private const val PRIVACY_POLICY_URL = "https://kairos-app.com/privacy-policy"
+private const val TERMS_OF_SERVICE_URL = "https://kairos-app.com/terms"
 
 /**
- * 개인정보 처리방침 화면 (WebView URL)
+ * 이용약관 화면 (WebView URL)
  */
 @Composable
-fun PrivacyPolicyScreen(
+fun TermsOfServiceScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     LegalWebViewScreen(
-        title = "개인정보 처리방침",
-        url = PRIVACY_POLICY_URL,
+        title = "이용약관",
+        url = TERMS_OF_SERVICE_URL,
         onNavigateBack = onNavigateBack
     )
 }
+

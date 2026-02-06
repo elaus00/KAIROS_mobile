@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,25 +19,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.Schedule
-import com.example.kairos_mobile.domain.model.ScheduleCategory
+import com.example.kairos_mobile.presentation.calendar.ScheduleDisplayItem
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
- * ScheduleTimeline 컴포넌트 (Reference 디자인)
+ * ScheduleTimeline 컴포넌트
  * 시간 기반 일정 목록 (타임라인 형태)
  */
 @Composable
 fun ScheduleTimeline(
-    schedules: List<Schedule>,
-    onScheduleClick: (Schedule) -> Unit,
+    schedules: List<ScheduleDisplayItem>,
+    onScheduleClick: (ScheduleDisplayItem) -> Unit,
+    onScheduleDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = KairosTheme.colors
-    val currentTime = remember { LocalTime.now() }
-
     Column(modifier = modifier) {
         SectionHeader(title = "일정")
 
@@ -48,7 +50,13 @@ fun ScheduleTimeline(
                     .padding(horizontal = 20.dp)
             ) {
                 schedules.forEachIndexed { index, schedule ->
-                    val isPast = schedule.time.isBefore(currentTime)
+                    val now = LocalTime.now()
+                    val scheduleTime = schedule.startTime?.let {
+                        Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalTime()
+                    }
+                    val isPast = scheduleTime?.isBefore(now) ?: false
                     val isFirst = index == 0
                     val isLast = index == schedules.lastIndex
 
@@ -57,7 +65,8 @@ fun ScheduleTimeline(
                         isPast = isPast,
                         isFirst = isFirst,
                         isLast = isLast,
-                        onClick = { onScheduleClick(schedule) }
+                        onClick = { onScheduleClick(schedule) },
+                        onDelete = { onScheduleDelete(schedule.captureId) }
                     )
                 }
             }
@@ -66,15 +75,16 @@ fun ScheduleTimeline(
 }
 
 /**
- * 타임라인 일정 아이템 (Reference 디자인)
+ * 타임라인 일정 아이템
  */
 @Composable
 private fun ScheduleTimelineItem(
-    schedule: Schedule,
+    schedule: ScheduleDisplayItem,
     isPast: Boolean,
     isFirst: Boolean,
     isLast: Boolean,
     onClick: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -92,7 +102,7 @@ private fun ScheduleTimelineItem(
         ) {
             // 시간 텍스트
             Text(
-                text = schedule.getFormattedTime(),
+                text = formatTime(schedule.startTime, schedule.isAllDay),
                 color = if (isPast) colors.textMuted else colors.textSecondary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
@@ -137,6 +147,7 @@ private fun ScheduleTimelineItem(
             schedule = schedule,
             isPast = isPast,
             onClick = onClick,
+            onDelete = onDelete,
             modifier = Modifier
                 .weight(1f)
                 .padding(bottom = 12.dp)
@@ -145,13 +156,14 @@ private fun ScheduleTimelineItem(
 }
 
 /**
- * 일정 카드 (Reference 디자인)
+ * 일정 카드
  */
 @Composable
 private fun ScheduleCard(
-    schedule: Schedule,
+    schedule: ScheduleDisplayItem,
     isPast: Boolean,
     onClick: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -169,8 +181,8 @@ private fun ScheduleCard(
             .padding(12.dp, 14.dp)
     ) {
         Column {
-            // 제목 + 카테고리 chip
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -180,19 +192,19 @@ private fun ScheduleCard(
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // 카테고리 chip
-                CategoryChip(
-                    category = schedule.category,
-                    isPast = isPast
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = "일정 삭제",
+                    tint = colors.textMuted,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clickable { onDelete() }
                 )
             }
 
-            // 장소 (있는 경우)
             schedule.location?.let { location ->
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -208,29 +220,15 @@ private fun ScheduleCard(
 }
 
 /**
- * 카테고리 Chip (Reference 디자인)
+ * 시간 포맷 (epoch ms → "HH:mm" 또는 "종일")
  */
-@Composable
-private fun CategoryChip(
-    category: ScheduleCategory,
-    isPast: Boolean = false,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(colors.chipBg)
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    ) {
-        Text(
-            text = category.getDisplayName(),
-            color = colors.chipText,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
+private fun formatTime(epochMs: Long?, isAllDay: Boolean): String {
+    if (isAllDay) return "종일"
+    if (epochMs == null) return ""
+    val time = Instant.ofEpochMilli(epochMs)
+        .atZone(ZoneId.systemDefault())
+        .toLocalTime()
+    return time.format(DateTimeFormatter.ofPattern("HH:mm"))
 }
 
 /**

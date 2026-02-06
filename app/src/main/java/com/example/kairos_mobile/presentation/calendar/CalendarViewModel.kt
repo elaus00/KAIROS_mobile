@@ -2,36 +2,58 @@ package com.example.kairos_mobile.presentation.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.Schedule
-import com.example.kairos_mobile.domain.model.Todo
-import com.example.kairos_mobile.domain.repository.ScheduleRepository
-import com.example.kairos_mobile.domain.repository.TodoRepository
+import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.schedule.GetDatesWithSchedulesUseCase
+import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCase
+import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
+import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
- * CalendarScreen ViewModel (PRD v4.0)
+ * CalendarScreen ViewModel
+ * UseCase 기반으로 일정/할일 조회
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    private val scheduleRepository: ScheduleRepository,
-    private val todoRepository: TodoRepository
+    private val getSchedulesByDate: GetSchedulesByDateUseCase,
+    private val getDatesWithSchedules: GetDatesWithSchedulesUseCase,
+    private val getActiveTodos: GetActiveTodosUseCase,
+    private val toggleTodoCompletion: ToggleTodoCompletionUseCase,
+    private val softDeleteCapture: SoftDeleteCaptureUseCase,
+    private val undoDeleteCapture: UndoDeleteCaptureUseCase,
+    private val captureRepository: CaptureRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState())
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
+    private val _events = MutableSharedFlow<CalendarUiEvent>()
+    val events: SharedFlow<CalendarUiEvent> = _events.asSharedFlow()
+
+    private var schedulesJob: Job? = null
+    private var todosJob: Job? = null
+    private var datesJob: Job? = null
 
     init {
-        loadDataForSelectedDate()
+        loadSchedulesForSelectedDate()
+        loadTodos()
         loadDatesWithSchedules()
     }
 
@@ -44,9 +66,8 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.ChangeMonth -> changeMonth(event.yearMonth)
             is CalendarEvent.ToggleMonthExpand -> toggleMonthExpand()
             is CalendarEvent.ToggleTaskComplete -> toggleTaskComplete(event.taskId)
-            is CalendarEvent.DeleteTask -> deleteTask(event.taskId)
-            is CalendarEvent.ClickSchedule -> { /* 네비게이션은 Screen에서 처리 */ }
-            is CalendarEvent.ClickTask -> { /* 네비게이션은 Screen에서 처리 */ }
+            is CalendarEvent.DeleteTask -> deleteByCaptureId(event.captureId)
+            is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
         }
     }
 
@@ -55,7 +76,7 @@ class CalendarViewModel @Inject constructor(
      */
     private fun selectDate(date: LocalDate) {
         _uiState.update { it.copy(selectedDate = date) }
-        loadDataForSelectedDate()
+        loadSchedulesForSelectedDate()
 
         // 선택된 날짜가 다른 월이면 월도 변경
         val newMonth = YearMonth.from(date)
@@ -81,34 +102,42 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 선택된 날짜의 데이터 로드
+     * 선택된 날짜의 일정 로드
      */
-    private fun loadDataForSelectedDate() {
-        viewModelScope.launch {
+    private fun loadSchedulesForSelectedDate() {
+        schedulesJob?.cancel()
+        schedulesJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             val selectedDate = _uiState.value.selectedDate
+            val zone = ZoneId.systemDefault()
+            val startMs = selectedDate.atStartOfDay(zone).toInstant().toEpochMilli()
+            val endMs = selectedDate.atTime(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()
 
-            // 일정과 할일을 함께 조회
-            combine(
-                scheduleRepository.getSchedulesByDate(selectedDate),
-                todoRepository.getTodosByDate(selectedDate)
-            ) { schedules, tasks ->
-                Pair(schedules, tasks)
-            }
+            getSchedulesByDate(startMs, endMs)
                 .catch { e ->
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = e.message ?: "데이터 로드 실패"
-                        )
+                        it.copy(isLoading = false, errorMessage = e.message)
                     }
                 }
-                .collect { (schedules, tasks) ->
+                .collect { schedules ->
+                    // Schedule → ScheduleDisplayItem (Capture에서 제목 조회)
+                    val displayItems = schedules.map { schedule ->
+                        val capture = captureRepository.getCaptureById(schedule.captureId)
+                        ScheduleDisplayItem(
+                            scheduleId = schedule.id,
+                            captureId = schedule.captureId,
+                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
+                            startTime = schedule.startTime,
+                            endTime = schedule.endTime,
+                            location = schedule.location,
+                            isAllDay = schedule.isAllDay
+                        )
+                    }
+
                     _uiState.update {
                         it.copy(
-                            schedules = schedules.sortedBy { s -> s.time },
-                            tasks = tasks,
+                            schedules = displayItems.sortedBy { item -> item.startTime },
                             isLoading = false,
                             errorMessage = null
                         )
@@ -118,20 +147,54 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
+     * 활성 할 일 로드
+     */
+    private fun loadTodos() {
+        todosJob?.cancel()
+        todosJob = viewModelScope.launch {
+            getActiveTodos()
+                .catch { /* 에러 무시 */ }
+                .collect { todos ->
+                    val displayItems = todos.map { todo ->
+                        val capture = captureRepository.getCaptureById(todo.captureId)
+                        TodoDisplayItem(
+                            todoId = todo.id,
+                            captureId = todo.captureId,
+                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
+                            deadline = todo.deadline,
+                            isCompleted = todo.isCompleted
+                        )
+                    }
+
+                    _uiState.update { it.copy(tasks = displayItems) }
+                }
+        }
+    }
+
+    /**
      * 현재 월의 일정이 있는 날짜 로드 (dot 표시용)
      */
     private fun loadDatesWithSchedules() {
-        viewModelScope.launch {
+        datesJob?.cancel()
+        datesJob = viewModelScope.launch {
             val currentMonth = _uiState.value.currentMonth
-            val startDate = currentMonth.atDay(1)
-            val endDate = currentMonth.atEndOfMonth()
+            val zone = ZoneId.systemDefault()
+            val startMs = currentMonth.atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
+            val endMs = currentMonth.atEndOfMonth().atTime(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()
 
-            scheduleRepository.getDatesWithSchedules(startDate, endDate)
+            getDatesWithSchedules(startMs, endMs)
                 .catch { /* 에러 무시 */ }
-                .collect { dates ->
-                    _uiState.update {
-                        it.copy(datesWithSchedules = dates.toSet())
-                    }
+                .collect { epochDays ->
+                    // epoch day → LocalDate 변환
+                    val dates = epochDays.mapNotNull { epochDay ->
+                        try {
+                            LocalDate.ofEpochDay(epochDay)
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }.toSet()
+
+                    _uiState.update { it.copy(datesWithSchedules = dates) }
                 }
         }
     }
@@ -141,18 +204,34 @@ class CalendarViewModel @Inject constructor(
      */
     private fun toggleTaskComplete(taskId: String) {
         viewModelScope.launch {
-            todoRepository.toggleCompletion(taskId)
+            toggleTodoCompletion(taskId)
             // Flow가 자동으로 UI 업데이트
         }
     }
 
-    /**
-     * 할 일 삭제
-     */
-    private fun deleteTask(taskId: String) {
+    fun undoDelete(captureId: String) {
         viewModelScope.launch {
-            todoRepository.deleteTodo(taskId)
-            // Flow가 자동으로 UI 업데이트
+            try {
+                undoDeleteCapture(captureId)
+                _events.emit(CalendarUiEvent.UndoSuccess)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "실행 취소에 실패했습니다.")
+                }
+            }
+        }
+    }
+
+    private fun deleteByCaptureId(captureId: String) {
+        viewModelScope.launch {
+            try {
+                softDeleteCapture(captureId)
+                _events.emit(CalendarUiEvent.DeleteSuccess(captureId))
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "삭제에 실패했습니다.")
+                }
+            }
         }
     }
 }

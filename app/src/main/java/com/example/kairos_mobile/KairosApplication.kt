@@ -5,8 +5,14 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
-// import com.example.kairos_mobile.data.worker.SyncCaptureWorker
+import com.example.kairos_mobile.data.debug.MockDataInitializer
+import com.example.kairos_mobile.data.worker.ReclassifyTempWorker
+import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -22,15 +28,37 @@ class KairosApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workManager: WorkManager
 
+    @Inject
+    lateinit var mockDataInitializer: MockDataInitializer
+
+    @Inject
+    lateinit var syncQueueRepository: SyncQueueRepository
+
+    // Application 레벨 CoroutineScope
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "Application onCreate")
 
         // WorkManager 초기화는 Configuration.Provider로 처리됨
 
-        // 주기적 동기화 작업 시작 (임시 비활성화)
-        // SyncCaptureWorker.enqueuePeriodicSync(workManager)
-        // Log.d(TAG, "Periodic sync work scheduled")
+        // 앱 시작 시 PROCESSING 상태를 PENDING으로 리셋 (비정상 종료 복구)
+        applicationScope.launch {
+            syncQueueRepository.resetProcessingToPending()
+            Log.d(TAG, "SyncQueue PROCESSING → PENDING 리셋 완료")
+        }
+
+        // Mock 데이터 초기화 (Debug 빌드에서만)
+        if (BuildConfig.DEBUG) {
+            applicationScope.launch {
+                mockDataInitializer.initializeMockData()
+            }
+        }
+
+        // 15분 주기 TEMP 재분류 Worker 등록
+        ReclassifyTempWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "ReclassifyTempWorker 등록 완료")
     }
 
     /**

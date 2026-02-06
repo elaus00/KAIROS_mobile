@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,26 +24,24 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kairos_mobile.domain.model.Todo
-import com.example.kairos_mobile.domain.model.TodoPriority
+import com.example.kairos_mobile.presentation.calendar.TodoDisplayItem
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
-import com.example.kairos_mobile.presentation.components.common.SwipeableCard
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
- * TaskList 컴포넌트 (Reference 디자인)
- * 할 일 목록 (드래그 핸들, 체크박스, 스와이프 삭제)
+ * TaskList 컴포넌트
+ * 할 일 목록 (체크박스 토글)
  */
 @Composable
 fun TaskList(
-    tasks: List<Todo>,
-    onTaskClick: (Todo) -> Unit,
+    tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onTaskDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = KairosTheme.colors
-
     Column(modifier = modifier) {
         SectionHeader(title = "할 일")
 
@@ -56,15 +55,11 @@ fun TaskList(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 tasks.forEach { task ->
-                    SwipeableCard(
-                        onDismiss = { onTaskDelete(task.id) }
-                    ) {
-                        TaskItem(
-                            task = task,
-                            onClick = { onTaskClick(task) },
-                            onToggleComplete = { onTaskComplete(task.id) }
-                        )
-                    }
+                    TaskItem(
+                        task = task,
+                        onToggleComplete = { onTaskComplete(task.todoId) },
+                        onDelete = { onTaskDelete(task.captureId) }
+                    )
                 }
             }
         }
@@ -72,13 +67,13 @@ fun TaskList(
 }
 
 /**
- * 할 일 아이템 (Reference 디자인)
+ * 할 일 아이템
  */
 @Composable
 private fun TaskItem(
-    task: Todo,
-    onClick: () -> Unit,
+    task: TodoDisplayItem,
     onToggleComplete: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -90,7 +85,6 @@ private fun TaskItem(
             .clip(RoundedCornerShape(12.dp))
             .background(colors.card)
             .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-            .clickable { onClick() }
             .alpha(alpha)
             .padding(12.dp, 14.dp)
     ) {
@@ -98,43 +92,29 @@ private fun TaskItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 드래그 핸들
-            DragHandle()
-
-            Spacer(modifier = Modifier.width(12.dp))
-
             // 내용
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // 제목 + 카테고리 chip (있는 경우)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = task.title ?: task.content,
-                        color = colors.text,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
+                // 제목
+                Text(
+                    text = task.title,
+                    color = colors.text,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+                )
 
-                    // 카테고리 표시 (우선순위로 대체)
-                    if (task.priority != TodoPriority.NONE) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        PriorityChip(priority = task.priority)
-                    }
-                }
-
-                // 마감 시간 (있는 경우)
-                task.dueTime?.let { time ->
+                // 마감일 (있는 경우)
+                task.deadline?.let { deadlineMs ->
                     Spacer(modifier = Modifier.height(2.dp))
+                    val deadlineText = formatDeadline(deadlineMs)
+                    val isOverdue = deadlineMs < System.currentTimeMillis() && !task.isCompleted
                     Text(
-                        text = "마감 ${String.format("%02d:%02d", time.hour, time.minute)}",
-                        color = if (task.isOverdue()) colors.danger else colors.danger,
+                        text = deadlineText,
+                        color = if (isOverdue) colors.danger else colors.textSecondary,
                         fontSize = 12.sp
                     )
                 }
@@ -147,37 +127,23 @@ private fun TaskItem(
                 isChecked = task.isCompleted,
                 onToggle = onToggleComplete
             )
-        }
-    }
-}
 
-/**
- * 드래그 핸들 (Reference 디자인)
- */
-@Composable
-private fun DragHandle(
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
+            Spacer(modifier = Modifier.width(8.dp))
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        repeat(2) {
-            Box(
+            Icon(
+                imageVector = Icons.Default.DeleteOutline,
+                contentDescription = "할 일 삭제",
+                tint = colors.textMuted,
                 modifier = Modifier
-                    .width(12.dp)
-                    .height(2.dp)
-                    .clip(RoundedCornerShape(1.dp))
-                    .background(colors.textMuted.copy(alpha = 0.3f))
+                    .size(20.dp)
+                    .clickable { onDelete() }
             )
         }
     }
 }
 
 /**
- * 커스텀 체크박스 (둥근 사각형 - Reference 디자인)
+ * 커스텀 체크박스 (둥근 사각형)
  */
 @Composable
 private fun TaskCheckbox(
@@ -220,35 +186,14 @@ private fun TaskCheckbox(
 }
 
 /**
- * 우선순위 Chip (Reference 디자인)
+ * 마감일 포맷 (epoch ms → "M/d HH:mm 마감")
  */
-@Composable
-private fun PriorityChip(
-    priority: TodoPriority,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-
-    val (text, bgColor, textColor) = when (priority) {
-        TodoPriority.HIGH -> Triple("Work", colors.chipBg, colors.chipText)
-        TodoPriority.MEDIUM -> Triple("Work", colors.chipBg, colors.chipText)
-        TodoPriority.LOW -> Triple("Personal", colors.chipBg, colors.chipText)
-        TodoPriority.NONE -> return
-    }
-
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(bgColor)
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
+private fun formatDeadline(epochMs: Long): String {
+    val dateTime = Instant.ofEpochMilli(epochMs)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime()
+    val formatter = DateTimeFormatter.ofPattern("M/d HH:mm")
+    return "${dateTime.format(formatter)} 마감"
 }
 
 /**

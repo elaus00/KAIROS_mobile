@@ -2,242 +2,210 @@ package com.example.kairos_mobile.presentation.notes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.NoteFolder
-import com.example.kairos_mobile.domain.repository.BookmarkRepository
+import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
+import com.example.kairos_mobile.domain.usecase.folder.DeleteFolderUseCase
+import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
+import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
+import com.example.kairos_mobile.domain.usecase.note.GetNotesByFolderUseCase
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * NotesScreen ViewModel (PRD v4.0)
+ * 노트 탭 ViewModel
+ * 폴더 기반 노트 관리
  */
 @HiltViewModel
 class NotesViewModel @Inject constructor(
+    private val getAllFoldersUseCase: GetAllFoldersUseCase,
+    private val getNotesByFolderUseCase: GetNotesByFolderUseCase,
+    private val createFolderUseCase: CreateFolderUseCase,
+    private val deleteFolderUseCase: DeleteFolderUseCase,
+    private val renameFolderUseCase: RenameFolderUseCase,
     private val noteRepository: NoteRepository,
-    private val bookmarkRepository: BookmarkRepository
+    private val captureRepository: CaptureRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
     val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
 
-    private var searchJob: Job? = null
+    private var foldersJob: Job? = null
+    private var notesJob: Job? = null
 
     init {
-        loadNotes()
-        loadBookmarks()
-        loadNoteCounts()
+        loadFolders()
     }
 
-    /**
-     * 이벤트 처리
-     */
     fun onEvent(event: NotesEvent) {
         when (event) {
-            is NotesEvent.SelectTab -> selectTab(event.tab)
             is NotesEvent.SelectFolder -> selectFolder(event.folder)
-            is NotesEvent.UpdateSearchQuery -> updateSearchQuery(event.query)
-            is NotesEvent.ClearSearch -> clearSearch()
-            is NotesEvent.DeleteNote -> deleteNote(event.noteId)
-            is NotesEvent.DeleteBookmark -> deleteBookmark(event.bookmarkId)
-            is NotesEvent.MoveNoteToFolder -> moveNoteToFolder(event.noteId, event.folder)
+            is NotesEvent.BackToFolders -> backToFolders()
+            is NotesEvent.ShowCreateFolderDialog -> showCreateFolderDialog()
+            is NotesEvent.DismissCreateFolderDialog -> dismissCreateFolderDialog()
+            is NotesEvent.CreateFolder -> createFolder(event.name)
+            is NotesEvent.ShowRenameFolderDialog -> showRenameFolderDialog(event.folder)
+            is NotesEvent.DismissRenameFolderDialog -> dismissRenameFolderDialog()
+            is NotesEvent.RenameFolder -> renameFolder(event.folderId, event.newName)
+            is NotesEvent.DeleteFolder -> deleteFolder(event.folderId)
             is NotesEvent.DismissError -> dismissError()
         }
     }
 
     /**
-     * 탭 선택
+     * 폴더 목록 로드
+     * Inbox는 노트가 있을 때만 표시, Ideas/Bookmarks는 항상 표시
      */
-    private fun selectTab(tab: NotesTab) {
-        _uiState.update { it.copy(selectedTab = tab) }
-    }
-
-    /**
-     * 폴더 선택
-     */
-    private fun selectFolder(folder: NoteFolder?) {
-        _uiState.update { it.copy(selectedFolder = folder) }
-        loadNotes()
-    }
-
-    /**
-     * 검색어 업데이트 (디바운싱 적용)
-     */
-    private fun updateSearchQuery(query: String) {
-        _uiState.update { it.copy(searchQuery = query, isSearching = query.isNotEmpty()) }
-
-        searchJob?.cancel()
-        if (query.isEmpty()) {
-            loadNotes()
-            loadBookmarks()
-            return
-        }
-
-        searchJob = viewModelScope.launch {
-            delay(300) // 300ms 디바운싱
-            searchNotes(query)
-            searchBookmarks(query)
-        }
-    }
-
-    /**
-     * 검색 초기화
-     */
-    private fun clearSearch() {
-        _uiState.update { it.copy(searchQuery = "", isSearching = false) }
-        loadNotes()
-        loadBookmarks()
-    }
-
-    /**
-     * 노트 로드
-     */
-    private fun loadNotes() {
-        viewModelScope.launch {
+    private fun loadFolders() {
+        foldersJob?.cancel()
+        foldersJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val notesFlow = when (val folder = _uiState.value.selectedFolder) {
-                null -> noteRepository.getAllNotes()
-                else -> noteRepository.getNotesByFolder(folder)
-            }
-
-            notesFlow
+            getAllFoldersUseCase()
                 .catch { e ->
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = e.message ?: "노트 로드 실패"
-                        )
+                        it.copy(isLoading = false, errorMessage = e.message)
                     }
+                }
+                .collect { folders ->
+                    // 각 폴더의 노트 수 조회
+                    val foldersWithCount = folders.map { folder ->
+                        FolderWithCount(folder, 0)
+                    }
+                    _uiState.update {
+                        it.copy(folders = foldersWithCount, isLoading = false)
+                    }
+                    // 개별 노트 수 업데이트
+                    folders.forEach { folder -> loadNoteCount(folder) }
+                }
+        }
+    }
+
+    /**
+     * 폴더별 노트 수 로드
+     */
+    private fun loadNoteCount(folder: Folder) {
+        viewModelScope.launch {
+            noteRepository.getNoteCountByFolderId(folder.id)
+                .catch { /* 에러 무시 */ }
+                .collect { count ->
+                    _uiState.update { state ->
+                        val updatedFolders = state.folders.map { fc ->
+                            if (fc.folder.id == folder.id) fc.copy(noteCount = count)
+                            else fc
+                        }.filter { fc ->
+                            // Inbox는 노트가 있을 때만 표시
+                            if (fc.folder.type == FolderType.INBOX) fc.noteCount > 0
+                            else true
+                        }
+                        state.copy(folders = updatedFolders)
+                    }
+                }
+        }
+    }
+
+    /**
+     * 폴더 선택 → 노트 목록 표시
+     */
+    private fun selectFolder(folder: Folder) {
+        _uiState.update { it.copy(selectedFolder = folder) }
+        loadNotesForFolder(folder.id)
+    }
+
+    /**
+     * 폴더 목록으로 돌아가기
+     */
+    private fun backToFolders() {
+        notesJob?.cancel()
+        _uiState.update { it.copy(selectedFolder = null, notes = emptyList()) }
+    }
+
+    /**
+     * 폴더 내 노트 로드
+     */
+    private fun loadNotesForFolder(folderId: String) {
+        notesJob?.cancel()
+        notesJob = viewModelScope.launch {
+            getNotesByFolderUseCase(folderId)
+                .catch { e ->
+                    _uiState.update { it.copy(errorMessage = e.message) }
                 }
                 .collect { notes ->
-                    _uiState.update {
-                        it.copy(
-                            notes = notes,
-                            isLoading = false
-                        )
-                    }
-                }
-        }
-    }
-
-    /**
-     * 북마크 로드
-     */
-    private fun loadBookmarks() {
-        viewModelScope.launch {
-            bookmarkRepository.getAllBookmarks()
-                .catch { /* 에러 무시 */ }
-                .collect { bookmarks ->
-                    _uiState.update { it.copy(bookmarks = bookmarks) }
-                }
-        }
-    }
-
-    /**
-     * 노트 개수 로드
-     */
-    private fun loadNoteCounts() {
-        viewModelScope.launch {
-            // 전체 노트 개수
-            noteRepository.getNoteCount()
-                .catch { /* 에러 무시 */ }
-                .collect { count ->
-                    _uiState.update { it.copy(totalNoteCount = count) }
-                }
-        }
-
-        viewModelScope.launch {
-            // 전체 북마크 개수
-            bookmarkRepository.getBookmarkCount()
-                .catch { /* 에러 무시 */ }
-                .collect { count ->
-                    _uiState.update { it.copy(totalBookmarkCount = count) }
-                }
-        }
-
-        // 폴더별 노트 개수
-        NoteFolder.entries.forEach { folder ->
-            viewModelScope.launch {
-                noteRepository.getNoteCountByFolder(folder)
-                    .catch { /* 에러 무시 */ }
-                    .collect { count ->
-                        _uiState.update { state ->
-                            state.copy(
-                                noteCountByFolder = state.noteCountByFolder + (folder to count)
+                    // 노트 + 캡처 정보 조합
+                    val notesWithCapture = notes.mapNotNull { note ->
+                        val capture = captureRepository.getCaptureById(note.captureId)
+                        capture?.let {
+                            NoteWithCapture(
+                                noteId = note.id,
+                                captureId = note.captureId,
+                                aiTitle = it.aiTitle,
+                                originalText = it.originalText,
+                                createdAt = it.createdAt
                             )
                         }
                     }
+                    _uiState.update { it.copy(notes = notesWithCapture) }
+                }
+        }
+    }
+
+    private fun showCreateFolderDialog() {
+        _uiState.update { it.copy(showCreateFolderDialog = true) }
+    }
+
+    private fun dismissCreateFolderDialog() {
+        _uiState.update { it.copy(showCreateFolderDialog = false) }
+    }
+
+    private fun createFolder(name: String) {
+        viewModelScope.launch {
+            try {
+                createFolderUseCase(name)
+                _uiState.update { it.copy(showCreateFolderDialog = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
             }
         }
     }
 
-    /**
-     * 노트 검색
-     */
-    private fun searchNotes(query: String) {
+    private fun showRenameFolderDialog(folder: Folder) {
+        _uiState.update { it.copy(renamingFolder = folder) }
+    }
+
+    private fun dismissRenameFolderDialog() {
+        _uiState.update { it.copy(renamingFolder = null) }
+    }
+
+    private fun renameFolder(folderId: String, newName: String) {
         viewModelScope.launch {
-            noteRepository.searchNotes(query)
-                .catch { /* 에러 무시 */ }
-                .collect { notes ->
-                    _uiState.update {
-                        it.copy(notes = notes, isSearching = false)
-                    }
-                }
+            try {
+                renameFolderUseCase(folderId, newName)
+                _uiState.update { it.copy(renamingFolder = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
         }
     }
 
-    /**
-     * 북마크 검색
-     */
-    private fun searchBookmarks(query: String) {
+    private fun deleteFolder(folderId: String) {
         viewModelScope.launch {
-            bookmarkRepository.searchBookmarks(query)
-                .catch { /* 에러 무시 */ }
-                .collect { bookmarks ->
-                    _uiState.update { it.copy(bookmarks = bookmarks) }
-                }
+            try {
+                deleteFolderUseCase(folderId)
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
         }
     }
 
-    /**
-     * 노트 삭제
-     */
-    private fun deleteNote(noteId: String) {
-        viewModelScope.launch {
-            noteRepository.deleteNote(noteId)
-        }
-    }
-
-    /**
-     * 북마크 삭제
-     */
-    private fun deleteBookmark(bookmarkId: String) {
-        viewModelScope.launch {
-            bookmarkRepository.deleteBookmark(bookmarkId)
-        }
-    }
-
-    /**
-     * 노트 폴더 이동
-     */
-    private fun moveNoteToFolder(noteId: String, folder: NoteFolder) {
-        viewModelScope.launch {
-            noteRepository.moveToFolder(noteId, folder)
-        }
-    }
-
-    /**
-     * 에러 메시지 닫기
-     */
     private fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
     }
