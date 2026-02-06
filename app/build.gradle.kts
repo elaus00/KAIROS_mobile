@@ -1,9 +1,13 @@
+import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("jacoco")
 }
 
 android {
@@ -55,6 +59,102 @@ android {
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val coverageGateEnabled = providers.environmentVariable("CI")
+    .map { true }
+    .orElse(
+        providers.gradleProperty("coverageGate").map { it.toBoolean() }
+    )
+    .getOrElse(false)
+
+val coverageLineMinimum = providers.gradleProperty("coverageLineMinimum")
+    .orElse("0.70")
+    .map { it.toBigDecimal() }
+    .get()
+
+val jacocoExclusions = listOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*",
+    "**/*\$Lambda$*.*",
+    "**/*\$inlined$*.*",
+    "**/*\$Companion*.*",
+    "**/di/**",
+    "**/data/worker/**"
+)
+
+val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+    include("com/example/kairos_mobile/domain/usecase/**")
+    exclude(jacocoExclusions)
+}
+
+val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
+    include("com/example/kairos_mobile/domain/usecase/**")
+    exclude(jacocoExclusions)
+}
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    classDirectories.setFrom(files(debugKotlinClasses, debugJavaClasses))
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get().asFile) {
+            include("jacoco/testDebugUnitTest.exec")
+            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        }
+    )
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("testDebugUnitTest")
+
+    classDirectories.setFrom(files(debugKotlinClasses, debugJavaClasses))
+    sourceDirectories.setFrom(files("src/main/java"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get().asFile) {
+            include("jacoco/testDebugUnitTest.exec")
+            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        }
+    )
+
+    violationRules {
+        rule {
+            element = "BUNDLE"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = coverageLineMinimum
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn("testDebugUnitTest")
+    dependsOn("jacocoTestReport")
+    if (coverageGateEnabled) {
+        dependsOn("jacocoTestCoverageVerification")
+    }
 }
 
 dependencies {

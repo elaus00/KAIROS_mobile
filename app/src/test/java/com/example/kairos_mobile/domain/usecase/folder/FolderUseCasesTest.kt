@@ -1,0 +1,119 @@
+package com.example.kairos_mobile.domain.usecase.folder
+
+import app.cash.turbine.test
+import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.repository.FolderRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class FolderUseCasesTest {
+
+    @Test
+    fun createFolder_rejects_blank_name() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = CreateFolderUseCase(repository)
+
+        val error = runCatching { useCase(" ") }.exceptionOrNull()
+
+        assertTrue(error is IllegalArgumentException)
+        assertEquals("폴더 이름이 비어있습니다", error?.message)
+        coVerify(exactly = 0) { repository.createFolder(any()) }
+    }
+
+    @Test
+    fun createFolder_rejects_duplicate_name() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = CreateFolderUseCase(repository)
+
+        coEvery { repository.existsByName("Ideas") } returns true
+
+        val error = runCatching { useCase("Ideas") }.exceptionOrNull()
+
+        assertTrue(error is IllegalArgumentException)
+        assertEquals("이미 존재하는 폴더 이름입니다", error?.message)
+        coVerify(exactly = 0) { repository.createFolder(any()) }
+    }
+
+    @Test
+    fun createFolder_creates_user_folder_when_valid() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = CreateFolderUseCase(repository)
+
+        coEvery { repository.existsByName("Ideas") } returns false
+        coEvery { repository.createFolder(any()) } just runs
+
+        useCase("Ideas")
+
+        coVerify(exactly = 1) {
+            repository.createFolder(match {
+                it.name == "Ideas" && it.type == FolderType.USER
+            })
+        }
+    }
+
+    @Test
+    fun renameFolder_validates_and_delegates() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = RenameFolderUseCase(repository)
+
+        coEvery { repository.existsByName("Archive") } returns false
+        coEvery { repository.renameFolder("f1", "Archive") } just runs
+
+        useCase("f1", "Archive")
+
+        coVerify(exactly = 1) { repository.renameFolder("f1", "Archive") }
+    }
+
+    @Test
+    fun renameFolder_rejects_blank_and_duplicate_name() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = RenameFolderUseCase(repository)
+
+        val blankError = runCatching { useCase("f1", " ") }.exceptionOrNull()
+        assertTrue(blankError is IllegalArgumentException)
+        assertEquals("폴더 이름이 비어있습니다", blankError?.message)
+
+        coEvery { repository.existsByName("Inbox") } returns true
+        val duplicateError = runCatching { useCase("f1", "Inbox") }.exceptionOrNull()
+        assertTrue(duplicateError is IllegalArgumentException)
+        assertEquals("이미 존재하는 폴더 이름입니다", duplicateError?.message)
+
+        coVerify(exactly = 0) { repository.renameFolder(any(), any()) }
+    }
+
+    @Test
+    fun getAllFolders_returns_repository_flow() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = GetAllFoldersUseCase(repository)
+        val folders = listOf(Folder(name = "Inbox", type = FolderType.INBOX))
+
+        every { repository.getAllFolders() } returns flowOf(folders)
+
+        useCase().test {
+            assertEquals(folders, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun deleteFolder_delegates_to_repository() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = DeleteFolderUseCase(repository)
+
+        coEvery { repository.deleteFolder("f1") } just runs
+
+        useCase("f1")
+
+        coVerify(exactly = 1) { repository.deleteFolder("f1") }
+    }
+}
