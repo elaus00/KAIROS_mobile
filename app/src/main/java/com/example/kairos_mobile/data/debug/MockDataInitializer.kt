@@ -2,10 +2,12 @@ package com.example.kairos_mobile.data.debug
 
 import android.util.Log
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.TodoDao
 import com.example.kairos_mobile.data.local.database.entities.CaptureEntity
+import com.example.kairos_mobile.data.local.database.entities.CaptureSearchFts
 import com.example.kairos_mobile.data.local.database.entities.NoteEntity
 import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
 import com.example.kairos_mobile.data.local.database.entities.TodoEntity
@@ -23,12 +25,17 @@ import javax.inject.Singleton
 @Singleton
 class MockDataInitializer @Inject constructor(
     private val captureDao: CaptureDao,
+    private val captureSearchDao: CaptureSearchDao,
     private val scheduleDao: ScheduleDao,
     private val todoDao: TodoDao,
     private val noteDao: NoteDao
 ) {
     companion object {
         private const val TAG = "MockDataInitializer"
+        private const val BENCHMARK_NOTE_COUNT = 120
+        private const val SYSTEM_IDEAS_FOLDER_ID = "system-ideas"
+        private const val BENCHMARK_CAPTURE_PREFIX = "benchmark-capture"
+        private const val BENCHMARK_NOTE_PREFIX = "benchmark-note"
     }
 
     /**
@@ -47,6 +54,59 @@ class MockDataInitializer @Inject constructor(
         seedMockCapturesAndDerivedEntities()
 
         Log.d(TAG, "Mock 데이터 초기화 완료")
+    }
+
+    /**
+     * Benchmark 전용 데이터 초기화
+     * Notes/Search 스크롤 벤치에서 충분한 리스트 길이를 보장한다.
+     */
+    suspend fun initializeBenchmarkData() {
+        val currentIdeasNoteCount = noteDao.getNoteCountByFolder(SYSTEM_IDEAS_FOLDER_ID).first()
+        if (currentIdeasNoteCount >= BENCHMARK_NOTE_COUNT) {
+            Log.d(TAG, "Benchmark 데이터가 이미 충분합니다. (ideasNotes=$currentIdeasNoteCount)")
+            return
+        }
+
+        if (captureDao.getActiveCount().first() == 0) {
+            seedMockCapturesAndDerivedEntities()
+        }
+
+        val targetInsertCount = BENCHMARK_NOTE_COUNT - currentIdeasNoteCount
+        val now = System.currentTimeMillis()
+
+        repeat(targetInsertCount) { index ->
+            val sequence = currentIdeasNoteCount + index + 1
+            val captureId = "$BENCHMARK_CAPTURE_PREFIX-$sequence"
+            val noteId = "$BENCHMARK_NOTE_PREFIX-$sequence"
+            val timestamp = now - (sequence * 1_000L)
+
+            val capture = CaptureEntity(
+                id = captureId,
+                originalText = "벤치 검색 성능 측정용 샘플 노트 $sequence. 스크롤과 검색 지표 수집을 위한 데이터입니다.",
+                aiTitle = "벤치 노트 $sequence",
+                classifiedType = "NOTES",
+                noteSubType = "IDEA",
+                confidence = "HIGH",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = timestamp,
+                updatedAt = timestamp,
+                classificationCompletedAt = timestamp
+            )
+
+            insertCaptureWithSearchIndex(capture)
+            noteDao.insert(
+                NoteEntity(
+                    id = noteId,
+                    captureId = captureId,
+                    folderId = SYSTEM_IDEAS_FOLDER_ID,
+                    createdAt = timestamp,
+                    updatedAt = timestamp
+                )
+            )
+        }
+
+        Log.d(TAG, "Benchmark 데이터 삽입 완료: ideasNotes +$targetInsertCount")
     }
 
     private suspend fun seedMockCapturesAndDerivedEntities() {
@@ -98,7 +158,7 @@ class MockDataInitializer @Inject constructor(
             )
         )
 
-        captures.forEach { captureDao.insert(it) }
+        captures.forEach { insertCaptureWithSearchIndex(it) }
 
         val scheduleStart = today.plusDays(1)
             .atTime(10, 0)
@@ -155,5 +215,18 @@ class MockDataInitializer @Inject constructor(
         )
 
         Log.d(TAG, "Mock 데이터 삽입 완료: captures=3, schedules=1, todos=1, notes=1")
+    }
+
+    private suspend fun insertCaptureWithSearchIndex(capture: CaptureEntity) {
+        captureDao.insert(capture)
+        captureSearchDao.insert(
+            CaptureSearchFts(
+                captureId = capture.id,
+                titleText = capture.aiTitle ?: "",
+                originalText = capture.originalText,
+                tagText = "",
+                entityText = ""
+            )
+        )
     }
 }

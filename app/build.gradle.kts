@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.baselineprofile)
     id("jacoco")
 }
 
@@ -27,6 +28,13 @@ android {
     buildTypes {
         debug {
             // 에뮬레이터에서 localhost 접근을 위해 10.0.2.2 사용
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
         }
         release {
@@ -157,6 +165,10 @@ tasks.named("check") {
     }
 }
 
+baselineProfile {
+    dexLayoutOptimization = true
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -218,6 +230,7 @@ dependencies {
 
     // Browser (Chrome Custom Tabs for OAuth)
     implementation(libs.browser)
+    implementation(libs.androidx.profileinstaller)
 
     // Testing - Unit Tests
     testImplementation(libs.junit)
@@ -241,4 +254,6 @@ dependencies {
     // Debug implementations
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    baselineProfile(project(":baselineprofile"))
 }

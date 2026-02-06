@@ -49,10 +49,13 @@ class KairosApplication : Application(), Configuration.Provider {
             Log.d(TAG, "SyncQueue PROCESSING → PENDING 리셋 완료")
         }
 
-        // Mock 데이터 초기화 (Debug 빌드에서만)
-        if (BuildConfig.DEBUG) {
+        // Mock/Benchmark 데이터 초기화
+        if (BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "benchmark") {
             applicationScope.launch {
                 mockDataInitializer.initializeMockData()
+                if (BuildConfig.BUILD_TYPE == "benchmark") {
+                    mockDataInitializer.initializeBenchmarkData()
+                }
             }
         }
 

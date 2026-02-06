@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "KAIROS_mobile"
 include(":app")
+include(":benchmark")
+include(":baselineprofile")

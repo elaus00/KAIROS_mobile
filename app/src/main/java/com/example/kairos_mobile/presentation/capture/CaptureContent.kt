@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -287,7 +288,9 @@ private fun CaptureInputBar(
         BasicTextField(
             value = inputText,
             onValueChange = onInputChange,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .testTag("capture_input"),
             textStyle = TextStyle(
                 color = colors.text,
                 fontSize = 16.sp,
@@ -318,6 +321,7 @@ private fun CaptureInputBar(
         // 전송 버튼
         Box(
             modifier = Modifier
+                .testTag("capture_submit")
                 .size(44.dp)
                 .clip(CircleShape)
                 .background(

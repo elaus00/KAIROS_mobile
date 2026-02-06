@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -120,6 +121,7 @@ fun SearchScreen(
                                 cursorBrush = SolidColor(colors.accent),
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .testTag("search_input")
                                     .focusRequester(focusRequester)
                             )
                         }
@@ -197,7 +199,9 @@ fun SearchScreen(
                 else -> {
                     // 검색 결과 리스트
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("search_results_list"),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {

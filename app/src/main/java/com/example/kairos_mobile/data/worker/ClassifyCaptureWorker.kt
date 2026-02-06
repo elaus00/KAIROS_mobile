@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.data.worker
 
 import android.content.Context
+import android.os.Trace
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.BackoffPolicy
@@ -36,6 +37,36 @@ class ClassifyCaptureWorker @AssistedInject constructor(
     private val classificationMapper: ClassificationMapper,
     private val processClassificationResult: ProcessClassificationResultUseCase
 ) : CoroutineWorker(context, params) {
+    companion object {
+        private const val TAG = "ClassifyCaptureWorker"
+        private const val WORK_NAME = "classify_capture"
+        private const val INITIAL_BACKOFF_MS = 5_000L
+        private const val BACKOFF_MULTIPLIER = 3
+        private const val TRACE_AI_CLASSIFICATION_COMPLETION = "ai_classification_completion"
+
+        /**
+         * 분류 작업 즉시 실행 (SyncQueue 항목 추가 시 호출)
+         */
+        fun enqueue(workManager: WorkManager) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val request = OneTimeWorkRequestBuilder<ClassifyCaptureWorker>()
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    5, TimeUnit.SECONDS
+                )
+                .build()
+
+            workManager.enqueueUniqueWork(
+                WORK_NAME,
+                ExistingWorkPolicy.KEEP,
+                request
+            )
+        }
+    }
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "ClassifyCaptureWorker 시작")
@@ -65,23 +96,28 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                     continue
                 }
 
-                // API 호출
-                val request = ClassifyRequest(text = capture.originalText)
-                val response = api.classify(request)
+                Trace.beginSection(TRACE_AI_CLASSIFICATION_COMPLETION)
+                try {
+                    // API 호출
+                    val request = ClassifyRequest(text = capture.originalText)
+                    val response = api.classify(request)
 
-                if (response.isSuccessful && response.body() != null) {
-                    // 분류 결과 적용
-                    val classification = classificationMapper.toDomain(response.body()!!)
-                    processClassificationResult(captureId, classification)
+                    if (response.isSuccessful && response.body() != null) {
+                        // 분류 결과 적용
+                        val classification = classificationMapper.toDomain(response.body()!!)
+                        processClassificationResult(captureId, classification)
 
-                    // 완료 처리
-                    syncQueueRepository.updateStatus(item.id, SyncQueueStatus.COMPLETED)
-                    successCount++
-                    Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
-                } else {
-                    handleRetry(item.id, item.retryCount, item.maxRetries)
-                    failCount++
-                    Log.w(TAG, "API 응답 실패: ${response.code()}")
+                        // 완료 처리
+                        syncQueueRepository.updateStatus(item.id, SyncQueueStatus.COMPLETED)
+                        successCount++
+                        Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
+                    } else {
+                        handleRetry(item.id, item.retryCount, item.maxRetries)
+                        failCount++
+                        Log.w(TAG, "API 응답 실패: ${response.code()}")
+                    }
+                } finally {
+                    Trace.endSection()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "분류 처리 실패: ${item.payload}", e)
@@ -113,33 +149,4 @@ class ClassifyCaptureWorker @AssistedInject constructor(
         }
     }
 
-    companion object {
-        private const val TAG = "ClassifyCaptureWorker"
-        private const val WORK_NAME = "classify_capture"
-        private const val INITIAL_BACKOFF_MS = 5_000L
-        private const val BACKOFF_MULTIPLIER = 3
-
-        /**
-         * 분류 작업 즉시 실행 (SyncQueue 항목 추가 시 호출)
-         */
-        fun enqueue(workManager: WorkManager) {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val request = OneTimeWorkRequestBuilder<ClassifyCaptureWorker>()
-                .setConstraints(constraints)
-                .setBackoffCriteria(
-                    BackoffPolicy.EXPONENTIAL,
-                    5, TimeUnit.SECONDS
-                )
-                .build()
-
-            workManager.enqueueUniqueWork(
-                WORK_NAME,
-                ExistingWorkPolicy.KEEP,
-                request
-            )
-        }
-    }
 }

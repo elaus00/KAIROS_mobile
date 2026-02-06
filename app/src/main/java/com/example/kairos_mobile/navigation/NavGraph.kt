@@ -3,6 +3,10 @@ package com.example.kairos_mobile.navigation
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -53,6 +57,7 @@ object NavRoutes {
  * SETTINGS는 독립 화면
  */
 @Composable
+@OptIn(ExperimentalComposeUiApi::class)
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = NavRoutes.HOME
@@ -69,6 +74,7 @@ fun KairosNavGraph(
 
     NavHost(
         navController = navController,
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         startDestination = startDestination,
         // 페이지 전환 애니메이션 제거
         enterTransition = { EnterTransition.None },

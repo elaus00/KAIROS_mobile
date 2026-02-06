@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.domain.usecase.capture
 
+import android.os.Trace
 import androidx.work.WorkManager
 import com.example.kairos_mobile.data.worker.ClassifyCaptureWorker
 import com.example.kairos_mobile.domain.model.Capture
@@ -25,30 +26,39 @@ class SubmitCaptureUseCase @Inject constructor(
     private val syncQueueRepository: SyncQueueRepository,
     private val workManager: WorkManager
 ) {
+    companion object {
+        private const val TRACE_CAPTURE_SAVE_COMPLETION = "capture_save_completion"
+    }
+
     suspend operator fun invoke(
         text: String,
         source: CaptureSource = CaptureSource.APP
     ): Capture {
         require(text.isNotBlank()) { "캡처 내용이 비어있습니다" }
 
-        // 1. TEMP 상태로 즉시 저장
-        val capture = Capture(
-            originalText = text,
-            classifiedType = ClassifiedType.TEMP,
-            source = source
-        )
-        captureRepository.saveCapture(capture)
+        Trace.beginSection(TRACE_CAPTURE_SAVE_COMPLETION)
+        try {
+            // 1. TEMP 상태로 즉시 저장
+            val capture = Capture(
+                originalText = text,
+                classifiedType = ClassifiedType.TEMP,
+                source = source
+            )
+            captureRepository.saveCapture(capture)
 
-        // 2. SyncQueue에 분류 작업 등록
-        val syncItem = SyncQueueItem(
-            id = UUID.randomUUID().toString(),
-            action = SyncAction.CLASSIFY,
-            payload = capture.id
-        )
-        syncQueueRepository.enqueue(syncItem)
-        // 큐 적재 직후 즉시 분류 워커를 실행한다.
-        runCatching { ClassifyCaptureWorker.enqueue(workManager) }
+            // 2. SyncQueue에 분류 작업 등록
+            val syncItem = SyncQueueItem(
+                id = UUID.randomUUID().toString(),
+                action = SyncAction.CLASSIFY,
+                payload = capture.id
+            )
+            syncQueueRepository.enqueue(syncItem)
+            // 큐 적재 직후 즉시 분류 워커를 실행한다.
+            runCatching { ClassifyCaptureWorker.enqueue(workManager) }
 
-        return capture
+            return capture
+        } finally {
+            Trace.endSection()
+        }
     }
 }

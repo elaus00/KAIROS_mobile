@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.capture
 
+import android.os.Trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.repository.CaptureRepository
@@ -30,6 +31,10 @@ class CaptureViewModel @Inject constructor(
     private val deleteDraftUseCase: DeleteDraftUseCase,
     private val captureRepository: CaptureRepository
 ) : ViewModel() {
+    companion object {
+        private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
+    }
+
 
     private val _uiState = MutableStateFlow(CaptureUiState())
     val uiState: StateFlow<CaptureUiState> = _uiState.asStateFlow()
@@ -75,11 +80,21 @@ class CaptureViewModel @Inject constructor(
      */
     fun updateInput(text: String) {
         if (text.length > _uiState.value.maxCharacterCount) return
-        _uiState.update {
-            it.copy(
-                inputText = text,
-                characterCount = text.length
-            )
+        val shouldTraceFirstInput = _uiState.value.inputText.isBlank() && text.isNotBlank()
+        if (shouldTraceFirstInput) {
+            Trace.beginSection(TRACE_FIRST_INPUT_LATENCY)
+        }
+        try {
+            _uiState.update {
+                it.copy(
+                    inputText = text,
+                    characterCount = text.length
+                )
+            }
+        } finally {
+            if (shouldTraceFirstInput) {
+                Trace.endSection()
+            }
         }
     }
 

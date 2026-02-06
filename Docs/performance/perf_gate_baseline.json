@@ -1,0 +1,24 @@
+{
+  "metrics": {
+    "cold_start_ms": {
+      "baseline": 800,
+      "max_regression_pct": 10
+    },
+    "first_input_latency_ms": {
+      "baseline": 45,
+      "max_regression_pct": 10
+    },
+    "capture_save_completion_ms": {
+      "baseline": 120,
+      "max_regression_pct": 10
+    },
+    "search_scroll_jank_percent": {
+      "baseline": 4.0,
+      "max_absolute": 8.0
+    },
+    "ai_classification_completion_ms": {
+      "baseline": 900,
+      "max_regression_pct": 15
+    }
+  }
+}

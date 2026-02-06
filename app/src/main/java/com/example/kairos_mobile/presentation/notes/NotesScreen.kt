@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -184,7 +185,9 @@ private fun ColumnScope.FolderListView(
     } else {
         // 폴더 리스트
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .testTag("notes_folder_list"),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -194,6 +197,7 @@ private fun ColumnScope.FolderListView(
             ) { folderWithCount ->
                 FolderItem(
                     folderWithCount = folderWithCount,
+                    modifier = Modifier.testTag("notes_folder_${folderWithCount.folder.id}"),
                     onClick = { onEvent(NotesEvent.SelectFolder(folderWithCount.folder)) },
                     onRename = {
                         onEvent(NotesEvent.ShowRenameFolderDialog(folderWithCount.folder))
