@@ -18,12 +18,13 @@ Docs/
 ├── specs/                   # 명세서 (기능/화면/데이터모델/API)
 ├── plan/                    # Phase별 개발 계획 문서
 │   ├── phase1/
+│   ├── phase2/
 │   ├── phase2a/
 │   ├── phase2b/
 │   └── phase3/
 ├── insights/                # 개발 인사이트 기록
 ├── discussion/              # 논의 기록
-└── analysis/                # 분석 기록
+└── performance/             # 성능 기준/리포트 템플릿
 ```
 
 ## 문서 목록
@@ -41,16 +42,30 @@ Docs/
 | `functional_spec.md` | 기능명세서 — 동작 규칙, 상태 전이, 엣지 케이스 | v2.1 | PRD v10.0, 데이터모델 v2.0 | 2026-02-06 |
 | `data_model_spec.md` | 데이터모델 명세서 — 스키마, 관계, 상태 머신 | v2.0 | PRD v10.0, 기능명세서 v2.0 | 2026-02-06 |
 | — | 화면정의서 (`screen_spec.md`) | 작성 예정 | — | — |
-| — | API 명세서 (`api_spec.md`) | 작성 예정 | — | — |
+| `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.0 | PRD v10.0, 기능명세서 v2.1, 데이터모델 v2.0 | 2026-02-07 |
 
 ### plan/
 
 | 디렉토리 | 설명 | 상태 |
 |----------|------|------|
-| `phase1/` | Phase 1 (MVP) 개발 계획 | **구현 완료, 통합 테스트 미완** |
+| `phase1/` | Phase 1 (MVP) 계획 문서 보관 디렉토리 | **정리 완료 (문서 비움)** |
+| `phase2/` | Phase 2 공통 참고/템플릿 문서 | 진행 중 |
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | 대기 |
 | `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | 대기 |
 | `phase3/` | Phase 3 (고도화) 개발 계획 | 대기 |
+
+#### Phase 1 상세 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase1/.gitkeep` | 빈 디렉토리 유지용 파일 | 유지 |
+
+#### Phase 2 공통 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase2/test_plan_viewmodel_worker_template.md` | ViewModel/Worker 테스트 계획 템플릿 | 재사용 예정 |
+| `phase2/review_checklist_template.md` | 코드 리뷰 체크리스트 템플릿 | 재사용 예정 |
 
 ### discussion/
 
@@ -63,14 +78,17 @@ Docs/
 
 | 파일 | 설명 | 날짜 |
 |------|------|------|
+| `architecture_conventions.md` | 아키텍처 컨벤션 정리 | 2026-02-07 |
 | `2026-02-07_bugfix-retrospective.md` | 버그 수정 회고 | 2026-02-07 |
 | `2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 (Phase 1 MVP) | 2026-02-07 |
 
-### analysis/
+### performance/
 
 | 파일 | 설명 | 날짜 |
 |------|------|------|
-| `2026-02-06_context-management-methodology.md` | 컨텍스트 관리 방법론 분석 | 2026-02-06 |
+| `README.md` | 성능 문서 사용 가이드 | 2026-02-07 |
+| `perf_gate_baseline.json` | 성능 게이트 기준값 | 2026-02-07 |
+| `pr_report_template.md` | PR 성능 리포트 템플릿 | 2026-02-07 |
 
 ---
 
@@ -88,4 +106,10 @@ Docs/
 | 2026-02-07 | `insights/2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 작성 |
 | 2026-02-07 | `plan/phase1/progress_report.md` | Phase 1 진행 보고서 작성 |
 | 2026-02-07 | `plan/phase1/implementation_plan.md` | 서브페이즈별 진행 상태 테이블 추가 |
+| 2026-02-07 | `plan/phase1/test_plan_viewmodel_worker.md` | ViewModel + Worker 테스트 계획서 작성 (79개 케이스) |
 | 2026-02-06 | `plan/phase1/implementation_plan.md` | Phase 1 구현 계획서 작성 — 13개 서브페이즈 |
+| 2026-02-07 | `plan/phase1/*` | Phase 1 문서 정리: 계획/리포트/리뷰 문서 삭제, 템플릿 2건을 `plan/phase2/`로 이동 |
+| 2026-02-07 | `ROADMAP.md` | Phase 1 검증 상태 업데이트: 유닛 테스트 96/96 통과 반영 |
+| 2026-02-07 | `INDEX.md` | 실파일 기준으로 문서 인덱스 정합성 보정 (specs/api, insights, performance 반영) |
+| 2026-02-07 | `ROADMAP.md` | 참조 문서 경로(`functional_spec`, `data_model_spec`, `api_spec`) 및 Phase 1 홈 화면 범위 설명을 PRD v10 기준으로 보정 |
+| 2026-02-07 | `ROADMAP.md` | PRD/기능명세서 재점검 결과 반영: Phase 1은 자동화 완료이나 명세 정합성 보강 필요 상태 명시 |
