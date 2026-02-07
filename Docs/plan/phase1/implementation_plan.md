@@ -1,5 +1,24 @@
 # Phase 1 (MVP) 구현 계획
 
+## 진행 상태 요약 (2026-02-07 기준)
+
+| 서브페이즈 | 상태 | 담당 | 비고 |
+|-----------|------|------|------|
+| 1-0 레거시 정리 | **완료** | qa | 24개 파일 삭제 |
+| 1-1 Entity/DAO/DB | **완료** | data-model | 11 Entity, 11 DAO, DB v9 |
+| 1-2 Domain Model | **완료** | feature | 모델, Enum, Repository Interface |
+| 1-3 Mapper/Repo/DTO/DI | **완료** | data-model | QA 리뷰 → HIGH 1건 수정 완료 |
+| 1-4 UseCase | **완료** | feature | 26개 UseCase |
+| 1-5 WorkManager | **완료** | data-model | ClassifyCapture + ReclassifyTemp |
+| 1-6 Home Tab | **완료** | ui-ux | CaptureContent + AI Status Sheet |
+| 1-7 Full History | **완료** | ui-ux | 무한 스크롤 + 스와이프 삭제 |
+| 1-8 Calendar Tab | **완료** | data-model | 주간 스트립 + 타임라인 + 투두 |
+| 1-9 Notes + Search | **완료** | feature | 폴더 구조 + FTS 검색 |
+| 1-10 Settings + Detail | **완료** | data-model | 설정 단순화 + 캡처 상세 화면 |
+| 1-11 Share Intent | **완료** | qa | ACTION_SEND text/plain |
+| 1-12 Onboarding | **완료** | qa | HorizontalPager 3화면 |
+| 1-13 통합 테스트 | **미완료** | — | MockDataInitializer 수정 완료, 컴파일 통과 미확인 |
+
 ## 진행 방식
 
 **서브페이즈별 순차 진행** — 각 서브페이즈 완료 후 컴파일 검증, 필요 시 피드백/수정 후 다음 단계로 진행.

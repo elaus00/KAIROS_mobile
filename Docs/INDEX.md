@@ -21,6 +21,7 @@ Docs/
 │   ├── phase2a/
 │   ├── phase2b/
 │   └── phase3/
+├── insights/                # 개발 인사이트 기록
 ├── discussion/              # 논의 기록
 └── analysis/                # 분석 기록
 ```
@@ -46,7 +47,7 @@ Docs/
 
 | 디렉토리 | 설명 | 상태 |
 |----------|------|------|
-| `phase1/` | Phase 1 (MVP) 개발 계획 | **진행 중** |
+| `phase1/` | Phase 1 (MVP) 개발 계획 | **구현 완료, 통합 테스트 미완** |
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | 대기 |
 | `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | 대기 |
 | `phase3/` | Phase 3 (고도화) 개발 계획 | 대기 |
@@ -57,6 +58,13 @@ Docs/
 |------|------|------|
 | `2026-02-05_app_philosophy.md` | 앱 철학 (Guilt-Free Capture) 논의 | 2026-02-05 |
 | `2026-02-05_privacy_and_sync.md` | 프라이버시 및 동기화 논의 | 2026-02-05 |
+
+### insights/
+
+| 파일 | 설명 | 날짜 |
+|------|------|------|
+| `2026-02-07_bugfix-retrospective.md` | 버그 수정 회고 | 2026-02-07 |
+| `2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 (Phase 1 MVP) | 2026-02-07 |
 
 ### analysis/
 
@@ -77,4 +85,7 @@ Docs/
 | 2026-02-06 19:50 | `data_model_spec.md` | 사용자 업로드 (v2.0) |
 | 2026-02-06 19:45 | `ROADMAP.md` | 초기 생성 — Phase 1~3 로드맵 정의 |
 | 2026-02-06 19:45 | `INDEX.md` | 초기 생성 — 문서 인덱스 구조 수립 |
+| 2026-02-07 | `insights/2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 작성 |
+| 2026-02-07 | `plan/phase1/progress_report.md` | Phase 1 진행 보고서 작성 |
+| 2026-02-07 | `plan/phase1/implementation_plan.md` | 서브페이즈별 진행 상태 테이블 추가 |
 | 2026-02-06 | `plan/phase1/implementation_plan.md` | Phase 1 구현 계획서 작성 — 13개 서브페이즈 |
