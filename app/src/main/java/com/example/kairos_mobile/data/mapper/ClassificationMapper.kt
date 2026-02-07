@@ -15,6 +15,8 @@ import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.ScheduleInfo
 import com.example.kairos_mobile.domain.model.SplitItem
 import com.example.kairos_mobile.domain.model.TodoInfo
+import java.time.Instant
+import java.time.OffsetDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -68,8 +70,8 @@ class ClassificationMapper @Inject constructor() {
 
     private fun toDomain(dto: ScheduleInfoDto): ScheduleInfo {
         return ScheduleInfo(
-            startTime = dto.startTime,
-            endTime = dto.endTime,
+            startTime = parseIsoDateTimeToEpochMs(dto.startTime),
+            endTime = parseIsoDateTimeToEpochMs(dto.endTime),
             location = dto.location,
             isAllDay = dto.isAllDay
         )
@@ -77,16 +79,27 @@ class ClassificationMapper @Inject constructor() {
 
     private fun toDomain(dto: TodoInfoDto): TodoInfo {
         return TodoInfo(
-            deadline = dto.deadline,
+            deadline = parseIsoDateTimeToEpochMs(dto.deadline),
             deadlineSource = dto.deadlineSource?.let { parseDeadlineSource(it) }
         )
     }
 
+    private fun parseIsoDateTimeToEpochMs(value: String?): Long? {
+        if (value.isNullOrBlank()) {
+            return null
+        }
+        return runCatching { OffsetDateTime.parse(value).toInstant().toEpochMilli() }
+            .recoverCatching { Instant.parse(value).toEpochMilli() }
+            .getOrNull()
+    }
+
     private fun parseDeadlineSource(value: String): DeadlineSource {
-        return try {
-            DeadlineSource.valueOf(value.uppercase())
-        } catch (e: Exception) {
-            DeadlineSource.AI
+        return when (value.trim().uppercase()) {
+            "AI_EXTRACTED" -> DeadlineSource.AI_EXTRACTED
+            "AI_SUGGESTED" -> DeadlineSource.AI_SUGGESTED
+            "AI" -> DeadlineSource.AI_EXTRACTED
+            "USER" -> DeadlineSource.USER
+            else -> DeadlineSource.AI_EXTRACTED
         }
     }
 

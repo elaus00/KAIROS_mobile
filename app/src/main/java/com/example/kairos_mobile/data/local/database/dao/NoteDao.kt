@@ -126,7 +126,8 @@ interface NoteDao {
             c.ai_title AS ai_title,
             c.original_text AS original_text,
             c.created_at AS created_at,
-            n.body AS body
+            n.body AS body,
+            n.folder_id AS folder_id
         FROM notes n
         INNER JOIN captures c ON c.id = n.capture_id
         WHERE n.folder_id = :folderId
@@ -135,6 +136,26 @@ interface NoteDao {
         ORDER BY n.updated_at DESC
     """)
     fun getNotesWithActiveCaptureByFolder(folderId: String): Flow<List<NoteWithCaptureRow>>
+
+    /**
+     * 전체 노트 + 활성 캡처 정보 조회 (삭제/휴지통 제외, 최신순)
+     */
+    @Query("""
+        SELECT
+            n.id AS note_id,
+            n.capture_id AS capture_id,
+            c.ai_title AS ai_title,
+            c.original_text AS original_text,
+            c.created_at AS created_at,
+            n.body AS body,
+            n.folder_id AS folder_id
+        FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE c.is_deleted = 0
+        AND c.is_trashed = 0
+        ORDER BY n.updated_at DESC
+    """)
+    fun getAllNotesWithActiveCapture(): Flow<List<NoteWithCaptureRow>>
 
     /**
      * 노트 본문 업데이트
@@ -184,7 +205,9 @@ data class NoteWithCaptureRow(
     @ColumnInfo(name = "created_at")
     val createdAt: Long,
     @ColumnInfo(name = "body")
-    val body: String? = null
+    val body: String? = null,
+    @ColumnInfo(name = "folder_id")
+    val folderId: String? = null
 )
 
 /**

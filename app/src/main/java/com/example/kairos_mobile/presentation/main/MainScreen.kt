@@ -3,16 +3,13 @@ package com.example.kairos_mobile.presentation.main
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.presentation.calendar.CalendarContent
@@ -39,6 +36,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToHistory: () -> Unit = {},
     onNavigateToNoteDetail: (String) -> Unit = {},
+    onNavigateToTrash: () -> Unit = {},
     captureViewModel: CaptureViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -59,26 +57,14 @@ fun MainScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                KairosBottomNav(
-                    selectedTab = currentTab,
-                    onTabSelected = { tab ->
-                        scope.launch {
-                            pagerState.animateScrollToPage(KairosTab.entries.indexOf(tab))
-                        }
+            KairosBottomNav(
+                selectedTab = currentTab,
+                onTabSelected = { tab ->
+                    scope.launch {
+                        pagerState.animateScrollToPage(KairosTab.entries.indexOf(tab))
                     }
-                )
-                // 페이지 인디케이터 점
-                Box(
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .size(5.dp)
-                        .clip(CircleShape)
-                        .background(colors.text)
-                )
-            }
+                }
+            )
         },
         containerColor = colors.background
     ) { paddingValues ->
@@ -93,7 +79,8 @@ fun MainScreen(
             when (KairosTab.entries[page]) {
                 KairosTab.NOTES -> NotesContent(
                     onSearchClick = onNavigateToSearch,
-                    onNoteClick = { noteId -> onNavigateToNoteDetail(noteId) }
+                    onNoteClick = { noteId -> onNavigateToNoteDetail(noteId) },
+                    onTrashClick = onNavigateToTrash
                 )
 
                 KairosTab.HOME -> CaptureContent(

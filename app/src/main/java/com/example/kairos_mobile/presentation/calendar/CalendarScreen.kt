@@ -103,6 +103,9 @@ fun CalendarScreen(
                 onToggleExpand = {
                     viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
                 },
+                onMonthChange = { yearMonth ->
+                    viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
+                },
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
@@ -231,6 +234,9 @@ fun CalendarContent(
                 },
                 onToggleExpand = {
                     viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
+                },
+                onMonthChange = { yearMonth ->
+                    viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
                 },
                 modifier = Modifier.padding(horizontal = 20.dp)
             )

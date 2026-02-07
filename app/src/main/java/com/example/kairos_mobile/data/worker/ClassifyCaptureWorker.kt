@@ -13,6 +13,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.kairos_mobile.data.mapper.ClassificationMapper
+import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyRequest
 import com.example.kairos_mobile.domain.model.SyncQueueStatus
@@ -34,6 +35,7 @@ class ClassifyCaptureWorker @AssistedInject constructor(
     private val syncQueueRepository: SyncQueueRepository,
     private val captureRepository: CaptureRepository,
     private val api: KairosApi,
+    private val deviceIdProvider: DeviceIdProvider,
     private val classificationMapper: ClassificationMapper,
     private val processClassificationResult: ProcessClassificationResultUseCase
 ) : CoroutineWorker(context, params) {
@@ -43,6 +45,12 @@ class ClassifyCaptureWorker @AssistedInject constructor(
         private const val INITIAL_BACKOFF_MS = 5_000L
         private const val BACKOFF_MULTIPLIER = 3
         private const val TRACE_AI_CLASSIFICATION_COMPLETION = "ai_classification_completion"
+        private val NON_RETRYABLE_ERROR_CODES = setOf(
+            "INVALID_REQUEST",
+            "TEXT_EMPTY",
+            "TEXT_TOO_LONG",
+            "RATE_LIMITED"
+        )
 
         /**
          * 분류 작업 즉시 실행 (SyncQueue 항목 추가 시 호출)
@@ -99,12 +107,25 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                 Trace.beginSection(TRACE_AI_CLASSIFICATION_COMPLETION)
                 try {
                     // API 호출
-                    val request = ClassifyRequest(text = capture.originalText)
+                    val source = when (capture.source.name) {
+                        "APP", "SHARE_INTENT", "WIDGET" -> capture.source.name
+                        else -> "APP"
+                    }
+                    val request = ClassifyRequest(
+                        text = capture.originalText,
+                        source = source,
+                        deviceId = deviceIdProvider.getOrCreateDeviceId()
+                    )
                     val response = api.classify(request)
+                    val responseBody = response.body()
 
-                    if (response.isSuccessful && response.body() != null) {
+                    if (
+                        response.isSuccessful &&
+                        responseBody?.status == "ok" &&
+                        responseBody.data != null
+                    ) {
                         // 분류 결과 적용
-                        val classification = classificationMapper.toDomain(response.body()!!)
+                        val classification = classificationMapper.toDomain(responseBody.data)
                         processClassificationResult(captureId, classification)
 
                         // 완료 처리
@@ -112,9 +133,14 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                         successCount++
                         Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
                     } else {
-                        handleRetry(item.id, item.retryCount, item.maxRetries)
+                        val errorCode = responseBody?.error?.code
+                        if (errorCode in NON_RETRYABLE_ERROR_CODES) {
+                            syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
+                        } else {
+                            handleRetry(item.id, item.retryCount, item.maxRetries)
+                        }
                         failCount++
-                        Log.w(TAG, "API 응답 실패: ${response.code()}")
+                        Log.w(TAG, "API 응답 실패: ${response.code()}, code=$errorCode")
                     }
                 } finally {
                     Trace.endSection()

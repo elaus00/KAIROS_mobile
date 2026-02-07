@@ -122,15 +122,39 @@ fun CaptureContent(
             // 날짜 표시
             DateDisplay()
 
-            // 빈 상태 영역 — 탭하면 입력 필드에 포커스
-            Box(
+            // 전체 화면 텍스트 입력 영역 (위에서부터 작성)
+            BasicTextField(
+                value = uiState.inputText,
+                onValueChange = { viewModel.updateInput(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { focusRequester.requestFocus() }
+                    .focusRequester(focusRequester)
+                    .testTag("capture_input"),
+                textStyle = TextStyle(
+                    color = colors.text,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp
+                ),
+                cursorBrush = SolidColor(colors.accent),
+                singleLine = false,
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        if (uiState.inputText.isEmpty()) {
+                            Text(
+                                text = "떠오르는 생각을 캡처하세요...",
+                                color = colors.placeholder,
+                                fontSize = 16.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
             )
 
             // 이미지 미리보기 (첨부된 경우)
@@ -141,20 +165,17 @@ fun CaptureContent(
                 )
             }
 
-            // 하단 입력 바
-            CaptureInputBar(
-                inputText = uiState.inputText,
-                characterCount = uiState.characterCount,
+            // 하단 툴바: 이미지 첨부 + 전송 버튼
+            CaptureToolBar(
                 isSubmitting = uiState.isSubmitting,
-                onInputChange = { viewModel.updateInput(it) },
+                canSubmit = uiState.inputText.isNotBlank() || uiState.imageUri != null,
+                hasImage = uiState.imageUri != null,
                 onSubmit = { viewModel.submit() },
                 onImageClick = {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
-                },
-                hasImage = uiState.imageUri != null,
-                focusRequester = focusRequester
+                }
             )
         }
 
@@ -235,7 +256,7 @@ private fun CaptureTopBar(
             Icon(
                 imageVector = Icons.Default.History,
                 contentDescription = "전체 기록",
-                tint = colors.textMuted,
+                tint = colors.text,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable(
@@ -248,7 +269,7 @@ private fun CaptureTopBar(
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "설정",
-                tint = colors.textMuted,
+                tint = colors.text,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable(
@@ -284,10 +305,7 @@ private fun DateDisplay() {
 }
 
 /**
- * 하단 입력 바: 텍스트 필드 + 전송 버튼
- */
-/**
- * 이미지 미리보기 (입력 바 위)
+ * 이미지 미리보기 (툴바 위)
  */
 @Composable
 private fun ImagePreview(
@@ -329,16 +347,16 @@ private fun ImagePreview(
     }
 }
 
+/**
+ * 하단 툴바: 이미지 첨부 아이콘 + 전송 버튼
+ */
 @Composable
-private fun CaptureInputBar(
-    inputText: String,
-    characterCount: Int,
+private fun CaptureToolBar(
     isSubmitting: Boolean,
-    onInputChange: (String) -> Unit,
+    canSubmit: Boolean,
+    hasImage: Boolean,
     onSubmit: () -> Unit,
-    onImageClick: () -> Unit = {},
-    hasImage: Boolean = false,
-    focusRequester: FocusRequester = FocusRequester()
+    onImageClick: () -> Unit
 ) {
     val colors = KairosTheme.colors
 
@@ -347,7 +365,7 @@ private fun CaptureInputBar(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // 이미지 아이콘
         Icon(
@@ -359,43 +377,7 @@ private fun CaptureInputBar(
                 .clickable { onImageClick() }
         )
 
-        // 텍스트 입력 필드
-        BasicTextField(
-            value = inputText,
-            onValueChange = onInputChange,
-            modifier = Modifier
-                .weight(1f)
-                .focusRequester(focusRequester)
-                .testTag("capture_input"),
-            textStyle = TextStyle(
-                color = colors.text,
-                fontSize = 16.sp,
-                lineHeight = 22.sp
-            ),
-            cursorBrush = SolidColor(colors.accent),
-            singleLine = false,
-            maxLines = 4,
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier
-                        .defaultMinSize(minHeight = 44.dp)
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (inputText.isEmpty()) {
-                        Text(
-                            text = "떠오르는 생각을 캡처하세요...",
-                            color = colors.placeholder,
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-
         // 전송 버튼
-        val canSubmit = inputText.isNotBlank() || hasImage
         Box(
             modifier = Modifier
                 .testTag("capture_submit")

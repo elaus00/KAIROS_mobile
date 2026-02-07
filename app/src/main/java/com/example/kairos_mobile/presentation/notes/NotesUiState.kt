@@ -4,14 +4,14 @@ import com.example.kairos_mobile.domain.model.Folder
 
 /**
  * 노트 탭 UI 상태
- * 폴더 기반 노트 관리 (Inbox/Ideas/Bookmarks + 사용자 폴더)
+ * 노트 우선 뷰 — 전체 노트 리스트 + 폴더 필터 칩
  */
 data class NotesUiState(
-    /** 폴더 목록 (시스템 + 사용자) */
+    /** 폴더 목록 (시스템 + 사용자) — 필터 칩용 */
     val folders: List<FolderWithCount> = emptyList(),
-    /** 현재 선택된 폴더 (null = 메인 폴더 리스트) */
-    val selectedFolder: Folder? = null,
-    /** 선택된 폴더의 노트 목록 */
+    /** 현재 선택된 필터 폴더 ID (null = 전체) */
+    val selectedFilterFolderId: String? = null,
+    /** 표시할 노트 목록 (필터 적용됨) */
     val notes: List<NoteWithCapture> = emptyList(),
     /** 로딩 상태 */
     val isLoading: Boolean = false,
@@ -39,17 +39,18 @@ data class NoteWithCapture(
     val captureId: String,
     val aiTitle: String?,
     val originalText: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val body: String? = null,
+    val folderId: String? = null,
+    val folderName: String? = null
 )
 
 /**
  * 노트 화면 이벤트
  */
 sealed interface NotesEvent {
-    /** 폴더 선택 (노트 목록으로 이동) */
-    data class SelectFolder(val folder: Folder) : NotesEvent
-    /** 폴더 목록으로 돌아가기 */
-    data object BackToFolders : NotesEvent
+    /** 폴더 필터 선택 (null = 전체) */
+    data class SelectFilter(val folderId: String?) : NotesEvent
     /** 폴더 생성 다이얼로그 표시 */
     data object ShowCreateFolderDialog : NotesEvent
     /** 폴더 생성 다이얼로그 닫기 */

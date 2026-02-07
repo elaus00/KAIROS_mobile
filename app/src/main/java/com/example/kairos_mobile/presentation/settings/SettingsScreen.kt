@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -150,19 +151,6 @@ fun SettingsScreen(
                     description = "일정 추가 확인 및 제안 알림",
                     isChecked = uiState.isNotificationEnabled,
                     onToggle = { viewModel.toggleNotification(it) }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 데이터 섹션
-            SectionHeader(title = "데이터")
-
-            SettingsCard {
-                NavigationSettingItem(
-                    title = "휴지통",
-                    description = "삭제된 항목 관리",
-                    onClick = onNavigateToTrash
                 )
             }
 
@@ -363,9 +351,14 @@ private fun ToggleSettingItem(
         Switch(
             checked = isChecked,
             onCheckedChange = onToggle,
+            modifier = Modifier.scale(0.85f),
             colors = SwitchDefaults.colors(
                 checkedThumbColor = colors.accent,
-                checkedTrackColor = colors.accent.copy(alpha = 0.3f)
+                checkedTrackColor = colors.accent.copy(alpha = 0.3f),
+                checkedBorderColor = colors.accent.copy(alpha = 0.3f),
+                uncheckedThumbColor = colors.textMuted,
+                uncheckedTrackColor = colors.borderLight,
+                uncheckedBorderColor = colors.border
             )
         )
     }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,9 +24,9 @@ import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
- * AI 분류 현황 바텀시트
+ * AI 분류 현황 패널
+ * 상단에서 아래로 펼쳐지는 형태
  * 24시간 이내 미확인 분류 목록 표시
- * 확인/변경 액션 제공
  */
 @Composable
 fun AIStatusSheet(
@@ -49,34 +48,24 @@ fun AIStatusSheet(
                 indication = null
             ) { onDismiss() }
     ) {
-        // 바텀시트 본체 (~70% 높이)
+        // 상단 패널 (위에서 아래로)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.7f)
-                .align(Alignment.BottomCenter)
-                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                .align(Alignment.TopCenter)
+                .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                 .background(colors.background)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ) { /* 시트 영역 클릭 시 닫히지 않음 */ }
+                ) { /* 패널 영역 클릭 시 닫히지 않음 */ }
         ) {
-            // 핸들 바
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .width(40.dp)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(colors.borderLight)
-                    .align(Alignment.CenterHorizontally)
-            )
+            // 상단 여백 (상태바 영역)
+            Spacer(modifier = Modifier.statusBarsPadding())
 
-            // 헤더: 제목 + 닫기 + 전체 확인
+            // 헤더: 제목 + 부제 + 전체 확인
             StatusSheetHeader(
                 count = uiState.unconfirmedCaptures.size,
-                onDismiss = onDismiss,
                 onConfirmAll = { viewModel.confirmAll() }
             )
 
@@ -90,7 +79,7 @@ fun AIStatusSheet(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .padding(vertical = 40.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
@@ -103,7 +92,7 @@ fun AIStatusSheet(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .padding(vertical = 40.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -114,9 +103,9 @@ fun AIStatusSheet(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.heightIn(max = 400.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(0.dp)
                 ) {
                     items(
                         items = uiState.unconfirmedCaptures,
@@ -129,20 +118,25 @@ fun AIStatusSheet(
                                 viewModel.changeClassification(capture.id, type, subType)
                             }
                         )
+                        // 항목 구분선
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = colors.borderLight,
+                            modifier = Modifier.padding(horizontal = 0.dp)
+                        )
                     }
                 }
             }
 
             // 전체 기록 보기 링크
             if (onNavigateToHistory != null) {
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = colors.borderLight
-                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onNavigateToHistory() }
+                        .clickable {
+                            onDismiss()
+                            onNavigateToHistory()
+                        }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -159,12 +153,11 @@ fun AIStatusSheet(
 }
 
 /**
- * 시트 헤더: 제목 + 닫기 버튼 + 전체 확인
+ * 패널 헤더: 제목 + 부제 + 전체 확인
  */
 @Composable
 private fun StatusSheetHeader(
     count: Int,
-    onDismiss: () -> Unit,
     onConfirmAll: () -> Unit
 ) {
     val colors = KairosTheme.colors
@@ -172,58 +165,38 @@ private fun StatusSheetHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column {
             Text(
                 text = "AI 분류 현황",
                 color = colors.text,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
-            if (count > 0) {
-                Text(
-                    text = "$count",
-                    color = colors.textSecondary,
-                    fontSize = 14.sp
-                )
-            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = "24시간 이내 분류된 항목",
+                color = colors.textMuted,
+                fontSize = 13.sp
+            )
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 전체 확인 버튼
-            if (count > 0) {
-                Text(
-                    text = "전체 확인",
-                    color = colors.accent,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onConfirmAll() }
-                )
-            }
-
-            // 닫기 버튼
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "닫기",
-                tint = colors.textMuted,
+        // 전체 확인 버튼
+        if (count > 0) {
+            Text(
+                text = "전체 확인",
+                color = colors.text,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier
-                    .size(24.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
-                    ) { onDismiss() }
+                    ) { onConfirmAll() }
+                    .padding(top = 4.dp)
             )
         }
     }
@@ -231,7 +204,7 @@ private fun StatusSheetHeader(
 
 /**
  * 개별 분류 항목
- * AI 제목 + 원문 미리보기 + 분류 칩(변경 가능) + 확인 버튼
+ * 수평 레이아웃: [분류 칩 ▾] [제목] [시간] [확인]
  */
 @Composable
 private fun ClassificationItem(
@@ -244,64 +217,70 @@ private fun ClassificationItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(colors.card)
-            .padding(12.dp),
+            .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 텍스트 영역
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            // AI 제목 또는 원문 앞부분
-            Text(
-                text = capture.aiTitle ?: capture.originalText.take(30),
-                color = colors.text,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+        // 분류 드롭다운 칩
+        ClassificationDropdown(
+            currentType = capture.classifiedType,
+            currentSubType = capture.noteSubType,
+            onTypeSelected = onChangeType
+        )
 
-            // 원문 미리보기 (AI 제목이 있을 때만)
-            if (capture.aiTitle != null) {
-                Text(
-                    text = capture.originalText,
-                    color = colors.textMuted,
-                    fontSize = 13.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+        // 제목 텍스트
+        Text(
+            text = capture.aiTitle ?: capture.originalText.take(30),
+            color = colors.text,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
 
-            // 분류 드롭다운
-            ClassificationDropdown(
-                currentType = capture.classifiedType,
-                currentSubType = capture.noteSubType,
-                onTypeSelected = onChangeType
-            )
-        }
+        // 시간 표시
+        Text(
+            text = getRelativeTime(capture.createdAt),
+            color = colors.textMuted,
+            fontSize = 13.sp
+        )
 
         // 확인 버튼
         Box(
             modifier = Modifier
-                .size(36.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.accentBg)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ) { onConfirm() },
+                ) { onConfirm() }
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "확인",
-                tint = colors.accent,
-                modifier = Modifier.size(20.dp)
+            Text(
+                text = "확인",
+                color = colors.text,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
             )
         }
+    }
+}
+
+/**
+ * 상대 시간 표시 (방금, N분 전, N시간 전, 어제)
+ */
+private fun getRelativeTime(timestamp: Long): String {
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
+    val minutes = diff / (1000 * 60)
+    val hours = diff / (1000 * 60 * 60)
+
+    return when {
+        minutes < 1 -> "방금"
+        minutes < 60 -> "${minutes}분 전"
+        hours < 24 -> "${hours}시간 전"
+        else -> "어제"
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,12 +22,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,10 +41,13 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.abs
 
 /**
- * CalendarCard 컴포넌트 (Reference 디자인)
+ * CalendarCard 컴포넌트
  * 날짜 헤더 + 주간/월간 뷰를 카드로 감싼 형태
+ * 아래로 스와이프 → 월간 확장, 위로 스와이프 → 주간 축소
+ * 월간에서 좌우 스와이프 → 달 변경
  */
 @Composable
 fun CalendarCard(
@@ -49,6 +56,7 @@ fun CalendarCard(
     isExpanded: Boolean,
     onDateSelected: (LocalDate) -> Unit,
     onToggleExpand: () -> Unit,
+    onMonthChange: (YearMonth) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -62,12 +70,51 @@ fun CalendarCard(
         label = "rotation"
     )
 
+    // 스와이프 제스처 감지용 누적값
+    var dragAmountX by remember { mutableFloatStateOf(0f) }
+    var dragAmountY by remember { mutableFloatStateOf(0f) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(colors.card)
             .border(1.dp, colors.border, RoundedCornerShape(12.dp))
+            .pointerInput(isExpanded) {
+                detectDragGestures(
+                    onDragStart = {
+                        dragAmountX = 0f
+                        dragAmountY = 0f
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        dragAmountX += dragAmount.x
+                        dragAmountY += dragAmount.y
+                    },
+                    onDragEnd = {
+                        val threshold = 50f
+                        if (abs(dragAmountY) > abs(dragAmountX)) {
+                            // 수직 스와이프 우선
+                            if (dragAmountY > threshold && !isExpanded) {
+                                // 아래로 스와이프 → 월간 확장
+                                onToggleExpand()
+                            } else if (dragAmountY < -threshold && isExpanded) {
+                                // 위로 스와이프 → 주간 축소
+                                onToggleExpand()
+                            }
+                        } else if (isExpanded && abs(dragAmountX) > threshold) {
+                            // 월간 뷰에서 좌우 스와이프 → 달 변경
+                            if (dragAmountX < -threshold) {
+                                // 왼쪽 스와이프 → 다음 달
+                                onMonthChange(currentMonth.plusMonths(1))
+                            } else if (dragAmountX > threshold) {
+                                // 오른쪽 스와이프 → 이전 달
+                                onMonthChange(currentMonth.minusMonths(1))
+                            }
+                        }
+                    }
+                )
+            }
             .padding(16.dp)
     ) {
         // 날짜 헤더 + 토글 버튼
@@ -169,7 +216,7 @@ private fun CalendarWeekRow(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         weekDates.forEachIndexed { index, date ->
             CalendarDayCell(
@@ -178,7 +225,8 @@ private fun CalendarWeekRow(
                 isSelected = date == selectedDate,
                 isToday = date == today,
                 hasSchedule = datesWithSchedules.contains(date) && date != selectedDate,
-                onClick = { onDateSelected(date) }
+                onClick = { onDateSelected(date) },
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -210,7 +258,7 @@ private fun CalendarDayCell(
         else -> colors.text
     }
 
-    // 요일은 선택 여부와 관계없이 항상 textMuted (Reference 디자인)
+    // 요일은 선택 여부와 관계없이 항상 textMuted
     val dayNameColor = colors.textMuted
 
     Column(

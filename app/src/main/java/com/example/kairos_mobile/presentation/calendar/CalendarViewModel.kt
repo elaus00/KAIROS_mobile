@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -216,9 +217,19 @@ class CalendarViewModel @Inject constructor(
 
     /**
      * 할 일 완료 토글
+     * 체크 애니메이션이 보이도록 즉시 UI 업데이트 후 딜레이
      */
     private fun toggleTaskComplete(taskId: String) {
+        // 즉시 UI에 체크 상태 반영
+        _uiState.update { state ->
+            state.copy(
+                tasks = state.tasks.map {
+                    if (it.todoId == taskId) it.copy(isCompleted = true) else it
+                }
+            )
+        }
         viewModelScope.launch {
+            delay(500) // 체크 애니메이션 표시
             toggleTodoCompletion(taskId)
             // Flow가 자동으로 UI 업데이트
         }

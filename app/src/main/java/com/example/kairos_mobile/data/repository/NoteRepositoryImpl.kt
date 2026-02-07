@@ -86,18 +86,25 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun getNotesWithActiveCaptureByFolderId(folderId: String): Flow<List<NoteWithCapturePreview>> {
         return noteDao.getNotesWithActiveCaptureByFolder(folderId)
-            .map { rows ->
-                rows.map { row ->
-                    NoteWithCapturePreview(
-                        noteId = row.noteId,
-                        captureId = row.captureId,
-                        aiTitle = row.aiTitle,
-                        originalText = row.originalText,
-                        createdAt = row.createdAt
-                    )
-                }
-            }
+            .map { rows -> rows.map { it.toPreview() } }
     }
+
+    override fun getAllNotesWithActiveCapture(): Flow<List<NoteWithCapturePreview>> {
+        return noteDao.getAllNotesWithActiveCapture()
+            .map { rows -> rows.map { it.toPreview() } }
+    }
+
+    /** NoteWithCaptureRow → NoteWithCapturePreview 변환 */
+    private fun com.example.kairos_mobile.data.local.database.dao.NoteWithCaptureRow.toPreview() =
+        NoteWithCapturePreview(
+            noteId = noteId,
+            captureId = captureId,
+            aiTitle = aiTitle,
+            originalText = originalText,
+            createdAt = createdAt,
+            body = body,
+            folderId = folderId
+        )
 
     override fun getNoteDetail(noteId: String): Flow<NoteDetail?> {
         return noteDao.getNoteWithCapture(noteId)

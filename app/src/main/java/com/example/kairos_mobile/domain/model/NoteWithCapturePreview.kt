@@ -8,5 +8,7 @@ data class NoteWithCapturePreview(
     val captureId: String,
     val aiTitle: String?,
     val originalText: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val body: String? = null,
+    val folderId: String? = null
 )

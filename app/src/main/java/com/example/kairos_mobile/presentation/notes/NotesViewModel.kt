@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.DeleteFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 /**
  * 노트 탭 ViewModel
- * 폴더 기반 노트 관리
+ * 노트 우선 뷰 — 전체 노트를 플랫 리스트로 보여주고 폴더 필터 칩으로 분류
  */
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -36,17 +37,15 @@ class NotesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NotesUiState())
     val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
 
-    private var foldersJob: Job? = null
-    private var notesJob: Job? = null
+    private var dataJob: Job? = null
 
     init {
-        loadFolders()
+        loadData()
     }
 
     fun onEvent(event: NotesEvent) {
         when (event) {
-            is NotesEvent.SelectFolder -> selectFolder(event.folder)
-            is NotesEvent.BackToFolders -> backToFolders()
+            is NotesEvent.SelectFilter -> selectFilter(event.folderId)
             is NotesEvent.ShowCreateFolderDialog -> showCreateFolderDialog()
             is NotesEvent.DismissCreateFolderDialog -> dismissCreateFolderDialog()
             is NotesEvent.CreateFolder -> createFolder(event.name)
@@ -59,19 +58,21 @@ class NotesViewModel @Inject constructor(
     }
 
     /**
-     * 폴더 목록 로드
-     * Inbox는 노트가 있을 때만 표시, Ideas/Bookmarks는 항상 표시
+     * 폴더 + 전체 노트를 동시에 로드
+     * 폴더 이름 매핑 및 필터링을 한곳에서 처리
      */
-    private fun loadFolders() {
-        foldersJob?.cancel()
-        foldersJob = viewModelScope.launch {
+    private fun loadData() {
+        dataJob?.cancel()
+        dataJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             combine(
                 getAllFoldersUseCase(),
-                noteRepository.getFolderNoteCounts()
-            ) { folders, countMap ->
-                folders.map { folder ->
+                noteRepository.getFolderNoteCounts(),
+                noteRepository.getAllNotesWithActiveCapture()
+            ) { folders, countMap, allNotes ->
+                // 폴더 목록 (Inbox는 노트 있을 때만 표시)
+                val foldersWithCount = folders.map { folder ->
                     FolderWithCount(folder, countMap[folder.id] ?: 0)
                 }.filter { folderWithCount ->
                     if (folderWithCount.folder.type == FolderType.INBOX) {
@@ -80,59 +81,69 @@ class NotesViewModel @Inject constructor(
                         true
                     }
                 }
+
+                // 폴더 ID → 이름 매핑
+                val folderNameMap = folders.associate { it.id to it.name }
+
+                // 노트 목록 (폴더 이름 포함)
+                val notesWithFolder = allNotes.map { preview ->
+                    NoteWithCapture(
+                        noteId = preview.noteId,
+                        captureId = preview.captureId,
+                        aiTitle = preview.aiTitle,
+                        originalText = preview.originalText,
+                        createdAt = preview.createdAt,
+                        body = preview.body,
+                        folderId = preview.folderId,
+                        folderName = preview.folderId?.let { folderNameMap[it] }
+                    )
+                }
+
+                foldersWithCount to notesWithFolder
             }
                 .catch { e ->
                     _uiState.update {
                         it.copy(isLoading = false, errorMessage = e.message)
                     }
                 }
-                .collect { foldersWithCount ->
+                .collect { (foldersWithCount, allNotes) ->
+                    val filteredNotes = applyFilter(
+                        allNotes,
+                        _uiState.value.selectedFilterFolderId
+                    )
                     _uiState.update {
-                        it.copy(folders = foldersWithCount, isLoading = false)
-                    }
-                }
-        }
-    }
-
-    /**
-     * 폴더 선택 → 노트 목록 표시
-     */
-    private fun selectFolder(folder: Folder) {
-        _uiState.update { it.copy(selectedFolder = folder) }
-        loadNotesForFolder(folder.id)
-    }
-
-    /**
-     * 폴더 목록으로 돌아가기
-     */
-    private fun backToFolders() {
-        notesJob?.cancel()
-        _uiState.update { it.copy(selectedFolder = null, notes = emptyList()) }
-    }
-
-    /**
-     * 폴더 내 노트 로드
-     */
-    private fun loadNotesForFolder(folderId: String) {
-        notesJob?.cancel()
-        notesJob = viewModelScope.launch {
-            noteRepository.getNotesWithActiveCaptureByFolderId(folderId)
-                .catch { e ->
-                    _uiState.update { it.copy(errorMessage = e.message) }
-                }
-                .collect { notes ->
-                    val notesWithCapture = notes.map { note ->
-                        NoteWithCapture(
-                            noteId = note.noteId,
-                            captureId = note.captureId,
-                            aiTitle = note.aiTitle,
-                            originalText = note.originalText,
-                            createdAt = note.createdAt
+                        it.copy(
+                            folders = foldersWithCount,
+                            notes = filteredNotes,
+                            isLoading = false
                         )
                     }
-                    _uiState.update { it.copy(notes = notesWithCapture) }
+                    // 전체 노트를 캐시 (필터 변경 시 재사용)
+                    cachedAllNotes = allNotes
                 }
         }
+    }
+
+    /** 캐시된 전체 노트 (필터 전환 시 재쿼리 없이 사용) */
+    private var cachedAllNotes: List<NoteWithCapture> = emptyList()
+
+    /**
+     * 폴더 필터 선택
+     */
+    private fun selectFilter(folderId: String?) {
+        val filtered = applyFilter(cachedAllNotes, folderId)
+        _uiState.update {
+            it.copy(selectedFilterFolderId = folderId, notes = filtered)
+        }
+    }
+
+    /** 폴더 ID로 노트 필터링 (null = 전체) */
+    private fun applyFilter(
+        notes: List<NoteWithCapture>,
+        folderId: String?
+    ): List<NoteWithCapture> {
+        return if (folderId == null) notes
+        else notes.filter { it.folderId == folderId }
     }
 
     private fun showCreateFolderDialog() {
@@ -177,6 +188,10 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 deleteFolderUseCase(folderId)
+                // 삭제된 폴더가 현재 필터면 전체로 리셋
+                if (_uiState.value.selectedFilterFolderId == folderId) {
+                    _uiState.update { it.copy(selectedFilterFolderId = null) }
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = e.message) }
             }

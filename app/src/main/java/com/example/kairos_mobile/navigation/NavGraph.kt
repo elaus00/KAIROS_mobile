@@ -119,7 +119,10 @@ fun KairosNavGraph(
                 onNavigateToHistory = {
                     navController.navigate(NavRoutes.HISTORY)
                 },
-                onNavigateToNoteDetail = navigateToNoteDetail
+                onNavigateToNoteDetail = navigateToNoteDetail,
+                onNavigateToTrash = {
+                    navController.navigate(NavRoutes.TRASH)
+                }
             )
         }
 

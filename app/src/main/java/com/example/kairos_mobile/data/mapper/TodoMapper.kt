@@ -47,7 +47,11 @@ class TodoMapper @Inject constructor() {
         return try {
             DeadlineSource.valueOf(value)
         } catch (e: IllegalArgumentException) {
-            DeadlineSource.AI
+            if (value.equals("AI", ignoreCase = true)) {
+                DeadlineSource.AI_EXTRACTED
+            } else {
+                DeadlineSource.AI_EXTRACTED
+            }
         }
     }
 

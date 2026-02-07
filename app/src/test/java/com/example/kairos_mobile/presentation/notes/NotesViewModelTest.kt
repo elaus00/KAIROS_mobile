@@ -32,7 +32,7 @@ import org.junit.Test
 
 /**
  * NotesViewModel 단위 테스트
- * 폴더 기반 노트 관리 로직 검증
+ * 노트 우선 뷰 + 폴더 필터 로직 검증
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotesViewModelTest {
@@ -60,13 +60,15 @@ class NotesViewModelTest {
         unmockkAll()
     }
 
-    /** 기본 폴더/노트 수 Flow 설정 후 ViewModel 생성 헬퍼 */
+    /** 기본 폴더/노트 수/전체 노트 Flow 설정 후 ViewModel 생성 헬퍼 */
     private fun createViewModel(
         folders: List<Folder> = emptyList(),
-        countMap: Map<String, Int> = emptyMap()
+        countMap: Map<String, Int> = emptyMap(),
+        allNotes: List<NoteWithCapturePreview> = emptyList()
     ): NotesViewModel {
         every { getAllFoldersUseCase() } returns flowOf(folders)
         every { noteRepository.getFolderNoteCounts() } returns flowOf(countMap)
+        every { noteRepository.getAllNotesWithActiveCapture() } returns flowOf(allNotes)
         return NotesViewModel(
             getAllFoldersUseCase,
             createFolderUseCase,
@@ -76,27 +78,40 @@ class NotesViewModelTest {
         )
     }
 
-    // ========== 폴더 로딩 테스트 ==========
+    // ========== 데이터 로딩 테스트 ==========
 
     @Test
-    fun `init_loads_folders_with_counts`() = runTest {
-        // Given: 2개 폴더, 노트 수 맵
+    fun `init_loads_folders_and_notes`() = runTest {
+        // Given: 2개 폴더, 노트 수 맵, 전체 노트 2개
         val folders = listOf(
             TestFixtures.folder(id = "f1", name = "아이디어", type = FolderType.IDEAS),
             TestFixtures.folder(id = "f2", name = "내 폴더", type = FolderType.USER)
         )
         val countMap = mapOf("f1" to 3, "f2" to 5)
+        val notes = listOf(
+            NoteWithCapturePreview(
+                noteId = "n1", captureId = "c1",
+                aiTitle = "노트1", originalText = "원본1",
+                createdAt = 1000L, folderId = "f1"
+            ),
+            NoteWithCapturePreview(
+                noteId = "n2", captureId = "c2",
+                aiTitle = "노트2", originalText = "원본2",
+                createdAt = 2000L, folderId = "f2"
+            )
+        )
 
         // When: ViewModel 생성
-        val viewModel = createViewModel(folders, countMap)
+        val viewModel = createViewModel(folders, countMap, notes)
         advanceUntilIdle()
 
-        // Then: combine 결과가 uiState에 반영
+        // Then: 폴더와 전체 노트가 로드됨
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
         assertEquals(2, state.folders.size)
         assertEquals(3, state.folders[0].noteCount)
-        assertEquals(5, state.folders[1].noteCount)
+        assertEquals(2, state.notes.size)
+        assertNull(state.selectedFilterFolderId)
     }
 
     @Test
@@ -143,50 +158,102 @@ class NotesViewModelTest {
         assertEquals(2, viewModel.uiState.value.folders.size)
     }
 
-    // ========== 폴더 선택/뒤로가기 ==========
+    // ========== 필터 테스트 ==========
 
     @Test
-    fun `selectFolder_loads_notes`() = runTest {
-        // Given
-        val folder = TestFixtures.folder(id = "f1", name = "내 폴더")
-        val notePreview = NoteWithCapturePreview(
-            noteId = "n1", captureId = "c1",
-            aiTitle = "AI 제목", originalText = "원본 텍스트", createdAt = 1000L
+    fun `selectFilter_filters_notes_by_folder`() = runTest {
+        // Given: 2개 폴더에 분산된 노트들
+        val folders = listOf(
+            TestFixtures.folder(id = "f1", name = "아이디어", type = FolderType.IDEAS),
+            TestFixtures.folder(id = "f2", name = "내 폴더", type = FolderType.USER)
         )
-        every { noteRepository.getNotesWithActiveCaptureByFolderId("f1") } returns flowOf(listOf(notePreview))
-        val viewModel = createViewModel()
+        val countMap = mapOf("f1" to 2, "f2" to 1)
+        val notes = listOf(
+            NoteWithCapturePreview(
+                noteId = "n1", captureId = "c1",
+                aiTitle = "아이디어1", originalText = "원본1",
+                createdAt = 1000L, folderId = "f1"
+            ),
+            NoteWithCapturePreview(
+                noteId = "n2", captureId = "c2",
+                aiTitle = "아이디어2", originalText = "원본2",
+                createdAt = 2000L, folderId = "f1"
+            ),
+            NoteWithCapturePreview(
+                noteId = "n3", captureId = "c3",
+                aiTitle = "내 노트", originalText = "원본3",
+                createdAt = 3000L, folderId = "f2"
+            )
+        )
+
+        val viewModel = createViewModel(folders, countMap, notes)
         advanceUntilIdle()
 
-        // When: 폴더 선택
-        viewModel.onEvent(NotesEvent.SelectFolder(folder))
+        // When: f1 폴더 필터 선택
+        viewModel.onEvent(NotesEvent.SelectFilter("f1"))
         advanceUntilIdle()
 
-        // Then: selectedFolder 설정, 노트 로드됨
+        // Then: f1 폴더 노트만 표시
         val state = viewModel.uiState.value
-        assertEquals(folder, state.selectedFolder)
-        assertEquals(1, state.notes.size)
-        assertEquals("n1", state.notes[0].noteId)
-        assertEquals("AI 제목", state.notes[0].aiTitle)
+        assertEquals("f1", state.selectedFilterFolderId)
+        assertEquals(2, state.notes.size)
+        assertTrue(state.notes.all { it.folderId == "f1" })
     }
 
     @Test
-    fun `backToFolders_clears_selection`() = runTest {
-        // Given: 폴더가 선택된 상태
-        val folder = TestFixtures.folder(id = "f1")
-        every { noteRepository.getNotesWithActiveCaptureByFolderId("f1") } returns flowOf(emptyList())
-        val viewModel = createViewModel()
+    fun `selectFilter_null_shows_all_notes`() = runTest {
+        // Given: 필터가 적용된 상태
+        val folders = listOf(
+            TestFixtures.folder(id = "f1", name = "폴더1", type = FolderType.IDEAS)
+        )
+        val notes = listOf(
+            NoteWithCapturePreview(
+                noteId = "n1", captureId = "c1",
+                aiTitle = "노트1", originalText = "원본",
+                createdAt = 1000L, folderId = "f1"
+            ),
+            NoteWithCapturePreview(
+                noteId = "n2", captureId = "c2",
+                aiTitle = "노트2", originalText = "원본2",
+                createdAt = 2000L, folderId = "f2"
+            )
+        )
+
+        val viewModel = createViewModel(folders, mapOf("f1" to 1), notes)
         advanceUntilIdle()
-        viewModel.onEvent(NotesEvent.SelectFolder(folder))
+        viewModel.onEvent(NotesEvent.SelectFilter("f1"))
         advanceUntilIdle()
 
-        // When: 뒤로가기
-        viewModel.onEvent(NotesEvent.BackToFolders)
+        // When: 전체 필터로 전환
+        viewModel.onEvent(NotesEvent.SelectFilter(null))
         advanceUntilIdle()
 
-        // Then: selectedFolder = null, notes = empty
+        // Then: 모든 노트가 표시됨
         val state = viewModel.uiState.value
-        assertNull(state.selectedFolder)
-        assertTrue(state.notes.isEmpty())
+        assertNull(state.selectedFilterFolderId)
+        assertEquals(2, state.notes.size)
+    }
+
+    @Test
+    fun `notes_include_folder_names`() = runTest {
+        // Given: 폴더에 속한 노트
+        val folders = listOf(
+            TestFixtures.folder(id = "f1", name = "아이디어", type = FolderType.IDEAS)
+        )
+        val notes = listOf(
+            NoteWithCapturePreview(
+                noteId = "n1", captureId = "c1",
+                aiTitle = "노트1", originalText = "원본",
+                createdAt = 1000L, folderId = "f1"
+            )
+        )
+
+        // When
+        val viewModel = createViewModel(folders, mapOf("f1" to 1), notes)
+        advanceUntilIdle()
+
+        // Then: 폴더 이름이 매핑됨
+        assertEquals("아이디어", viewModel.uiState.value.notes[0].folderName)
     }
 
     // ========== 폴더 CRUD ==========
@@ -254,5 +321,24 @@ class NotesViewModelTest {
 
         // Then: UseCase 호출됨
         coVerify(exactly = 1) { deleteFolderUseCase("f1") }
+    }
+
+    @Test
+    fun `deleteFolder_resets_filter_if_current`() = runTest {
+        // Given: 필터가 f1으로 설정된 상태
+        val folders = listOf(
+            TestFixtures.folder(id = "f1", name = "내 폴더", type = FolderType.USER)
+        )
+        coEvery { deleteFolderUseCase(any()) } just runs
+        val viewModel = createViewModel(folders, mapOf("f1" to 1))
+        advanceUntilIdle()
+        viewModel.onEvent(NotesEvent.SelectFilter("f1"))
+
+        // When: 현재 필터 폴더를 삭제
+        viewModel.onEvent(NotesEvent.DeleteFolder("f1"))
+        advanceUntilIdle()
+
+        // Then: 필터가 전체(null)로 리셋됨
+        assertNull(viewModel.uiState.value.selectedFilterFolderId)
     }
 }

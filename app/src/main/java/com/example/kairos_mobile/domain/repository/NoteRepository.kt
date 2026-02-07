@@ -34,6 +34,9 @@ interface NoteRepository {
     /** 삭제되지 않은 캡처만 포함한 폴더별 노트 목록 */
     fun getNotesWithActiveCaptureByFolderId(folderId: String): Flow<List<NoteWithCapturePreview>>
 
+    /** 전체 활성 노트 목록 (삭제/휴지통 제외) */
+    fun getAllNotesWithActiveCapture(): Flow<List<NoteWithCapturePreview>>
+
     /** 노트 상세 조회 (캡처 정보 포함) */
     fun getNoteDetail(noteId: String): Flow<NoteDetail?>
 

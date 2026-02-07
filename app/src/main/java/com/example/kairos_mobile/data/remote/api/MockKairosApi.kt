@@ -1,8 +1,20 @@
 package com.example.kairos_mobile.data.remote.api
 
-import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventDto
+import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventsRequest
+import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventsResponse
+import com.example.kairos_mobile.data.remote.dto.v2.ApiEnvelope
 import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventRequest
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventDeleteResponse
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventItemDto
 import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventResponse
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventsResponse
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenExchangeRequest
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenRequest
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenResponse
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyBatchFailedDto
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyBatchRequest
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyBatchResponse
+import com.example.kairos_mobile.data.remote.dto.v2.ClassifyBatchResultDto
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyRequest
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
 import com.example.kairos_mobile.data.remote.dto.v2.EntityDto
@@ -14,11 +26,12 @@ import kotlinx.coroutines.delay
 import retrofit2.Response
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.time.ZoneId
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 /**
  * Mock KAIROS API 구현체
@@ -33,7 +46,7 @@ class MockKairosApi @Inject constructor() : KairosApi {
      */
     override suspend fun classify(
         request: ClassifyRequest
-    ): Response<ClassifyResponse> {
+    ): Response<ApiEnvelope<ClassifyResponse>> {
         delay(500)
 
         val text = request.text.lowercase()
@@ -54,7 +67,7 @@ class MockKairosApi @Inject constructor() : KairosApi {
                 todoInfo = firstSplit.todoInfo,
                 splitItems = splitItems
             )
-            return Response.success(response)
+            return Response.success(ApiEnvelope(status = "ok", data = response))
         }
 
         // 단일 의도 분류
@@ -92,13 +105,62 @@ class MockKairosApi @Inject constructor() : KairosApi {
             todoInfo = todoInfo
         )
 
-        return Response.success(response)
+        return Response.success(ApiEnvelope(status = "ok", data = response))
+    }
+
+    override suspend fun classifyBatch(
+        request: ClassifyBatchRequest
+    ): Response<ApiEnvelope<ClassifyBatchResponse>> {
+        delay(300)
+        val (results, failed) = request.items.fold(
+            mutableListOf<ClassifyBatchResultDto>() to mutableListOf<ClassifyBatchFailedDto>()
+        ) { acc, item ->
+            val (resultList, failedList) = acc
+            if (item.text.isBlank()) {
+                failedList.add(ClassifyBatchFailedDto(captureId = item.captureId, error = "TEXT_EMPTY"))
+            } else {
+                val single = classify(
+                    ClassifyRequest(
+                        text = item.text,
+                        source = "APP",
+                        deviceId = request.deviceId
+                    )
+                ).body()?.data
+
+                if (single == null) {
+                    failedList.add(ClassifyBatchFailedDto(captureId = item.captureId, error = "CLASSIFICATION_FAILED"))
+                } else {
+                    resultList.add(
+                        ClassifyBatchResultDto(
+                            captureId = item.captureId,
+                            classifiedType = single.classifiedType,
+                            noteSubType = single.noteSubType,
+                            confidence = single.confidence,
+                            aiTitle = single.aiTitle,
+                            tags = single.tags,
+                            entities = single.entities,
+                            scheduleInfo = single.scheduleInfo,
+                            todoInfo = single.todoInfo,
+                            splitItems = single.splitItems
+                        )
+                    )
+                }
+            }
+            acc
+        }
+
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = ClassifyBatchResponse(results = results, failed = failed)
+            )
+        )
     }
 
     /**
      * Mock 서버 상태 확인
      */
-    override suspend fun health(): Response<HealthResponse> {
+    override suspend fun health(): Response<ApiEnvelope<HealthResponse>> {
         delay(100)
 
         val response = HealthResponse(
@@ -109,35 +171,96 @@ class MockKairosApi @Inject constructor() : KairosApi {
             timestamp = java.time.Instant.now().toString()
         )
 
-        return Response.success(response)
+        return Response.success(ApiEnvelope(status = "ok", data = response))
     }
 
     /**
      * Mock 분석 이벤트 배치 전송
      */
-    override suspend fun analyticsEvents(events: List<AnalyticsEventDto>): Response<Unit> {
+    override suspend fun analyticsEvents(request: AnalyticsEventsRequest): Response<ApiEnvelope<AnalyticsEventsResponse>> {
         delay(100)
-        return Response.success(Unit)
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = AnalyticsEventsResponse(received = request.events.size)
+            )
+        )
     }
 
     /**
      * Mock Google Calendar 이벤트 생성
      */
-    override suspend fun createCalendarEvent(request: CalendarEventRequest): Response<CalendarEventResponse> {
+    override suspend fun createCalendarEvent(request: CalendarEventRequest): Response<ApiEnvelope<CalendarEventResponse>> {
         delay(300)
         val response = CalendarEventResponse(
             googleEventId = "mock_event_${UUID.randomUUID().toString().take(8)}",
-            status = "confirmed"
+            htmlLink = "https://calendar.google.com/event?eid=mock"
         )
-        return Response.success(response)
+        return Response.success(ApiEnvelope(status = "ok", data = response))
+    }
+
+    override suspend fun exchangeCalendarToken(
+        request: CalendarTokenExchangeRequest
+    ): Response<ApiEnvelope<CalendarTokenResponse>> {
+        delay(200)
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = CalendarTokenResponse(connected = true)
+            )
+        )
+    }
+
+    override suspend fun saveCalendarToken(
+        request: CalendarTokenRequest
+    ): Response<ApiEnvelope<CalendarTokenResponse>> {
+        delay(150)
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = CalendarTokenResponse(connected = true)
+            )
+        )
+    }
+
+    override suspend fun getCalendarEvents(
+        startDate: String,
+        endDate: String
+    ): Response<ApiEnvelope<CalendarEventsResponse>> {
+        delay(180)
+        val now = Instant.now().toEpochMilli()
+        val oneHourLater = now + 3_600_000L
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = CalendarEventsResponse(
+                    events = listOf(
+                        CalendarEventItemDto(
+                            googleEventId = "mock_event_${UUID.randomUUID().toString().take(8)}",
+                            title = "Mock 일정",
+                            startTime = toIsoOffsetDateTime(now),
+                            endTime = toIsoOffsetDateTime(oneHourLater),
+                            location = "Mock Office",
+                            isAllDay = false,
+                            source = "kairos"
+                        )
+                    )
+                )
+            )
+        )
     }
 
     /**
      * Mock Google Calendar 이벤트 삭제
      */
-    override suspend fun deleteCalendarEvent(eventId: String): Response<Unit> {
+    override suspend fun deleteCalendarEvent(eventId: String): Response<ApiEnvelope<CalendarEventDeleteResponse>> {
         delay(200)
-        return Response.success(Unit)
+        return Response.success(
+            ApiEnvelope(
+                status = "ok",
+                data = CalendarEventDeleteResponse(deleted = true)
+            )
+        )
     }
 
     // ========== Helper Methods ==========
@@ -194,8 +317,8 @@ class MockKairosApi @Inject constructor() : KairosApi {
                     noteSubType = null,
                     scheduleInfo = null,
                     todoInfo = TodoInfoDto(
-                        deadline = deadline,
-                        deadlineSource = if (deadline != null) "AI" else null
+                        deadline = deadline?.let { toIsoOffsetDateTime(it) },
+                        deadlineSource = if (deadline != null) "AI_EXTRACTED" else null
                     )
                 )
             }
@@ -210,8 +333,8 @@ class MockKairosApi @Inject constructor() : KairosApi {
                     classifiedType = "SCHEDULE",
                     noteSubType = null,
                     scheduleInfo = ScheduleInfoDto(
-                        startTime = startTime,
-                        endTime = startTime + 3600_000L,
+                        startTime = toIsoOffsetDateTime(startTime),
+                        endTime = toIsoOffsetDateTime(startTime + 3600_000L),
                         location = extractLocation(text),
                         isAllDay = false
                     ),
@@ -385,4 +508,10 @@ class MockKairosApi @Inject constructor() : KairosApi {
         val scheduleInfo: ScheduleInfoDto?,
         val todoInfo: TodoInfoDto?
     )
+
+    private fun toIsoOffsetDateTime(epochMs: Long): String {
+        return Instant.ofEpochMilli(epochMs)
+            .atZone(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    }
 }

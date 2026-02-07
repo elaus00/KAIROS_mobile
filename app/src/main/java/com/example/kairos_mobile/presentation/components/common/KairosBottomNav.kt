@@ -44,16 +44,17 @@ fun KairosBottomNav(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 48.dp, vertical = 16.dp),
+            .padding(horizontal = 48.dp)
+            .padding(top = 12.dp, bottom = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier
                 .shadow(
-                    elevation = 8.dp,
+                    elevation = 16.dp,
                     shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.1f),
-                    spotColor = Color.Black.copy(alpha = 0.1f)
+                    ambientColor = Color.Black.copy(alpha = 0.15f),
+                    spotColor = Color.Black.copy(alpha = 0.15f)
                 )
                 .clip(RoundedCornerShape(20.dp))
                 .background(colors.card)
@@ -108,7 +109,7 @@ private fun KairosNavItem(
             imageVector = if (selected) tab.filledIcon else tab.outlinedIcon,
             contentDescription = tab.label,
             tint = iconColor,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
 }

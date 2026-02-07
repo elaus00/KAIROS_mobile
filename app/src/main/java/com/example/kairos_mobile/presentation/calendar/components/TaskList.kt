@@ -183,17 +183,6 @@ private fun TaskItem(
                 isChecked = task.isCompleted,
                 onToggle = onToggleComplete
             )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Icon(
-                imageVector = Icons.Default.DeleteOutline,
-                contentDescription = "할 일 삭제",
-                tint = colors.textMuted,
-                modifier = Modifier
-                    .size(20.dp)
-                    .clickable { onDelete() }
-            )
         }
     }
 }
