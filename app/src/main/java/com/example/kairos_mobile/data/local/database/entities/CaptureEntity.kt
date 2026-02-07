@@ -17,7 +17,8 @@ import androidx.room.PrimaryKey
         Index(value = ["created_at"]),
         Index(value = ["is_deleted"]),
         Index(value = ["is_confirmed"]),
-        Index(value = ["is_trashed"])
+        Index(value = ["is_trashed"]),
+        Index(value = ["parent_capture_id"])
     ]
 )
 data class CaptureEntity(
@@ -88,5 +89,9 @@ data class CaptureEntity(
 
     // 이미지 URI
     @ColumnInfo(name = "image_uri")
-    val imageUri: String? = null
+    val imageUri: String? = null,
+
+    // 부모 캡처 ID (멀티 인텐트 분할 시 원본 참조)
+    @ColumnInfo(name = "parent_capture_id")
+    val parentCaptureId: String? = null
 )

@@ -38,6 +38,7 @@ fun MainScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToHistory: () -> Unit = {},
+    onNavigateToNoteDetail: (String) -> Unit = {},
     captureViewModel: CaptureViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -92,7 +93,7 @@ fun MainScreen(
             when (KairosTab.entries[page]) {
                 KairosTab.NOTES -> NotesContent(
                     onSearchClick = onNavigateToSearch,
-                    onNoteClick = { captureId -> onNavigateToCapture(captureId) }
+                    onNoteClick = { noteId -> onNavigateToNoteDetail(noteId) }
                 )
 
                 KairosTab.HOME -> CaptureContent(

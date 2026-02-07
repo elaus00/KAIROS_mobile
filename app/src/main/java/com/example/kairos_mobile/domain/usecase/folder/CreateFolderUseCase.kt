@@ -15,6 +15,7 @@ class CreateFolderUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(name: String) {
         require(name.isNotBlank()) { "폴더 이름이 비어있습니다" }
+        require(name.length <= 30) { "폴더 이름은 30자 이내여야 합니다" }
         require(!folderRepository.existsByName(name)) { "이미 존재하는 폴더 이름입니다" }
 
         val folder = Folder(

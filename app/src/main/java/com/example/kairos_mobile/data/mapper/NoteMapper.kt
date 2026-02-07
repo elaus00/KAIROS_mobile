@@ -17,7 +17,8 @@ class NoteMapper @Inject constructor() {
             captureId = entity.captureId,
             folderId = entity.folderId,
             createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt
+            updatedAt = entity.updatedAt,
+            body = entity.body
         )
     }
 
@@ -27,7 +28,8 @@ class NoteMapper @Inject constructor() {
             captureId = note.captureId,
             folderId = note.folderId,
             createdAt = note.createdAt,
-            updatedAt = note.updatedAt
+            updatedAt = note.updatedAt,
+            body = note.body
         )
     }
 }

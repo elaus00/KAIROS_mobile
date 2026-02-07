@@ -7,7 +7,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -39,18 +39,18 @@ class CaptureDetailViewModelTest {
     private lateinit var captureRepository: CaptureRepository
     private lateinit var changeClassificationUseCase: ChangeClassificationUseCase
     private lateinit var scheduleRepository: ScheduleRepository
-    private lateinit var syncScheduleToCalendar: SyncScheduleToCalendarUseCase
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
     private lateinit var rejectSuggestion: RejectCalendarSuggestionUseCase
+    private lateinit var trackEventUseCase: TrackEventUseCase
 
     @Before
     fun setUp() {
         captureRepository = mockk()
         changeClassificationUseCase = mockk(relaxed = true)
         scheduleRepository = mockk(relaxed = true)
-        syncScheduleToCalendar = mockk(relaxed = true)
         approveSuggestion = mockk(relaxed = true)
         rejectSuggestion = mockk(relaxed = true)
+        trackEventUseCase = mockk(relaxed = true)
     }
 
     @After
@@ -77,9 +77,9 @@ class CaptureDetailViewModelTest {
             captureRepository = captureRepository,
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
-            syncScheduleToCalendar = syncScheduleToCalendar,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion
+            rejectSuggestion = rejectSuggestion,
+            trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
 
@@ -106,9 +106,9 @@ class CaptureDetailViewModelTest {
             captureRepository = captureRepository,
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
-            syncScheduleToCalendar = syncScheduleToCalendar,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion
+            rejectSuggestion = rejectSuggestion,
+            trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
 
@@ -129,9 +129,9 @@ class CaptureDetailViewModelTest {
             captureRepository = captureRepository,
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
-            syncScheduleToCalendar = syncScheduleToCalendar,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion
+            rejectSuggestion = rejectSuggestion,
+            trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
 
@@ -159,9 +159,9 @@ class CaptureDetailViewModelTest {
             captureRepository = captureRepository,
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
-            syncScheduleToCalendar = syncScheduleToCalendar,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion
+            rejectSuggestion = rejectSuggestion,
+            trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
 
@@ -183,9 +183,9 @@ class CaptureDetailViewModelTest {
             captureRepository = captureRepository,
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
-            syncScheduleToCalendar = syncScheduleToCalendar,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion
+            rejectSuggestion = rejectSuggestion,
+            trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)

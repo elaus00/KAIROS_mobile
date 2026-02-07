@@ -10,11 +10,12 @@ import javax.inject.Singleton
  */
 @Singleton
 class EmptyTrashUseCase @Inject constructor(
-    private val captureRepository: CaptureRepository
+    private val captureRepository: CaptureRepository,
+    private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase
 ) {
     suspend operator fun invoke() {
         // threshold=Long.MAX_VALUE로 모든 휴지통 항목 가져옴
         val allTrashed = captureRepository.getTrashedOverdue(Long.MAX_VALUE)
-        allTrashed.forEach { captureRepository.hardDelete(it.id) }
+        allTrashed.forEach { hardDeleteCaptureUseCase(it.id) }
     }
 }

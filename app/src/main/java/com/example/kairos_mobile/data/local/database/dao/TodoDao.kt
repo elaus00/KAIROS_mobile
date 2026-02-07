@@ -112,4 +112,32 @@ interface TodoDao {
         AND c.is_trashed = 0
     """)
     fun getActiveCount(): Flow<Int>
+
+    /**
+     * 오늘 마감 미완료 할 일 조회 (위젯용, 최대 5개)
+     */
+    @Query("""
+        SELECT t.id AS todoId, t.capture_id AS captureId,
+               c.ai_title AS aiTitle, c.original_text AS originalText,
+               t.deadline, t.is_completed AS isCompleted
+        FROM todos t
+        INNER JOIN captures c ON t.capture_id = c.id
+        WHERE t.is_completed = 0 AND c.is_deleted = 0 AND c.is_trashed = 0
+        AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
+        ORDER BY t.deadline ASC, t.sort_order ASC
+        LIMIT 5
+    """)
+    suspend fun getTodayIncompleteTodos(todayEndMs: Long?): List<TodoWithCaptureRow>
 }
+
+/**
+ * 위젯용 할 일 + 캡처 결합 데이터 클래스
+ */
+data class TodoWithCaptureRow(
+    val todoId: String,
+    val captureId: String,
+    val aiTitle: String?,
+    val originalText: String,
+    val deadline: Long?,
+    val isCompleted: Boolean
+)

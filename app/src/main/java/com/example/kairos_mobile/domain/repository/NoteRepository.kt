@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.domain.repository
 
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import kotlinx.coroutines.flow.Flow
 
@@ -32,4 +33,10 @@ interface NoteRepository {
 
     /** 삭제되지 않은 캡처만 포함한 폴더별 노트 목록 */
     fun getNotesWithActiveCaptureByFolderId(folderId: String): Flow<List<NoteWithCapturePreview>>
+
+    /** 노트 상세 조회 (캡처 정보 포함) */
+    fun getNoteDetail(noteId: String): Flow<NoteDetail?>
+
+    /** 노트 본문 업데이트 */
+    suspend fun updateNoteBody(noteId: String, body: String?)
 }

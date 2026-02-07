@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.capture.GetFilteredCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
@@ -40,6 +41,7 @@ class HistoryViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val getAllCapturesUseCase: GetAllCapturesUseCase = mockk()
+    private val getFilteredCapturesUseCase: GetFilteredCapturesUseCase = mockk()
     private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase = mockk()
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase = mockk()
     private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase = mockk()
@@ -58,6 +60,7 @@ class HistoryViewModelTest {
     private fun createViewModel(): HistoryViewModel {
         return HistoryViewModel(
             getAllCapturesUseCase,
+            getFilteredCapturesUseCase,
             softDeleteCaptureUseCase,
             hardDeleteCaptureUseCase,
             undoDeleteCaptureUseCase,
@@ -308,7 +311,114 @@ class HistoryViewModelTest {
         assertEquals("분류 변경 실패", viewModel.uiState.value.errorMessage)
     }
 
-    // ── 12. onCleared → 대기 중인 hardDelete 즉시 실행 ──
+    // ── 12. setTypeFilter → 필터 적용 ──
+
+    @Test
+    fun `setTypeFilter_loads_filtered_captures`() = runTest {
+        // given: 초기 로드
+        val captures = listOf(TestFixtures.capture(id = "cap-1"))
+        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+
+        val filteredCaptures = listOf(
+            TestFixtures.capture(id = "cap-2", classifiedType = ClassifiedType.TODO)
+        )
+        coEvery {
+            getFilteredCapturesUseCase(
+                type = ClassifiedType.TODO,
+                startDate = null,
+                endDate = null,
+                limit = 20,
+                offset = 0
+            )
+        } returns filteredCaptures
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // when: 유형 필터 적용
+        viewModel.setTypeFilter(ClassifiedType.TODO)
+        advanceUntilIdle()
+
+        // then
+        assertEquals(ClassifiedType.TODO, viewModel.uiState.value.selectedType)
+        assertEquals(1, viewModel.uiState.value.captures.size)
+        assertEquals("cap-2", viewModel.uiState.value.captures[0].id)
+    }
+
+    // ── 13. setDateRange → 날짜 필터 적용 ──
+
+    @Test
+    fun `setDateRange_loads_filtered_captures`() = runTest {
+        // given
+        val captures = listOf(TestFixtures.capture(id = "cap-1"))
+        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+
+        val filteredCaptures = listOf(
+            TestFixtures.capture(id = "cap-3", createdAt = 5000L)
+        )
+        coEvery {
+            getFilteredCapturesUseCase(
+                type = null,
+                startDate = 1000L,
+                endDate = 9000L,
+                limit = 20,
+                offset = 0
+            )
+        } returns filteredCaptures
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // when
+        viewModel.setDateRange(1000L, 9000L)
+        advanceUntilIdle()
+
+        // then
+        assertEquals(1000L, viewModel.uiState.value.startDate)
+        assertEquals(9000L, viewModel.uiState.value.endDate)
+        assertEquals(1, viewModel.uiState.value.captures.size)
+    }
+
+    // ── 14. clearFilters → 필터 초기화 후 전체 로드 ──
+
+    @Test
+    fun `clearFilters_reloads_all_captures`() = runTest {
+        // given
+        val captures = listOf(TestFixtures.capture(id = "cap-1"))
+        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+
+        val filteredCaptures = listOf(
+            TestFixtures.capture(id = "cap-2", classifiedType = ClassifiedType.TODO)
+        )
+        coEvery {
+            getFilteredCapturesUseCase(
+                type = ClassifiedType.TODO,
+                startDate = null,
+                endDate = null,
+                limit = 20,
+                offset = 0
+            )
+        } returns filteredCaptures
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // 필터 적용
+        viewModel.setTypeFilter(ClassifiedType.TODO)
+        advanceUntilIdle()
+        assertEquals(ClassifiedType.TODO, viewModel.uiState.value.selectedType)
+
+        // when: 필터 초기화
+        viewModel.clearFilters()
+        advanceUntilIdle()
+
+        // then: 필터 해제 + 전체 목록 재로드
+        assertNull(viewModel.uiState.value.selectedType)
+        assertNull(viewModel.uiState.value.startDate)
+        assertNull(viewModel.uiState.value.endDate)
+    }
+
+    // ── 15. onCleared → 대기 중인 hardDelete 즉시 실행 ──
 
     @Test
     fun `onCleared_executes_pending_moves_to_trash`() = runTest {

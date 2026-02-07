@@ -11,6 +11,9 @@ interface TodoRepository {
     /** 할 일 생성 */
     suspend fun createTodo(todo: Todo)
 
+    /** 할 일 조회 (ID 기준) */
+    suspend fun getTodoById(todoId: String): Todo?
+
     /** 할 일 조회 (capture_id 기준) */
     suspend fun getTodoByCaptureId(captureId: String): Todo?
 

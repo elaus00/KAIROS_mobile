@@ -6,6 +6,7 @@ import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.SyncAction
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
@@ -123,13 +124,15 @@ class CaptureUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val imageRepository = mockk<ImageRepository>()
 
         val useCase = HardDeleteCaptureUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
-            tagRepository
+            tagRepository,
+            imageRepository
         )
 
         coEvery { todoRepository.deleteByCaptureId("cap-1") } just runs
@@ -137,15 +140,27 @@ class CaptureUseCasesTest {
         coEvery { noteRepository.deleteByCaptureId("cap-1") } just runs
         coEvery { tagRepository.deleteTagsByCaptureId("cap-1") } just runs
         coEvery { captureRepository.hardDelete("cap-1") } just runs
+        coEvery {
+            captureRepository.getCaptureById("cap-1")
+        } returns Capture(
+            id = "cap-1",
+            originalText = "img",
+            classifiedType = ClassifiedType.NOTES,
+            source = CaptureSource.APP,
+            imageUri = "file:///tmp/cap.jpg"
+        )
+        coEvery { imageRepository.deleteImage("file:///tmp/cap.jpg") } just runs
 
         useCase("cap-1")
 
         coVerifySequence {
+            captureRepository.getCaptureById("cap-1")
             todoRepository.deleteByCaptureId("cap-1")
             scheduleRepository.deleteByCaptureId("cap-1")
             noteRepository.deleteByCaptureId("cap-1")
             tagRepository.deleteTagsByCaptureId("cap-1")
             captureRepository.hardDelete("cap-1")
+            imageRepository.deleteImage("file:///tmp/cap.jpg")
         }
     }
 

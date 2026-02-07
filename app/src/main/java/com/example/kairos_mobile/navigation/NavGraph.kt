@@ -20,6 +20,7 @@ import com.example.kairos_mobile.presentation.main.MainScreen
 import com.example.kairos_mobile.presentation.onboarding.OnboardingScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.PrivacyPolicyScreen
+import com.example.kairos_mobile.presentation.notes.detail.NoteDetailScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
 import com.example.kairos_mobile.presentation.settings.TermsOfServiceScreen
 import com.example.kairos_mobile.presentation.trash.TrashScreen
@@ -41,6 +42,7 @@ object NavRoutes {
 
     // 보조 화면
     const val DETAIL = "detail/{captureId}"
+    const val NOTE_DETAIL = "note_detail/{noteId}"
     const val SEARCH = "search"
     const val HISTORY = "history"
     const val TRASH = "trash"
@@ -51,6 +53,11 @@ object NavRoutes {
      * CaptureDetailScreen 라우트 생성
      */
     fun detail(captureId: String): String = "detail/$captureId"
+
+    /**
+     * NoteDetailScreen 라우트 생성
+     */
+    fun noteDetail(noteId: String): String = "note_detail/$noteId"
 }
 
 /**
@@ -67,6 +74,11 @@ fun KairosNavGraph(
     // 캡처 상세 화면으로 네비게이션
     val navigateToDetail: (String) -> Unit = { captureId ->
         navController.navigate(NavRoutes.detail(captureId))
+    }
+
+    // 노트 상세 화면으로 네비게이션
+    val navigateToNoteDetail: (String) -> Unit = { noteId ->
+        navController.navigate(NavRoutes.noteDetail(noteId))
     }
 
     // 검색 화면으로 네비게이션
@@ -106,7 +118,8 @@ fun KairosNavGraph(
                 },
                 onNavigateToHistory = {
                     navController.navigate(NavRoutes.HISTORY)
-                }
+                },
+                onNavigateToNoteDetail = navigateToNoteDetail
             )
         }
 
@@ -136,6 +149,20 @@ fun KairosNavGraph(
             )
         ) {
             CaptureDetailScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // 노트 상세 화면 (NOTE_DETAIL)
+        composable(
+            route = NavRoutes.NOTE_DETAIL,
+            arguments = listOf(
+                navArgument("noteId") { type = NavType.StringType }
+            )
+        ) {
+            NoteDetailScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

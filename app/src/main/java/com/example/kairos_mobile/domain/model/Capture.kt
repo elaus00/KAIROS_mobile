@@ -41,5 +41,7 @@ data class Capture(
     /** 휴지통 이동 시점 */
     val trashedAt: Long? = null,
     /** 이미지 URI */
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    /** 부모 캡처 ID (멀티 인텐트 분할 시 원본 참조) */
+    val parentCaptureId: String? = null
 )

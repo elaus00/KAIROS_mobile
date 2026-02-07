@@ -241,6 +241,32 @@ interface CaptureDao {
     suspend fun getTrashedOverdue(threshold: Long): List<CaptureEntity>
 
     /**
+     * 부모 캡처 ID로 자식 캡처 조회 (멀티 인텐트 분할)
+     */
+    @Query("SELECT * FROM captures WHERE parent_capture_id = :parentId AND is_deleted = 0")
+    fun getByParentCaptureId(parentId: String): Flow<List<CaptureEntity>>
+
+    /**
+     * 필터링된 캡처 조회 (분류 유형 + 날짜 범위, 페이징)
+     */
+    @Query("""
+        SELECT * FROM captures
+        WHERE is_deleted = 0 AND is_trashed = 0
+        AND (:type IS NULL OR classified_type = :type)
+        AND (:startDate IS NULL OR created_at >= :startDate)
+        AND (:endDate IS NULL OR created_at <= :endDate)
+        ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
+    """)
+    suspend fun getFilteredCapturesPaged(
+        type: String?,
+        startDate: Long?,
+        endDate: Long?,
+        limit: Int,
+        offset: Int
+    ): List<CaptureEntity>
+
+    /**
      * 모든 캡처 삭제 (테스트용)
      */
     @Query("DELETE FROM captures")

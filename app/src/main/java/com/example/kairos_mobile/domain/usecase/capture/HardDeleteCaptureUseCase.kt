@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.domain.usecase.capture
 
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
@@ -18,9 +19,12 @@ class HardDeleteCaptureUseCase @Inject constructor(
     private val todoRepository: TodoRepository,
     private val scheduleRepository: ScheduleRepository,
     private val noteRepository: NoteRepository,
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    private val imageRepository: ImageRepository
 ) {
     suspend operator fun invoke(captureId: String) {
+        val imageUri = captureRepository.getCaptureById(captureId)?.imageUri
+
         // 파생 엔티티 삭제 (FK CASCADE로 자동 삭제되지만 명시적으로 처리)
         todoRepository.deleteByCaptureId(captureId)
         scheduleRepository.deleteByCaptureId(captureId)
@@ -28,5 +32,6 @@ class HardDeleteCaptureUseCase @Inject constructor(
         tagRepository.deleteTagsByCaptureId(captureId)
         // 캡처 본체 삭제 (FTS 인덱스도 함께 삭제)
         captureRepository.hardDelete(captureId)
+        imageUri?.let { imageRepository.deleteImage(it) }
     }
 }

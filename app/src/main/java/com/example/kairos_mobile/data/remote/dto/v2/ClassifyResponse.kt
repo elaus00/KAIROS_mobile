@@ -28,7 +28,10 @@ data class ClassifyResponse(
     val scheduleInfo: ScheduleInfoDto? = null,
 
     @SerializedName("todo_info")
-    val todoInfo: TodoInfoDto? = null
+    val todoInfo: TodoInfoDto? = null,
+
+    @SerializedName("split_items")
+    val splitItems: List<SplitItemDto>? = null
 )
 
 /**

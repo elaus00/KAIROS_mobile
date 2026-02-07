@@ -1,8 +1,15 @@
 package com.example.kairos_mobile.data.repository
 
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
+import com.example.kairos_mobile.data.local.database.dao.CaptureDao
+import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.mapper.NoteMapper
+import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteDetail
+import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,11 +23,35 @@ import javax.inject.Singleton
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
     private val noteDao: NoteDao,
+    private val captureDao: CaptureDao,
+    private val folderDao: FolderDao,
     private val noteMapper: NoteMapper
 ) : NoteRepository {
+    companion object {
+        private const val TAG = "NoteRepository"
+    }
 
     override suspend fun createNote(note: Note) {
-        noteDao.insert(noteMapper.toEntity(note))
+        // 캡처가 없으면 FK 위반이므로 노트 생성을 스킵한다.
+        if (captureDao.getById(note.captureId) == null) {
+            Log.w(TAG, "createNote skipped: capture not found (${note.captureId})")
+            return
+        }
+
+        // 폴더 FK가 깨진 경우에는 null로 저장하여 노트 데이터 손실을 방지한다.
+        val safeFolderId = note.folderId?.takeIf { folderId ->
+            folderDao.getById(folderId) != null
+        }
+        if (note.folderId != null && safeFolderId == null) {
+            Log.w(TAG, "createNote fallback: folder not found (${note.folderId})")
+        }
+
+        try {
+            noteDao.insert(noteMapper.toEntity(note.copy(folderId = safeFolderId)))
+        } catch (e: SQLiteConstraintException) {
+            // 분류 처리 중 캡처가 삭제되는 경쟁 상태를 앱 크래시 없이 흡수한다.
+            Log.w(TAG, "createNote skipped due to FK constraint (captureId=${note.captureId})", e)
+        }
     }
 
     override suspend fun getNoteByCaptureId(captureId: String): Note? {
@@ -66,5 +97,40 @@ class NoteRepositoryImpl @Inject constructor(
                     )
                 }
             }
+    }
+
+    override fun getNoteDetail(noteId: String): Flow<NoteDetail?> {
+        return noteDao.getNoteWithCapture(noteId)
+            .map { row ->
+                row?.let {
+                    NoteDetail(
+                        noteId = it.noteId,
+                        captureId = it.captureId,
+                        aiTitle = it.aiTitle,
+                        originalText = it.originalText,
+                        body = it.body,
+                        classifiedType = try {
+                            ClassifiedType.valueOf(it.classifiedType)
+                        } catch (_: Exception) {
+                            ClassifiedType.TEMP
+                        },
+                        noteSubType = it.noteSubType?.let { subType ->
+                            try {
+                                NoteSubType.valueOf(subType)
+                            } catch (_: Exception) {
+                                null
+                            }
+                        },
+                        folderId = it.folderId,
+                        imageUri = it.imageUri,
+                        createdAt = it.createdAt,
+                        updatedAt = it.updatedAt
+                    )
+                }
+            }
+    }
+
+    override suspend fun updateNoteBody(noteId: String, body: String?) {
+        noteDao.updateBody(noteId, body, System.currentTimeMillis())
     }
 }

@@ -159,6 +159,43 @@ class CaptureRepositoryImpl @Inject constructor(
             .map { captureMapper.toDomain(it) }
     }
 
+    override fun getChildCaptures(parentId: String): Flow<List<Capture>> {
+        return captureDao.getByParentCaptureId(parentId)
+            .map { entities -> entities.map { captureMapper.toDomain(it) } }
+    }
+
+    override suspend fun getFilteredCaptures(
+        type: ClassifiedType?,
+        startDate: Long?,
+        endDate: Long?,
+        limit: Int,
+        offset: Int
+    ): List<Capture> {
+        return captureDao.getFilteredCapturesPaged(
+            type = type?.name,
+            startDate = startDate,
+            endDate = endDate,
+            limit = limit,
+            offset = offset
+        ).map { captureMapper.toDomain(it) }
+    }
+
+    override suspend fun searchCapturesFiltered(
+        query: String,
+        type: ClassifiedType?,
+        startDate: Long?,
+        endDate: Long?,
+        limit: Int
+    ): List<Capture> {
+        return captureSearchDao.searchFiltered(
+            query = sanitizeFtsQuery(query),
+            type = type?.name,
+            startDate = startDate,
+            endDate = endDate,
+            limit = limit
+        ).map { captureMapper.toDomain(it) }
+    }
+
     private fun sanitizeFtsQuery(query: String): String {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) {

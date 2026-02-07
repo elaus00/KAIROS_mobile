@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.settings.CalendarSettingsKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,20 @@ class OnboardingViewModel @Inject constructor(
     private val _events = MutableSharedFlow<OnboardingEvent>()
     val events: SharedFlow<OnboardingEvent> = _events.asSharedFlow()
 
+    init {
+        loadGoogleConnectionState()
+    }
+
+    private fun loadGoogleConnectionState() {
+        viewModelScope.launch {
+            val connected = userPreferenceRepository.getString(
+                CalendarSettingsKeys.KEY_CALENDAR_ENABLED,
+                "false"
+            ) == "true"
+            _uiState.update { it.copy(isGoogleConnected = connected) }
+        }
+    }
+
     /**
      * 입력 텍스트 업데이트 (3번째 화면 입력창)
      */
@@ -62,9 +77,9 @@ class OnboardingViewModel @Inject constructor(
      */
     fun completeOnboarding() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
             val text = _uiState.value.inputText
             if (text.isNotBlank()) {
-                _uiState.update { it.copy(isSubmitting = true) }
                 try {
                     submitCaptureUseCase(text)
                 } catch (_: Exception) {
@@ -73,6 +88,7 @@ class OnboardingViewModel @Inject constructor(
             }
             userPreferenceRepository.setOnboardingCompleted()
             _events.emit(OnboardingEvent.NavigateToHome)
+            _uiState.update { it.copy(isSubmitting = false) }
         }
     }
 
@@ -81,8 +97,10 @@ class OnboardingViewModel @Inject constructor(
      */
     fun skip() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
             userPreferenceRepository.setOnboardingCompleted()
             _events.emit(OnboardingEvent.NavigateToHome)
+            _uiState.update { it.copy(isSubmitting = false) }
         }
     }
 
@@ -90,6 +108,9 @@ class OnboardingViewModel @Inject constructor(
      * Google Calendar 연결 (Mock — 즉시 연결됨 상태로 전환)
      */
     fun connectGoogle() {
-        _uiState.update { it.copy(isGoogleConnected = true) }
+        viewModelScope.launch {
+            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+            _uiState.update { it.copy(isGoogleConnected = true) }
+        }
     }
 }

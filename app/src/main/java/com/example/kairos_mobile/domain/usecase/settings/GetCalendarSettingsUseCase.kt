@@ -15,20 +15,28 @@ class GetCalendarSettingsUseCase @Inject constructor(
      * Google Calendar 연동 여부
      */
     suspend fun isCalendarEnabled(): Boolean {
-        return userPreferenceRepository.getString("calendar_enabled", "false") == "true"
+        return userPreferenceRepository.getString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "false") == "true"
     }
 
     /**
      * 일정 추가 모드 (auto / suggest)
      */
     suspend fun getCalendarMode(): String {
-        return userPreferenceRepository.getString("calendar_mode", "suggest")
+        return when (
+            userPreferenceRepository.getString(
+                CalendarSettingsKeys.KEY_CALENDAR_MODE,
+                CalendarSettingsKeys.MODE_SUGGEST
+            ).lowercase()
+        ) {
+            CalendarSettingsKeys.MODE_AUTO -> CalendarSettingsKeys.MODE_AUTO
+            else -> CalendarSettingsKeys.MODE_SUGGEST
+        }
     }
 
     /**
      * 알림 설정 여부
      */
     suspend fun isNotificationEnabled(): Boolean {
-        return userPreferenceRepository.getString("notification_enabled", "true") == "true"
+        return userPreferenceRepository.getString(CalendarSettingsKeys.KEY_NOTIFICATION_ENABLED, "true") == "true"
     }
 }

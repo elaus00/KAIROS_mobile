@@ -6,6 +6,7 @@ import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.capture.GetFilteredCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val getAllCapturesUseCase: GetAllCapturesUseCase,
+    private val getFilteredCapturesUseCase: GetFilteredCapturesUseCase,
     private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase,
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase,
     private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase,
@@ -86,7 +88,11 @@ class HistoryViewModel @Inject constructor(
 
         loadingMorePage = nextPage
         _uiState.update { it.copy(isLoadingMore = true) }
-        subscribePage(nextPage)
+        if (isFilterActive) {
+            loadFilteredPage(nextPage)
+        } else {
+            subscribePage(nextPage)
+        }
     }
 
     /**
@@ -143,6 +149,102 @@ class HistoryViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "분류 변경에 실패했습니다.")
+                }
+            }
+        }
+    }
+
+    /**
+     * 분류 유형 필터 설정
+     */
+    fun setTypeFilter(type: ClassifiedType?) {
+        _uiState.update { it.copy(selectedType = type) }
+        reloadWithFilters()
+    }
+
+    /**
+     * 날짜 범위 필터 설정
+     */
+    fun setDateRange(startDate: Long?, endDate: Long?) {
+        _uiState.update { it.copy(startDate = startDate, endDate = endDate) }
+        reloadWithFilters()
+    }
+
+    /**
+     * 필터 초기화
+     */
+    fun clearFilters() {
+        _uiState.update { it.copy(selectedType = null, startDate = null, endDate = null) }
+        reloadWithFilters()
+    }
+
+    /**
+     * 필터 활성 여부
+     */
+    private val isFilterActive: Boolean
+        get() {
+            val state = _uiState.value
+            return state.selectedType != null || state.startDate != null || state.endDate != null
+        }
+
+    /**
+     * 필터 적용 후 데이터 재로드
+     */
+    private fun reloadWithFilters() {
+        if (!isFilterActive) {
+            loadFirstPage()
+            return
+        }
+        // 필터 모드: Flow 구독 중단, 직접 조회
+        pageJobs.values.forEach { it.cancel() }
+        pageJobs.clear()
+        pageSnapshots.clear()
+        highestPageRequested = -1
+        loadingMorePage = null
+        _uiState.update { it.copy(isLoading = true, captures = emptyList(), hasMore = true) }
+        loadFilteredPage(0)
+    }
+
+    /**
+     * 필터 모드 페이지 로드
+     */
+    private fun loadFilteredPage(page: Int) {
+        highestPageRequested = maxOf(highestPageRequested, page)
+        pageJobs[page]?.cancel()
+        pageJobs[page] = viewModelScope.launch {
+            try {
+                val state = _uiState.value
+                val captures = getFilteredCapturesUseCase(
+                    type = state.selectedType,
+                    startDate = state.startDate,
+                    endDate = state.endDate,
+                    limit = PAGE_SIZE,
+                    offset = page * PAGE_SIZE
+                )
+                pageSnapshots[page] = captures
+                val mergedCaptures = (0..highestPageRequested)
+                    .flatMap { index -> pageSnapshots[index].orEmpty() }
+                    .distinctBy { capture -> capture.id }
+                val hasMore = captures.size >= PAGE_SIZE
+                val isLoadingMoreFinished = loadingMorePage == page
+                if (isLoadingMoreFinished) loadingMorePage = null
+                _uiState.update { s ->
+                    s.copy(
+                        captures = mergedCaptures,
+                        isLoading = false,
+                        isLoadingMore = if (isLoadingMoreFinished) false else s.isLoadingMore,
+                        hasMore = hasMore,
+                        errorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                if (loadingMorePage == page) loadingMorePage = null
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isLoadingMore = false,
+                        errorMessage = e.message ?: "기록을 불러오지 못했습니다."
+                    )
                 }
             }
         }

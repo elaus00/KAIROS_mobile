@@ -89,7 +89,7 @@ fun FolderNoteList(
                 ) { note ->
                     NoteItem(
                         note = note,
-                        onClick = { onNoteClick(note.captureId) }
+                        onClick = { onNoteClick(note.noteId) }
                     )
                 }
             }

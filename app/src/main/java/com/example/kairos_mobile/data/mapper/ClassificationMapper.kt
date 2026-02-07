@@ -3,6 +3,7 @@ package com.example.kairos_mobile.data.mapper
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
 import com.example.kairos_mobile.data.remote.dto.v2.EntityDto
 import com.example.kairos_mobile.data.remote.dto.v2.ScheduleInfoDto
+import com.example.kairos_mobile.data.remote.dto.v2.SplitItemDto
 import com.example.kairos_mobile.data.remote.dto.v2.TodoInfoDto
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.ClassifiedType
@@ -12,6 +13,7 @@ import com.example.kairos_mobile.domain.model.EntityType
 import com.example.kairos_mobile.domain.model.ExtractedEntity
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.ScheduleInfo
+import com.example.kairos_mobile.domain.model.SplitItem
 import com.example.kairos_mobile.domain.model.TodoInfo
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +36,24 @@ class ClassificationMapper @Inject constructor() {
             tags = response.tags,
             entities = response.entities.map { toDomain(it) },
             scheduleInfo = response.scheduleInfo?.let { toDomain(it) },
-            todoInfo = response.todoInfo?.let { toDomain(it) }
+            todoInfo = response.todoInfo?.let { toDomain(it) },
+            splitItems = response.splitItems?.map { toDomain(it) }
+        )
+    }
+
+    /**
+     * SplitItemDto → SplitItem 도메인 모델 변환
+     */
+    private fun toDomain(dto: SplitItemDto): SplitItem {
+        return SplitItem(
+            splitText = dto.splitText,
+            classifiedType = parseClassifiedType(dto.classifiedType),
+            noteSubType = dto.noteSubType?.let { parseNoteSubType(it) },
+            confidence = parseConfidence(dto.confidence),
+            aiTitle = dto.aiTitle,
+            tags = dto.tags,
+            scheduleInfo = dto.scheduleInfo?.let { toDomain(it) },
+            todoInfo = dto.todoInfo?.let { toDomain(it) }
         )
     }
 

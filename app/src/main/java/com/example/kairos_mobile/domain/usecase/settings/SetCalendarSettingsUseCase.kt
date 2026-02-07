@@ -15,20 +15,24 @@ class SetCalendarSettingsUseCase @Inject constructor(
      * Google Calendar 연동 설정
      */
     suspend fun setCalendarEnabled(enabled: Boolean) {
-        userPreferenceRepository.setString("calendar_enabled", enabled.toString())
+        userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, enabled.toString())
     }
 
     /**
      * 일정 추가 모드 설정 (auto / suggest)
      */
     suspend fun setCalendarMode(mode: String) {
-        userPreferenceRepository.setString("calendar_mode", mode)
+        val normalizedMode = when (mode.lowercase()) {
+            CalendarSettingsKeys.MODE_AUTO -> CalendarSettingsKeys.MODE_AUTO
+            else -> CalendarSettingsKeys.MODE_SUGGEST
+        }
+        userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_MODE, normalizedMode)
     }
 
     /**
      * 알림 설정
      */
     suspend fun setNotificationEnabled(enabled: Boolean) {
-        userPreferenceRepository.setString("notification_enabled", enabled.toString())
+        userPreferenceRepository.setString(CalendarSettingsKeys.KEY_NOTIFICATION_ENABLED, enabled.toString())
     }
 }

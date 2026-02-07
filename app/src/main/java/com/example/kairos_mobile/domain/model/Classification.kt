@@ -20,7 +20,9 @@ data class Classification(
     /** 일정 정보 (type=SCHEDULE일 때) */
     val scheduleInfo: ScheduleInfo? = null,
     /** 할 일 정보 (type=TODO일 때) */
-    val todoInfo: TodoInfo? = null
+    val todoInfo: TodoInfo? = null,
+    /** 다중 의도 분리 결과 (null이면 단일 의도) */
+    val splitItems: List<SplitItem>? = null
 )
 
 /**

@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.kairos_mobile.data.remote.api.KairosApi
+import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventDto
 import com.example.kairos_mobile.domain.repository.AnalyticsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -30,7 +31,19 @@ class AnalyticsBatchWorker @AssistedInject constructor(
         val events = analyticsRepository.getUnsynced(50)
         if (events.isEmpty()) return Result.success()
 
-        // Mock: 실제 전송 대신 동기화 완료 처리
+        val response = kairosApi.analyticsEvents(
+            events.map {
+                AnalyticsEventDto(
+                    eventType = it.eventType,
+                    eventData = it.eventData,
+                    timestamp = it.timestamp
+                )
+            }
+        )
+        if (!response.isSuccessful) {
+            return Result.retry()
+        }
+
         analyticsRepository.markSynced(events.map { it.id })
 
         // 7일 이상 된 동기화 완료 이벤트 삭제

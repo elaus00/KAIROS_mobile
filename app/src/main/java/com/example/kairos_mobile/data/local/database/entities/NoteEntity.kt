@@ -49,5 +49,9 @@ data class NoteEntity(
 
     // 최종 수정 시각
     @ColumnInfo(name = "updated_at")
-    val updatedAt: Long
+    val updatedAt: Long,
+
+    // 노트 본문 (사용자 편집 가능)
+    @ColumnInfo(name = "body")
+    val body: String? = null
 )

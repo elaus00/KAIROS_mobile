@@ -8,6 +8,7 @@ import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
 import com.example.kairos_mobile.data.remote.dto.v2.EntityDto
 import com.example.kairos_mobile.data.remote.dto.v2.HealthResponse
 import com.example.kairos_mobile.data.remote.dto.v2.ScheduleInfoDto
+import com.example.kairos_mobile.data.remote.dto.v2.SplitItemDto
 import com.example.kairos_mobile.data.remote.dto.v2.TodoInfoDto
 import kotlinx.coroutines.delay
 import retrofit2.Response
@@ -28,6 +29,7 @@ class MockKairosApi @Inject constructor() : KairosApi {
 
     /**
      * Mock AI 분류 — 키워드 기반 분류 로직
+     * 멀티 인텐트 감지 시 splitItems 포함
      */
     override suspend fun classify(
         request: ClassifyRequest
@@ -36,7 +38,26 @@ class MockKairosApi @Inject constructor() : KairosApi {
 
         val text = request.text.lowercase()
 
-        // 키워드 기반 분류
+        // 멀티 인텐트 패턴 감지 ("~하고", "~그리고")
+        val splitItems = detectMultiIntent(request.text)
+        if (splitItems != null) {
+            // 멀티 인텐트: 첫 번째 split 기준으로 대표 분류 생성
+            val firstSplit = splitItems.first()
+            val response = ClassifyResponse(
+                classifiedType = firstSplit.classifiedType,
+                noteSubType = firstSplit.noteSubType,
+                confidence = firstSplit.confidence,
+                aiTitle = request.text.take(30),
+                tags = extractTags(request.text),
+                entities = extractEntities(text),
+                scheduleInfo = firstSplit.scheduleInfo,
+                todoInfo = firstSplit.todoInfo,
+                splitItems = splitItems
+            )
+            return Response.success(response)
+        }
+
+        // 단일 의도 분류
         val (classifiedType, noteSubType, scheduleInfo, todoInfo) = classifyByKeywords(text)
 
         // 제목 추출 (첫 줄, 최대 30자)
@@ -120,6 +141,40 @@ class MockKairosApi @Inject constructor() : KairosApi {
     }
 
     // ========== Helper Methods ==========
+
+    /**
+     * 멀티 인텐트 패턴 감지
+     * "~하고", "~그리고" 구분자로 텍스트를 분할하여 각 의도를 개별 분류한다.
+     * 분할 결과가 2개 이상이면 splitItems 반환, 아니면 null.
+     */
+    private fun detectMultiIntent(originalText: String): List<SplitItemDto>? {
+        // "하고 ", " 그리고 " 패턴으로 분할
+        val splitPattern = "(?:하고\\s|\\s그리고\\s)".toRegex()
+        val parts = originalText.split(splitPattern).map { it.trim() }.filter { it.isNotEmpty() }
+
+        if (parts.size < 2) return null
+
+        return parts.map { part ->
+            val lowerPart = part.lowercase()
+            val (type, subType, schedInfo, todoInf) = classifyByKeywords(lowerPart)
+            val confidence = when {
+                lowerPart.contains("해야") || lowerPart.contains("todo") -> "HIGH"
+                lowerPart.contains("회의") || lowerPart.contains("약속") -> "HIGH"
+                else -> "MEDIUM"
+            }
+            SplitItemDto(
+                splitText = part,
+                classifiedType = type,
+                noteSubType = subType,
+                confidence = confidence,
+                aiTitle = part.take(30),
+                tags = extractTags(part),
+                entities = extractEntities(lowerPart),
+                scheduleInfo = schedInfo,
+                todoInfo = todoInf
+            )
+        }
+    }
 
     /**
      * 키워드 기반 분류 결과 반환

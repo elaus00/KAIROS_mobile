@@ -3,6 +3,7 @@ package com.example.kairos_mobile.presentation.onboarding
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.settings.CalendarSettingsKeys
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,6 +14,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -36,6 +38,12 @@ class OnboardingViewModelTest {
     fun setUp() {
         userPreferenceRepository = mockk(relaxed = true)
         submitCaptureUseCase = mockk(relaxed = true)
+        coEvery {
+            userPreferenceRepository.getString(
+                CalendarSettingsKeys.KEY_CALENDAR_ENABLED,
+                "false"
+            )
+        } returns "false"
         viewModel = OnboardingViewModel(userPreferenceRepository, submitCaptureUseCase)
     }
 
@@ -130,9 +138,9 @@ class OnboardingViewModelTest {
         coVerify { userPreferenceRepository.setOnboardingCompleted() }
     }
 
-    /** completeOnboarding 중 isSubmitting이 true로 설정된다 */
+    /** completeOnboarding 완료 후 isSubmitting이 false로 복귀한다 */
     @Test
-    fun isSubmitting_true_during_completion() = runTest {
+    fun isSubmitting_false_after_completion() = runTest {
         // given
         viewModel.updateInput("제출 중 테스트")
 
@@ -144,8 +152,17 @@ class OnboardingViewModelTest {
         // advanceUntilIdle 후에는 이미 완료되므로 중간 상태를 검증
         advanceUntilIdle()
 
-        // isSubmitting은 true로 설정되었다가 코루틴 완료 후에도 유지됨
-        // (completeOnboarding에서 isSubmitting = false로 되돌리지 않으므로)
-        assertTrue(viewModel.uiState.value.isSubmitting)
+        assertFalse(viewModel.uiState.value.isSubmitting)
+    }
+
+    @Test
+    fun connectGoogle_persists_and_updates_state() = runTest {
+        viewModel.connectGoogle()
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+        }
+        assertTrue(viewModel.uiState.value.isGoogleConnected)
     }
 }

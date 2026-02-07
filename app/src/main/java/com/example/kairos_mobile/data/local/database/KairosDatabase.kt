@@ -52,7 +52,7 @@ import com.example.kairos_mobile.data.local.database.entities.UserPreferenceEnti
         ClassificationLogEntity::class,
         AnalyticsEventEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -82,6 +82,16 @@ abstract class KairosDatabase : RoomDatabase() {
         val SEED_SYSTEM_FOLDERS = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
+                seedSystemFolders(db)
+            }
+
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                super.onOpen(db)
+                // 기존 DB에서 시스템 폴더가 유실된 경우를 복구한다.
+                seedSystemFolders(db)
+            }
+
+            private fun seedSystemFolders(db: SupportSQLiteDatabase) {
                 val now = System.currentTimeMillis()
                 db.execSQL(
                     """

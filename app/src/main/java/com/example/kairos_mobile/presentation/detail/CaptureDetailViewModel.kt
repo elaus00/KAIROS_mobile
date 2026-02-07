@@ -9,7 +9,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,9 +29,9 @@ class CaptureDetailViewModel @Inject constructor(
     private val captureRepository: CaptureRepository,
     private val changeClassification: ChangeClassificationUseCase,
     private val scheduleRepository: ScheduleRepository,
-    private val syncScheduleToCalendar: SyncScheduleToCalendarUseCase,
     private val approveSuggestion: ApproveCalendarSuggestionUseCase,
-    private val rejectSuggestion: RejectCalendarSuggestionUseCase
+    private val rejectSuggestion: RejectCalendarSuggestionUseCase,
+    private val trackEventUseCase: TrackEventUseCase
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -72,6 +72,13 @@ class CaptureDetailViewModel @Inject constructor(
                         googleEventId = schedule?.googleEventId
                     )
                 }
+
+                // 캡처 재방문 분석 이벤트
+                val timeSinceCreation = System.currentTimeMillis() - capture.createdAt
+                trackEventUseCase(
+                    eventType = "capture_revisited",
+                    eventData = """{"time_since_creation_ms":$timeSinceCreation,"access_method":"list"}"""
+                )
             } else {
                 _uiState.update {
                     it.copy(isLoading = false, errorMessage = "캡처를 찾을 수 없습니다")

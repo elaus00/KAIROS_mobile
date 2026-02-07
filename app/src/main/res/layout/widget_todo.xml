@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/widget_background">
+
+    <!-- 헤더: 제목 -->
+    <TextView
+        android:id="@+id/widget_todo_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="오늘 할 일"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:paddingBottom="6dp" />
+
+    <!-- 할 일 리스트 -->
+    <ListView
+        android:id="@+id/widget_todo_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+    <!-- 비어있을 때 표시 -->
+    <TextView
+        android:id="@+id/widget_todo_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="할 일이 없습니다"
+        android:textColor="#888888"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <!-- 앱 열기 버튼 -->
+    <TextView
+        android:id="@+id/widget_todo_open_app"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:text="앱 열기"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp" />
+
+</LinearLayout>

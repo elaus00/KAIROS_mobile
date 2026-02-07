@@ -19,6 +19,7 @@ import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCa
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import io.mockk.coEvery
@@ -115,11 +116,13 @@ class DelegatingUseCasesTest {
     @Test
     fun todo_usecases_delegate_to_repository() = runTest {
         val todoRepository = mockk<TodoRepository>()
+        val trackEventUseCase = mockk<TrackEventUseCase>(relaxed = true)
         val getActiveTodos = GetActiveTodosUseCase(todoRepository)
-        val toggleTodoCompletion = ToggleTodoCompletionUseCase(todoRepository)
+        val toggleTodoCompletion = ToggleTodoCompletionUseCase(todoRepository, trackEventUseCase)
         val todos = listOf(Todo(captureId = "c1"))
 
         every { todoRepository.getActiveTodos() } returns flowOf(todos)
+        coEvery { todoRepository.getTodoById("t1") } returns null
         coEvery { todoRepository.toggleCompletion("t1") } just runs
 
         getActiveTodos().test {

@@ -17,9 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.kairos_mobile.presentation.components.common.FilterChipRow
+import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.presentation.components.common.SwipeableCard
 import com.example.kairos_mobile.presentation.history.components.HistoryItem
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import java.util.Calendar
 
 /**
  * 전체 기록 화면
@@ -93,6 +96,20 @@ fun HistoryScreen(
         ) {
             // 상단 바: 뒤로 가기 + 제목
             HistoryTopBar(onNavigateBack = onNavigateBack)
+
+            // 분류 유형 필터 칩
+            FilterChipRow(
+                selectedType = uiState.selectedType,
+                onTypeSelected = { viewModel.setTypeFilter(it) },
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            // 날짜 범위 필터 칩
+            DateRangeChipRow(
+                startDate = uiState.startDate,
+                endDate = uiState.endDate,
+                onDateRangeSelected = { start, end -> viewModel.setDateRange(start, end) }
+            )
 
             // 콘텐츠
             when {
@@ -209,6 +226,89 @@ private fun HistoryTopBar(
             color = colors.text,
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+/**
+ * 날짜 범위 필터 칩 Row
+ * 오늘 / 이번 주 / 이번 달 / 전체
+ */
+@Composable
+private fun DateRangeChipRow(
+    startDate: Long?,
+    endDate: Long?,
+    onDateRangeSelected: (Long?, Long?) -> Unit
+) {
+    val now = remember { System.currentTimeMillis() }
+
+    // 오늘 시작 시각 계산
+    val todayStart = remember {
+        Calendar.getInstance().apply {
+            timeInMillis = now
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
+    // 이번 주 시작 시각 (월요일)
+    val weekStart = remember {
+        Calendar.getInstance().apply {
+            timeInMillis = now
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
+    // 이번 달 시작 시각
+    val monthStart = remember {
+        Calendar.getInstance().apply {
+            timeInMillis = now
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
+    // 현재 선택된 범위 판별
+    val selectedRange = when {
+        startDate == null && endDate == null -> "전체"
+        startDate == todayStart -> "오늘"
+        startDate == weekStart -> "이번 주"
+        startDate == monthStart -> "이번 달"
+        else -> "기타"
+    }
+
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        KairosChip(
+            text = "전체",
+            selected = selectedRange == "전체",
+            onClick = { onDateRangeSelected(null, null) }
+        )
+        KairosChip(
+            text = "오늘",
+            selected = selectedRange == "오늘",
+            onClick = { onDateRangeSelected(todayStart, null) }
+        )
+        KairosChip(
+            text = "이번 주",
+            selected = selectedRange == "이번 주",
+            onClick = { onDateRangeSelected(weekStart, null) }
+        )
+        KairosChip(
+            text = "이번 달",
+            selected = selectedRange == "이번 달",
+            onClick = { onDateRangeSelected(monthStart, null) }
         )
     }
 }

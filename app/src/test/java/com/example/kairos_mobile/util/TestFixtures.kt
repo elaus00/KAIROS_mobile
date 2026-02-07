@@ -14,6 +14,7 @@ import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.Schedule
 import com.example.kairos_mobile.domain.model.SortSource
 import com.example.kairos_mobile.domain.model.SyncAction
+import com.example.kairos_mobile.domain.model.Note
 import com.example.kairos_mobile.domain.model.SyncQueueItem
 import com.example.kairos_mobile.domain.model.SyncQueueStatus
 import com.example.kairos_mobile.domain.model.Todo
@@ -36,6 +37,7 @@ object TestFixtures {
         isTrashed: Boolean = false,
         trashedAt: Long? = null,
         imageUri: String? = null,
+        parentCaptureId: String? = null,
         createdAt: Long = 1000L
     ) = Capture(
         id = id,
@@ -50,6 +52,7 @@ object TestFixtures {
         isTrashed = isTrashed,
         trashedAt = trashedAt,
         imageUri = imageUri,
+        parentCaptureId = parentCaptureId,
         createdAt = createdAt
     )
 
@@ -121,6 +124,20 @@ object TestFixtures {
         id = id,
         eventType = eventType,
         eventData = eventData
+    )
+
+    fun note(
+        id: String = "note-1",
+        captureId: String = "cap-1",
+        folderId: String? = "system-inbox",
+        body: String? = null,
+        createdAt: Long = 1000L
+    ) = Note(
+        id = id,
+        captureId = captureId,
+        folderId = folderId,
+        body = body,
+        createdAt = createdAt
     )
 
     fun syncQueueItem(

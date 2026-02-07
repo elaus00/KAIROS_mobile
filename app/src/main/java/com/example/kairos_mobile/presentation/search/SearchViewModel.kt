@@ -2,6 +2,8 @@ package com.example.kairos_mobile.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -16,11 +18,12 @@ import javax.inject.Inject
 
 /**
  * 검색 화면 ViewModel
- * FTS 기반 실시간 검색 (300ms 디바운싱)
+ * FTS 기반 실시간 검색 (300ms 디바운싱) + 분류/날짜 필터
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchCapturesUseCase: SearchCapturesUseCase
+    private val searchCapturesUseCase: SearchCapturesUseCase,
+    private val trackEventUseCase: TrackEventUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -42,29 +45,99 @@ class SearchViewModel @Inject constructor(
 
         searchJob = viewModelScope.launch {
             delay(300)
-            executeSearch(text)
+            executeSearch()
         }
     }
 
     /**
-     * FTS 검색 실행
+     * 분류 유형 필터 변경
      */
-    private fun executeSearch(query: String) {
-        viewModelScope.launch {
-            searchCapturesUseCase(query)
-                .catch { e ->
-                    _uiState.update {
-                        it.copy(errorMessage = e.message ?: "검색 실패")
-                    }
+    fun setTypeFilter(type: ClassifiedType?) {
+        _uiState.update { it.copy(selectedType = type) }
+        triggerSearch()
+    }
+
+    /**
+     * 날짜 범위 필터 변경
+     */
+    fun setDateRange(startDate: Long?, endDate: Long?) {
+        _uiState.update { it.copy(startDate = startDate, endDate = endDate) }
+        triggerSearch()
+    }
+
+    /**
+     * 필터 전체 초기화
+     */
+    fun clearFilters() {
+        _uiState.update { it.copy(selectedType = null, startDate = null, endDate = null) }
+        triggerSearch()
+    }
+
+    /**
+     * 필터 변경 시 즉시 검색 재실행
+     */
+    private fun triggerSearch() {
+        val query = _uiState.value.searchText
+        if (query.isBlank()) return
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            executeSearch()
+        }
+    }
+
+    /**
+     * 검색 실행 (필터 유무에 따라 분기)
+     */
+    private suspend fun executeSearch() {
+        val state = _uiState.value
+        val query = state.searchText
+        if (query.isBlank()) return
+
+        val hasFilters = state.selectedType != null || state.startDate != null || state.endDate != null
+
+        try {
+            if (hasFilters) {
+                // 필터 포함 검색 (suspend)
+                val results = searchCapturesUseCase.searchFiltered(
+                    query = query,
+                    type = state.selectedType,
+                    startDate = state.startDate,
+                    endDate = state.endDate
+                )
+                _uiState.update {
+                    it.copy(searchResults = results, hasSearched = true)
                 }
-                .collect { results ->
-                    _uiState.update {
-                        it.copy(
-                            searchResults = results,
-                            hasSearched = true
+
+                // 검색 수행 분석 이벤트
+                trackEventUseCase(
+                    eventType = "search_performed",
+                    eventData = """{"result_count":${results.size},"result_clicked":false,"filtered":true}"""
+                )
+            } else {
+                // 기본 검색 (Flow 수집)
+                searchCapturesUseCase(query)
+                    .catch { e ->
+                        _uiState.update {
+                            it.copy(errorMessage = e.message ?: "검색 실패")
+                        }
+                    }
+                    .collect { results ->
+                        _uiState.update {
+                            it.copy(searchResults = results, hasSearched = true)
+                        }
+
+                        // 검색 수행 분석 이벤트
+                        trackEventUseCase(
+                            eventType = "search_performed",
+                            eventData = """{"result_count":${results.size},"result_clicked":false}"""
                         )
                     }
-                }
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(errorMessage = e.message ?: "검색 실패")
+            }
         }
     }
 

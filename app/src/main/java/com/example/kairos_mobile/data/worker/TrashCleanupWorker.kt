@@ -9,6 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
@@ -21,7 +22,8 @@ import java.util.concurrent.TimeUnit
 class TrashCleanupWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val captureRepository: CaptureRepository
+    private val captureRepository: CaptureRepository,
+    private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -40,7 +42,7 @@ class TrashCleanupWorker @AssistedInject constructor(
         var deletedCount = 0
         for (item in overdueItems) {
             try {
-                captureRepository.hardDelete(item.id)
+                hardDeleteCaptureUseCase(item.id)
                 deletedCount++
             } catch (e: Exception) {
                 Log.e(TAG, "휴지통 항목 삭제 실패: ${item.id}", e)

@@ -116,4 +116,56 @@ class FolderUseCasesTest {
 
         coVerify(exactly = 1) { repository.deleteFolder("f1") }
     }
+
+    // ── 폴더 이름 30자 제한 테스트 ──
+
+    @Test
+    fun createFolder_rejects_name_longer_than_30_chars() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = CreateFolderUseCase(repository)
+
+        val error = runCatching { useCase("a".repeat(31)) }.exceptionOrNull()
+
+        assertTrue(error is IllegalArgumentException)
+        assertEquals("폴더 이름은 30자 이내여야 합니다", error?.message)
+        coVerify(exactly = 0) { repository.createFolder(any()) }
+    }
+
+    @Test
+    fun createFolder_accepts_name_at_30_chars() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = CreateFolderUseCase(repository)
+
+        coEvery { repository.existsByName(any()) } returns false
+        coEvery { repository.createFolder(any()) } just runs
+
+        useCase("a".repeat(30))
+
+        coVerify(exactly = 1) { repository.createFolder(any()) }
+    }
+
+    @Test
+    fun renameFolder_rejects_name_longer_than_30_chars() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = RenameFolderUseCase(repository)
+
+        val error = runCatching { useCase("f1", "b".repeat(31)) }.exceptionOrNull()
+
+        assertTrue(error is IllegalArgumentException)
+        assertEquals("폴더 이름은 30자 이내여야 합니다", error?.message)
+        coVerify(exactly = 0) { repository.renameFolder(any(), any()) }
+    }
+
+    @Test
+    fun renameFolder_accepts_name_at_30_chars() = runTest {
+        val repository = mockk<FolderRepository>()
+        val useCase = RenameFolderUseCase(repository)
+
+        coEvery { repository.existsByName(any()) } returns false
+        coEvery { repository.renameFolder("f1", any()) } just runs
+
+        useCase("f1", "b".repeat(30))
+
+        coVerify(exactly = 1) { repository.renameFolder("f1", any()) }
+    }
 }

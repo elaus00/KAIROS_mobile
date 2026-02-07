@@ -37,7 +37,8 @@ class CaptureMapper @Inject constructor() {
             classificationCompletedAt = entity.classificationCompletedAt,
             isTrashed = entity.isTrashed,
             trashedAt = entity.trashedAt,
-            imageUri = entity.imageUri
+            imageUri = entity.imageUri,
+            parentCaptureId = entity.parentCaptureId
         )
     }
 
@@ -95,7 +96,8 @@ class CaptureMapper @Inject constructor() {
             classificationCompletedAt = capture.classificationCompletedAt,
             isTrashed = capture.isTrashed,
             trashedAt = capture.trashedAt,
-            imageUri = capture.imageUri
+            imageUri = capture.imageUri,
+            parentCaptureId = capture.parentCaptureId
         )
     }
 }

@@ -2,6 +2,7 @@ package com.example.kairos_mobile.domain.usecase.classification
 
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.ConfidenceLevel
@@ -10,6 +11,7 @@ import com.example.kairos_mobile.domain.model.ExtractedEntity
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.ScheduleInfo
+import com.example.kairos_mobile.domain.model.SplitItem
 import com.example.kairos_mobile.domain.model.Tag
 import com.example.kairos_mobile.domain.model.TodoInfo
 import com.example.kairos_mobile.domain.repository.AnalyticsRepository
@@ -21,6 +23,7 @@ import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifySequence
@@ -43,13 +46,15 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val classificationLogRepository = mockk<ClassificationLogRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ChangeClassificationUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
             classificationLogRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val mockCapture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.NOTES)
@@ -84,13 +89,15 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val classificationLogRepository = mockk<ClassificationLogRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ChangeClassificationUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
             classificationLogRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val mockCapture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.TODO)
@@ -108,6 +115,7 @@ class ClassificationUseCasesTest {
         useCase("cap-1", ClassifiedType.SCHEDULE)
 
         coVerify { scheduleRepository.createSchedule(match { it.captureId == "cap-1" }) }
+        coVerify(exactly = 1) { syncScheduleToCalendarUseCase(any()) }
     }
 
     @Test
@@ -118,13 +126,15 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val classificationLogRepository = mockk<ClassificationLogRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ChangeClassificationUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
             classificationLogRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val mockCapture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.TODO)
@@ -156,13 +166,15 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val classificationLogRepository = mockk<ClassificationLogRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ChangeClassificationUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
             classificationLogRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val mockCapture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.TODO)
@@ -194,13 +206,15 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val classificationLogRepository = mockk<ClassificationLogRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ChangeClassificationUseCase(
             captureRepository,
             todoRepository,
             scheduleRepository,
             noteRepository,
             classificationLogRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val mockCapture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.NOTES)
@@ -267,6 +281,7 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
             captureRepository,
             extractedRepository,
@@ -274,7 +289,8 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val entity = ExtractedEntity(
@@ -339,6 +355,7 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
             captureRepository,
             extractedRepository,
@@ -346,7 +363,8 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val classification = Classification(
@@ -377,6 +395,7 @@ class ClassificationUseCasesTest {
                     !it.isAllDay
             })
         }
+        coVerify(exactly = 1) { syncScheduleToCalendarUseCase(any()) }
     }
 
     @Test
@@ -388,6 +407,7 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
             captureRepository,
             extractedRepository,
@@ -395,7 +415,8 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val bookmarkClassification = Classification(
@@ -432,6 +453,100 @@ class ClassificationUseCasesTest {
     }
 
     @Test
+    fun processClassification_splitItems_creates_child_captures_and_derived_entities() = runTest {
+        val captureRepository = mockk<CaptureRepository>()
+        val extractedRepository = mockk<ExtractedEntityRepository>()
+        val todoRepository = mockk<TodoRepository>()
+        val scheduleRepository = mockk<ScheduleRepository>()
+        val noteRepository = mockk<NoteRepository>()
+        val tagRepository = mockk<TagRepository>()
+        val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
+        val useCase = ProcessClassificationResultUseCase(
+            captureRepository,
+            extractedRepository,
+            todoRepository,
+            scheduleRepository,
+            noteRepository,
+            tagRepository,
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
+        )
+
+        // 2개 분할 아이템: TODO + SCHEDULE
+        val splitItems = listOf(
+            SplitItem(
+                splitText = "우유 사기",
+                classifiedType = ClassifiedType.TODO,
+                confidence = ConfidenceLevel.HIGH,
+                aiTitle = "우유 구매",
+                todoInfo = TodoInfo(deadline = 5000L)
+            ),
+            SplitItem(
+                splitText = "저녁 약속",
+                classifiedType = ClassifiedType.SCHEDULE,
+                confidence = ConfidenceLevel.MEDIUM,
+                aiTitle = "저녁 식사",
+                scheduleInfo = ScheduleInfo(startTime = 6000L, endTime = 8000L)
+            )
+        )
+        val classification = Classification(
+            type = ClassifiedType.NOTES,
+            confidence = ConfidenceLevel.HIGH,
+            aiTitle = "복합 입력",
+            splitItems = splitItems
+        )
+
+        coEvery { captureRepository.updateClassification(any(), any(), any(), any(), any()) } just runs
+        coEvery { captureRepository.saveCapture(any()) } answers { firstArg() }
+        coEvery { extractedRepository.replaceForCapture(any(), any()) } just runs
+        coEvery { todoRepository.createTodo(any()) } just runs
+        coEvery { scheduleRepository.createSchedule(any()) } just runs
+        coEvery { trackEventUseCase(any(), any()) } just runs
+
+        useCase("cap-1", classification)
+
+        // 부모 캡처 분류 업데이트
+        coVerify {
+            captureRepository.updateClassification(
+                captureId = "cap-1",
+                classifiedType = ClassifiedType.NOTES,
+                noteSubType = null,
+                aiTitle = "복합 입력",
+                confidence = ConfidenceLevel.HIGH
+            )
+        }
+
+        // 자식 캡처 2개 생성 (source = SPLIT, parentCaptureId = "cap-1")
+        coVerify(exactly = 2) {
+            captureRepository.saveCapture(match {
+                it.source == CaptureSource.SPLIT && it.parentCaptureId == "cap-1"
+            })
+        }
+
+        // 자식별 분류 업데이트 (2회) + 부모 (1회) = 총 3회
+        coVerify(exactly = 3) {
+            captureRepository.updateClassification(any(), any(), any(), any(), any())
+        }
+
+        // 파생 엔티티 생성: TODO 1개 + SCHEDULE 1개
+        coVerify(exactly = 1) { todoRepository.createTodo(match { it.deadline == 5000L }) }
+        coVerify(exactly = 1) {
+            scheduleRepository.createSchedule(match {
+                it.startTime == 6000L && it.endTime == 8000L
+            })
+        }
+
+        // 분석 이벤트: split_capture_created
+        coVerify {
+            trackEventUseCase(
+                "split_capture_created",
+                match { it.contains("cap-1") && it.contains("2") }
+            )
+        }
+    }
+
+    @Test
     fun processClassification_temp_creates_no_derived_entities() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val extractedRepository = mockk<ExtractedEntityRepository>()
@@ -440,6 +555,7 @@ class ClassificationUseCasesTest {
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
+        val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
             captureRepository,
             extractedRepository,
@@ -447,7 +563,8 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
-            trackEventUseCase
+            trackEventUseCase,
+            syncScheduleToCalendarUseCase
         )
 
         val classification = Classification(

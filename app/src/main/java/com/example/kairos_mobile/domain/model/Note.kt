@@ -15,5 +15,7 @@ data class Note(
     /** 생성 시각 */
     val createdAt: Long = System.currentTimeMillis(),
     /** 최종 수정 시각 */
-    val updatedAt: Long = createdAt
+    val updatedAt: Long = createdAt,
+    /** 노트 본문 (사용자 편집 가능) */
+    val body: String? = null
 )

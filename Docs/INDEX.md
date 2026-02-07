@@ -51,8 +51,8 @@ Docs/
 | `phase1/` | Phase 1 (MVP) 계획 문서 보관 디렉토리 | **정리 완료 (문서 비움)** |
 | `phase2/` | Phase 2 공통 참고/템플릿 문서 | 진행 중 |
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | **완료** |
-| `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | 대기 |
-| `phase3/` | Phase 3 (고도화) 개발 계획 | 대기 |
+| `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | **계획 수립** |
+| `phase3/` | Phase 3 (서버 연동) 개발 계획 | **계획 수립** |
 
 #### Phase 1 상세 문서
 
@@ -65,6 +65,18 @@ Docs/
 | 파일 | 설명 | 상태 |
 |------|------|------|
 | `phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 — 10개 서브페이즈, 81개 파일 | 완료 |
+
+#### Phase 2b 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase2b/implementation_plan.md` | Phase 2b 구현 계획서 — 9개 서브페이즈, ~52개 파일 | 계획 수립 |
+
+#### Phase 3 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 — Mock 삭제 → 실제 API 연결, 8개 서브페이즈 | 계획 수립 |
 
 #### Phase 2 공통 문서
 
@@ -122,3 +134,7 @@ Docs/
 | 2026-02-07 | `plan/phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 작성 — 10개 서브페이즈, 81개 파일 |
 | 2026-02-07 | `ROADMAP.md` | Phase 2a 상태를 "구현 완료"로 업데이트 (컴파일 + 96개 테스트 통과) |
 | 2026-02-07 | `INDEX.md` | Phase 2a 문서 섹션 추가, 상태 "완료"로 변경 |
+| 2026-02-07 | `plan/phase2b/implementation_plan.md` | Phase 2b 구현 계획서 작성 — 9개 서브페이즈, ~52개 파일 |
+| 2026-02-07 | `plan/phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 작성 — Mock 삭제 → 실제 API, 8개 서브페이즈 |
+| 2026-02-07 | `INDEX.md` | Phase 2b/3 문서 섹션 추가, 상태 "계획 수립"으로 변경 |
+| 2026-02-07 | `ROADMAP.md` | Phase 2b/3 상세 내용 업데이트 |

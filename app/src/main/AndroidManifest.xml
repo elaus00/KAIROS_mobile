@@ -64,6 +64,26 @@
                 android:resource="@xml/capture_widget_info" />
         </receiver>
 
+        <!-- 할 일 위젯 리시버 -->
+        <receiver
+            android:name=".presentation.widget.TodoWidgetProvider"
+            android:exported="true"
+            android:label="KAIROS 할 일">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.kairos_mobile.ACTION_TOGGLE_TODO" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/todo_widget_info" />
+        </receiver>
+
+        <!-- 할 일 위젯 리스트 서비스 -->
+        <service
+            android:name=".presentation.widget.TodoWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <!-- WorkManager initialization -->
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.presentation.components.common.FilterChipRow
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -143,6 +144,12 @@ fun SearchScreen(
 
                 Spacer(modifier = Modifier.width(8.dp))
             }
+
+            // 분류 유형 필터 칩
+            FilterChipRow(
+                selectedType = uiState.selectedType,
+                onTypeSelected = { type -> viewModel.setTypeFilter(type) }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 

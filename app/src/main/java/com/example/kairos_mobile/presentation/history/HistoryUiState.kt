@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.presentation.history
 
 import com.example.kairos_mobile.domain.model.Capture
+import com.example.kairos_mobile.domain.model.ClassifiedType
 
 /**
  * 전체 기록 화면 UI 상태
@@ -15,7 +16,13 @@ data class HistoryUiState(
     /** 더 불러올 데이터 존재 여부 */
     val hasMore: Boolean = true,
     /** 에러 메시지 */
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** 선택된 분류 유형 필터 (null = 전체) */
+    val selectedType: ClassifiedType? = null,
+    /** 날짜 범위 필터 시작 (epoch ms) */
+    val startDate: Long? = null,
+    /** 날짜 범위 필터 끝 (epoch ms) */
+    val endDate: Long? = null
 )
 
 /**

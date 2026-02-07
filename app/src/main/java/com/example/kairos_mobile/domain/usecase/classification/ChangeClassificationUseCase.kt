@@ -13,6 +13,7 @@ import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,7 +28,8 @@ class ChangeClassificationUseCase @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val noteRepository: NoteRepository,
     private val classificationLogRepository: ClassificationLogRepository,
-    private val trackEventUseCase: TrackEventUseCase
+    private val trackEventUseCase: TrackEventUseCase,
+    private val syncScheduleToCalendarUseCase: SyncScheduleToCalendarUseCase
 ) {
     suspend operator fun invoke(
         captureId: String,
@@ -60,7 +62,9 @@ class ChangeClassificationUseCase @Inject constructor(
                 todoRepository.createTodo(Todo(captureId = captureId))
             }
             ClassifiedType.SCHEDULE -> {
-                scheduleRepository.createSchedule(Schedule(captureId = captureId))
+                val schedule = Schedule(captureId = captureId)
+                scheduleRepository.createSchedule(schedule)
+                syncScheduleToCalendarUseCase(schedule.id)
             }
             ClassifiedType.NOTES -> {
                 val folderId = when (newSubType) {

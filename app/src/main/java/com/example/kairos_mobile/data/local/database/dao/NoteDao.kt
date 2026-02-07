@@ -125,7 +125,8 @@ interface NoteDao {
             n.capture_id AS capture_id,
             c.ai_title AS ai_title,
             c.original_text AS original_text,
-            c.created_at AS created_at
+            c.created_at AS created_at,
+            n.body AS body
         FROM notes n
         INNER JOIN captures c ON c.id = n.capture_id
         WHERE n.folder_id = :folderId
@@ -134,6 +135,34 @@ interface NoteDao {
         ORDER BY n.updated_at DESC
     """)
     fun getNotesWithActiveCaptureByFolder(folderId: String): Flow<List<NoteWithCaptureRow>>
+
+    /**
+     * 노트 본문 업데이트
+     */
+    @Query("UPDATE notes SET body = :body, updated_at = :updatedAt WHERE id = :noteId")
+    suspend fun updateBody(noteId: String, body: String?, updatedAt: Long)
+
+    /**
+     * 노트 상세 조회 (캡처 정보 포함)
+     */
+    @Query("""
+        SELECT
+            n.id AS note_id,
+            n.capture_id AS capture_id,
+            c.ai_title AS ai_title,
+            c.original_text AS original_text,
+            n.body AS body,
+            c.classified_type AS classified_type,
+            c.note_sub_type AS note_sub_type,
+            n.folder_id AS folder_id,
+            c.image_uri AS image_uri,
+            n.created_at AS created_at,
+            n.updated_at AS updated_at
+        FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE n.id = :noteId
+    """)
+    fun getNoteWithCapture(noteId: String): Flow<NoteDetailRow?>
 }
 
 data class FolderNoteCountRow(
@@ -153,5 +182,35 @@ data class NoteWithCaptureRow(
     @ColumnInfo(name = "original_text")
     val originalText: String,
     @ColumnInfo(name = "created_at")
-    val createdAt: Long
+    val createdAt: Long,
+    @ColumnInfo(name = "body")
+    val body: String? = null
+)
+
+/**
+ * 노트 상세 조회용 Row (캡처 정보 포함)
+ */
+data class NoteDetailRow(
+    @ColumnInfo(name = "note_id")
+    val noteId: String,
+    @ColumnInfo(name = "capture_id")
+    val captureId: String,
+    @ColumnInfo(name = "ai_title")
+    val aiTitle: String?,
+    @ColumnInfo(name = "original_text")
+    val originalText: String,
+    @ColumnInfo(name = "body")
+    val body: String?,
+    @ColumnInfo(name = "classified_type")
+    val classifiedType: String,
+    @ColumnInfo(name = "note_sub_type")
+    val noteSubType: String?,
+    @ColumnInfo(name = "folder_id")
+    val folderId: String?,
+    @ColumnInfo(name = "image_uri")
+    val imageUri: String?,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Long
 )
