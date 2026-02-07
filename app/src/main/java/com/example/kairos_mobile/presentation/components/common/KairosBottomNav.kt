@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,9 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -47,29 +44,28 @@ fun KairosBottomNav(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .padding(horizontal = 48.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .shadow(
                     elevation = 8.dp,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(20.dp),
                     ambientColor = Color.Black.copy(alpha = 0.1f),
                     spotColor = Color.Black.copy(alpha = 0.1f)
                 )
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(20.dp))
                 .background(colors.card)
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .padding(horizontal = 28.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(36.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             KairosTab.entries.forEach { tab ->
                 KairosNavItem(
                     tab = tab,
                     selected = selectedTab == tab,
-                    onClick = { onTabSelected(tab) },
-                    modifier = Modifier.weight(1f)
+                    onClick = { onTabSelected(tab) }
                 )
             }
         }
@@ -89,53 +85,30 @@ private fun KairosNavItem(
 ) {
     val colors = KairosTheme.colors
 
-    // 선택 시: 검정 배경 + 흰색 텍스트
-    // 비선택 시: 투명 배경 + textMuted 색상
+    // 선택 시: 채워진 아이콘 + 진한 색상
+    // 비선택 시: 윤곽 아이콘 + textMuted 색상
     val iconColor by animateColorAsState(
-        targetValue = if (selected) Color.White else colors.textMuted,
+        targetValue = if (selected) colors.text else colors.textMuted,
         animationSpec = tween(durationMillis = 200),
         label = "iconColor"
     )
 
-    val labelColor by animateColorAsState(
-        targetValue = if (selected) Color.White else colors.textMuted,
-        animationSpec = tween(durationMillis = 200),
-        label = "labelColor"
-    )
-
-    val backgroundColor by animateColorAsState(
-        targetValue = if (selected) Color.Black else Color.Transparent,
-        animationSpec = tween(durationMillis = 200),
-        label = "backgroundColor"
-    )
-
-    Column(
+    Box(
         modifier = modifier
             .testTag("tab_${tab.route}")
-            .clip(RoundedCornerShape(16.dp))
-            .background(backgroundColor)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
             )
-            .padding(vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(vertical = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = if (selected) tab.filledIcon else tab.outlinedIcon,
             contentDescription = tab.label,
             tint = iconColor,
             modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = tab.label,
-            color = labelColor,
-            fontSize = 11.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            letterSpacing = 0.3.sp
         )
     }
 }

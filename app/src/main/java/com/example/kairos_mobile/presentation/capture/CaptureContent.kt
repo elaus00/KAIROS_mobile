@@ -5,10 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Image
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,6 +86,8 @@ fun CaptureContent(
         }
     }
 
+    val focusRequester = remember { FocusRequester() }
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -101,23 +105,16 @@ fun CaptureContent(
             // 날짜 표시
             DateDisplay()
 
-            // 빈 상태 영역 (가운데 확장)
+            // 빈 상태 영역 — 탭하면 입력 필드에 포커스
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                if (uiState.inputText.isEmpty()) {
-                    Text(
-                        text = "떠오르는 생각을\n바로 던져보세요",
-                        color = colors.placeholder,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        lineHeight = 28.sp
-                    )
-                }
-            }
+                    .weight(1f)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { focusRequester.requestFocus() }
+            )
 
             // 하단 입력 바
             CaptureInputBar(
@@ -125,7 +122,8 @@ fun CaptureContent(
                 characterCount = uiState.characterCount,
                 isSubmitting = uiState.isSubmitting,
                 onInputChange = { viewModel.updateInput(it) },
-                onSubmit = { viewModel.submit() }
+                onSubmit = { viewModel.submit() },
+                focusRequester = focusRequester
             )
         }
 
@@ -238,7 +236,7 @@ private fun CaptureTopBar(
 private fun DateDisplay() {
     val colors = KairosTheme.colors
     val today = remember {
-        val format = SimpleDateFormat("M월 d일 EEEE", Locale.KOREAN)
+        val format = SimpleDateFormat("yyyy년 M월 d일 EEEE", Locale.KOREAN)
         format.format(Date())
     }
 
@@ -247,7 +245,10 @@ private fun DateDisplay() {
         color = colors.textSecondary,
         fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
-        modifier = Modifier.padding(horizontal = 20.dp)
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
     )
 }
 
@@ -260,14 +261,10 @@ private fun CaptureInputBar(
     characterCount: Int,
     isSubmitting: Boolean,
     onInputChange: (String) -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     val colors = KairosTheme.colors
-
-    HorizontalDivider(
-        thickness = 1.dp,
-        color = colors.borderLight
-    )
 
     Row(
         modifier = Modifier
@@ -290,6 +287,7 @@ private fun CaptureInputBar(
             onValueChange = onInputChange,
             modifier = Modifier
                 .weight(1f)
+                .focusRequester(focusRequester)
                 .testTag("capture_input"),
             textStyle = TextStyle(
                 color = colors.text,
@@ -302,9 +300,9 @@ private fun CaptureInputBar(
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(colors.accentBg)
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .defaultMinSize(minHeight = 44.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     if (inputText.isEmpty()) {
                         Text(
@@ -343,7 +341,7 @@ private fun CaptureInputBar(
                 )
             } else {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    imageVector = Icons.Default.ArrowUpward,
                     contentDescription = "전송",
                     tint = if (inputText.isNotBlank()) {
                         if (colors.isDark) colors.background else Color.White
