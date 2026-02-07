@@ -47,6 +47,7 @@ interface ScheduleDao {
         WHERE s.start_time >= :startOfDay
         AND s.start_time < :endOfDay
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
         ORDER BY s.start_time ASC
     """)
     fun getSchedulesByDate(startOfDay: Long, endOfDay: Long): Flow<List<ScheduleEntity>>
@@ -60,6 +61,7 @@ interface ScheduleDao {
         WHERE s.start_time >= :startTime
         AND s.start_time <= :endTime
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
         ORDER BY s.start_time ASC
     """)
     fun getSchedulesBetween(startTime: Long, endTime: Long): Flow<List<ScheduleEntity>>
@@ -75,6 +77,7 @@ interface ScheduleDao {
         WHERE s.start_time >= :startTime
         AND s.start_time <= :endTime
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
     """)
     fun getDatesWithSchedules(startTime: Long, endTime: Long): Flow<List<Long>>
 

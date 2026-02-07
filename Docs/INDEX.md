@@ -50,7 +50,7 @@ Docs/
 |----------|------|------|
 | `phase1/` | Phase 1 (MVP) 계획 문서 보관 디렉토리 | **정리 완료 (문서 비움)** |
 | `phase2/` | Phase 2 공통 참고/템플릿 문서 | 진행 중 |
-| `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | 대기 |
+| `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | **완료** |
 | `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | 대기 |
 | `phase3/` | Phase 3 (고도화) 개발 계획 | 대기 |
 
@@ -59,6 +59,12 @@ Docs/
 | 파일 | 설명 | 상태 |
 |------|------|------|
 | `phase1/.gitkeep` | 빈 디렉토리 유지용 파일 | 유지 |
+
+#### Phase 2a 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 — 10개 서브페이즈, 81개 파일 | 완료 |
 
 #### Phase 2 공통 문서
 
@@ -113,3 +119,6 @@ Docs/
 | 2026-02-07 | `INDEX.md` | 실파일 기준으로 문서 인덱스 정합성 보정 (specs/api, insights, performance 반영) |
 | 2026-02-07 | `ROADMAP.md` | 참조 문서 경로(`functional_spec`, `data_model_spec`, `api_spec`) 및 Phase 1 홈 화면 범위 설명을 PRD v10 기준으로 보정 |
 | 2026-02-07 | `ROADMAP.md` | PRD/기능명세서 재점검 결과 반영: Phase 1은 자동화 완료이나 명세 정합성 보강 필요 상태 명시 |
+| 2026-02-07 | `plan/phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 작성 — 10개 서브페이즈, 81개 파일 |
+| 2026-02-07 | `ROADMAP.md` | Phase 2a 상태를 "구현 완료"로 업데이트 (컴파일 + 96개 테스트 통과) |
+| 2026-02-07 | `INDEX.md` | Phase 2a 문서 섹션 추가, 상태 "완료"로 변경 |

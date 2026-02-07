@@ -43,26 +43,38 @@ interface NoteDao {
      * 폴더별 노트 조회 (최신순)
      */
     @Query("""
-        SELECT * FROM notes
-        WHERE folder_id = :folderId
-        ORDER BY updated_at DESC
+        SELECT n.* FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE n.folder_id = :folderId
+        AND c.is_deleted = 0
+        AND c.is_trashed = 0
+        ORDER BY n.updated_at DESC
     """)
     fun getNotesByFolder(folderId: String): Flow<List<NoteEntity>>
 
     /**
      * 폴더별 노트 수 조회
      */
-    @Query("SELECT COUNT(*) FROM notes WHERE folder_id = :folderId")
+    @Query("""
+        SELECT COUNT(*) FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE n.folder_id = :folderId
+        AND c.is_deleted = 0
+        AND c.is_trashed = 0
+    """)
     fun getNoteCountByFolder(folderId: String): Flow<Int>
 
     /**
      * 전체 폴더별 노트 수 조회
      */
     @Query("""
-        SELECT folder_id, COUNT(*) AS note_count
-        FROM notes
-        WHERE folder_id IS NOT NULL
-        GROUP BY folder_id
+        SELECT n.folder_id, COUNT(*) AS note_count
+        FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE n.folder_id IS NOT NULL
+        AND c.is_deleted = 0
+        AND c.is_trashed = 0
+        GROUP BY n.folder_id
     """)
     fun getFolderNoteCounts(): Flow<List<FolderNoteCountRow>>
 
@@ -118,6 +130,7 @@ interface NoteDao {
         INNER JOIN captures c ON c.id = n.capture_id
         WHERE n.folder_id = :folderId
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
         ORDER BY n.updated_at DESC
     """)
     fun getNotesWithActiveCaptureByFolder(folderId: String): Flow<List<NoteWithCaptureRow>>
