@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">KAIROS_mobile</string>
+    <string name="widget_description">탭하여 빠르게 캡처</string>
 </resources>

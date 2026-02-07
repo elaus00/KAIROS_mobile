@@ -1,7 +1,9 @@
 package com.example.kairos_mobile.presentation.settings
 
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coVerify
@@ -31,11 +33,15 @@ class SettingsViewModelTest {
 
     private lateinit var getThemePreferenceUseCase: GetThemePreferenceUseCase
     private lateinit var setThemePreferenceUseCase: SetThemePreferenceUseCase
+    private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
+    private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
 
     @Before
     fun setUp() {
         getThemePreferenceUseCase = mockk()
         setThemePreferenceUseCase = mockk(relaxed = true)
+        getCalendarSettingsUseCase = mockk(relaxed = true)
+        setCalendarSettingsUseCase = mockk(relaxed = true)
     }
 
     @After
@@ -50,7 +56,7 @@ class SettingsViewModelTest {
         every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
 
         // when - ViewModel 생성 시 init에서 loadPreferences 호출
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase)
+        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
         advanceUntilIdle()
 
         // then
@@ -62,7 +68,7 @@ class SettingsViewModelTest {
     fun setTheme_delegates_to_usecase() = runTest {
         // given
         every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase)
+        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
         advanceUntilIdle()
 
         // when
@@ -79,7 +85,7 @@ class SettingsViewModelTest {
     fun onErrorDismissed_clears_error() = runTest {
         // given
         every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase)
+        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
         advanceUntilIdle()
 
         // when

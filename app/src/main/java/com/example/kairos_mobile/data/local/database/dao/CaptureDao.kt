@@ -37,7 +37,7 @@ interface CaptureDao {
      */
     @Query("""
         SELECT * FROM captures
-        WHERE is_deleted = 0
+        WHERE is_deleted = 0 AND is_trashed = 0
         ORDER BY created_at DESC
         LIMIT :limit OFFSET :offset
     """)
@@ -48,7 +48,7 @@ interface CaptureDao {
      */
     @Query("""
         SELECT * FROM captures
-        WHERE classified_type = :type AND is_deleted = 0
+        WHERE classified_type = :type AND is_deleted = 0 AND is_trashed = 0
         ORDER BY created_at DESC
     """)
     fun getCapturesByType(type: String): Flow<List<CaptureEntity>>
@@ -62,6 +62,7 @@ interface CaptureDao {
         WHERE is_confirmed = 0
         AND classified_type != 'TEMP'
         AND is_deleted = 0
+        AND is_trashed = 0
         AND COALESCE(classification_completed_at, created_at) >= (strftime('%s', 'now', '-1 day') * 1000)
         ORDER BY created_at DESC
     """)
@@ -75,6 +76,7 @@ interface CaptureDao {
         WHERE is_confirmed = 0
         AND classified_type != 'TEMP'
         AND is_deleted = 0
+        AND is_trashed = 0
         AND COALESCE(classification_completed_at, created_at) >= (strftime('%s', 'now', '-1 day') * 1000)
     """)
     fun getUnconfirmedCount(): Flow<Int>
@@ -86,6 +88,7 @@ interface CaptureDao {
         SELECT * FROM captures
         WHERE classified_type = 'TEMP'
         AND is_deleted = 0
+        AND is_trashed = 0
         ORDER BY created_at ASC
     """)
     suspend fun getTempCaptures(): List<CaptureEntity>
@@ -154,6 +157,7 @@ interface CaptureDao {
         WHERE is_confirmed = 0
         AND classified_type != 'TEMP'
         AND is_deleted = 0
+        AND is_trashed = 0
         AND COALESCE(classification_completed_at, created_at) >= (strftime('%s', 'now', '-1 day') * 1000)
     """)
     suspend fun confirmAllClassifications(confirmedAt: Long)
@@ -181,7 +185,7 @@ interface CaptureDao {
     /**
      * 전체 캡처 개수 (삭제되지 않은 항목)
      */
-    @Query("SELECT COUNT(*) FROM captures WHERE is_deleted = 0")
+    @Query("SELECT COUNT(*) FROM captures WHERE is_deleted = 0 AND is_trashed = 0")
     fun getActiveCount(): Flow<Int>
 
     /**
@@ -196,6 +200,45 @@ interface CaptureDao {
         )
     """)
     suspend fun updateNoteSubTypeByFolderId(folderId: String, noteSubType: String, updatedAt: Long)
+
+    /**
+     * 휴지통으로 이동
+     */
+    @Query("""
+        UPDATE captures
+        SET is_trashed = 1, trashed_at = :trashedAt, is_deleted = 0, deleted_at = NULL, updated_at = :trashedAt
+        WHERE id = :id
+    """)
+    suspend fun moveToTrash(id: String, trashedAt: Long)
+
+    /**
+     * 휴지통에서 복원
+     */
+    @Query("""
+        UPDATE captures
+        SET is_trashed = 0, trashed_at = NULL, updated_at = :updatedAt
+        WHERE id = :id
+    """)
+    suspend fun restoreFromTrash(id: String, updatedAt: Long)
+
+    /**
+     * 휴지통 항목 조회
+     */
+    @Query("""
+        SELECT * FROM captures
+        WHERE is_trashed = 1
+        ORDER BY trashed_at DESC
+    """)
+    fun getTrashedItems(): Flow<List<CaptureEntity>>
+
+    /**
+     * 보존 기간 초과 휴지통 항목 조회
+     */
+    @Query("""
+        SELECT * FROM captures
+        WHERE is_trashed = 1 AND trashed_at < :threshold
+    """)
+    suspend fun getTrashedOverdue(threshold: Long): List<CaptureEntity>
 
     /**
      * 모든 캡처 삭제 (테스트용)

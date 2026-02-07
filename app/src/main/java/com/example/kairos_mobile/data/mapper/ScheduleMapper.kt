@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.data.mapper
 
 import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.model.ConfidenceLevel
 import com.example.kairos_mobile.domain.model.Schedule
 import javax.inject.Inject
@@ -21,6 +22,8 @@ class ScheduleMapper @Inject constructor() {
             location = entity.location,
             isAllDay = entity.isAllDay,
             confidence = parseConfidenceLevel(entity.confidence),
+            calendarSyncStatus = parseCalendarSyncStatus(entity.calendarSyncStatus),
+            googleEventId = entity.googleEventId,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -34,6 +37,14 @@ class ScheduleMapper @Inject constructor() {
         }
     }
 
+    private fun parseCalendarSyncStatus(value: String): CalendarSyncStatus {
+        return try {
+            CalendarSyncStatus.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            CalendarSyncStatus.NOT_LINKED
+        }
+    }
+
     fun toEntity(schedule: Schedule): ScheduleEntity {
         return ScheduleEntity(
             id = schedule.id,
@@ -43,6 +54,8 @@ class ScheduleMapper @Inject constructor() {
             location = schedule.location,
             isAllDay = schedule.isAllDay,
             confidence = schedule.confidence.name,
+            calendarSyncStatus = schedule.calendarSyncStatus.name,
+            googleEventId = schedule.googleEventId,
             createdAt = schedule.createdAt,
             updatedAt = schedule.updatedAt
         )

@@ -8,6 +8,7 @@ import com.example.kairos_mobile.domain.model.SyncQueueItem
 
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,20 +21,23 @@ import javax.inject.Singleton
 @Singleton
 class SubmitCaptureUseCase @Inject constructor(
     private val captureRepository: CaptureRepository,
-    private val syncQueueRepository: SyncQueueRepository
+    private val syncQueueRepository: SyncQueueRepository,
+    private val trackEventUseCase: TrackEventUseCase
 ) {
 
     suspend operator fun invoke(
         text: String,
-        source: CaptureSource = CaptureSource.APP
+        source: CaptureSource = CaptureSource.APP,
+        imageUri: String? = null
     ): Capture {
-        require(text.isNotBlank()) { "캡처 내용이 비어있습니다" }
+        require(text.isNotBlank() || imageUri != null) { "캡처 내용이 비어있습니다" }
 
         // 1. TEMP 상태로 즉시 저장
         val capture = Capture(
             originalText = text,
             classifiedType = ClassifiedType.TEMP,
-            source = source
+            source = source,
+            imageUri = imageUri
         )
         captureRepository.saveCapture(capture)
 
@@ -45,6 +49,12 @@ class SubmitCaptureUseCase @Inject constructor(
         )
         syncQueueRepository.enqueue(syncItem)
         syncQueueRepository.triggerProcessing()
+
+        // 3. 분석 이벤트 추적
+        trackEventUseCase(
+            eventType = "capture_created",
+            eventData = "source=${source.name}"
+        )
 
         return capture
     }

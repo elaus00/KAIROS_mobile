@@ -8,6 +8,7 @@ import com.example.kairos_mobile.domain.usecase.capture.DeleteDraftUseCase
 import com.example.kairos_mobile.domain.usecase.capture.GetDraftUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SaveDraftUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
 import io.mockk.coEvery
@@ -49,6 +50,7 @@ class CaptureViewModelTest {
     private lateinit var getDraftUseCase: GetDraftUseCase
     private lateinit var deleteDraftUseCase: DeleteDraftUseCase
     private lateinit var captureRepository: CaptureRepository
+    private lateinit var imageRepository: ImageRepository
 
     @Before
     fun setup() {
@@ -62,6 +64,7 @@ class CaptureViewModelTest {
         getDraftUseCase = mockk()
         deleteDraftUseCase = mockk()
         captureRepository = mockk()
+        imageRepository = mockk()
     }
 
     @After
@@ -84,7 +87,8 @@ class CaptureViewModelTest {
             saveDraftUseCase,
             getDraftUseCase,
             deleteDraftUseCase,
-            captureRepository
+            captureRepository,
+            imageRepository
         )
     }
 

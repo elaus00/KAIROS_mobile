@@ -22,7 +22,8 @@ import androidx.room.PrimaryKey
     ],
     indices = [
         Index(value = ["capture_id"], unique = true),
-        Index(value = ["start_time"])
+        Index(value = ["start_time"]),
+        Index(value = ["calendar_sync_status"])
     ]
 )
 data class ScheduleEntity(
@@ -50,6 +51,14 @@ data class ScheduleEntity(
 
     // AI 분류 신뢰도: HIGH, MEDIUM, LOW
     val confidence: String,
+
+    // Google Calendar 동기화 상태
+    @ColumnInfo(name = "calendar_sync_status", defaultValue = "NOT_LINKED")
+    val calendarSyncStatus: String = "NOT_LINKED",
+
+    // Google Calendar 이벤트 ID
+    @ColumnInfo(name = "google_event_id")
+    val googleEventId: String? = null,
 
     // 생성 시각 (epoch ms)
     @ColumnInfo(name = "created_at")

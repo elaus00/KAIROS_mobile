@@ -10,6 +10,15 @@ data class SettingsUiState(
     // 테마 설정 (LIGHT / DARK / SYSTEM)
     val themePreference: ThemePreference = ThemePreference.DARK,
 
+    // Google Calendar 연동 여부
+    val isCalendarEnabled: Boolean = false,
+
+    // 일정 추가 모드 (auto / suggest)
+    val calendarMode: String = "suggest",
+
+    // 알림 설정 여부
+    val isNotificationEnabled: Boolean = true,
+
     // 에러 메시지
     val errorMessage: String? = null
 )

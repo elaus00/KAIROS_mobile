@@ -3,9 +3,11 @@ package com.example.kairos_mobile.data.local.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.kairos_mobile.data.local.database.dao.AnalyticsEventDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
+import com.example.kairos_mobile.data.local.database.dao.ClassificationLogDao
 import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
@@ -15,9 +17,11 @@ import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
 import com.example.kairos_mobile.data.local.database.dao.TodoDao
 import com.example.kairos_mobile.data.local.database.dao.UserPreferenceDao
+import com.example.kairos_mobile.data.local.database.entities.AnalyticsEventEntity
 import com.example.kairos_mobile.data.local.database.entities.CaptureEntity
 import com.example.kairos_mobile.data.local.database.entities.CaptureSearchFts
 import com.example.kairos_mobile.data.local.database.entities.CaptureTagEntity
+import com.example.kairos_mobile.data.local.database.entities.ClassificationLogEntity
 import com.example.kairos_mobile.data.local.database.entities.ExtractedEntityEntity
 import com.example.kairos_mobile.data.local.database.entities.FolderEntity
 import com.example.kairos_mobile.data.local.database.entities.NoteEntity
@@ -44,9 +48,11 @@ import com.example.kairos_mobile.data.local.database.entities.UserPreferenceEnti
         SyncQueueEntity::class,
         UserPreferenceEntity::class,
         NotificationEntity::class,
-        CaptureSearchFts::class
+        CaptureSearchFts::class,
+        ClassificationLogEntity::class,
+        AnalyticsEventEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -63,6 +69,8 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun notificationDao(): NotificationDao
     abstract fun captureSearchDao(): CaptureSearchDao
+    abstract fun classificationLogDao(): ClassificationLogDao
+    abstract fun analyticsEventDao(): AnalyticsEventDao
 
     companion object {
         const val DATABASE_NAME = "kairos_database"

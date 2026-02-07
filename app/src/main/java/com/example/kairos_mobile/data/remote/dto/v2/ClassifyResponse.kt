@@ -67,5 +67,8 @@ data class ScheduleInfoDto(
  */
 data class TodoInfoDto(
     @SerializedName("deadline")
-    val deadline: Long? = null
+    val deadline: Long? = null,
+
+    @SerializedName("deadline_source")
+    val deadlineSource: String? = null
 )

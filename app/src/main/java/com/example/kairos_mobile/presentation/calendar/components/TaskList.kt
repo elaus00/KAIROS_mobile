@@ -40,6 +40,9 @@ fun TaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onTaskDelete: (String) -> Unit,
+    completedTasks: List<TodoDisplayItem> = emptyList(),
+    showCompleted: Boolean = false,
+    onToggleShowCompleted: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -60,6 +63,43 @@ fun TaskList(
                         onToggleComplete = { onTaskComplete(task.todoId) },
                         onDelete = { onTaskDelete(task.captureId) }
                     )
+                }
+            }
+        }
+
+        // 완료 항목 토글
+        val completedCount = completedTasks.size
+        if (completedCount > 0 || showCompleted) {
+            val colors = KairosTheme.colors
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+                    .clickable { onToggleShowCompleted() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (showCompleted) "완료 항목 숨기기" else "완료 항목 ($completedCount)",
+                    color = colors.textSecondary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            if (showCompleted) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    completedTasks.forEach { task ->
+                        TaskItem(
+                            task = task,
+                            onToggleComplete = { onTaskComplete(task.todoId) },
+                            onDelete = { onTaskDelete(task.captureId) }
+                        )
+                    }
                 }
             }
         }
@@ -110,13 +150,29 @@ private fun TaskItem(
                 // 마감일 (있는 경우)
                 task.deadline?.let { deadlineMs ->
                     Spacer(modifier = Modifier.height(2.dp))
-                    val deadlineText = formatDeadline(deadlineMs)
-                    val isOverdue = deadlineMs < System.currentTimeMillis() && !task.isCompleted
-                    Text(
-                        text = deadlineText,
-                        color = if (isOverdue) colors.danger else colors.textSecondary,
-                        fontSize = 12.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val deadlineText = formatDeadline(deadlineMs)
+                        val isOverdue = deadlineMs < System.currentTimeMillis() && !task.isCompleted
+                        Text(
+                            text = deadlineText,
+                            color = if (isOverdue) colors.danger else colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                        // AI 마감일 배지
+                        if (task.deadlineSource == "AI") {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "AI",
+                                color = colors.accent,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(colors.accent.copy(alpha = 0.15f))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                    }
                 }
             }
 

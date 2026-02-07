@@ -47,7 +47,7 @@ fun OnboardingScreen(
 
     val pagerState = rememberPagerState(
         initialPage = 0,
-        pageCount = { 3 }
+        pageCount = { 4 }
     )
 
     // 이벤트 처리
@@ -92,7 +92,12 @@ fun OnboardingScreen(
             when (page) {
                 0 -> OnboardingPage1(colors = colors)
                 1 -> OnboardingPage2(colors = colors)
-                2 -> OnboardingPage3(
+                2 -> OnboardingPageGoogle(
+                    colors = colors,
+                    isConnected = uiState.isGoogleConnected,
+                    onConnect = viewModel::connectGoogle
+                )
+                3 -> OnboardingPage3(
                     colors = colors,
                     inputText = uiState.inputText,
                     isSubmitting = uiState.isSubmitting,
@@ -105,11 +110,11 @@ fun OnboardingScreen(
         // 하단: 페이지 인디케이터 + 다음/시작 버튼
         OnboardingBottomBar(
             currentPage = pagerState.currentPage,
-            totalPages = 3,
+            totalPages = 4,
             colors = colors,
             onNext = {
                 scope.launch {
-                    if (pagerState.currentPage < 2) {
+                    if (pagerState.currentPage < 3) {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     } else {
                         viewModel.completeOnboarding()
@@ -204,6 +209,91 @@ private fun OnboardingPage2(colors: com.example.kairos_mobile.ui.theme.KairosCol
             color = colors.textSecondary,
             fontSize = 16.sp,
             lineHeight = 24.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+/**
+ * 온보딩 Google Calendar 연결 페이지
+ */
+@Composable
+private fun OnboardingPageGoogle(
+    colors: com.example.kairos_mobile.ui.theme.KairosColors,
+    isConnected: Boolean,
+    onConnect: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Google Calendar\n연동",
+            color = colors.text,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 40.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있습니다.",
+            color = colors.textSecondary,
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // 연결 버튼 / 연결됨 상태
+        if (isConnected) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color(0xFF4CAF50).copy(alpha = 0.15f))
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "연결됨",
+                    color = Color(0xFF4CAF50),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(colors.accent)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onConnect() }
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Google Calendar 연결",
+                    color = if (colors.isDark) colors.background else Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "나중에 설정에서 연결할 수도 있습니다.",
+            color = colors.textMuted,
+            fontSize = 13.sp,
             textAlign = TextAlign.Center
         )
     }

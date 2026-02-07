@@ -13,6 +13,7 @@ import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,7 +28,8 @@ class ProcessClassificationResultUseCase @Inject constructor(
     private val todoRepository: TodoRepository,
     private val scheduleRepository: ScheduleRepository,
     private val noteRepository: NoteRepository,
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    private val trackEventUseCase: TrackEventUseCase
 ) {
     suspend operator fun invoke(captureId: String, classification: Classification) {
         // 1. Capture 분류 결과 업데이트
@@ -56,7 +58,8 @@ class ProcessClassificationResultUseCase @Inject constructor(
             ClassifiedType.TODO -> {
                 val todo = Todo(
                     captureId = captureId,
-                    deadline = classification.todoInfo?.deadline
+                    deadline = classification.todoInfo?.deadline,
+                    deadlineSource = classification.todoInfo?.deadlineSource
                 )
                 todoRepository.createTodo(todo)
             }
@@ -84,6 +87,12 @@ class ProcessClassificationResultUseCase @Inject constructor(
                 // TEMP는 파생 엔티티 없음
             }
         }
+
+        // 5. 분석 이벤트 추적
+        trackEventUseCase(
+            eventType = "classification_completed",
+            eventData = "type=${classification.type.name},confidence=${classification.confidence.name}"
+        )
     }
 
     /**

@@ -35,5 +35,11 @@ data class Capture(
     /** 최종 수정 시각 */
     val updatedAt: Long = createdAt,
     /** AI 분류 완료 시각 */
-    val classificationCompletedAt: Long? = null
+    val classificationCompletedAt: Long? = null,
+    /** 휴지통 여부 */
+    val isTrashed: Boolean = false,
+    /** 휴지통 이동 시점 */
+    val trashedAt: Long? = null,
+    /** 이미지 URI */
+    val imageUri: String? = null
 )

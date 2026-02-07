@@ -12,6 +12,7 @@ import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifySequence
@@ -152,7 +153,8 @@ class CaptureUseCasesTest {
     fun submitCapture_rejects_blank_text() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val syncQueueRepository = mockk<SyncQueueRepository>()
-        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository)
+        val trackEventUseCase = mockk<TrackEventUseCase>()
+        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository, trackEventUseCase)
 
         val error = runCatching { useCase("   ") }.exceptionOrNull()
 
@@ -167,11 +169,13 @@ class CaptureUseCasesTest {
     fun submitCapture_persists_temp_capture_and_enqueues_classify_job() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val syncQueueRepository = mockk<SyncQueueRepository>()
-        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository)
+        val trackEventUseCase = mockk<TrackEventUseCase>()
+        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository, trackEventUseCase)
 
         coEvery { captureRepository.saveCapture(any()) } answers { firstArg() }
         coEvery { syncQueueRepository.enqueue(any()) } just runs
         every { syncQueueRepository.triggerProcessing() } just runs
+        coEvery { trackEventUseCase(any(), any()) } just runs
 
         val capture = useCase("Buy milk", CaptureSource.APP)
 

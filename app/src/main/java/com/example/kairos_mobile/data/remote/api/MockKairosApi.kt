@@ -1,5 +1,8 @@
 package com.example.kairos_mobile.data.remote.api
 
+import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventDto
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventRequest
+import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventResponse
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyRequest
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyResponse
 import com.example.kairos_mobile.data.remote.dto.v2.EntityDto
@@ -11,6 +14,7 @@ import retrofit2.Response
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -87,6 +91,34 @@ class MockKairosApi @Inject constructor() : KairosApi {
         return Response.success(response)
     }
 
+    /**
+     * Mock 분석 이벤트 배치 전송
+     */
+    override suspend fun analyticsEvents(events: List<AnalyticsEventDto>): Response<Unit> {
+        delay(100)
+        return Response.success(Unit)
+    }
+
+    /**
+     * Mock Google Calendar 이벤트 생성
+     */
+    override suspend fun createCalendarEvent(request: CalendarEventRequest): Response<CalendarEventResponse> {
+        delay(300)
+        val response = CalendarEventResponse(
+            googleEventId = "mock_event_${UUID.randomUUID().toString().take(8)}",
+            status = "confirmed"
+        )
+        return Response.success(response)
+    }
+
+    /**
+     * Mock Google Calendar 이벤트 삭제
+     */
+    override suspend fun deleteCalendarEvent(eventId: String): Response<Unit> {
+        delay(200)
+        return Response.success(Unit)
+    }
+
     // ========== Helper Methods ==========
 
     /**
@@ -106,7 +138,10 @@ class MockKairosApi @Inject constructor() : KairosApi {
                     classifiedType = "TODO",
                     noteSubType = null,
                     scheduleInfo = null,
-                    todoInfo = TodoInfoDto(deadline = deadline)
+                    todoInfo = TodoInfoDto(
+                        deadline = deadline,
+                        deadlineSource = if (deadline != null) "AI" else null
+                    )
                 )
             }
 

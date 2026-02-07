@@ -62,4 +62,16 @@ interface CaptureRepository {
 
     /** FTS 검색 */
     fun searchCaptures(query: String): Flow<List<Capture>>
+
+    /** 휴지통으로 이동 */
+    suspend fun moveToTrash(captureId: String)
+
+    /** 휴지통에서 복원 */
+    suspend fun restoreFromTrash(captureId: String)
+
+    /** 휴지통 항목 조회 */
+    fun getTrashedItems(): Flow<List<Capture>>
+
+    /** 보존 기간 초과 항목 조회 */
+    suspend fun getTrashedOverdue(thresholdMs: Long): List<Capture>
 }

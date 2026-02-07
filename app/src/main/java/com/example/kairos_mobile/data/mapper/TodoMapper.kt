@@ -1,6 +1,8 @@
 package com.example.kairos_mobile.data.mapper
 
 import com.example.kairos_mobile.data.local.database.entities.TodoEntity
+import com.example.kairos_mobile.domain.model.DeadlineSource
+import com.example.kairos_mobile.domain.model.SortSource
 import com.example.kairos_mobile.domain.model.Todo
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,6 +21,8 @@ class TodoMapper @Inject constructor() {
             isCompleted = entity.isCompleted,
             completedAt = entity.completedAt,
             sortOrder = entity.sortOrder,
+            deadlineSource = entity.deadlineSource?.let { parseDeadlineSource(it) },
+            sortSource = parseSortSource(entity.sortSource),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -32,8 +36,26 @@ class TodoMapper @Inject constructor() {
             isCompleted = todo.isCompleted,
             completedAt = todo.completedAt,
             sortOrder = todo.sortOrder,
+            deadlineSource = todo.deadlineSource?.name,
+            sortSource = todo.sortSource.name,
             createdAt = todo.createdAt,
             updatedAt = todo.updatedAt
         )
+    }
+
+    private fun parseDeadlineSource(value: String): DeadlineSource {
+        return try {
+            DeadlineSource.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            DeadlineSource.AI
+        }
+    }
+
+    private fun parseSortSource(value: String): SortSource {
+        return try {
+            SortSource.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            SortSource.DEFAULT
+        }
     }
 }

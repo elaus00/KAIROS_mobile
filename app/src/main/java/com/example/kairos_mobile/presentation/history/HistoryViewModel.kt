@@ -7,6 +7,7 @@ import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
@@ -35,6 +36,7 @@ class HistoryViewModel @Inject constructor(
     private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase,
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase,
     private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase,
+    private val moveToTrashUseCase: MoveToTrashUseCase,
     private val changeClassificationUseCase: ChangeClassificationUseCase
 ) : ViewModel() {
 
@@ -52,7 +54,7 @@ class HistoryViewModel @Inject constructor(
 
     companion object {
         private const val PAGE_SIZE = 20
-        private const val HARD_DELETE_DELAY_MS = 3_000L
+        private const val MOVE_TO_TRASH_DELAY_MS = 3_000L
     }
 
     init {
@@ -88,7 +90,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     /**
-     * 스와이프 삭제 (소프트 삭제)
+     * 스와이프 삭제 (소프트 삭제 → 휴지통 이동)
      */
     fun deleteCaptureById(captureId: String) {
         viewModelScope.launch {
@@ -98,7 +100,7 @@ class HistoryViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(captures = it.captures.filter { c -> c.id != captureId })
                 }
-                scheduleHardDelete(captureId)
+                scheduleMoveToTrash(captureId)
                 _events.emit(HistoryEvent.DeleteSuccess(captureId))
             } catch (e: Exception) {
                 _uiState.update {
@@ -153,15 +155,18 @@ class HistoryViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    private fun scheduleHardDelete(captureId: String) {
+    /**
+     * 3초 후 휴지통으로 이동 예약
+     */
+    private fun scheduleMoveToTrash(captureId: String) {
         pendingHardDeleteJobs.remove(captureId)?.cancel()
         pendingHardDeleteJobs[captureId] = viewModelScope.launch {
             try {
-                delay(HARD_DELETE_DELAY_MS)
-                hardDeleteCaptureUseCase(captureId)
+                delay(MOVE_TO_TRASH_DELAY_MS)
+                moveToTrashUseCase(captureId)
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message ?: "완전 삭제에 실패했습니다.")
+                    it.copy(errorMessage = e.message ?: "휴지통 이동에 실패했습니다.")
                 }
             } finally {
                 pendingHardDeleteJobs.remove(captureId)
@@ -218,9 +223,10 @@ class HistoryViewModel @Inject constructor(
         val pendingIds = pendingHardDeleteJobs.keys.toList()
         pendingHardDeleteJobs.values.forEach { it.cancel() }
         pendingHardDeleteJobs.clear()
+        // ViewModel 종료 시 대기 중인 항목들을 휴지통으로 이동
         runBlocking(Dispatchers.IO) {
             pendingIds.forEach { captureId ->
-                runCatching { hardDeleteCaptureUseCase(captureId) }
+                runCatching { moveToTrashUseCase(captureId) }
             }
         }
         super.onCleared()

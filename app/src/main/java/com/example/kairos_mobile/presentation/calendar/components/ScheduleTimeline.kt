@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.presentation.calendar.ScheduleDisplayItem
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.ui.theme.KairosTheme
@@ -36,7 +37,9 @@ fun ScheduleTimeline(
     schedules: List<ScheduleDisplayItem>,
     onScheduleClick: (ScheduleDisplayItem) -> Unit,
     onScheduleDelete: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onApproveSuggestion: (String) -> Unit = {},
+    onRejectSuggestion: (String) -> Unit = {}
 ) {
     Column(modifier = modifier) {
         SectionHeader(title = "일정")
@@ -66,7 +69,9 @@ fun ScheduleTimeline(
                         isFirst = isFirst,
                         isLast = isLast,
                         onClick = { onScheduleClick(schedule) },
-                        onDelete = { onScheduleDelete(schedule.captureId) }
+                        onDelete = { onScheduleDelete(schedule.captureId) },
+                        onApprove = { onApproveSuggestion(schedule.scheduleId) },
+                        onReject = { onRejectSuggestion(schedule.scheduleId) }
                     )
                 }
             }
@@ -85,6 +90,8 @@ private fun ScheduleTimelineItem(
     isLast: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    onApprove: () -> Unit = {},
+    onReject: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -148,6 +155,8 @@ private fun ScheduleTimelineItem(
             isPast = isPast,
             onClick = onClick,
             onDelete = onDelete,
+            onApprove = onApprove,
+            onReject = onReject,
             modifier = Modifier
                 .weight(1f)
                 .padding(bottom = 12.dp)
@@ -164,6 +173,8 @@ private fun ScheduleCard(
     isPast: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    onApprove: () -> Unit = {},
+    onReject: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -195,6 +206,11 @@ private fun ScheduleCard(
                     modifier = Modifier.weight(1f)
                 )
 
+                // 동기화 상태 배지
+                SyncStatusBadge(status = schedule.calendarSyncStatus)
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,
                     contentDescription = "일정 삭제",
@@ -215,7 +231,77 @@ private fun ScheduleCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+
+            // SUGGESTION_PENDING 시 승인/거부 버튼
+            if (schedule.calendarSyncStatus == CalendarSyncStatus.SUGGESTION_PENDING) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(colors.accent)
+                            .clickable { onApprove() }
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "캘린더 추가",
+                            color = if (colors.isDark) colors.background else Color.White,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(colors.chipBg)
+                            .clickable { onReject() }
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "무시",
+                            color = colors.textSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
         }
+    }
+}
+
+/**
+ * 동기화 상태 배지
+ */
+@Composable
+private fun SyncStatusBadge(
+    status: CalendarSyncStatus,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    val (label, badgeColor) = when (status) {
+        CalendarSyncStatus.SYNCED -> "동기화됨" to Color(0xFF4CAF50)
+        CalendarSyncStatus.SUGGESTION_PENDING -> "제안" to Color(0xFFFFA726)
+        CalendarSyncStatus.SYNC_FAILED -> "실패" to Color(0xFFEF5350)
+        CalendarSyncStatus.REJECTED -> "거부됨" to colors.textMuted
+        CalendarSyncStatus.NOT_LINKED -> return  // 배지 없음
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(badgeColor.copy(alpha = 0.15f))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    ) {
+        Text(
+            text = label,
+            color = badgeColor,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

@@ -1,15 +1,22 @@
 package com.example.kairos_mobile.presentation.capture
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Image
@@ -21,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.kairos_mobile.presentation.classification.AIStatusSheet
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.text.SimpleDateFormat
@@ -88,6 +98,13 @@ fun CaptureContent(
 
     val focusRequester = remember { FocusRequester() }
 
+    // 갤러리 이미지 선택 런처
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.handleImageSelected(it) }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -116,6 +133,14 @@ fun CaptureContent(
                     ) { focusRequester.requestFocus() }
             )
 
+            // 이미지 미리보기 (첨부된 경우)
+            uiState.imageUri?.let { imageUri ->
+                ImagePreview(
+                    imageUri = imageUri,
+                    onRemove = { viewModel.removeImage() }
+                )
+            }
+
             // 하단 입력 바
             CaptureInputBar(
                 inputText = uiState.inputText,
@@ -123,6 +148,12 @@ fun CaptureContent(
                 isSubmitting = uiState.isSubmitting,
                 onInputChange = { viewModel.updateInput(it) },
                 onSubmit = { viewModel.submit() },
+                onImageClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+                hasImage = uiState.imageUri != null,
                 focusRequester = focusRequester
             )
         }
@@ -255,6 +286,49 @@ private fun DateDisplay() {
 /**
  * 하단 입력 바: 텍스트 필드 + 전송 버튼
  */
+/**
+ * 이미지 미리보기 (입력 바 위)
+ */
+@Composable
+private fun ImagePreview(
+    imageUri: String,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Box(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(Uri.parse(imageUri))
+                .crossfade(true)
+                .build(),
+            contentDescription = "첨부 이미지",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+
+        // 제거 버튼
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "이미지 제거",
+            tint = Color.White,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(colors.danger.copy(alpha = 0.8f))
+                .clickable { onRemove() }
+                .padding(2.dp)
+        )
+    }
+}
+
 @Composable
 private fun CaptureInputBar(
     inputText: String,
@@ -262,6 +336,8 @@ private fun CaptureInputBar(
     isSubmitting: Boolean,
     onInputChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onImageClick: () -> Unit = {},
+    hasImage: Boolean = false,
     focusRequester: FocusRequester = FocusRequester()
 ) {
     val colors = KairosTheme.colors
@@ -273,12 +349,14 @@ private fun CaptureInputBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // 이미지 아이콘 (비활성 — Phase 2 멀티모달 대비)
+        // 이미지 아이콘
         Icon(
             imageVector = Icons.Outlined.Image,
             contentDescription = "이미지 첨부",
-            tint = colors.iconMuted,
-            modifier = Modifier.size(24.dp)
+            tint = if (hasImage) colors.accent else colors.iconMuted,
+            modifier = Modifier
+                .size(24.dp)
+                .clickable { onImageClick() }
         )
 
         // 텍스트 입력 필드
@@ -317,19 +395,20 @@ private fun CaptureInputBar(
         )
 
         // 전송 버튼
+        val canSubmit = inputText.isNotBlank() || hasImage
         Box(
             modifier = Modifier
                 .testTag("capture_submit")
                 .size(44.dp)
                 .clip(CircleShape)
                 .background(
-                    if (inputText.isNotBlank()) colors.accent
+                    if (canSubmit) colors.accent
                     else colors.accentBg
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    enabled = !isSubmitting && inputText.isNotBlank()
+                    enabled = !isSubmitting && canSubmit
                 ) { onSubmit() },
             contentAlignment = Alignment.Center
         ) {
@@ -343,7 +422,7 @@ private fun CaptureInputBar(
                 Icon(
                     imageVector = Icons.Default.ArrowUpward,
                     contentDescription = "전송",
-                    tint = if (inputText.isNotBlank()) {
+                    tint = if (canSubmit) {
                         if (colors.isDark) colors.background else Color.White
                     } else colors.textMuted,
                     modifier = Modifier.size(22.dp)

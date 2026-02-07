@@ -3,11 +3,12 @@ package com.example.kairos_mobile.di
 import android.content.Context
 import androidx.room.Room
 import com.example.kairos_mobile.BuildConfig
-import com.example.kairos_mobile.data.local.database.DatabaseMigrations
 import com.example.kairos_mobile.data.local.database.KairosDatabase
+import com.example.kairos_mobile.data.local.database.dao.AnalyticsEventDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
+import com.example.kairos_mobile.data.local.database.dao.ClassificationLogDao
 import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
@@ -45,8 +46,6 @@ object DatabaseModule {
             KairosDatabase.DATABASE_NAME
         )
             .addCallback(KairosDatabase.SEED_SYSTEM_FOLDERS)
-            .addMigrations(DatabaseMigrations.MIGRATION_9_10)
-            .addMigrations(DatabaseMigrations.MIGRATION_10_11)
 
         if (BuildConfig.ALLOW_DESTRUCTIVE_MIGRATION) {
             builder.fallbackToDestructiveMigration()
@@ -125,5 +124,17 @@ object DatabaseModule {
     @Singleton
     fun provideCaptureSearchDao(database: KairosDatabase): CaptureSearchDao {
         return database.captureSearchDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideClassificationLogDao(database: KairosDatabase): ClassificationLogDao {
+        return database.classificationLogDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsEventDao(database: KairosDatabase): AnalyticsEventDao {
+        return database.analyticsEventDao()
     }
 }

@@ -54,6 +54,14 @@ data class TodoEntity(
     @ColumnInfo(name = "created_at")
     val createdAt: Long,
 
+    // 마감일 소스 (AI, USER)
+    @ColumnInfo(name = "deadline_source")
+    val deadlineSource: String? = null,
+
+    // 정렬 소스 (DEFAULT, AI, USER)
+    @ColumnInfo(name = "sort_source", defaultValue = "DEFAULT")
+    val sortSource: String = "DEFAULT",
+
     // 최종 수정 시각
     @ColumnInfo(name = "updated_at")
     val updatedAt: Long

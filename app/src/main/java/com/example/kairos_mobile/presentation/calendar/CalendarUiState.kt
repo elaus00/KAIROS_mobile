@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.calendar
 
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -19,8 +20,14 @@ data class CalendarUiState(
     // 선택된 날짜의 일정 목록 (표시용)
     val schedules: List<ScheduleDisplayItem> = emptyList(),
 
-    // 할 일 목록 (전체 활성)
+    // 활성 할 일 목록
     val tasks: List<TodoDisplayItem> = emptyList(),
+
+    // 완료된 할 일 목록
+    val completedTasks: List<TodoDisplayItem> = emptyList(),
+
+    // 완료 항목 표시 여부
+    val showCompletedTasks: Boolean = false,
 
     // 일정이 있는 날짜 목록 (dot 표시용)
     val datesWithSchedules: Set<LocalDate> = emptySet(),
@@ -47,7 +54,9 @@ data class ScheduleDisplayItem(
     /** 장소 */
     val location: String?,
     /** 종일 이벤트 여부 */
-    val isAllDay: Boolean
+    val isAllDay: Boolean,
+    /** Google Calendar 동기화 상태 */
+    val calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED
 )
 
 /**
@@ -61,7 +70,9 @@ data class TodoDisplayItem(
     /** 마감 시각 (epoch ms) */
     val deadline: Long?,
     /** 완료 여부 */
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    /** 마감일 소스 (AI / USER) */
+    val deadlineSource: String? = null
 )
 
 /**
@@ -74,6 +85,14 @@ sealed interface CalendarEvent {
     data class ToggleTaskComplete(val taskId: String) : CalendarEvent
     data class DeleteTask(val captureId: String) : CalendarEvent
     data class DeleteSchedule(val captureId: String) : CalendarEvent
+    /** 완료 항목 표시/숨김 토글 */
+    data object ToggleCompletedTasks : CalendarEvent
+    /** 할 일 순서 변경 (드래그 완료 후) */
+    data class ReorderTodos(val todoIds: List<String>) : CalendarEvent
+    /** 캘린더 제안 승인 */
+    data class ApproveSuggestion(val scheduleId: String) : CalendarEvent
+    /** 캘린더 제안 거부 */
+    data class RejectSuggestion(val scheduleId: String) : CalendarEvent
 }
 
 /**
@@ -82,4 +101,8 @@ sealed interface CalendarEvent {
 sealed class CalendarUiEvent {
     data class DeleteSuccess(val captureId: String) : CalendarUiEvent()
     data object UndoSuccess : CalendarUiEvent()
+    /** 캘린더 동기화 승인 완료 */
+    data object SyncApproved : CalendarUiEvent()
+    /** 캘린더 동기화 거부 완료 */
+    data object SyncRejected : CalendarUiEvent()
 }

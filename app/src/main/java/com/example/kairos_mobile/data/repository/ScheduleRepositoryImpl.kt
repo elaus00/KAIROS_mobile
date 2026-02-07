@@ -22,6 +22,10 @@ class ScheduleRepositoryImpl @Inject constructor(
         scheduleDao.insert(scheduleMapper.toEntity(schedule))
     }
 
+    override suspend fun getScheduleById(id: String): Schedule? {
+        return scheduleDao.getById(id)?.let { scheduleMapper.toDomain(it) }
+    }
+
     override suspend fun getScheduleByCaptureId(captureId: String): Schedule? {
         return scheduleDao.getByCaptureId(captureId)?.let { scheduleMapper.toDomain(it) }
     }

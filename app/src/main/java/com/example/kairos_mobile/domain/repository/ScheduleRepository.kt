@@ -11,6 +11,9 @@ interface ScheduleRepository {
     /** 일정 생성 */
     suspend fun createSchedule(schedule: Schedule)
 
+    /** 일정 조회 (id 기준) */
+    suspend fun getScheduleById(id: String): Schedule?
+
     /** 일정 조회 (capture_id 기준) */
     suspend fun getScheduleByCaptureId(captureId: String): Schedule?
 

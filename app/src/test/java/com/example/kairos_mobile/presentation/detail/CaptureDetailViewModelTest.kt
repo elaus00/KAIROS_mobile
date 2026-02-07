@@ -4,6 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -34,11 +38,19 @@ class CaptureDetailViewModelTest {
 
     private lateinit var captureRepository: CaptureRepository
     private lateinit var changeClassificationUseCase: ChangeClassificationUseCase
+    private lateinit var scheduleRepository: ScheduleRepository
+    private lateinit var syncScheduleToCalendar: SyncScheduleToCalendarUseCase
+    private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
+    private lateinit var rejectSuggestion: RejectCalendarSuggestionUseCase
 
     @Before
     fun setUp() {
         captureRepository = mockk()
         changeClassificationUseCase = mockk(relaxed = true)
+        scheduleRepository = mockk(relaxed = true)
+        syncScheduleToCalendar = mockk(relaxed = true)
+        approveSuggestion = mockk(relaxed = true)
+        rejectSuggestion = mockk(relaxed = true)
     }
 
     @After
@@ -63,7 +75,11 @@ class CaptureDetailViewModelTest {
         val viewModel = CaptureDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-1")),
             captureRepository = captureRepository,
-            changeClassification = changeClassificationUseCase
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            syncScheduleToCalendar = syncScheduleToCalendar,
+            approveSuggestion = approveSuggestion,
+            rejectSuggestion = rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -88,7 +104,11 @@ class CaptureDetailViewModelTest {
         val viewModel = CaptureDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-999")),
             captureRepository = captureRepository,
-            changeClassification = changeClassificationUseCase
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            syncScheduleToCalendar = syncScheduleToCalendar,
+            approveSuggestion = approveSuggestion,
+            rejectSuggestion = rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -107,7 +127,11 @@ class CaptureDetailViewModelTest {
         val viewModel = CaptureDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-1")),
             captureRepository = captureRepository,
-            changeClassification = changeClassificationUseCase
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            syncScheduleToCalendar = syncScheduleToCalendar,
+            approveSuggestion = approveSuggestion,
+            rejectSuggestion = rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -133,7 +157,11 @@ class CaptureDetailViewModelTest {
         val viewModel = CaptureDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-1")),
             captureRepository = captureRepository,
-            changeClassification = changeClassificationUseCase
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            syncScheduleToCalendar = syncScheduleToCalendar,
+            approveSuggestion = approveSuggestion,
+            rejectSuggestion = rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -153,7 +181,11 @@ class CaptureDetailViewModelTest {
         val viewModel = CaptureDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-1")),
             captureRepository = captureRepository,
-            changeClassification = changeClassificationUseCase
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            syncScheduleToCalendar = syncScheduleToCalendar,
+            approveSuggestion = approveSuggestion,
+            rejectSuggestion = rejectSuggestion
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)

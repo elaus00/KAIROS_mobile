@@ -16,6 +16,8 @@ data class CaptureUiState(
     val isSubmitting: Boolean = false,
     /** AI Status Sheet 표시 여부 */
     val showStatusSheet: Boolean = false,
+    /** 첨부 이미지 URI */
+    val imageUri: String? = null,
     /** 에러 메시지 */
     val errorMessage: String? = null
 )

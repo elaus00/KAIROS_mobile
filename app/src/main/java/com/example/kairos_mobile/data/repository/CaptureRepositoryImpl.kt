@@ -141,6 +141,24 @@ class CaptureRepositoryImpl @Inject constructor(
             .map { entities -> entities.map { captureMapper.toDomain(it) } }
     }
 
+    override suspend fun moveToTrash(captureId: String) {
+        captureDao.moveToTrash(captureId, System.currentTimeMillis())
+    }
+
+    override suspend fun restoreFromTrash(captureId: String) {
+        captureDao.restoreFromTrash(captureId, System.currentTimeMillis())
+    }
+
+    override fun getTrashedItems(): Flow<List<Capture>> {
+        return captureDao.getTrashedItems()
+            .map { entities -> entities.map { captureMapper.toDomain(it) } }
+    }
+
+    override suspend fun getTrashedOverdue(thresholdMs: Long): List<Capture> {
+        return captureDao.getTrashedOverdue(thresholdMs)
+            .map { captureMapper.toDomain(it) }
+    }
+
     private fun sanitizeFtsQuery(query: String): String {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) {

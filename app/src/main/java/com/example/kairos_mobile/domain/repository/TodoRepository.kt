@@ -17,8 +17,14 @@ interface TodoRepository {
     /** 활성 할 일 목록 (is_completed=false, sort_order 순) */
     fun getActiveTodos(): Flow<List<Todo>>
 
+    /** 완료된 할 일 목록 */
+    fun getCompletedTodos(): Flow<List<Todo>>
+
     /** 완료 토글 */
     suspend fun toggleCompletion(todoId: String)
+
+    /** 정렬 순서 업데이트 */
+    suspend fun updateSortOrder(todoId: String, sortOrder: Int, sortSource: String)
 
     /** capture_id로 삭제 */
     suspend fun deleteByCaptureId(captureId: String)

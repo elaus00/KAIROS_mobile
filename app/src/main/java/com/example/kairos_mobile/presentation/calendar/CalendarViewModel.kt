@@ -3,11 +3,15 @@ package com.example.kairos_mobile.presentation.calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.schedule.GetDatesWithSchedulesUseCase
 import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCase
 import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
+import com.example.kairos_mobile.domain.usecase.todo.GetCompletedTodosUseCase
+import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -36,10 +40,14 @@ class CalendarViewModel @Inject constructor(
     private val getSchedulesByDate: GetSchedulesByDateUseCase,
     private val getDatesWithSchedules: GetDatesWithSchedulesUseCase,
     private val getActiveTodos: GetActiveTodosUseCase,
+    private val getCompletedTodos: GetCompletedTodosUseCase,
+    private val reorderTodo: ReorderTodoUseCase,
     private val toggleTodoCompletion: ToggleTodoCompletionUseCase,
     private val softDeleteCapture: SoftDeleteCaptureUseCase,
     private val undoDeleteCapture: UndoDeleteCaptureUseCase,
-    private val captureRepository: CaptureRepository
+    private val captureRepository: CaptureRepository,
+    private val approveSuggestion: ApproveCalendarSuggestionUseCase,
+    private val rejectSuggestion: RejectCalendarSuggestionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState())
@@ -49,6 +57,7 @@ class CalendarViewModel @Inject constructor(
 
     private var schedulesJob: Job? = null
     private var todosJob: Job? = null
+    private var completedTodosJob: Job? = null
     private var datesJob: Job? = null
 
     init {
@@ -68,6 +77,10 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.ToggleTaskComplete -> toggleTaskComplete(event.taskId)
             is CalendarEvent.DeleteTask -> deleteByCaptureId(event.captureId)
             is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
+            is CalendarEvent.ToggleCompletedTasks -> toggleCompletedTasks()
+            is CalendarEvent.ReorderTodos -> reorderTodos(event.todoIds)
+            is CalendarEvent.ApproveSuggestion -> approveCalendarSuggestion(event.scheduleId)
+            is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
         }
     }
 
@@ -131,7 +144,8 @@ class CalendarViewModel @Inject constructor(
                             startTime = schedule.startTime,
                             endTime = schedule.endTime,
                             location = schedule.location,
-                            isAllDay = schedule.isAllDay
+                            isAllDay = schedule.isAllDay,
+                            calendarSyncStatus = schedule.calendarSyncStatus
                         )
                     }
 
@@ -162,7 +176,8 @@ class CalendarViewModel @Inject constructor(
                             captureId = todo.captureId,
                             title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
                             deadline = todo.deadline,
-                            isCompleted = todo.isCompleted
+                            isCompleted = todo.isCompleted,
+                            deadlineSource = todo.deadlineSource?.name
                         )
                     }
 
@@ -230,6 +245,88 @@ class CalendarViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "삭제에 실패했습니다.")
+                }
+            }
+        }
+    }
+
+    /**
+     * 완료 항목 표시/숨김 토글
+     */
+    private fun toggleCompletedTasks() {
+        val newShow = !_uiState.value.showCompletedTasks
+        _uiState.update { it.copy(showCompletedTasks = newShow) }
+        if (newShow) {
+            loadCompletedTodos()
+        } else {
+            completedTodosJob?.cancel()
+            _uiState.update { it.copy(completedTasks = emptyList()) }
+        }
+    }
+
+    /**
+     * 완료된 할 일 로드
+     */
+    private fun loadCompletedTodos() {
+        completedTodosJob?.cancel()
+        completedTodosJob = viewModelScope.launch {
+            getCompletedTodos()
+                .catch { /* 에러 무시 */ }
+                .collect { todos ->
+                    val displayItems = todos.map { todo ->
+                        val capture = captureRepository.getCaptureById(todo.captureId)
+                        TodoDisplayItem(
+                            todoId = todo.id,
+                            captureId = todo.captureId,
+                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
+                            deadline = todo.deadline,
+                            isCompleted = todo.isCompleted,
+                            deadlineSource = todo.deadlineSource?.name
+                        )
+                    }
+                    _uiState.update { it.copy(completedTasks = displayItems) }
+                }
+        }
+    }
+
+    /**
+     * 할 일 순서 변경
+     */
+    private fun reorderTodos(todoIds: List<String>) {
+        viewModelScope.launch {
+            reorderTodo(todoIds)
+        }
+    }
+
+    /**
+     * 캘린더 제안 승인
+     */
+    private fun approveCalendarSuggestion(scheduleId: String) {
+        viewModelScope.launch {
+            try {
+                approveSuggestion(scheduleId)
+                _events.emit(CalendarUiEvent.SyncApproved)
+                loadSchedulesForSelectedDate()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "캘린더 동기화에 실패했습니다.")
+                }
+            }
+        }
+    }
+
+    /**
+     * 캘린더 제안 거부
+     */
+    private fun rejectCalendarSuggestion(scheduleId: String) {
+        viewModelScope.launch {
+            try {
+                rejectSuggestion(scheduleId)
+                _events.emit(CalendarUiEvent.SyncRejected)
+                loadSchedulesForSelectedDate()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "캘린더 동기화 거부에 실패했습니다.")
                 }
             }
         }

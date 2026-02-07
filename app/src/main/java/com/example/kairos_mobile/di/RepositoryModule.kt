@@ -1,6 +1,11 @@
 package com.example.kairos_mobile.di
 
+import com.example.kairos_mobile.data.notification.NotificationHelper
+import com.example.kairos_mobile.data.repository.AnalyticsRepositoryImpl
+import com.example.kairos_mobile.data.repository.CalendarRepositoryImpl
+import com.example.kairos_mobile.data.repository.ImageRepositoryImpl
 import com.example.kairos_mobile.data.repository.CaptureRepositoryImpl
+import com.example.kairos_mobile.data.repository.ClassificationLogRepositoryImpl
 import com.example.kairos_mobile.data.repository.ExtractedEntityRepositoryImpl
 import com.example.kairos_mobile.data.repository.FolderRepositoryImpl
 import com.example.kairos_mobile.data.repository.NoteRepositoryImpl
@@ -9,7 +14,12 @@ import com.example.kairos_mobile.data.repository.SyncQueueRepositoryImpl
 import com.example.kairos_mobile.data.repository.TagRepositoryImpl
 import com.example.kairos_mobile.data.repository.TodoRepositoryImpl
 import com.example.kairos_mobile.data.repository.UserPreferenceRepositoryImpl
+import com.example.kairos_mobile.domain.repository.AnalyticsRepository
+import com.example.kairos_mobile.domain.repository.CalendarRepository
+import com.example.kairos_mobile.domain.repository.ImageRepository
+import com.example.kairos_mobile.domain.usecase.calendar.CalendarNotifier
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ClassificationLogRepository
 import com.example.kairos_mobile.domain.repository.ExtractedEntityRepository
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
@@ -84,4 +94,34 @@ abstract class RepositoryModule {
     abstract fun bindUserPreferenceRepository(
         impl: UserPreferenceRepositoryImpl
     ): UserPreferenceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindClassificationLogRepository(
+        impl: ClassificationLogRepositoryImpl
+    ): ClassificationLogRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsRepository(
+        impl: AnalyticsRepositoryImpl
+    ): AnalyticsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindImageRepository(
+        impl: ImageRepositoryImpl
+    ): ImageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCalendarRepository(
+        impl: CalendarRepositoryImpl
+    ): CalendarRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCalendarNotifier(
+        impl: NotificationHelper
+    ): CalendarNotifier
 }

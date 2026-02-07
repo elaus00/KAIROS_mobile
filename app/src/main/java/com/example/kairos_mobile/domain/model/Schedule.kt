@@ -20,6 +20,10 @@ data class Schedule(
     val isAllDay: Boolean = false,
     /** 일정 신뢰도 */
     val confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM,
+    /** Google Calendar 동기화 상태 */
+    val calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED,
+    /** Google Calendar 이벤트 ID */
+    val googleEventId: String? = null,
     /** 생성 시각 */
     val createdAt: Long = System.currentTimeMillis(),
     /** 최종 수정 시각 */

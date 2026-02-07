@@ -100,4 +100,20 @@ interface ScheduleDao {
      */
     @Query("DELETE FROM schedules WHERE capture_id = :captureId")
     suspend fun deleteByCaptureId(captureId: String)
+
+    /**
+     * 캘린더 동기화 상태로 일정 조회
+     */
+    @Query("SELECT * FROM schedules WHERE calendar_sync_status = :status")
+    suspend fun getByCalendarSyncStatus(status: String): List<ScheduleEntity>
+
+    /**
+     * 캘린더 동기화 상태 업데이트
+     */
+    @Query("""
+        UPDATE schedules
+        SET calendar_sync_status = :status, google_event_id = :googleEventId, updated_at = :updatedAt
+        WHERE id = :id
+    """)
+    suspend fun updateCalendarSync(id: String, status: String, googleEventId: String?, updatedAt: Long = System.currentTimeMillis())
 }

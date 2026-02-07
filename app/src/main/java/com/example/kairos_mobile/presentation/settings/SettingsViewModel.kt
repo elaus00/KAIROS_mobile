@@ -3,7 +3,9 @@ package com.example.kairos_mobile.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
+import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getThemePreferenceUseCase: GetThemePreferenceUseCase,
-    private val setThemePreferenceUseCase: SetThemePreferenceUseCase
+    private val setThemePreferenceUseCase: SetThemePreferenceUseCase,
+    private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
+    private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -28,6 +32,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         loadPreferences()
+        loadCalendarSettings()
     }
 
     /**
@@ -42,12 +47,60 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * 캘린더 설정 로드
+     */
+    private fun loadCalendarSettings() {
+        viewModelScope.launch {
+            val calendarEnabled = getCalendarSettingsUseCase.isCalendarEnabled()
+            val calendarMode = getCalendarSettingsUseCase.getCalendarMode()
+            val notificationEnabled = getCalendarSettingsUseCase.isNotificationEnabled()
+            _uiState.update {
+                it.copy(
+                    isCalendarEnabled = calendarEnabled,
+                    calendarMode = calendarMode,
+                    isNotificationEnabled = notificationEnabled
+                )
+            }
+        }
+    }
+
+    /**
      * 테마 변경 (LIGHT / DARK / SYSTEM)
      */
     fun setTheme(theme: ThemePreference) {
         viewModelScope.launch {
             setThemePreferenceUseCase(theme)
             _uiState.update { it.copy(themePreference = theme) }
+        }
+    }
+
+    /**
+     * Google Calendar 연동 토글
+     */
+    fun toggleCalendar(enabled: Boolean) {
+        viewModelScope.launch {
+            setCalendarSettingsUseCase.setCalendarEnabled(enabled)
+            _uiState.update { it.copy(isCalendarEnabled = enabled) }
+        }
+    }
+
+    /**
+     * 일정 추가 모드 변경
+     */
+    fun setCalendarMode(mode: String) {
+        viewModelScope.launch {
+            setCalendarSettingsUseCase.setCalendarMode(mode)
+            _uiState.update { it.copy(calendarMode = mode) }
+        }
+    }
+
+    /**
+     * 알림 설정 토글
+     */
+    fun toggleNotification(enabled: Boolean) {
+        viewModelScope.launch {
+            setCalendarSettingsUseCase.setNotificationEnabled(enabled)
+            _uiState.update { it.copy(isNotificationEnabled = enabled) }
         }
     }
 

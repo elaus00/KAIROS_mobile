@@ -34,7 +34,10 @@ class CaptureMapper @Inject constructor() {
             draftText = entity.draftText,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt,
-            classificationCompletedAt = entity.classificationCompletedAt
+            classificationCompletedAt = entity.classificationCompletedAt,
+            isTrashed = entity.isTrashed,
+            trashedAt = entity.trashedAt,
+            imageUri = entity.imageUri
         )
     }
 
@@ -89,7 +92,10 @@ class CaptureMapper @Inject constructor() {
             draftText = capture.draftText,
             createdAt = capture.createdAt,
             updatedAt = capture.updatedAt,
-            classificationCompletedAt = capture.classificationCompletedAt
+            classificationCompletedAt = capture.classificationCompletedAt,
+            isTrashed = capture.isTrashed,
+            trashedAt = capture.trashedAt,
+            imageUri = capture.imageUri
         )
     }
 }

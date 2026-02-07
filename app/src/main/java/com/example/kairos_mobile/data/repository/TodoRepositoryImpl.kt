@@ -31,9 +31,18 @@ class TodoRepositoryImpl @Inject constructor(
             .map { entities -> entities.map { todoMapper.toDomain(it) } }
     }
 
+    override fun getCompletedTodos(): Flow<List<Todo>> {
+        return todoDao.getCompletedTodos()
+            .map { entities -> entities.map { todoMapper.toDomain(it) } }
+    }
+
     override suspend fun toggleCompletion(todoId: String) {
         val now = System.currentTimeMillis()
         todoDao.toggleCompletion(todoId, now, now)
+    }
+
+    override suspend fun updateSortOrder(todoId: String, sortOrder: Int, sortSource: String) {
+        todoDao.updateSortOrder(todoId, sortOrder, sortSource, System.currentTimeMillis())
     }
 
     override suspend fun deleteByCaptureId(captureId: String) {

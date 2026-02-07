@@ -57,6 +57,10 @@ fun CalendarScreen(
                     }
                 }
                 CalendarUiEvent.UndoSuccess -> Unit
+                CalendarUiEvent.SyncApproved -> {
+                    snackbarHostState.showSnackbar("캘린더에 추가되었습니다")
+                }
+                CalendarUiEvent.SyncRejected -> Unit
             }
         }
     }
@@ -130,6 +134,12 @@ fun CalendarScreen(
                         onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
                         onScheduleDelete = { captureId ->
                             viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))
+                        },
+                        onApproveSuggestion = { scheduleId ->
+                            viewModel.onEvent(CalendarEvent.ApproveSuggestion(scheduleId))
+                        },
+                        onRejectSuggestion = { scheduleId ->
+                            viewModel.onEvent(CalendarEvent.RejectSuggestion(scheduleId))
                         }
                     )
 
@@ -143,6 +153,11 @@ fun CalendarScreen(
                         },
                         onTaskDelete = { captureId ->
                             viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
+                        },
+                        completedTasks = uiState.completedTasks,
+                        showCompleted = uiState.showCompletedTasks,
+                        onToggleShowCompleted = {
+                            viewModel.onEvent(CalendarEvent.ToggleCompletedTasks)
                         }
                     )
 
@@ -181,6 +196,10 @@ fun CalendarContent(
                     }
                 }
                 CalendarUiEvent.UndoSuccess -> Unit
+                CalendarUiEvent.SyncApproved -> {
+                    snackbarHostState.showSnackbar("캘린더에 추가되었습니다")
+                }
+                CalendarUiEvent.SyncRejected -> Unit
             }
         }
     }
@@ -244,6 +263,12 @@ fun CalendarContent(
                         onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
                         onScheduleDelete = { captureId ->
                             viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))
+                        },
+                        onApproveSuggestion = { scheduleId ->
+                            viewModel.onEvent(CalendarEvent.ApproveSuggestion(scheduleId))
+                        },
+                        onRejectSuggestion = { scheduleId ->
+                            viewModel.onEvent(CalendarEvent.RejectSuggestion(scheduleId))
                         }
                     )
 
@@ -257,6 +282,11 @@ fun CalendarContent(
                         },
                         onTaskDelete = { captureId ->
                             viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
+                        },
+                        completedTasks = uiState.completedTasks,
+                        showCompleted = uiState.showCompletedTasks,
+                        onToggleShowCompleted = {
+                            viewModel.onEvent(CalendarEvent.ToggleCompletedTasks)
                         }
                     )
 

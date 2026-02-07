@@ -5,6 +5,7 @@ import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
@@ -42,6 +43,7 @@ class HistoryViewModelTest {
     private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase = mockk()
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase = mockk()
     private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase = mockk()
+    private val moveToTrashUseCase: MoveToTrashUseCase = mockk()
     private val changeClassificationUseCase: ChangeClassificationUseCase = mockk()
 
     @Before
@@ -59,6 +61,7 @@ class HistoryViewModelTest {
             softDeleteCaptureUseCase,
             hardDeleteCaptureUseCase,
             undoDeleteCaptureUseCase,
+            moveToTrashUseCase,
             changeClassificationUseCase
         )
     }
@@ -180,7 +183,7 @@ class HistoryViewModelTest {
         )
         every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { hardDeleteCaptureUseCase(any()) } returns Unit
+        coEvery { moveToTrashUseCase(any()) } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -207,11 +210,11 @@ class HistoryViewModelTest {
     // ── 8. 3초 지연 후 hardDelete 실행 ──
 
     @Test
-    fun `delete_schedules_hard_delete_3s`() = runTest {
+    fun `delete_schedules_move_to_trash_3s`() = runTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
         every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { hardDeleteCaptureUseCase("cap-1") } returns Unit
+        coEvery { moveToTrashUseCase("cap-1") } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -219,13 +222,13 @@ class HistoryViewModelTest {
         viewModel.deleteCaptureById("cap-1")
         runCurrent()  // softDelete 실행 (delay 작업은 대기 상태 유지)
 
-        // 2초 후 → hardDelete 아직 미실행
+        // 2초 후 → moveToTrash 아직 미실행
         advanceTimeBy(2000)
-        coVerify(exactly = 0) { hardDeleteCaptureUseCase(any()) }
+        coVerify(exactly = 0) { moveToTrashUseCase(any()) }
 
-        // 추가 1.5초 (총 3.5초) → hardDelete 실행
+        // 추가 1.5초 (총 3.5초) → moveToTrash 실행
         advanceTimeBy(1500)
-        coVerify(exactly = 1) { hardDeleteCaptureUseCase("cap-1") }
+        coVerify(exactly = 1) { moveToTrashUseCase("cap-1") }
     }
 
     // ── 9. undoDelete → hardDelete 취소 + undoDeleteCapture + 새로고침 ──
@@ -235,7 +238,7 @@ class HistoryViewModelTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
         every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { hardDeleteCaptureUseCase("cap-1") } returns Unit
+        coEvery { moveToTrashUseCase("cap-1") } returns Unit
         coEvery { undoDeleteCaptureUseCase("cap-1") } returns Unit
 
         val viewModel = createViewModel()
@@ -243,7 +246,7 @@ class HistoryViewModelTest {
 
         // 삭제 실행
         viewModel.deleteCaptureById("cap-1")
-        runCurrent()  // softDelete 실행 (hardDelete delay는 아직 실행되지 않음)
+        runCurrent()  // softDelete 실행 (moveToTrash delay는 아직 실행되지 않음)
 
         // 실행 취소
         viewModel.events.test {
@@ -252,9 +255,9 @@ class HistoryViewModelTest {
 
             // then: undoDelete 호출됨
             coVerify { undoDeleteCaptureUseCase("cap-1") }
-            // hardDelete 예약 취소 확인
+            // moveToTrash 예약 취소 확인
             advanceTimeBy(3500)
-            coVerify(exactly = 0) { hardDeleteCaptureUseCase("cap-1") }
+            coVerify(exactly = 0) { moveToTrashUseCase("cap-1") }
             // UndoSuccess 이벤트 발생
             val event = awaitItem()
             assertTrue(event is HistoryEvent.UndoSuccess)
@@ -308,19 +311,19 @@ class HistoryViewModelTest {
     // ── 12. onCleared → 대기 중인 hardDelete 즉시 실행 ──
 
     @Test
-    fun `onCleared_executes_pending_deletes`() = runTest {
+    fun `onCleared_executes_pending_moves_to_trash`() = runTest {
         val captures = listOf(
             TestFixtures.capture(id = "cap-1"),
             TestFixtures.capture(id = "cap-2")
         )
         every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery { softDeleteCaptureUseCase(any()) } returns Unit
-        coEvery { hardDeleteCaptureUseCase(any()) } returns Unit
+        coEvery { moveToTrashUseCase(any()) } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        // 두 개 삭제 → 각각 3초 대기 중인 hardDelete 스케줄
+        // 두 개 삭제 → 각각 3초 대기 중인 moveToTrash 스케줄
         viewModel.deleteCaptureById("cap-1")
         viewModel.deleteCaptureById("cap-2")
         advanceUntilIdle()
@@ -330,8 +333,8 @@ class HistoryViewModelTest {
             isAccessible = true
         }.invoke(viewModel)
 
-        // then: 두 캡처 모두 즉시 hardDelete 실행
-        coVerify { hardDeleteCaptureUseCase("cap-1") }
-        coVerify { hardDeleteCaptureUseCase("cap-2") }
+        // then: 두 캡처 모두 즉시 moveToTrash 실행
+        coVerify { moveToTrashUseCase("cap-1") }
+        coVerify { moveToTrashUseCase("cap-2") }
     }
 }

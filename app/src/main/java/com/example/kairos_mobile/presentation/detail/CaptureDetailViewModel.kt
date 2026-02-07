@@ -6,6 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +27,11 @@ import javax.inject.Inject
 class CaptureDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val captureRepository: CaptureRepository,
-    private val changeClassification: ChangeClassificationUseCase
+    private val changeClassification: ChangeClassificationUseCase,
+    private val scheduleRepository: ScheduleRepository,
+    private val syncScheduleToCalendar: SyncScheduleToCalendarUseCase,
+    private val approveSuggestion: ApproveCalendarSuggestionUseCase,
+    private val rejectSuggestion: RejectCalendarSuggestionUseCase
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -44,6 +52,11 @@ class CaptureDetailViewModel @Inject constructor(
 
             val capture = captureRepository.getCaptureById(captureId)
             if (capture != null) {
+                // SCHEDULE 타입이면 일정의 동기화 상태 조회
+                val schedule = if (capture.classifiedType == ClassifiedType.SCHEDULE) {
+                    scheduleRepository.getScheduleByCaptureId(capture.id)
+                } else null
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -52,7 +65,11 @@ class CaptureDetailViewModel @Inject constructor(
                         aiTitle = capture.aiTitle,
                         classifiedType = capture.classifiedType,
                         noteSubType = capture.noteSubType,
-                        createdAt = capture.createdAt
+                        imageUri = capture.imageUri,
+                        createdAt = capture.createdAt,
+                        scheduleId = schedule?.id,
+                        calendarSyncStatus = schedule?.calendarSyncStatus,
+                        googleEventId = schedule?.googleEventId
                     )
                 }
             } else {
@@ -87,5 +104,33 @@ class CaptureDetailViewModel @Inject constructor(
      */
     fun onErrorDismissed() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    /**
+     * 캘린더 제안 승인
+     */
+    fun onApproveCalendarSync(scheduleId: String) {
+        viewModelScope.launch {
+            try {
+                approveSuggestion(scheduleId)
+                loadCapture()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
+    }
+
+    /**
+     * 캘린더 제안 거부
+     */
+    fun onRejectCalendarSync(scheduleId: String) {
+        viewModelScope.launch {
+            try {
+                rejectSuggestion(scheduleId)
+                loadCapture()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
     }
 }

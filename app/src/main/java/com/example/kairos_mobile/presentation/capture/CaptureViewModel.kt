@@ -3,7 +3,9 @@ package com.example.kairos_mobile.presentation.capture
 import android.os.Trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.net.Uri
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.usecase.capture.DeleteDraftUseCase
 import com.example.kairos_mobile.domain.usecase.capture.GetDraftUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SaveDraftUseCase
@@ -29,7 +31,8 @@ class CaptureViewModel @Inject constructor(
     private val saveDraftUseCase: SaveDraftUseCase,
     private val getDraftUseCase: GetDraftUseCase,
     private val deleteDraftUseCase: DeleteDraftUseCase,
-    private val captureRepository: CaptureRepository
+    private val captureRepository: CaptureRepository,
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
     companion object {
         private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
@@ -103,13 +106,22 @@ class CaptureViewModel @Inject constructor(
      */
     fun submit() {
         val currentText = _uiState.value.inputText
-        if (currentText.isBlank()) return
+        val currentImageUri = _uiState.value.imageUri
+        if (currentText.isBlank() && currentImageUri == null) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
 
             try {
-                submitCaptureUseCase(currentText)
+                // 이미지가 있으면 내부 저장소에 복사
+                val savedImageUri = currentImageUri?.let {
+                    imageRepository.saveImage(Uri.parse(it))
+                }
+
+                submitCaptureUseCase(
+                    text = currentText.ifBlank { "이미지 캡처" },
+                    imageUri = savedImageUri
+                )
 
                 // 임시 저장 삭제
                 deleteDraftUseCase()
@@ -118,7 +130,8 @@ class CaptureViewModel @Inject constructor(
                     it.copy(
                         isSubmitting = false,
                         inputText = "",
-                        characterCount = 0
+                        characterCount = 0,
+                        imageUri = null
                     )
                 }
                 _events.emit(CaptureEvent.SubmitSuccess)
@@ -131,6 +144,20 @@ class CaptureViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * 이미지 선택 처리
+     */
+    fun handleImageSelected(uri: Uri) {
+        _uiState.update { it.copy(imageUri = uri.toString()) }
+    }
+
+    /**
+     * 첨부 이미지 제거
+     */
+    fun removeImage() {
+        _uiState.update { it.copy(imageUri = null) }
     }
 
     /**

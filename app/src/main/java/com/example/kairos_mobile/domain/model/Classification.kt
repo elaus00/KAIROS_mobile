@@ -37,5 +37,6 @@ data class ScheduleInfo(
  * AI 추출 할 일 정보
  */
 data class TodoInfo(
-    val deadline: Long? = null
+    val deadline: Long? = null,
+    val deadlineSource: DeadlineSource? = null
 )

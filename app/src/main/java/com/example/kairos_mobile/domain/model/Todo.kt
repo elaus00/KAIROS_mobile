@@ -18,6 +18,10 @@ data class Todo(
     val completedAt: Long? = null,
     /** 리스트 내 정렬 순서 */
     val sortOrder: Int = 0,
+    /** 마감일 소스 */
+    val deadlineSource: DeadlineSource? = null,
+    /** 정렬 소스 */
+    val sortSource: SortSource = SortSource.DEFAULT,
     /** 생성 시각 */
     val createdAt: Long = System.currentTimeMillis(),
     /** 최종 수정 시각 */

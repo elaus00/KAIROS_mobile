@@ -16,7 +16,8 @@ import androidx.room.PrimaryKey
         Index(value = ["note_sub_type"]),
         Index(value = ["created_at"]),
         Index(value = ["is_deleted"]),
-        Index(value = ["is_confirmed"])
+        Index(value = ["is_confirmed"]),
+        Index(value = ["is_trashed"])
     ]
 )
 data class CaptureEntity(
@@ -75,5 +76,17 @@ data class CaptureEntity(
 
     // AI 분류 완료 시각
     @ColumnInfo(name = "classification_completed_at")
-    val classificationCompletedAt: Long? = null
+    val classificationCompletedAt: Long? = null,
+
+    // 휴지통 여부 (30일 보존)
+    @ColumnInfo(name = "is_trashed", defaultValue = "0")
+    val isTrashed: Boolean = false,
+
+    // 휴지통 이동 시점
+    @ColumnInfo(name = "trashed_at")
+    val trashedAt: Long? = null,
+
+    // 이미지 URI
+    @ColumnInfo(name = "image_uri")
+    val imageUri: String? = null
 )

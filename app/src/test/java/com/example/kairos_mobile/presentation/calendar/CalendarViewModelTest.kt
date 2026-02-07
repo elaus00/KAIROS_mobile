@@ -2,11 +2,15 @@ package com.example.kairos_mobile.presentation.calendar
 
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.schedule.GetDatesWithSchedulesUseCase
 import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCase
 import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
+import com.example.kairos_mobile.domain.usecase.todo.GetCompletedTodosUseCase
+import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -44,20 +48,28 @@ class CalendarViewModelTest {
     private lateinit var getSchedulesByDate: GetSchedulesByDateUseCase
     private lateinit var getDatesWithSchedules: GetDatesWithSchedulesUseCase
     private lateinit var getActiveTodos: GetActiveTodosUseCase
+    private lateinit var getCompletedTodos: GetCompletedTodosUseCase
+    private lateinit var reorderTodo: ReorderTodoUseCase
     private lateinit var toggleTodoCompletion: ToggleTodoCompletionUseCase
     private lateinit var softDeleteCapture: SoftDeleteCaptureUseCase
     private lateinit var undoDeleteCapture: UndoDeleteCaptureUseCase
     private lateinit var captureRepository: CaptureRepository
+    private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
+    private lateinit var rejectSuggestion: RejectCalendarSuggestionUseCase
 
     @Before
     fun setUp() {
         getSchedulesByDate = mockk()
         getDatesWithSchedules = mockk()
         getActiveTodos = mockk()
+        getCompletedTodos = mockk()
+        reorderTodo = mockk()
         toggleTodoCompletion = mockk()
         softDeleteCapture = mockk()
         undoDeleteCapture = mockk()
         captureRepository = mockk()
+        approveSuggestion = mockk(relaxed = true)
+        rejectSuggestion = mockk(relaxed = true)
     }
 
     @After
@@ -79,10 +91,14 @@ class CalendarViewModelTest {
             getSchedulesByDate,
             getDatesWithSchedules,
             getActiveTodos,
+            getCompletedTodos,
+            reorderTodo,
             toggleTodoCompletion,
             softDeleteCapture,
             undoDeleteCapture,
-            captureRepository
+            captureRepository,
+            approveSuggestion,
+            rejectSuggestion
         )
     }
 
@@ -105,7 +121,9 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            toggleTodoCompletion, softDeleteCapture, undoDeleteCapture, captureRepository
+            getCompletedTodos, reorderTodo, toggleTodoCompletion,
+            softDeleteCapture, undoDeleteCapture, captureRepository,
+            approveSuggestion, rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -131,7 +149,9 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            toggleTodoCompletion, softDeleteCapture, undoDeleteCapture, captureRepository
+            getCompletedTodos, reorderTodo, toggleTodoCompletion,
+            softDeleteCapture, undoDeleteCapture, captureRepository,
+            approveSuggestion, rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -154,7 +174,9 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            toggleTodoCompletion, softDeleteCapture, undoDeleteCapture, captureRepository
+            getCompletedTodos, reorderTodo, toggleTodoCompletion,
+            softDeleteCapture, undoDeleteCapture, captureRepository,
+            approveSuggestion, rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -236,7 +258,9 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            toggleTodoCompletion, softDeleteCapture, undoDeleteCapture, captureRepository
+            getCompletedTodos, reorderTodo, toggleTodoCompletion,
+            softDeleteCapture, undoDeleteCapture, captureRepository,
+            approveSuggestion, rejectSuggestion
         )
         advanceUntilIdle()
 
@@ -260,7 +284,9 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            toggleTodoCompletion, softDeleteCapture, undoDeleteCapture, captureRepository
+            getCompletedTodos, reorderTodo, toggleTodoCompletion,
+            softDeleteCapture, undoDeleteCapture, captureRepository,
+            approveSuggestion, rejectSuggestion
         )
         advanceUntilIdle()
 

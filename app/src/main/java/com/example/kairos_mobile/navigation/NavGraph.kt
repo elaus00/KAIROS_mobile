@@ -22,6 +22,7 @@ import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.PrivacyPolicyScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
 import com.example.kairos_mobile.presentation.settings.TermsOfServiceScreen
+import com.example.kairos_mobile.presentation.trash.TrashScreen
 
 /**
  * Navigation 경로 정의
@@ -42,6 +43,7 @@ object NavRoutes {
     const val DETAIL = "detail/{captureId}"
     const val SEARCH = "search"
     const val HISTORY = "history"
+    const val TRASH = "trash"
     const val PRIVACY_POLICY = "privacy-policy"
     const val TERMS_OF_SERVICE = "terms-of-service"
 
@@ -119,6 +121,9 @@ fun KairosNavGraph(
                 },
                 onNavigateToTermsOfService = {
                     navController.navigate(NavRoutes.TERMS_OF_SERVICE)
+                },
+                onNavigateToTrash = {
+                    navController.navigate(NavRoutes.TRASH)
                 }
             )
         }
@@ -155,6 +160,15 @@ fun KairosNavGraph(
                     navController.popBackStack()
                 },
                 onCaptureClick = navigateToDetail
+            )
+        }
+
+        // 휴지통 화면 (TRASH)
+        composable(NavRoutes.TRASH) {
+            TrashScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
 

@@ -20,7 +20,9 @@ import javax.inject.Inject
  */
 data class OnboardingUiState(
     val inputText: String = "",
-    val isSubmitting: Boolean = false
+    val isSubmitting: Boolean = false,
+    /** Google Calendar 연결 상태 (Mock) */
+    val isGoogleConnected: Boolean = false
 )
 
 /**
@@ -82,5 +84,12 @@ class OnboardingViewModel @Inject constructor(
             userPreferenceRepository.setOnboardingCompleted()
             _events.emit(OnboardingEvent.NavigateToHome)
         }
+    }
+
+    /**
+     * Google Calendar 연결 (Mock — 즉시 연결됨 상태로 전환)
+     */
+    fun connectGoogle() {
+        _uiState.update { it.copy(isGoogleConnected = true) }
     }
 }

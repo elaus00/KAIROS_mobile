@@ -6,7 +6,9 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.example.kairos_mobile.data.debug.MockDataInitializer
+import com.example.kairos_mobile.data.notification.NotificationHelper
 import com.example.kairos_mobile.data.worker.ReclassifyTempWorker
+import com.example.kairos_mobile.data.worker.TrashCleanupWorker
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -34,12 +36,18 @@ class KairosApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var syncQueueRepository: SyncQueueRepository
 
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
+
     // Application 레벨 CoroutineScope
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "Application onCreate")
+
+        // 알림 채널 생성
+        notificationHelper.createNotificationChannels()
 
         // WorkManager 초기화는 Configuration.Provider로 처리됨
 
@@ -62,6 +70,18 @@ class KairosApplication : Application(), Configuration.Provider {
         // 15분 주기 TEMP 재분류 Worker 등록
         ReclassifyTempWorker.enqueuePeriodicWork(workManager)
         Log.d(TAG, "ReclassifyTempWorker 등록 완료")
+
+        // 일일 휴지통 정리 Worker 등록
+        TrashCleanupWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "TrashCleanupWorker 등록 완료")
+
+        // 1시간 주기 분석 이벤트 배치 Worker 등록
+        com.example.kairos_mobile.data.worker.AnalyticsBatchWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "AnalyticsBatchWorker 등록 완료")
+
+        // 1시간 주기 캘린더 동기화 재시도 Worker 등록
+        com.example.kairos_mobile.data.worker.CalendarSyncWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "CalendarSyncWorker 등록 완료")
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.detail
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,10 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.ui.theme.KairosTheme
@@ -119,6 +125,46 @@ fun CaptureDetailScreen(
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
+
+                // 캘린더 동기화 상태 (SCHEDULE 타입일 때)
+                uiState.calendarSyncStatus?.let { syncStatus ->
+                    CalendarSyncSection(
+                        syncStatus = syncStatus,
+                        onApprove = {
+                            uiState.scheduleId?.let { viewModel.onApproveCalendarSync(it) }
+                        },
+                        onReject = {
+                            uiState.scheduleId?.let { viewModel.onRejectCalendarSync(it) }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                // 첨부 이미지 (있는 경우)
+                uiState.imageUri?.let { imageUri ->
+                    Text(
+                        text = "첨부 이미지",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(Uri.parse(imageUri))
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "첨부 이미지",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
 
                 // 생성 시각
                 if (uiState.createdAt > 0) {
@@ -242,6 +288,92 @@ private fun ClassificationChip(
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+/**
+ * 캘린더 동기화 상태 섹션
+ */
+@Composable
+private fun CalendarSyncSection(
+    syncStatus: CalendarSyncStatus,
+    onApprove: () -> Unit,
+    onReject: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = "캘린더 동기화",
+            color = colors.textSecondary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(colors.card)
+                .border(1.dp, colors.border, RoundedCornerShape(12.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                // 상태 텍스트
+                val (statusText, statusColor) = when (syncStatus) {
+                    CalendarSyncStatus.SYNCED -> "Google Calendar에 동기화됨" to androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                    CalendarSyncStatus.SUGGESTION_PENDING -> "캘린더 추가를 제안합니다" to androidx.compose.ui.graphics.Color(0xFFFFA726)
+                    CalendarSyncStatus.SYNC_FAILED -> "동기화 실패" to androidx.compose.ui.graphics.Color(0xFFEF5350)
+                    CalendarSyncStatus.REJECTED -> "사용자가 거부함" to colors.textMuted
+                    CalendarSyncStatus.NOT_LINKED -> "연결되지 않음" to colors.textMuted
+                }
+
+                Text(
+                    text = statusText,
+                    color = statusColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                // SUGGESTION_PENDING일 때 승인/거부 버튼
+                if (syncStatus == CalendarSyncStatus.SUGGESTION_PENDING) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(colors.accent)
+                                .clickable { onApprove() }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "캘린더에 추가",
+                                color = if (colors.isDark) colors.background else androidx.compose.ui.graphics.Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(colors.chipBg)
+                                .clickable { onReject() }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "무시",
+                                color = colors.textSecondary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

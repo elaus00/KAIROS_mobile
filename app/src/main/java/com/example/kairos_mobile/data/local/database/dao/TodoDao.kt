@@ -46,6 +46,7 @@ interface TodoDao {
         INNER JOIN captures c ON c.id = t.capture_id
         WHERE t.is_completed = 0
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
         ORDER BY
             CASE WHEN t.deadline IS NULL THEN 1 ELSE 0 END,
             t.deadline ASC,
@@ -61,6 +62,7 @@ interface TodoDao {
         INNER JOIN captures c ON c.id = t.capture_id
         WHERE t.is_completed = 1
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
         ORDER BY t.completed_at DESC
     """)
     fun getCompletedTodos(): Flow<List<TodoEntity>>
@@ -90,6 +92,16 @@ interface TodoDao {
     suspend fun deleteByCaptureId(captureId: String)
 
     /**
+     * 정렬 순서 업데이트
+     */
+    @Query("""
+        UPDATE todos
+        SET sort_order = :sortOrder, sort_source = :sortSource, updated_at = :updatedAt
+        WHERE id = :id
+    """)
+    suspend fun updateSortOrder(id: String, sortOrder: Int, sortSource: String, updatedAt: Long)
+
+    /**
      * 활성 할 일 수 조회
      */
     @Query("""
@@ -97,6 +109,7 @@ interface TodoDao {
         INNER JOIN captures c ON c.id = t.capture_id
         WHERE t.is_completed = 0
         AND c.is_deleted = 0
+        AND c.is_trashed = 0
     """)
     fun getActiveCount(): Flow<Int>
 }

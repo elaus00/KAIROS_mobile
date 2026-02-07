@@ -1,13 +1,18 @@
 package com.example.kairos_mobile.util
 
+import com.example.kairos_mobile.domain.model.AnalyticsEvent
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureSource
+import com.example.kairos_mobile.domain.model.ClassificationLog
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.ConfidenceLevel
+import com.example.kairos_mobile.domain.model.DeadlineSource
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.Schedule
+import com.example.kairos_mobile.domain.model.SortSource
 import com.example.kairos_mobile.domain.model.SyncAction
 import com.example.kairos_mobile.domain.model.SyncQueueItem
 import com.example.kairos_mobile.domain.model.SyncQueueStatus
@@ -28,6 +33,9 @@ object TestFixtures {
         source: CaptureSource = CaptureSource.APP,
         isConfirmed: Boolean = false,
         isDeleted: Boolean = false,
+        isTrashed: Boolean = false,
+        trashedAt: Long? = null,
+        imageUri: String? = null,
         createdAt: Long = 1000L
     ) = Capture(
         id = id,
@@ -39,6 +47,9 @@ object TestFixtures {
         source = source,
         isConfirmed = isConfirmed,
         isDeleted = isDeleted,
+        isTrashed = isTrashed,
+        trashedAt = trashedAt,
+        imageUri = imageUri,
         createdAt = createdAt
     )
 
@@ -58,12 +69,16 @@ object TestFixtures {
         id: String = "todo-1",
         captureId: String = "cap-1",
         deadline: Long? = null,
-        isCompleted: Boolean = false
+        isCompleted: Boolean = false,
+        deadlineSource: DeadlineSource? = null,
+        sortSource: SortSource = SortSource.DEFAULT
     ) = Todo(
         id = id,
         captureId = captureId,
         deadline = deadline,
-        isCompleted = isCompleted
+        isCompleted = isCompleted,
+        deadlineSource = deadlineSource,
+        sortSource = sortSource
     )
 
     fun schedule(
@@ -72,14 +87,40 @@ object TestFixtures {
         startTime: Long? = null,
         endTime: Long? = null,
         location: String? = null,
-        isAllDay: Boolean = false
+        isAllDay: Boolean = false,
+        calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED,
+        googleEventId: String? = null
     ) = Schedule(
         id = id,
         captureId = captureId,
         startTime = startTime,
         endTime = endTime,
         location = location,
-        isAllDay = isAllDay
+        isAllDay = isAllDay,
+        calendarSyncStatus = calendarSyncStatus,
+        googleEventId = googleEventId
+    )
+
+    fun classificationLog(
+        id: String = "log-1",
+        captureId: String = "cap-1",
+        originalType: ClassifiedType = ClassifiedType.TEMP,
+        newType: ClassifiedType = ClassifiedType.TODO
+    ) = ClassificationLog(
+        id = id,
+        captureId = captureId,
+        originalType = originalType,
+        newType = newType
+    )
+
+    fun analyticsEvent(
+        id: String = "event-1",
+        eventType: String = "capture_created",
+        eventData: String? = null
+    ) = AnalyticsEvent(
+        id = id,
+        eventType = eventType,
+        eventData = eventData
     )
 
     fun syncQueueItem(

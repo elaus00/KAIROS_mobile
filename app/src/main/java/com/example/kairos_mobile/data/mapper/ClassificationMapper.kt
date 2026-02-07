@@ -7,6 +7,7 @@ import com.example.kairos_mobile.data.remote.dto.v2.TodoInfoDto
 import com.example.kairos_mobile.domain.model.Classification
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.ConfidenceLevel
+import com.example.kairos_mobile.domain.model.DeadlineSource
 import com.example.kairos_mobile.domain.model.EntityType
 import com.example.kairos_mobile.domain.model.ExtractedEntity
 import com.example.kairos_mobile.domain.model.NoteSubType
@@ -56,7 +57,18 @@ class ClassificationMapper @Inject constructor() {
     }
 
     private fun toDomain(dto: TodoInfoDto): TodoInfo {
-        return TodoInfo(deadline = dto.deadline)
+        return TodoInfo(
+            deadline = dto.deadline,
+            deadlineSource = dto.deadlineSource?.let { parseDeadlineSource(it) }
+        )
+    }
+
+    private fun parseDeadlineSource(value: String): DeadlineSource {
+        return try {
+            DeadlineSource.valueOf(value.uppercase())
+        } catch (e: Exception) {
+            DeadlineSource.AI
+        }
     }
 
     private fun parseClassifiedType(value: String): ClassifiedType {
