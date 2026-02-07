@@ -11,6 +11,9 @@ interface SyncQueueRepository {
     /** 큐에 작업 추가 */
     suspend fun enqueue(item: SyncQueueItem)
 
+    /** 큐 처리 워커 즉시 트리거 */
+    fun triggerProcessing()
+
     /** PENDING 상태 작업 조회 (next_retry_at 순) */
     suspend fun getPendingItems(): List<SyncQueueItem>
 

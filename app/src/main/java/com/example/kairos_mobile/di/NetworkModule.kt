@@ -31,13 +31,6 @@ annotation class UseMockApi
 object NetworkModule {
 
     /**
-     * Mock API 사용 여부 플래그
-     * true: MockKairosApi 사용 (로컬 테스트)
-     * false: 실제 API 사용 (서버 연동)
-     */
-    private const val USE_MOCK_API = true
-
-    /**
      * OkHttpClient 제공
      */
     @Provides
@@ -83,7 +76,7 @@ object NetworkModule {
     fun provideKairosApi(
         retrofit: Retrofit
     ): KairosApi {
-        return if (USE_MOCK_API) {
+        return if (BuildConfig.USE_MOCK_API) {
             // Mock API 사용 (로컬 테스트용)
             MockKairosApi()
         } else {

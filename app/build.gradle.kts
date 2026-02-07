@@ -29,6 +29,8 @@ android {
         debug {
             // 에뮬레이터에서 localhost 접근을 위해 10.0.2.2 사용
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+            buildConfigField("boolean", "USE_MOCK_API", "true")
+            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         create("benchmark") {
             initWith(getByName("release"))
@@ -36,6 +38,8 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000\"")
+            buildConfigField("boolean", "USE_MOCK_API", "true")
+            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
             isMinifyEnabled = false
@@ -45,6 +49,8 @@ android {
             )
             // Production 서버 URL (설정 필요)
             buildConfigField("String", "API_BASE_URL", "\"http://your-production-server.com\"")
+            buildConfigField("boolean", "USE_MOCK_API", "false")
+            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
         }
     }
     compileOptions {
@@ -238,6 +244,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.arch.core.testing)
+    testImplementation(libs.work.testing)
 
     // Testing - Instrumented Tests
     androidTestImplementation(libs.androidx.junit)

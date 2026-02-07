@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.domain.repository
 
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -25,4 +26,10 @@ interface NoteRepository {
 
     /** 폴더별 노트 수 */
     fun getNoteCountByFolderId(folderId: String): Flow<Int>
+
+    /** 전체 폴더별 노트 수 */
+    fun getFolderNoteCounts(): Flow<Map<String, Int>>
+
+    /** 삭제되지 않은 캡처만 포함한 폴더별 노트 목록 */
+    fun getNotesWithActiveCaptureByFolderId(folderId: String): Flow<List<NoteWithCapturePreview>>
 }

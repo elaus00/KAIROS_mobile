@@ -3,6 +3,7 @@ package com.example.kairos_mobile.data.repository
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.mapper.NoteMapper
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -41,5 +42,29 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun getNoteCountByFolderId(folderId: String): Flow<Int> {
         return noteDao.getNoteCountByFolder(folderId)
+    }
+
+    override fun getFolderNoteCounts(): Flow<Map<String, Int>> {
+        return noteDao.getFolderNoteCounts()
+            .map { rows ->
+                rows.mapNotNull { row ->
+                    row.folderId?.let { folderId -> folderId to row.noteCount }
+                }.toMap()
+            }
+    }
+
+    override fun getNotesWithActiveCaptureByFolderId(folderId: String): Flow<List<NoteWithCapturePreview>> {
+        return noteDao.getNotesWithActiveCaptureByFolder(folderId)
+            .map { rows ->
+                rows.map { row ->
+                    NoteWithCapturePreview(
+                        noteId = row.noteId,
+                        captureId = row.captureId,
+                        aiTitle = row.aiTitle,
+                        originalText = row.originalText,
+                        createdAt = row.createdAt
+                    )
+                }
+            }
     }
 }

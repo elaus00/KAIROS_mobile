@@ -1,8 +1,6 @@
 package com.example.kairos_mobile.domain.usecase.capture
 
-import androidx.work.WorkManager
 import app.cash.turbine.test
-import com.example.kairos_mobile.data.worker.ClassifyCaptureWorker
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.ClassifiedType
@@ -20,7 +18,6 @@ import io.mockk.coVerifySequence
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.runs
 import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.flowOf
@@ -155,8 +152,7 @@ class CaptureUseCasesTest {
     fun submitCapture_rejects_blank_text() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val syncQueueRepository = mockk<SyncQueueRepository>()
-        val workManager = mockk<WorkManager>()
-        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository, workManager)
+        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository)
 
         val error = runCatching { useCase("   ") }.exceptionOrNull()
 
@@ -164,20 +160,18 @@ class CaptureUseCasesTest {
         assertEquals("캡처 내용이 비어있습니다", error?.message)
         coVerify(exactly = 0) { captureRepository.saveCapture(any()) }
         coVerify(exactly = 0) { syncQueueRepository.enqueue(any()) }
+        io.mockk.verify(exactly = 0) { syncQueueRepository.triggerProcessing() }
     }
 
     @Test
     fun submitCapture_persists_temp_capture_and_enqueues_classify_job() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val syncQueueRepository = mockk<SyncQueueRepository>()
-        val workManager = mockk<WorkManager>(relaxed = true)
-        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository, workManager)
-
-        mockkObject(ClassifyCaptureWorker.Companion)
+        val useCase = SubmitCaptureUseCase(captureRepository, syncQueueRepository)
 
         coEvery { captureRepository.saveCapture(any()) } answers { firstArg() }
         coEvery { syncQueueRepository.enqueue(any()) } just runs
-        every { ClassifyCaptureWorker.enqueue(workManager) } just runs
+        every { syncQueueRepository.triggerProcessing() } just runs
 
         val capture = useCase("Buy milk", CaptureSource.APP)
 
@@ -189,6 +183,6 @@ class CaptureUseCasesTest {
                 it.action == SyncAction.CLASSIFY && it.payload == capture.id
             })
         }
-        io.mockk.verify(exactly = 1) { ClassifyCaptureWorker.enqueue(workManager) }
+        io.mockk.verify(exactly = 1) { syncQueueRepository.triggerProcessing() }
     }
 }

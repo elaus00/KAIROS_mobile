@@ -137,7 +137,16 @@ class CaptureRepositoryImpl @Inject constructor(
     }
 
     override fun searchCaptures(query: String): Flow<List<Capture>> {
-        return captureSearchDao.search(query)
+        return captureSearchDao.search(sanitizeFtsQuery(query))
             .map { entities -> entities.map { captureMapper.toDomain(it) } }
+    }
+
+    private fun sanitizeFtsQuery(query: String): String {
+        val trimmed = query.trim()
+        if (trimmed.isEmpty()) {
+            return "\"\""
+        }
+        val escaped = trimmed.replace("\"", "\"\"")
+        return "\"$escaped\""
     }
 }

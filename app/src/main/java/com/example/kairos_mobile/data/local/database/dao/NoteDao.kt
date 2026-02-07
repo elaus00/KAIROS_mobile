@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.ColumnInfo
 import com.example.kairos_mobile.data.local.database.entities.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -55,6 +56,17 @@ interface NoteDao {
     fun getNoteCountByFolder(folderId: String): Flow<Int>
 
     /**
+     * 전체 폴더별 노트 수 조회
+     */
+    @Query("""
+        SELECT folder_id, COUNT(*) AS note_count
+        FROM notes
+        WHERE folder_id IS NOT NULL
+        GROUP BY folder_id
+    """)
+    fun getFolderNoteCounts(): Flow<List<FolderNoteCountRow>>
+
+    /**
      * 폴더 이동
      */
     @Query("""
@@ -91,4 +103,42 @@ interface NoteDao {
      */
     @Query("SELECT * FROM notes ORDER BY updated_at DESC")
     fun getAllNotes(): Flow<List<NoteEntity>>
+
+    /**
+     * 폴더별 노트 + 활성 캡처 정보 조회
+     */
+    @Query("""
+        SELECT
+            n.id AS note_id,
+            n.capture_id AS capture_id,
+            c.ai_title AS ai_title,
+            c.original_text AS original_text,
+            c.created_at AS created_at
+        FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE n.folder_id = :folderId
+        AND c.is_deleted = 0
+        ORDER BY n.updated_at DESC
+    """)
+    fun getNotesWithActiveCaptureByFolder(folderId: String): Flow<List<NoteWithCaptureRow>>
 }
+
+data class FolderNoteCountRow(
+    @ColumnInfo(name = "folder_id")
+    val folderId: String?,
+    @ColumnInfo(name = "note_count")
+    val noteCount: Int
+)
+
+data class NoteWithCaptureRow(
+    @ColumnInfo(name = "note_id")
+    val noteId: String,
+    @ColumnInfo(name = "capture_id")
+    val captureId: String,
+    @ColumnInfo(name = "ai_title")
+    val aiTitle: String?,
+    @ColumnInfo(name = "original_text")
+    val originalText: String,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long
+)

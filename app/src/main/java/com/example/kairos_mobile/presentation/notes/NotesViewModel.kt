@@ -8,11 +8,10 @@ import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.DeleteFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
 import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
-import com.example.kairos_mobile.domain.usecase.note.GetNotesByFolderUseCase
-import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,12 +27,10 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val getAllFoldersUseCase: GetAllFoldersUseCase,
-    private val getNotesByFolderUseCase: GetNotesByFolderUseCase,
     private val createFolderUseCase: CreateFolderUseCase,
     private val deleteFolderUseCase: DeleteFolderUseCase,
     private val renameFolderUseCase: RenameFolderUseCase,
-    private val noteRepository: NoteRepository,
-    private val captureRepository: CaptureRepository
+    private val noteRepository: NoteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -70,44 +67,28 @@ class NotesViewModel @Inject constructor(
         foldersJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            getAllFoldersUseCase()
+            combine(
+                getAllFoldersUseCase(),
+                noteRepository.getFolderNoteCounts()
+            ) { folders, countMap ->
+                folders.map { folder ->
+                    FolderWithCount(folder, countMap[folder.id] ?: 0)
+                }.filter { folderWithCount ->
+                    if (folderWithCount.folder.type == FolderType.INBOX) {
+                        folderWithCount.noteCount > 0
+                    } else {
+                        true
+                    }
+                }
+            }
                 .catch { e ->
                     _uiState.update {
                         it.copy(isLoading = false, errorMessage = e.message)
                     }
                 }
-                .collect { folders ->
-                    // 각 폴더의 노트 수 조회
-                    val foldersWithCount = folders.map { folder ->
-                        FolderWithCount(folder, 0)
-                    }
+                .collect { foldersWithCount ->
                     _uiState.update {
                         it.copy(folders = foldersWithCount, isLoading = false)
-                    }
-                    // 개별 노트 수 업데이트
-                    folders.forEach { folder -> loadNoteCount(folder) }
-                }
-        }
-    }
-
-    /**
-     * 폴더별 노트 수 로드
-     */
-    private fun loadNoteCount(folder: Folder) {
-        viewModelScope.launch {
-            noteRepository.getNoteCountByFolderId(folder.id)
-                .catch { /* 에러 무시 */ }
-                .collect { count ->
-                    _uiState.update { state ->
-                        val updatedFolders = state.folders.map { fc ->
-                            if (fc.folder.id == folder.id) fc.copy(noteCount = count)
-                            else fc
-                        }.filter { fc ->
-                            // Inbox는 노트가 있을 때만 표시
-                            if (fc.folder.type == FolderType.INBOX) fc.noteCount > 0
-                            else true
-                        }
-                        state.copy(folders = updatedFolders)
                     }
                 }
         }
@@ -135,23 +116,19 @@ class NotesViewModel @Inject constructor(
     private fun loadNotesForFolder(folderId: String) {
         notesJob?.cancel()
         notesJob = viewModelScope.launch {
-            getNotesByFolderUseCase(folderId)
+            noteRepository.getNotesWithActiveCaptureByFolderId(folderId)
                 .catch { e ->
                     _uiState.update { it.copy(errorMessage = e.message) }
                 }
                 .collect { notes ->
-                    // 노트 + 캡처 정보 조합
-                    val notesWithCapture = notes.mapNotNull { note ->
-                        val capture = captureRepository.getCaptureById(note.captureId)
-                        capture?.let {
-                            NoteWithCapture(
-                                noteId = note.id,
-                                captureId = note.captureId,
-                                aiTitle = it.aiTitle,
-                                originalText = it.originalText,
-                                createdAt = it.createdAt
-                            )
-                        }
+                    val notesWithCapture = notes.map { note ->
+                        NoteWithCapture(
+                            noteId = note.noteId,
+                            captureId = note.captureId,
+                            aiTitle = note.aiTitle,
+                            originalText = note.originalText,
+                            createdAt = note.createdAt
+                        )
                     }
                     _uiState.update { it.copy(notes = notesWithCapture) }
                 }
