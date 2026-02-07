@@ -2,6 +2,8 @@ package com.example.kairos_mobile.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.kairos_mobile.BuildConfig
+import com.example.kairos_mobile.data.local.database.DatabaseMigrations
 import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
@@ -9,6 +11,7 @@ import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
 import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
+import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
@@ -36,14 +39,20 @@ object DatabaseModule {
     fun provideKairosDatabase(
         @ApplicationContext context: Context
     ): KairosDatabase {
-        return Room.databaseBuilder(
+        val builder = Room.databaseBuilder(
             context,
             KairosDatabase::class.java,
             KairosDatabase.DATABASE_NAME
         )
             .addCallback(KairosDatabase.SEED_SYSTEM_FOLDERS)
-            .fallbackToDestructiveMigration()
-            .build()
+            .addMigrations(DatabaseMigrations.MIGRATION_9_10)
+            .addMigrations(DatabaseMigrations.MIGRATION_10_11)
+
+        if (BuildConfig.ALLOW_DESTRUCTIVE_MIGRATION) {
+            builder.fallbackToDestructiveMigration()
+        }
+
+        return builder.build()
     }
 
     @Provides
@@ -104,6 +113,12 @@ object DatabaseModule {
     @Singleton
     fun provideUserPreferenceDao(database: KairosDatabase): UserPreferenceDao {
         return database.userPreferenceDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationDao(database: KairosDatabase): NotificationDao {
+        return database.notificationDao()
     }
 
     @Provides

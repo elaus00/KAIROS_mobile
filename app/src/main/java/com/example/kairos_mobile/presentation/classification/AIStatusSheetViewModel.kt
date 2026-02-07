@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
-import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
+import com.example.kairos_mobile.domain.usecase.classification.ConfirmAllClassificationsUseCase
+import com.example.kairos_mobile.domain.usecase.classification.ConfirmClassificationUseCase
+import com.example.kairos_mobile.domain.usecase.classification.GetUnconfirmedClassificationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +23,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AIStatusSheetViewModel @Inject constructor(
-    private val captureRepository: CaptureRepository,
+    private val getUnconfirmedClassificationsUseCase: GetUnconfirmedClassificationsUseCase,
+    private val confirmClassificationUseCase: ConfirmClassificationUseCase,
+    private val confirmAllClassificationsUseCase: ConfirmAllClassificationsUseCase,
     private val changeClassificationUseCase: ChangeClassificationUseCase
 ) : ViewModel() {
 
@@ -37,7 +41,7 @@ class AIStatusSheetViewModel @Inject constructor(
      */
     private fun observeUnconfirmedClassifications() {
         viewModelScope.launch {
-            captureRepository.getUnconfirmedClassifications().collect { captures ->
+            getUnconfirmedClassificationsUseCase().collect { captures ->
                 _uiState.update {
                     it.copy(
                         unconfirmedCaptures = captures,
@@ -54,7 +58,7 @@ class AIStatusSheetViewModel @Inject constructor(
     fun confirmClassification(captureId: String) {
         viewModelScope.launch {
             try {
-                captureRepository.confirmClassification(captureId)
+                confirmClassificationUseCase(captureId)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "확인에 실패했습니다.")
@@ -69,7 +73,7 @@ class AIStatusSheetViewModel @Inject constructor(
     fun confirmAll() {
         viewModelScope.launch {
             try {
-                captureRepository.confirmAllClassifications()
+                confirmAllClassificationsUseCase()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "일괄 확인에 실패했습니다.")
