@@ -16,7 +16,6 @@ import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
 import com.example.kairos_mobile.data.local.database.dao.TodoDao
-import com.example.kairos_mobile.data.local.database.dao.UserPreferenceDao
 import com.example.kairos_mobile.data.local.database.entities.AnalyticsEventEntity
 import com.example.kairos_mobile.data.local.database.entities.CaptureEntity
 import com.example.kairos_mobile.data.local.database.entities.CaptureSearchFts
@@ -30,7 +29,6 @@ import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
 import com.example.kairos_mobile.data.local.database.entities.SyncQueueEntity
 import com.example.kairos_mobile.data.local.database.entities.TagEntity
 import com.example.kairos_mobile.data.local.database.entities.TodoEntity
-import com.example.kairos_mobile.data.local.database.entities.UserPreferenceEntity
 
 /**
  * KAIROS 앱의 Room Database (Data Model Spec v2.0)
@@ -46,13 +44,12 @@ import com.example.kairos_mobile.data.local.database.entities.UserPreferenceEnti
         CaptureTagEntity::class,
         ExtractedEntityEntity::class,
         SyncQueueEntity::class,
-        UserPreferenceEntity::class,
         NotificationEntity::class,
         CaptureSearchFts::class,
         ClassificationLogEntity::class,
         AnalyticsEventEntity::class
     ],
-    version = 13,
+    version = 14,
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -66,7 +63,6 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun captureTagDao(): CaptureTagDao
     abstract fun extractedEntityDao(): ExtractedEntityDao
     abstract fun syncQueueDao(): SyncQueueDao
-    abstract fun userPreferenceDao(): UserPreferenceDao
     abstract fun notificationDao(): NotificationDao
     abstract fun captureSearchDao(): CaptureSearchDao
     abstract fun classificationLogDao(): ClassificationLogDao

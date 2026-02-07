@@ -234,6 +234,9 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
+    // Security (EncryptedSharedPreferences)
+    implementation(libs.security.crypto)
+
     // Browser (Chrome Custom Tabs for OAuth)
     implementation(libs.browser)
     implementation(libs.androidx.profileinstaller)

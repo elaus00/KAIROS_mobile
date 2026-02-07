@@ -1,7 +1,10 @@
 package com.example.kairos_mobile.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.local.database.dao.AnalyticsEventDao
@@ -17,12 +20,12 @@ import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
 import com.example.kairos_mobile.data.local.database.dao.TodoDao
-import com.example.kairos_mobile.data.local.database.dao.UserPreferenceDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -108,10 +111,24 @@ object DatabaseModule {
         return database.syncQueueDao()
     }
 
+    /**
+     * 암호화된 SharedPreferences 제공
+     * 사용자 설정값(테마, 온보딩, 임시저장 등)을 암호화하여 저장
+     */
     @Provides
     @Singleton
-    fun provideUserPreferenceDao(database: KairosDatabase): UserPreferenceDao {
-        return database.userPreferenceDao()
+    @Named("encrypted_prefs")
+    fun provideEncryptedSharedPreferences(
+        @ApplicationContext context: Context
+    ): SharedPreferences {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        return EncryptedSharedPreferences.create(
+            "kairos_encrypted_prefs",
+            masterKeyAlias,
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     @Provides
