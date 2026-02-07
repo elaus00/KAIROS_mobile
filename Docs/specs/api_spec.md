@@ -1,8 +1,8 @@
 # KAIROS — API 명세서
 
-> **Version**: 2.0
+> **Version**: 2.4
 **작성일**: 2026-02-07
-**기준**: PRD v10.0, 기능명세서 v2.1, 데이터 모델 명세서 v2.0
+**기준**: PRD v10.0, 기능명세서 v2.3, 데이터 모델 명세서 v2.0
 **서버 프레임워크**: FastAPI (Python 3.11+)
 **Base URL**: `https://api.kairos.app/api/v1`
 >
@@ -15,6 +15,10 @@
 | --- | --- | --- |
 | 1.0 | 2026-02-06 | 초기 작성 (PRD v9.2 기준) |
 | 2.0 | 2026-02-07 | PRD v10.0 + 기능명세서 v2.1 + 데이터 모델 v2.0 반영. (1) 분류 체계 변경 — classified_type을 SCHEDULE/TODO/NOTES/TEMP 4개로 재편, IDEA를 NOTES 하위 note_sub_type으로 이동, (2) classify 응답에 note_sub_type 필드 추가, (3) classify 응답에 split_items[] 추가 (다중 의도 분리, Phase 2b), (4) Analytics 이벤트 유형 업데이트 — classification_confirmed/trash_restored/split_capture_created 추가, inbox_item_resolved → temp_item_resolved 변경, classification_modified에 sub_type 필드 추가, (5) Notes API에 Inbox AI 자동 분류 엔드포인트 추가 (Phase 3a), (6) Phase 배정 조정 — 멀티 인텐트 분할 Phase 2b, 외부 공유 Phase 3b, (7) 문서 기준 버전 갱신 |
+| 2.1 | 2026-02-07 | Phase 2a 캘린더 토큰 저장 경로 추가. (1) POST /calendar/token 추가 — 디바이스별 Google OAuth 토큰 서버 저장, (2) 캘린더 API 섹션/요약 테이블 갱신 |
+| 2.2 | 2026-02-07 | Phase 2a OAuth 코드 교환 경로 추가. (1) POST /calendar/token/exchange 추가 — authorization code를 토큰으로 교환 후 저장, (2) 캘린더 API 섹션/요약 테이블 갱신 |
+| 2.3 | 2026-02-07 | PRD v10.0 우선 정렬. (1) user_context.modification_history를 Phase 2b로 조정, (2) 수정 이력 기반 학습(modification_learning) Phase를 3b→2b로 조정 |
+| 2.4 | 2026-02-07 | PRD 충돌 정렬. (1) 수정 이력 기반 학습을 2b(초안)/3b(고도화)로 분리, (2) 분류 프리셋/사용자 지시를 3a로 조정, (3) AI 자동 그룹화 명칭을 AI 통합 그룹화로 통일 |
 
 ---
 
@@ -103,9 +107,9 @@
 | text | string | ✓ | 캡처 원문 (1~5000자) |
 | source | string | ✓ | APP / SHARE_INTENT / WIDGET |
 | device_id | string | ✓ | 디바이스 식별자 |
-| user_context.modification_history | object? | | 수정 이력 요약 (Phase 3b) |
-| user_context.preset_id | string? | | 분류 프리셋 ID (Phase 3b) |
-| user_context.custom_instruction | string? | | 사용자 지시 텍스트 (Phase 3b) |
+| user_context.modification_history | object? | | 수정 이력 요약 (Phase 2b 초안, Phase 3b 고도화) |
+| user_context.preset_id | string? | | 분류 프리셋 ID (Phase 3a) |
+| user_context.custom_instruction | string? | | 사용자 지시 텍스트 (Phase 3a) |
 
 **Response (200):**
 
@@ -172,7 +176,7 @@
 | --- | --- | --- |
 | INBOX | 미분류 노트 (기본) | system-inbox |
 | IDEA | 아이디어 | system-ideas |
-| BOOKMARK | URL 포함 콘텐츠 | system-bookmarks |
+| BOOKMARK | URL 포함 콘텐츠 (장기 로드맵. 현재 비활성) | system-bookmarks (예정) |
 
 **사용자 분류 수정 UI 옵션 ↔ 서버 응답 매핑:**
 
@@ -335,7 +339,67 @@ Temp 재분류용. 여러 캡처를 일괄 분류한다.
 
 클라이언트가 Google Calendar API를 직접 호출하지 않고, 서버를 프록시로 사용한다. 서버가 OAuth 토큰을 관리하고 API 호출을 대행한다.
 
-### 3.1 POST /calendar/events — 이벤트 생성
+### 3.1 POST /calendar/token/exchange — OAuth 코드 교환 + 토큰 저장
+
+Google OAuth에서 받은 authorization code를 서버가 Google Token API로 교환하고, 결과 토큰을 디바이스 기준으로 저장한다.
+
+**Request:**
+
+```json
+{
+  "device_id": "uuid-device-123",
+  "code": "oauth-auth-code",
+  "redirect_uri": "com.kairos.app:/oauth2redirect"
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "connected": true,
+    "expires_at": "2026-03-07T00:00:00+09:00"
+  }
+}
+```
+
+**에러:**
+
+| HTTP | 코드 | 조건 |
+| --- | --- | --- |
+| 503 | GOOGLE_TOKEN_EXCHANGE_FAILED | Google OAuth 코드 교환 실패 |
+
+### 3.2 POST /calendar/token — 디바이스 토큰 저장
+
+Google OAuth 완료 후 디바이스별 access_token/refresh_token을 서버에 저장한다.
+
+**Request:**
+
+```json
+{
+  "device_id": "uuid-device-123",
+  "access_token": "google-access-token",
+  "refresh_token": "google-refresh-token",
+  "expires_at": "2026-03-07T00:00:00+09:00"
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "connected": true
+  }
+}
+```
+
+**검증 규칙:** Header `X-Device-ID`와 body `device_id`가 일치해야 한다.
+
+### 3.3 POST /calendar/events — 이벤트 생성
 
 **Request:**
 
@@ -370,7 +434,7 @@ Temp 재분류용. 여러 캡처를 일괄 분류한다.
 | 401 | GOOGLE_TOKEN_EXPIRED | 토큰 만료 (클라이언트에서 리프레시 요청) |
 | 503 | GOOGLE_API_ERROR | Google Calendar API 오류 |
 
-### 3.2 DELETE /calendar/events/{google_event_id} — 이벤트 삭제
+### 3.4 DELETE /calendar/events/{google_event_id} — 이벤트 삭제
 
 **Response (200):**
 
@@ -383,7 +447,7 @@ Temp 재분류용. 여러 캡처를 일괄 분류한다.
 }
 ```
 
-### 3.3 GET /calendar/events — 이벤트 조회
+### 3.5 GET /calendar/events — 이벤트 조회
 
 **Query Parameters:**
 
@@ -617,18 +681,18 @@ Google Play Billing 영수증 검증.
 | 기능 키 | 설명 | Phase |
 | --- | --- | --- |
 | inbox_auto_classify | Inbox 노트 AI 자동 분류 | 3a |
-| auto_grouping | AI 자동 그룹화 | 3a |
+| auto_grouping | AI 통합 그룹화 | 3a |
 | reorganize | 전체 노트 재정리 | 3a |
-| classification_preset | 분류 프리셋 | 3b |
-| custom_instruction | 사용자 분류 지시 | 3b |
+| classification_preset | 분류 프리셋 | 3a |
+| custom_instruction | 사용자 분류 지시 | 3a |
 | semantic_search | AI 시맨틱 검색 | 3a |
-| modification_learning | 수정 이력 기반 학습 | 3b |
+| modification_learning | 수정 이력 기반 학습 (고도화) | 3b |
 
 ---
 
 ## 7. 노트 API (Phase 2b~3a)
 
-### 7.1 POST /notes/group — AI 자동 그룹화 (Phase 3a, 구독)
+### 7.1 POST /notes/group — AI 통합 그룹화 (Phase 3a, 구독)
 
 Inbox 및 Ideas 폴더의 노트를 토픽 기반으로 그룹화한다.
 
@@ -871,11 +935,13 @@ classify 요청 수신
 | --- | --- | --- | --- |
 | /classify | POST | 1 | 단건 AI 분류 |
 | /classify/batch | POST | 1 | 배치 AI 분류 (Temp 재분류) |
+| /calendar/token/exchange | POST | 2a | OAuth 코드 교환 + 디바이스 토큰 저장 |
+| /calendar/token | POST | 2a | 디바이스별 Google OAuth 토큰 저장 |
 | /calendar/events | POST | 2a | 캘린더 이벤트 생성 |
 | /calendar/events/{id} | DELETE | 2a | 캘린더 이벤트 삭제 |
 | /calendar/events | GET | 2a | 캘린더 이벤트 조회 |
 | /analytics/events | POST | 2a | 분석 이벤트 배치 전송 |
-| /notes/group | POST | 3a | AI 자동 그룹화 (구독) |
+| /notes/group | POST | 3a | AI 통합 그룹화 (구독) |
 | /notes/reorganize | POST | 3a | 전체 재정리 (구독) |
 | /notes/inbox-classify | POST | 3a | Inbox AI 자동 분류 (구독) |
 | /auth/google | POST | 3a | Google OAuth 로그인 |
@@ -886,4 +952,4 @@ classify 요청 수신
 
 ---
 
-*Document Version: 2.0 | Last Updated: 2026-02-07*
+*Document Version: 2.4 | Last Updated: 2026-02-07*

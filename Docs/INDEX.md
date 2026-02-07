@@ -39,7 +39,7 @@ Docs/
 
 | 파일 | 설명 | 버전 | 기준 문서 | 최종 수정 |
 |------|------|------|-----------|-----------|
-| `functional_spec.md` | 기능명세서 — 동작 규칙, 상태 전이, 엣지 케이스 | v2.1 | PRD v10.0, 데이터모델 v2.0 | 2026-02-06 |
+| `functional_spec.md` | 기능명세서 — 동작 규칙, 상태 전이, 엣지 케이스 | v2.3 | PRD v10.0, 데이터모델 v2.0 | 2026-02-07 |
 | `data_model_spec.md` | 데이터모델 명세서 — 스키마, 관계, 상태 머신 | v2.0 | PRD v10.0, 기능명세서 v2.0 | 2026-02-06 |
 | — | 화면정의서 (`screen_spec.md`) | 작성 예정 | — | — |
 | `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.0 | PRD v10.0, 기능명세서 v2.1, 데이터모델 v2.0 | 2026-02-07 |
@@ -138,3 +138,4 @@ Docs/
 | 2026-02-07 | `plan/phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 작성 — Mock 삭제 → 실제 API, 8개 서브페이즈 |
 | 2026-02-07 | `INDEX.md` | Phase 2b/3 문서 섹션 추가, 상태 "계획 수립"으로 변경 |
 | 2026-02-07 | `ROADMAP.md` | Phase 2b/3 상세 내용 업데이트 |
+| 2026-02-07 | `functional_spec.md` | v2.1 → v2.3: PRD 변경사항 반영 (BOOKMARK 장기 로드맵, 임시 저장 EncryptedSharedPreferences 제거, 수정 이력 기반 학습 Phase 2b~3b, 분류 프리셋/사용자 지시 Phase 3a, AI 통합 그룹화, Phase 로드맵 업데이트) |

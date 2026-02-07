@@ -13,6 +13,7 @@
 | --- | --- | --- |
 | 1.0 | 2026-02-06 | 초기 작성 (PRD v9.2 기준) |
 | 2.0 | 2026-02-06 | PRD v10.0 + 기능명세서 v2.0 반영 (불일치 시 PRD 우선). (1) 분류 체계 전면 변경 — classified_type을 SCHEDULE/TODO/NOTES/TEMP 4개로 재편, note_sub_type 필드 추가, (2) 삭제 모델 변경 — Phase 1: Soft Delete(3초) → Hard Delete, Phase 2a: 휴지통(30일) 도입으로 3단계화, is_trashed/trashed_at 필드 추가(Phase 2a), (3) AI 분류 확인 추적 — is_confirmed/confirmed_at 필드 추가 (AI 분류 현황 시트 뱃지 지원), (4) 멀티 인텐트 분할(Phase 2b) — parent_capture_id 필드 추가, source enum에 SPLIT 추가, (5) Folder에 BOOKMARKS 타입 및 system-bookmarks 시스템 폴더 추가, (6) AnalyticsEvent 이벤트 유형 업데이트 — classification_confirmed/trash_restored/split_capture_created 추가, inbox_item_resolved → temp_item_resolved 변경 |
+| 2.1 | 2026-02-07 | 서버 PostgreSQL 스키마 정렬. (1) analytics_events 저장 테이블을 서버 섹션에 명시, (2) Phase 2a 디바이스별 Google OAuth 토큰 저장용 google_device_tokens 테이블 추가 |
 
 ## 1. 아키텍처 개요
 
@@ -594,7 +595,20 @@ Room FTS4를 사용한 전문 검색 테이블.
 | timestamp | Timestamp | 이벤트 발생 시각 |
 | received_at | Timestamp | 서버 수신 시각 |
 
-### 6.2 users (Phase 3a — 서버 PostgreSQL)
+### 6.2 google_device_tokens (Phase 2a — 서버 PostgreSQL)
+
+디바이스 ID 기준 Google Calendar OAuth 토큰 저장 테이블.
+
+| 필드 | 타입 | 설명 |
+| --- | --- | --- |
+| device_id | String | PK. 디바이스 식별자 |
+| access_token | String | Google 액세스 토큰 |
+| refresh_token | String? | Google 리프레시 토큰 |
+| token_expiry | Timestamp? | 액세스 토큰 만료 시각 |
+| created_at | Timestamp | 최초 저장 시각 |
+| updated_at | Timestamp | 마지막 갱신 시각 |
+
+### 6.3 users (Phase 3a — 서버 PostgreSQL)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
@@ -620,4 +634,4 @@ Room DB 스키마 변경 시 마이그레이션을 제공하여 데이터 손실
 
 ---
 
-*Document Version: 2.0 | Last Updated: 2026-02-06*
+*Document Version: 2.1 | Last Updated: 2026-02-07*
