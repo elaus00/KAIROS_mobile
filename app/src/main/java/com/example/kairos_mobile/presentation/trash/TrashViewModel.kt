@@ -2,10 +2,9 @@ package com.example.kairos_mobile.presentation.trash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.usecase.capture.EmptyTrashUseCase
-import com.example.kairos_mobile.domain.usecase.capture.GetTrashItemsUseCase
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.RestoreFromTrashUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +20,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TrashViewModel @Inject constructor(
-    private val getTrashItemsUseCase: GetTrashItemsUseCase,
-    private val restoreFromTrashUseCase: RestoreFromTrashUseCase,
+    private val captureRepository: CaptureRepository,
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase,
     private val emptyTrashUseCase: EmptyTrashUseCase
 ) : ViewModel() {
@@ -40,7 +38,7 @@ class TrashViewModel @Inject constructor(
     private fun loadTrashItems() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            getTrashItemsUseCase()
+            captureRepository.getTrashedItems()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -67,7 +65,7 @@ class TrashViewModel @Inject constructor(
     fun restoreItem(captureId: String) {
         viewModelScope.launch {
             try {
-                restoreFromTrashUseCase(captureId)
+                captureRepository.restoreFromTrash(captureId)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "복원에 실패했습니다.")

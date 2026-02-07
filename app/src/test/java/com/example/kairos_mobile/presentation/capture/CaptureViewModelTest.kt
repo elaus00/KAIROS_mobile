@@ -4,11 +4,9 @@ import android.os.Trace
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.repository.CaptureRepository
-import com.example.kairos_mobile.domain.usecase.capture.DeleteDraftUseCase
-import com.example.kairos_mobile.domain.usecase.capture.GetDraftUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SaveDraftUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.repository.ImageRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
 import io.mockk.coEvery
@@ -46,9 +44,7 @@ class CaptureViewModelTest {
     val dispatcherRule = MainDispatcherRule()
 
     private lateinit var submitCaptureUseCase: SubmitCaptureUseCase
-    private lateinit var saveDraftUseCase: SaveDraftUseCase
-    private lateinit var getDraftUseCase: GetDraftUseCase
-    private lateinit var deleteDraftUseCase: DeleteDraftUseCase
+    private lateinit var userPreferenceRepository: UserPreferenceRepository
     private lateinit var captureRepository: CaptureRepository
     private lateinit var imageRepository: ImageRepository
 
@@ -60,9 +56,7 @@ class CaptureViewModelTest {
         every { Trace.endSection() } just runs
 
         submitCaptureUseCase = mockk()
-        saveDraftUseCase = mockk()
-        getDraftUseCase = mockk()
-        deleteDraftUseCase = mockk()
+        userPreferenceRepository = mockk()
         captureRepository = mockk()
         imageRepository = mockk()
     }
@@ -74,19 +68,17 @@ class CaptureViewModelTest {
 
     /**
      * 기본 mock 설정 후 ViewModel 생성 헬퍼
-     * init{}에서 getDraftUseCase + getUnconfirmedCount를 호출하므로 반드시 mock 필요
+     * init{}에서 userPreferenceRepository.getString + getUnconfirmedCount를 호출하므로 반드시 mock 필요
      */
     private fun createViewModel(
         draftText: String = "",
         unconfirmedCount: Int = 0
     ): CaptureViewModel {
-        coEvery { getDraftUseCase() } returns draftText
+        coEvery { userPreferenceRepository.getString("draft_capture", "") } returns draftText
         every { captureRepository.getUnconfirmedCount() } returns flowOf(unconfirmedCount)
         return CaptureViewModel(
             submitCaptureUseCase,
-            saveDraftUseCase,
-            getDraftUseCase,
-            deleteDraftUseCase,
+            userPreferenceRepository,
             captureRepository,
             imageRepository
         )
@@ -170,7 +162,7 @@ class CaptureViewModelTest {
         // given: 텍스트 입력 후 제출 준비
         vm.updateInput("캡처 내용")
         coEvery { submitCaptureUseCase(any(), any()) } returns TestFixtures.capture()
-        coEvery { deleteDraftUseCase() } just runs
+        coEvery { userPreferenceRepository.setString("draft_capture", "") } just runs
 
         // when: 이벤트 수집 시작 + 제출
         vm.events.test {
@@ -186,7 +178,7 @@ class CaptureViewModelTest {
         assertEquals("", vm.uiState.value.inputText)
         assertEquals(0, vm.uiState.value.characterCount)
         assertFalse(vm.uiState.value.isSubmitting)
-        coVerify(exactly = 1) { deleteDraftUseCase() }
+        coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture", "") }
     }
 
     @Test
@@ -229,14 +221,14 @@ class CaptureViewModelTest {
 
         // given: 텍스트 입력
         vm.updateInput("저장할 내용")
-        coEvery { saveDraftUseCase(any()) } just runs
+        coEvery { userPreferenceRepository.setString("draft_capture", any()) } just runs
 
         // when: 임시 저장
         vm.saveDraft()
         advanceUntilIdle()
 
-        // then: saveDraftUseCase 호출됨
-        coVerify(exactly = 1) { saveDraftUseCase("저장할 내용") }
+        // then: userPreferenceRepository.setString 호출됨
+        coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture", "저장할 내용") }
     }
 
     @Test
@@ -248,8 +240,8 @@ class CaptureViewModelTest {
         vm.saveDraft()
         advanceUntilIdle()
 
-        // then: saveDraftUseCase 호출되지 않음
-        coVerify(exactly = 0) { saveDraftUseCase(any()) }
+        // then: userPreferenceRepository.setString 호출되지 않음
+        coVerify(exactly = 0) { userPreferenceRepository.setString(any(), any()) }
     }
 
     // ========== UI 상태 토글 테스트 ==========

@@ -15,7 +15,6 @@ import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.navigation.KairosNavGraph
 import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
@@ -28,9 +27,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var getThemePreferenceUseCase: GetThemePreferenceUseCase
 
     @Inject
     lateinit var submitCaptureUseCase: SubmitCaptureUseCase
@@ -46,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val themePreference by getThemePreferenceUseCase().collectAsState(initial = ThemePreference.DARK)
+            val themePreference by userPreferenceRepository.getThemePreference().collectAsState(initial = ThemePreference.DARK)
             val isDarkTheme = themePreference == ThemePreference.DARK
 
             // 온보딩 완료 여부에 따라 시작 화면 결정

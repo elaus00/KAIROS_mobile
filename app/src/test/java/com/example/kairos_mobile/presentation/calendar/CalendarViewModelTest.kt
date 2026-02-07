@@ -1,15 +1,11 @@
 package com.example.kairos_mobile.presentation.calendar
 
 import app.cash.turbine.test
+import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.schedule.GetDatesWithSchedulesUseCase
-import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCase
-import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
-import com.example.kairos_mobile.domain.usecase.todo.GetCompletedTodosUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
@@ -45,31 +41,23 @@ class CalendarViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var getSchedulesByDate: GetSchedulesByDateUseCase
-    private lateinit var getDatesWithSchedules: GetDatesWithSchedulesUseCase
-    private lateinit var getActiveTodos: GetActiveTodosUseCase
-    private lateinit var getCompletedTodos: GetCompletedTodosUseCase
+    private lateinit var scheduleRepository: ScheduleRepository
+    private lateinit var todoRepository: TodoRepository
+    private lateinit var captureRepository: CaptureRepository
+    private lateinit var calendarRepository: CalendarRepository
     private lateinit var reorderTodo: ReorderTodoUseCase
     private lateinit var toggleTodoCompletion: ToggleTodoCompletionUseCase
-    private lateinit var softDeleteCapture: SoftDeleteCaptureUseCase
-    private lateinit var undoDeleteCapture: UndoDeleteCaptureUseCase
-    private lateinit var captureRepository: CaptureRepository
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
-    private lateinit var rejectSuggestion: RejectCalendarSuggestionUseCase
 
     @Before
     fun setUp() {
-        getSchedulesByDate = mockk()
-        getDatesWithSchedules = mockk()
-        getActiveTodos = mockk()
-        getCompletedTodos = mockk()
+        scheduleRepository = mockk()
+        todoRepository = mockk()
+        captureRepository = mockk()
+        calendarRepository = mockk(relaxed = true)
         reorderTodo = mockk()
         toggleTodoCompletion = mockk()
-        softDeleteCapture = mockk()
-        undoDeleteCapture = mockk()
-        captureRepository = mockk()
         approveSuggestion = mockk(relaxed = true)
-        rejectSuggestion = mockk(relaxed = true)
     }
 
     @After
@@ -82,23 +70,19 @@ class CalendarViewModelTest {
      * 기본 빈 Flow 설정 후 ViewModel 생성 헬퍼
      */
     private fun createViewModel(): CalendarViewModel {
-        // init에서 호출되는 3개 UseCase에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
-        every { getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { getActiveTodos() } returns flowOf(emptyList())
+        // init에서 호출되는 3개 Repository 메서드에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
 
         return CalendarViewModel(
-            getSchedulesByDate,
-            getDatesWithSchedules,
-            getActiveTodos,
-            getCompletedTodos,
+            scheduleRepository,
+            todoRepository,
+            captureRepository,
+            calendarRepository,
             reorderTodo,
             toggleTodoCompletion,
-            softDeleteCapture,
-            undoDeleteCapture,
-            captureRepository,
-            approveSuggestion,
-            rejectSuggestion
+            approveSuggestion
         )
     }
 
@@ -113,17 +97,16 @@ class CalendarViewModelTest {
         )
         val capture = TestFixtures.capture(id = "cap-1", aiTitle = "회의")
 
-        every { getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { getActiveTodos() } returns flowOf(emptyList())
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("cap-1") } returns capture
 
         // When
         val viewModel = CalendarViewModel(
-            getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            getCompletedTodos, reorderTodo, toggleTodoCompletion,
-            softDeleteCapture, undoDeleteCapture, captureRepository,
-            approveSuggestion, rejectSuggestion
+            scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, reorderTodo, toggleTodoCompletion,
+            approveSuggestion
         )
         advanceUntilIdle()
 
@@ -141,17 +124,16 @@ class CalendarViewModelTest {
         val todo = TestFixtures.todo(id = "todo-1", captureId = "cap-2", isCompleted = false)
         val capture = TestFixtures.capture(id = "cap-2", aiTitle = "보고서 작성")
 
-        every { getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { getActiveTodos() } returns flowOf(listOf(todo))
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
         coEvery { captureRepository.getCaptureById("cap-2") } returns capture
 
         // When
         val viewModel = CalendarViewModel(
-            getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            getCompletedTodos, reorderTodo, toggleTodoCompletion,
-            softDeleteCapture, undoDeleteCapture, captureRepository,
-            approveSuggestion, rejectSuggestion
+            scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, reorderTodo, toggleTodoCompletion,
+            approveSuggestion
         )
         advanceUntilIdle()
 
@@ -167,16 +149,15 @@ class CalendarViewModelTest {
         // Given: epochDay 리스트 반환
         val epochDay = LocalDate.of(2026, 2, 7).toEpochDay()
 
-        every { getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(listOf(epochDay))
-        every { getActiveTodos() } returns flowOf(emptyList())
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(epochDay))
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
 
         // When
         val viewModel = CalendarViewModel(
-            getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            getCompletedTodos, reorderTodo, toggleTodoCompletion,
-            softDeleteCapture, undoDeleteCapture, captureRepository,
-            approveSuggestion, rejectSuggestion
+            scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, reorderTodo, toggleTodoCompletion,
+            approveSuggestion
         )
         advanceUntilIdle()
 
@@ -249,18 +230,17 @@ class CalendarViewModelTest {
         val cap1 = TestFixtures.capture(id = "c1", aiTitle = "늦은 일정")
         val cap2 = TestFixtures.capture(id = "c2", aiTitle = "이른 일정")
 
-        every { getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { getActiveTodos() } returns flowOf(emptyList())
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("c1") } returns cap1
         coEvery { captureRepository.getCaptureById("c2") } returns cap2
 
         // When
         val viewModel = CalendarViewModel(
-            getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            getCompletedTodos, reorderTodo, toggleTodoCompletion,
-            softDeleteCapture, undoDeleteCapture, captureRepository,
-            approveSuggestion, rejectSuggestion
+            scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, reorderTodo, toggleTodoCompletion,
+            approveSuggestion
         )
         advanceUntilIdle()
 
@@ -276,17 +256,16 @@ class CalendarViewModelTest {
         // Given: 캡처가 null
         val schedule = TestFixtures.schedule(id = "s1", captureId = "missing-cap")
 
-        every { getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
-        every { getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { getActiveTodos() } returns flowOf(emptyList())
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("missing-cap") } returns null
 
         // When
         val viewModel = CalendarViewModel(
-            getSchedulesByDate, getDatesWithSchedules, getActiveTodos,
-            getCompletedTodos, reorderTodo, toggleTodoCompletion,
-            softDeleteCapture, undoDeleteCapture, captureRepository,
-            approveSuggestion, rejectSuggestion
+            scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, reorderTodo, toggleTodoCompletion,
+            approveSuggestion
         )
         advanceUntilIdle()
 
@@ -314,7 +293,7 @@ class CalendarViewModelTest {
     @Test
     fun `delete_emits_event`() = runTest {
         // Given
-        coEvery { softDeleteCapture(any()) } just runs
+        coEvery { captureRepository.softDelete(any()) } just runs
         val viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -326,7 +305,7 @@ class CalendarViewModelTest {
             val event = awaitItem()
             assertTrue(event is CalendarUiEvent.DeleteSuccess)
             assertEquals("cap-1", (event as CalendarUiEvent.DeleteSuccess).captureId)
-            coVerify(exactly = 1) { softDeleteCapture("cap-1") }
+            coVerify(exactly = 1) { captureRepository.softDelete("cap-1") }
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -335,7 +314,7 @@ class CalendarViewModelTest {
     @Test
     fun `undoDelete_restores_and_emits`() = runTest {
         // Given
-        coEvery { undoDeleteCapture(any()) } just runs
+        coEvery { captureRepository.undoSoftDelete(any()) } just runs
         val viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -346,7 +325,7 @@ class CalendarViewModelTest {
 
             val event = awaitItem()
             assertTrue(event is CalendarUiEvent.UndoSuccess)
-            coVerify(exactly = 1) { undoDeleteCapture("cap-1") }
+            coVerify(exactly = 1) { captureRepository.undoSoftDelete("cap-1") }
 
             cancelAndIgnoreRemainingEvents()
         }

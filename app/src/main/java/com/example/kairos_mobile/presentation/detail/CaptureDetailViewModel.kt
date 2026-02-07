@@ -5,10 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
+import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +31,7 @@ class CaptureDetailViewModel @Inject constructor(
     private val changeClassification: ChangeClassificationUseCase,
     private val scheduleRepository: ScheduleRepository,
     private val approveSuggestion: ApproveCalendarSuggestionUseCase,
-    private val rejectSuggestion: RejectCalendarSuggestionUseCase,
+    private val calendarRepository: CalendarRepository,
     private val trackEventUseCase: TrackEventUseCase
 ) : ViewModel() {
 
@@ -133,7 +134,7 @@ class CaptureDetailViewModel @Inject constructor(
     fun onRejectCalendarSync(scheduleId: String) {
         viewModelScope.launch {
             try {
-                rejectSuggestion(scheduleId)
+                calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.REJECTED)
                 loadCapture()
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = e.message) }

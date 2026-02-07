@@ -236,21 +236,17 @@ class ClassificationUseCasesTest {
     }
 
     @Test
-    fun confirmUseCases_delegate_to_capture_repository() = runTest {
+    fun confirmClassification_delegates_to_capture_repository() = runTest {
         val captureRepository = mockk<CaptureRepository>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val confirmOne = ConfirmClassificationUseCase(captureRepository, trackEventUseCase)
-        val confirmAll = ConfirmAllClassificationsUseCase(captureRepository)
 
         coEvery { captureRepository.confirmClassification("cap-1") } just runs
-        coEvery { captureRepository.confirmAllClassifications() } just runs
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         confirmOne("cap-1")
-        confirmAll()
 
         coVerify(exactly = 1) { captureRepository.confirmClassification("cap-1") }
-        coVerify(exactly = 1) { captureRepository.confirmAllClassifications() }
     }
 
     @Test

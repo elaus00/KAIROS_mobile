@@ -3,9 +3,9 @@ package com.example.kairos_mobile.presentation.notes.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.repository.FolderRepository
+import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
-import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
-import com.example.kairos_mobile.domain.usecase.note.GetNoteDetailUseCase
 import com.example.kairos_mobile.domain.usecase.note.UpdateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +23,9 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getNoteDetailUseCase: GetNoteDetailUseCase,
+    private val noteRepository: NoteRepository,
     private val updateNoteUseCase: UpdateNoteUseCase,
-    private val getAllFoldersUseCase: GetAllFoldersUseCase,
+    private val folderRepository: FolderRepository,
     private val trackEventUseCase: TrackEventUseCase
 ) : ViewModel() {
 
@@ -44,7 +44,7 @@ class NoteDetailViewModel @Inject constructor(
      */
     private fun loadNoteDetail() {
         viewModelScope.launch {
-            getNoteDetailUseCase(noteId).collectLatest { noteDetail ->
+            noteRepository.getNoteDetail(noteId).collectLatest { noteDetail ->
                 if (noteDetail != null) {
                     val currentState = _uiState.value
                     // 최초 로드 시에만 편집 필드 초기화
@@ -81,7 +81,7 @@ class NoteDetailViewModel @Inject constructor(
      */
     private fun loadFolders() {
         viewModelScope.launch {
-            getAllFoldersUseCase().collectLatest { folders ->
+            folderRepository.getAllFolders().collectLatest { folders ->
                 _uiState.update { it.copy(folders = folders) }
             }
         }

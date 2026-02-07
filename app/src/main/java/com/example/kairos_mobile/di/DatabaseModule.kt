@@ -15,7 +15,6 @@ import com.example.kairos_mobile.data.local.database.dao.ClassificationLogDao
 import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
-import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
@@ -129,12 +128,6 @@ object DatabaseModule {
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
-    }
-
-    @Provides
-    @Singleton
-    fun provideNotificationDao(database: KairosDatabase): NotificationDao {
-        return database.notificationDao()
     }
 
     @Provides

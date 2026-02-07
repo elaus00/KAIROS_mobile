@@ -2,15 +2,12 @@ package com.example.kairos_mobile.presentation.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.model.CalendarSyncStatus
+import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.schedule.GetDatesWithSchedulesUseCase
-import com.example.kairos_mobile.domain.usecase.schedule.GetSchedulesByDateUseCase
-import com.example.kairos_mobile.domain.usecase.todo.GetActiveTodosUseCase
-import com.example.kairos_mobile.domain.usecase.todo.GetCompletedTodosUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,21 +31,17 @@ import javax.inject.Inject
 
 /**
  * CalendarScreen ViewModel
- * UseCase 기반으로 일정/할일 조회
+ * Repository + UseCase 기반으로 일정/할일 조회
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    private val getSchedulesByDate: GetSchedulesByDateUseCase,
-    private val getDatesWithSchedules: GetDatesWithSchedulesUseCase,
-    private val getActiveTodos: GetActiveTodosUseCase,
-    private val getCompletedTodos: GetCompletedTodosUseCase,
+    private val scheduleRepository: ScheduleRepository,
+    private val todoRepository: TodoRepository,
+    private val captureRepository: CaptureRepository,
+    private val calendarRepository: CalendarRepository,
     private val reorderTodo: ReorderTodoUseCase,
     private val toggleTodoCompletion: ToggleTodoCompletionUseCase,
-    private val softDeleteCapture: SoftDeleteCaptureUseCase,
-    private val undoDeleteCapture: UndoDeleteCaptureUseCase,
-    private val captureRepository: CaptureRepository,
-    private val approveSuggestion: ApproveCalendarSuggestionUseCase,
-    private val rejectSuggestion: RejectCalendarSuggestionUseCase
+    private val approveSuggestion: ApproveCalendarSuggestionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarUiState())
@@ -101,10 +94,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 월 변경
+     * 월 변경 (스와이프로 달 이동 시 selectedDate도 함께 이동)
      */
     private fun changeMonth(yearMonth: YearMonth) {
-        _uiState.update { it.copy(currentMonth = yearMonth) }
+        val newSelectedDate = yearMonth.atDay(1)
+        _uiState.update { it.copy(selectedDate = newSelectedDate, currentMonth = yearMonth) }
+        loadSchedulesForSelectedDate()
         loadDatesWithSchedules()
     }
 
@@ -128,7 +123,7 @@ class CalendarViewModel @Inject constructor(
             val startMs = selectedDate.atStartOfDay(zone).toInstant().toEpochMilli()
             val endMs = selectedDate.atTime(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()
 
-            getSchedulesByDate(startMs, endMs)
+            scheduleRepository.getSchedulesByDate(startMs, endMs)
                 .catch { e ->
                     _uiState.update {
                         it.copy(isLoading = false, errorMessage = e.message)
@@ -167,7 +162,7 @@ class CalendarViewModel @Inject constructor(
     private fun loadTodos() {
         todosJob?.cancel()
         todosJob = viewModelScope.launch {
-            getActiveTodos()
+            todoRepository.getActiveTodos()
                 .catch { /* 에러 무시 */ }
                 .collect { todos ->
                     val displayItems = todos.map { todo ->
@@ -198,7 +193,7 @@ class CalendarViewModel @Inject constructor(
             val startMs = currentMonth.atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()
             val endMs = currentMonth.atEndOfMonth().atTime(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()
 
-            getDatesWithSchedules(startMs, endMs)
+            scheduleRepository.getDatesWithSchedules(startMs, endMs)
                 .catch { /* 에러 무시 */ }
                 .collect { epochDays ->
                     // epoch day → LocalDate 변환
@@ -238,7 +233,7 @@ class CalendarViewModel @Inject constructor(
     fun undoDelete(captureId: String) {
         viewModelScope.launch {
             try {
-                undoDeleteCapture(captureId)
+                captureRepository.undoSoftDelete(captureId)
                 _events.emit(CalendarUiEvent.UndoSuccess)
             } catch (e: Exception) {
                 _uiState.update {
@@ -251,7 +246,7 @@ class CalendarViewModel @Inject constructor(
     private fun deleteByCaptureId(captureId: String) {
         viewModelScope.launch {
             try {
-                softDeleteCapture(captureId)
+                captureRepository.softDelete(captureId)
                 _events.emit(CalendarUiEvent.DeleteSuccess(captureId))
             } catch (e: Exception) {
                 _uiState.update {
@@ -281,7 +276,7 @@ class CalendarViewModel @Inject constructor(
     private fun loadCompletedTodos() {
         completedTodosJob?.cancel()
         completedTodosJob = viewModelScope.launch {
-            getCompletedTodos()
+            todoRepository.getCompletedTodos()
                 .catch { /* 에러 무시 */ }
                 .collect { todos ->
                     val displayItems = todos.map { todo ->
@@ -332,7 +327,7 @@ class CalendarViewModel @Inject constructor(
     private fun rejectCalendarSuggestion(scheduleId: String) {
         viewModelScope.launch {
             try {
-                rejectSuggestion(scheduleId)
+                calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.REJECTED)
                 _events.emit(CalendarUiEvent.SyncRejected)
                 loadSchedulesForSelectedDate()
             } catch (e: Exception) {

@@ -2,7 +2,6 @@ package com.example.kairos_mobile.di
 
 import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.data.remote.api.KairosApi
-import com.example.kairos_mobile.data.remote.api.MockKairosApi
 import com.example.kairos_mobile.data.remote.interceptor.DeviceIdInterceptor
 import com.google.gson.Gson
 import dagger.Module
@@ -14,15 +13,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
 import javax.inject.Singleton
-
-/**
- * Mock API 사용 여부 Qualifier
- */
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class UseMockApi
 
 /**
  * Network Hilt 모듈 (API v2.1)
@@ -73,19 +64,12 @@ object NetworkModule {
 
     /**
      * KairosApi 제공
-     * USE_MOCK_API 플래그에 따라 Mock/실제 API 선택
      */
     @Provides
     @Singleton
     fun provideKairosApi(
         retrofit: Retrofit
     ): KairosApi {
-        return if (BuildConfig.USE_MOCK_API) {
-            // Mock API 사용 (로컬 테스트용)
-            MockKairosApi()
-        } else {
-            // 실제 API 사용 (서버 연동)
-            retrofit.create(KairosApi::class.java)
-        }
+        return retrofit.create(KairosApi::class.java)
     }
 }

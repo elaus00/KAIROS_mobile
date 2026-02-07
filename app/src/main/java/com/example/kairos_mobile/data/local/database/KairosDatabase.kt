@@ -11,7 +11,6 @@ import com.example.kairos_mobile.data.local.database.dao.ClassificationLogDao
 import com.example.kairos_mobile.data.local.database.dao.ExtractedEntityDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
-import com.example.kairos_mobile.data.local.database.dao.NotificationDao
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.data.local.database.dao.SyncQueueDao
 import com.example.kairos_mobile.data.local.database.dao.TagDao
@@ -24,7 +23,6 @@ import com.example.kairos_mobile.data.local.database.entities.ClassificationLogE
 import com.example.kairos_mobile.data.local.database.entities.ExtractedEntityEntity
 import com.example.kairos_mobile.data.local.database.entities.FolderEntity
 import com.example.kairos_mobile.data.local.database.entities.NoteEntity
-import com.example.kairos_mobile.data.local.database.entities.NotificationEntity
 import com.example.kairos_mobile.data.local.database.entities.ScheduleEntity
 import com.example.kairos_mobile.data.local.database.entities.SyncQueueEntity
 import com.example.kairos_mobile.data.local.database.entities.TagEntity
@@ -44,12 +42,11 @@ import com.example.kairos_mobile.data.local.database.entities.TodoEntity
         CaptureTagEntity::class,
         ExtractedEntityEntity::class,
         SyncQueueEntity::class,
-        NotificationEntity::class,
         CaptureSearchFts::class,
         ClassificationLogEntity::class,
         AnalyticsEventEntity::class
     ],
-    version = 14,
+    version = 15,
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {
@@ -63,7 +60,6 @@ abstract class KairosDatabase : RoomDatabase() {
     abstract fun captureTagDao(): CaptureTagDao
     abstract fun extractedEntityDao(): ExtractedEntityDao
     abstract fun syncQueueDao(): SyncQueueDao
-    abstract fun notificationDao(): NotificationDao
     abstract fun captureSearchDao(): CaptureSearchDao
     abstract fun classificationLogDao(): ClassificationLogDao
     abstract fun analyticsEventDao(): AnalyticsEventDao

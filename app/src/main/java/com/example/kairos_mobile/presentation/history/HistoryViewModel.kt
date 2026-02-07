@@ -5,12 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
-import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
-import com.example.kairos_mobile.domain.usecase.capture.GetFilteredCapturesUseCase
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,12 +29,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getAllCapturesUseCase: GetAllCapturesUseCase,
-    private val getFilteredCapturesUseCase: GetFilteredCapturesUseCase,
-    private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase,
+    private val captureRepository: CaptureRepository,
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase,
-    private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase,
-    private val moveToTrashUseCase: MoveToTrashUseCase,
     private val changeClassificationUseCase: ChangeClassificationUseCase
 ) : ViewModel() {
 
@@ -101,7 +93,7 @@ class HistoryViewModel @Inject constructor(
     fun deleteCaptureById(captureId: String) {
         viewModelScope.launch {
             try {
-                softDeleteCaptureUseCase(captureId)
+                captureRepository.softDelete(captureId)
                 // UI에서 즉시 제거
                 _uiState.update {
                     it.copy(captures = it.captures.filter { c -> c.id != captureId })
@@ -123,7 +115,7 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 pendingHardDeleteJobs.remove(captureId)?.cancel()
-                undoDeleteCaptureUseCase(captureId)
+                captureRepository.undoSoftDelete(captureId)
                 // 목록 새로고침
                 loadFirstPage()
                 _events.emit(HistoryEvent.UndoSuccess)
@@ -214,7 +206,7 @@ class HistoryViewModel @Inject constructor(
         pageJobs[page] = viewModelScope.launch {
             try {
                 val state = _uiState.value
-                val captures = getFilteredCapturesUseCase(
+                val captures = captureRepository.getFilteredCaptures(
                     type = state.selectedType,
                     startDate = state.startDate,
                     endDate = state.endDate,
@@ -265,7 +257,7 @@ class HistoryViewModel @Inject constructor(
         pendingHardDeleteJobs[captureId] = viewModelScope.launch {
             try {
                 delay(MOVE_TO_TRASH_DELAY_MS)
-                moveToTrashUseCase(captureId)
+                captureRepository.moveToTrash(captureId)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "휴지통 이동에 실패했습니다.")
@@ -281,7 +273,7 @@ class HistoryViewModel @Inject constructor(
         pageJobs[page]?.cancel()
         pageJobs[page] = viewModelScope.launch {
             try {
-                getAllCapturesUseCase(
+                captureRepository.getAllCaptures(
                     offset = page * PAGE_SIZE,
                     limit = PAGE_SIZE
                 ).collect { captures ->
@@ -328,7 +320,7 @@ class HistoryViewModel @Inject constructor(
         // ViewModel 종료 시 대기 중인 항목들을 휴지통으로 이동
         runBlocking(Dispatchers.IO) {
             pendingIds.forEach { captureId ->
-                runCatching { moveToTrashUseCase(captureId) }
+                runCatching { captureRepository.moveToTrash(captureId) }
             }
         }
         super.onCleared()

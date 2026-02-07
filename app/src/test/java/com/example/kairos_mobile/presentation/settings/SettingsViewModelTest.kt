@@ -1,10 +1,11 @@
 package com.example.kairos_mobile.presentation.settings
 
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.repository.ImageRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
-import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
-import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,17 +33,19 @@ class SettingsViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var getThemePreferenceUseCase: GetThemePreferenceUseCase
-    private lateinit var setThemePreferenceUseCase: SetThemePreferenceUseCase
+    private lateinit var userPreferenceRepository: UserPreferenceRepository
     private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
+    private lateinit var submitCaptureUseCase: SubmitCaptureUseCase
+    private lateinit var imageRepository: ImageRepository
 
     @Before
     fun setUp() {
-        getThemePreferenceUseCase = mockk()
-        setThemePreferenceUseCase = mockk(relaxed = true)
+        userPreferenceRepository = mockk()
         getCalendarSettingsUseCase = mockk(relaxed = true)
         setCalendarSettingsUseCase = mockk(relaxed = true)
+        submitCaptureUseCase = mockk(relaxed = true)
+        imageRepository = mockk(relaxed = true)
     }
 
     @After
@@ -54,28 +57,29 @@ class SettingsViewModelTest {
     @Test
     fun init_loads_theme_preference() = runTest {
         // given
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.DARK)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
         // when - ViewModel 생성 시 init에서 loadPreferences 호출
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         // then
         assertEquals(ThemePreference.DARK, viewModel.uiState.value.themePreference)
     }
 
-    /** setTheme 호출 시 SetThemePreferenceUseCase에 위임한다 */
+    /** setTheme 호출 시 UserPreferenceRepository에 위임한다 */
     @Test
     fun setTheme_delegates_to_usecase() = runTest {
         // given
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.DARK)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        coEvery { userPreferenceRepository.setThemePreference(any()) } returns Unit
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         // when
@@ -83,7 +87,7 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         // then
-        coVerify { setThemePreferenceUseCase(ThemePreference.LIGHT) }
+        coVerify { userPreferenceRepository.setThemePreference(ThemePreference.LIGHT) }
         assertEquals(ThemePreference.LIGHT, viewModel.uiState.value.themePreference)
     }
 
@@ -91,11 +95,11 @@ class SettingsViewModelTest {
     @Test
     fun onErrorDismissed_clears_error() = runTest {
         // given
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.DARK)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.DARK)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         // when
@@ -107,12 +111,12 @@ class SettingsViewModelTest {
 
     @Test
     fun init_loads_calendar_settings() = runTest {
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.SYSTEM)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.SYSTEM)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns true
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "auto"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns false
 
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         assertEquals(true, viewModel.uiState.value.isCalendarEnabled)
@@ -122,12 +126,12 @@ class SettingsViewModelTest {
 
     @Test
     fun toggleCalendar_delegates_to_usecase() = runTest {
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.SYSTEM)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.SYSTEM)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         viewModel.toggleCalendar(true)
@@ -138,12 +142,12 @@ class SettingsViewModelTest {
 
     @Test
     fun setCalendarMode_delegates_to_usecase() = runTest {
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.SYSTEM)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.SYSTEM)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         viewModel.setCalendarMode("auto")
@@ -154,12 +158,12 @@ class SettingsViewModelTest {
 
     @Test
     fun toggleNotification_delegates_to_usecase() = runTest {
-        every { getThemePreferenceUseCase() } returns flowOf(ThemePreference.SYSTEM)
+        every { userPreferenceRepository.getThemePreference() } returns flowOf(ThemePreference.SYSTEM)
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(getThemePreferenceUseCase, setThemePreferenceUseCase, getCalendarSettingsUseCase, setCalendarSettingsUseCase)
+        val viewModel = SettingsViewModel(userPreferenceRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
         advanceUntilIdle()
 
         viewModel.toggleNotification(false)

@@ -5,8 +5,8 @@ import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.calendar.RejectCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
@@ -40,7 +40,7 @@ class CaptureDetailViewModelTest {
     private lateinit var changeClassificationUseCase: ChangeClassificationUseCase
     private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
-    private lateinit var rejectSuggestion: RejectCalendarSuggestionUseCase
+    private lateinit var calendarRepository: CalendarRepository
     private lateinit var trackEventUseCase: TrackEventUseCase
 
     @Before
@@ -49,7 +49,7 @@ class CaptureDetailViewModelTest {
         changeClassificationUseCase = mockk(relaxed = true)
         scheduleRepository = mockk(relaxed = true)
         approveSuggestion = mockk(relaxed = true)
-        rejectSuggestion = mockk(relaxed = true)
+        calendarRepository = mockk(relaxed = true)
         trackEventUseCase = mockk(relaxed = true)
     }
 
@@ -78,7 +78,7 @@ class CaptureDetailViewModelTest {
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion,
+            calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
@@ -107,7 +107,7 @@ class CaptureDetailViewModelTest {
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion,
+            calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
@@ -130,7 +130,7 @@ class CaptureDetailViewModelTest {
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion,
+            calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
@@ -160,7 +160,7 @@ class CaptureDetailViewModelTest {
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion,
+            calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()
@@ -184,7 +184,7 @@ class CaptureDetailViewModelTest {
             changeClassification = changeClassificationUseCase,
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
-            rejectSuggestion = rejectSuggestion,
+            calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase
         )
         advanceUntilIdle()

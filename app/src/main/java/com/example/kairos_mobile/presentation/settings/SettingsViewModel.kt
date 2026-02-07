@@ -1,12 +1,14 @@
 package com.example.kairos_mobile.presentation.settings
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.repository.ImageRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
-import com.example.kairos_mobile.domain.usecase.settings.GetThemePreferenceUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
-import com.example.kairos_mobile.domain.usecase.settings.SetThemePreferenceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,10 +23,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val getThemePreferenceUseCase: GetThemePreferenceUseCase,
-    private val setThemePreferenceUseCase: SetThemePreferenceUseCase,
+    private val userPreferenceRepository: UserPreferenceRepository,
     private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
-    private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase
+    private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase,
+    private val submitCaptureUseCase: SubmitCaptureUseCase,
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -40,7 +43,7 @@ class SettingsViewModel @Inject constructor(
      */
     private fun loadPreferences() {
         viewModelScope.launch {
-            getThemePreferenceUseCase().collect { theme ->
+            userPreferenceRepository.getThemePreference().collect { theme ->
                 _uiState.update { it.copy(themePreference = theme) }
             }
         }
@@ -69,7 +72,7 @@ class SettingsViewModel @Inject constructor(
      */
     fun setTheme(theme: ThemePreference) {
         viewModelScope.launch {
-            setThemePreferenceUseCase(theme)
+            userPreferenceRepository.setThemePreference(theme)
             _uiState.update { it.copy(themePreference = theme) }
         }
     }
@@ -109,5 +112,41 @@ class SettingsViewModel @Inject constructor(
      */
     fun onErrorDismissed() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    /**
+     * 디버그: 이미지 URI로 캡처 제출
+     */
+    fun debugSubmitImage(uri: Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(debugSubmitting = true, debugResult = null) }
+            try {
+                val savedUri = imageRepository.saveImage(uri)
+                val capture = submitCaptureUseCase(
+                    text = "[디버그] 이미지 캡처 테스트",
+                    imageUri = savedUri
+                )
+                _uiState.update {
+                    it.copy(
+                        debugSubmitting = false,
+                        debugResult = "캡처 생성됨: ${capture.id.take(8)}..."
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        debugSubmitting = false,
+                        debugResult = "실패: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * 디버그 결과 메시지 닫기
+     */
+    fun dismissDebugResult() {
+        _uiState.update { it.copy(debugResult = null) }
     }
 }

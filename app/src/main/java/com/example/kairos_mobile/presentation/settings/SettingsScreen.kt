@@ -1,5 +1,9 @@
 package com.example.kairos_mobile.presentation.settings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -179,6 +183,20 @@ fun SettingsScreen(
                     description = "1.0.0",
                     showArrow = false,
                     onClick = { }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 개발자 도구 (디버그)
+            SectionHeader(title = "개발자 도구")
+
+            SettingsCard {
+                DebugImageUploadItem(
+                    isSubmitting = uiState.debugSubmitting,
+                    result = uiState.debugResult,
+                    onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
+                    onDismissResult = { viewModel.dismissDebugResult() }
                 )
             }
 
@@ -378,4 +396,75 @@ private fun SettingsDivider(
         thickness = 0.5.dp,
         color = colors.borderLight
     )
+}
+
+/**
+ * 디버그: 이미지 업로드 테스트 아이템
+ * 갤러리에서 이미지를 선택하면 캡처로 제출
+ */
+@Composable
+private fun DebugImageUploadItem(
+    isSubmitting: Boolean,
+    result: String?,
+    onImageSelected: (Uri) -> Unit,
+    onDismissResult: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { onImageSelected(it) }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = !isSubmitting) {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "이미지 캡처 테스트",
+                    color = colors.text,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "갤러리에서 이미지를 선택하여 캡처로 제출",
+                    color = colors.textMuted,
+                    fontSize = 13.sp
+                )
+            }
+
+            if (isSubmitting) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = colors.textMuted
+                )
+            }
+        }
+
+        // 결과 표시
+        if (result != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = result,
+                color = if (result.startsWith("실패")) colors.danger else colors.success,
+                fontSize = 12.sp
+            )
+        }
+    }
 }

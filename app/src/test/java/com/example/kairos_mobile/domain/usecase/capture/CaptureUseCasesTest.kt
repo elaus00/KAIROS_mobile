@@ -1,6 +1,5 @@
 package com.example.kairos_mobile.domain.usecase.capture
 
-import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.ClassifiedType
@@ -12,7 +11,6 @@ import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
-import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +20,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.unmockkAll
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -34,87 +31,6 @@ class CaptureUseCasesTest {
     @After
     fun tearDown() {
         unmockkAll()
-    }
-
-    @Test
-    fun saveDraft_persists_text_with_expected_key() = runTest {
-        val prefs = mockk<UserPreferenceRepository>()
-        val useCase = SaveDraftUseCase(prefs)
-
-        coEvery { prefs.setString(any(), any()) } just runs
-
-        useCase("draft")
-
-        coVerify(exactly = 1) { prefs.setString(SaveDraftUseCase.KEY_DRAFT_TEXT, "draft") }
-    }
-
-    @Test
-    fun getDraft_reads_text_with_expected_key() = runTest {
-        val prefs = mockk<UserPreferenceRepository>()
-        val useCase = GetDraftUseCase(prefs)
-
-        coEvery { prefs.getString(SaveDraftUseCase.KEY_DRAFT_TEXT, "") } returns "saved"
-
-        val result = useCase()
-
-        assertEquals("saved", result)
-    }
-
-    @Test
-    fun deleteDraft_clears_draft_text() = runTest {
-        val prefs = mockk<UserPreferenceRepository>()
-        val useCase = DeleteDraftUseCase(prefs)
-
-        coEvery { prefs.setString(any(), any()) } just runs
-
-        useCase()
-
-        coVerify(exactly = 1) { prefs.setString(SaveDraftUseCase.KEY_DRAFT_TEXT, "") }
-    }
-
-    @Test
-    fun getAllCaptures_forwards_default_paging_values() = runTest {
-        val repository = mockk<CaptureRepository>()
-        val expected = listOf(
-            Capture(
-                id = "c1",
-                originalText = "hello",
-                classifiedType = ClassifiedType.TEMP,
-                source = CaptureSource.APP
-            )
-        )
-        val useCase = GetAllCapturesUseCase(repository)
-
-        every { repository.getAllCaptures(0, 20) } returns flowOf(expected)
-
-        useCase().test {
-            assertEquals(expected, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun softDelete_delegates_to_repository() = runTest {
-        val repository = mockk<CaptureRepository>()
-        val useCase = SoftDeleteCaptureUseCase(repository)
-
-        coEvery { repository.softDelete("cap-1") } just runs
-
-        useCase("cap-1")
-
-        coVerify(exactly = 1) { repository.softDelete("cap-1") }
-    }
-
-    @Test
-    fun undoSoftDelete_delegates_to_repository() = runTest {
-        val repository = mockk<CaptureRepository>()
-        val useCase = UndoDeleteCaptureUseCase(repository)
-
-        coEvery { repository.undoSoftDelete("cap-1") } just runs
-
-        useCase("cap-1")
-
-        coVerify(exactly = 1) { repository.undoSoftDelete("cap-1") }
     }
 
     @Test

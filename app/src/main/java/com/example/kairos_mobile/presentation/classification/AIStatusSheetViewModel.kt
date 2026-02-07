@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
-import com.example.kairos_mobile.domain.usecase.classification.ConfirmAllClassificationsUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ConfirmClassificationUseCase
 import com.example.kairos_mobile.domain.usecase.classification.GetUnconfirmedClassificationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class AIStatusSheetViewModel @Inject constructor(
     private val getUnconfirmedClassificationsUseCase: GetUnconfirmedClassificationsUseCase,
     private val confirmClassificationUseCase: ConfirmClassificationUseCase,
-    private val confirmAllClassificationsUseCase: ConfirmAllClassificationsUseCase,
+    private val captureRepository: CaptureRepository,
     private val changeClassificationUseCase: ChangeClassificationUseCase
 ) : ViewModel() {
 
@@ -73,7 +73,7 @@ class AIStatusSheetViewModel @Inject constructor(
     fun confirmAll() {
         viewModelScope.launch {
             try {
-                confirmAllClassificationsUseCase()
+                captureRepository.confirmAllClassifications()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessage = e.message ?: "일괄 확인에 실패했습니다.")

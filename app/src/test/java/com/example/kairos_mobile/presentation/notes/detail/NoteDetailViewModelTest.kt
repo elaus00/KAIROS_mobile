@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteSubType
+import com.example.kairos_mobile.domain.repository.FolderRepository
+import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
-import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
-import com.example.kairos_mobile.domain.usecase.note.GetNoteDetailUseCase
 import com.example.kairos_mobile.domain.usecase.note.UpdateNoteUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import io.mockk.coEvery
@@ -44,16 +44,16 @@ class NoteDetailViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var getNoteDetailUseCase: GetNoteDetailUseCase
+    private lateinit var noteRepository: NoteRepository
     private lateinit var updateNoteUseCase: UpdateNoteUseCase
-    private lateinit var getAllFoldersUseCase: GetAllFoldersUseCase
+    private lateinit var folderRepository: FolderRepository
     private lateinit var trackEventUseCase: TrackEventUseCase
 
     @Before
     fun setup() {
-        getNoteDetailUseCase = mockk()
+        noteRepository = mockk()
         updateNoteUseCase = mockk()
-        getAllFoldersUseCase = mockk()
+        folderRepository = mockk()
         trackEventUseCase = mockk(relaxed = true)
     }
 
@@ -94,9 +94,9 @@ class NoteDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("noteId" to noteId))
         return NoteDetailViewModel(
             savedStateHandle,
-            getNoteDetailUseCase,
+            noteRepository,
             updateNoteUseCase,
-            getAllFoldersUseCase,
+            folderRepository,
             trackEventUseCase
         )
     }
@@ -106,8 +106,8 @@ class NoteDetailViewModelTest {
     @Test
     fun `note_not_found_sets_error`() = runTest {
         // given: 노트 없음
-        every { getNoteDetailUseCase("note-1") } returns flowOf(null)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(null)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         // when
         val viewModel = createViewModel()
@@ -124,8 +124,8 @@ class NoteDetailViewModelTest {
     fun `load_note_detail_populates_state`() = runTest {
         // given
         val noteDetail = createNoteDetail(aiTitle = "테스트 제목", body = "노트 본문")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         // when
         val viewModel = createViewModel()
@@ -146,8 +146,8 @@ class NoteDetailViewModelTest {
     fun `edit_title_sets_hasChanges_true`() = runTest {
         // given
         val noteDetail = createNoteDetail(aiTitle = "원래 제목")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -167,8 +167,8 @@ class NoteDetailViewModelTest {
     fun `edit_body_sets_hasChanges_true`() = runTest {
         // given
         val noteDetail = createNoteDetail(body = "원래 본문")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -187,8 +187,8 @@ class NoteDetailViewModelTest {
     fun `folder_change_sets_hasChanges_true`() = runTest {
         // given
         val noteDetail = createNoteDetail(folderId = "system-inbox")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -207,8 +207,8 @@ class NoteDetailViewModelTest {
     fun `save_delegates_title_body_folder_to_usecase`() = runTest {
         // given
         val noteDetail = createNoteDetail(aiTitle = "원래", body = "원본", folderId = "f1")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
         coEvery { updateNoteUseCase.updateTitle("cap-1", any()) } just runs
         coEvery { updateNoteUseCase.updateBody("note-1", any()) } just runs
         coEvery { updateNoteUseCase.moveToFolder("note-1", any()) } just runs
@@ -237,8 +237,8 @@ class NoteDetailViewModelTest {
     fun `capture_revisited_event_tracked_on_first_load`() = runTest {
         // given
         val noteDetail = createNoteDetail(createdAt = 1000L)
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         // when
         createViewModel()
@@ -259,8 +259,8 @@ class NoteDetailViewModelTest {
     fun `toggle_original_text_flips_flag`() = runTest {
         // given
         val noteDetail = createNoteDetail()
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -281,8 +281,8 @@ class NoteDetailViewModelTest {
     fun `error_dismissed_clears_error`() = runTest {
         // given: 저장 실패로 에러 발생
         val noteDetail = createNoteDetail(aiTitle = "원래")
-        every { getNoteDetailUseCase("note-1") } returns flowOf(noteDetail)
-        every { getAllFoldersUseCase() } returns flowOf(emptyList())
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
         coEvery { updateNoteUseCase.updateTitle(any(), any()) } throws RuntimeException("저장 실패")
 
         val viewModel = createViewModel()

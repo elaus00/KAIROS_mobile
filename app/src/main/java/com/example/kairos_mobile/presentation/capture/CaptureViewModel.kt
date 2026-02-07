@@ -6,9 +6,7 @@ import androidx.lifecycle.viewModelScope
 import android.net.Uri
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
-import com.example.kairos_mobile.domain.usecase.capture.DeleteDraftUseCase
-import com.example.kairos_mobile.domain.usecase.capture.GetDraftUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SaveDraftUseCase
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,14 +26,13 @@ import javax.inject.Inject
 @HiltViewModel
 class CaptureViewModel @Inject constructor(
     private val submitCaptureUseCase: SubmitCaptureUseCase,
-    private val saveDraftUseCase: SaveDraftUseCase,
-    private val getDraftUseCase: GetDraftUseCase,
-    private val deleteDraftUseCase: DeleteDraftUseCase,
+    private val userPreferenceRepository: UserPreferenceRepository,
     private val captureRepository: CaptureRepository,
     private val imageRepository: ImageRepository
 ) : ViewModel() {
     companion object {
         private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
+        private const val KEY_DRAFT_TEXT = "draft_capture"
     }
 
 
@@ -66,7 +63,7 @@ class CaptureViewModel @Inject constructor(
      */
     private fun loadDraft() {
         viewModelScope.launch {
-            val draft = getDraftUseCase()
+            val draft = userPreferenceRepository.getString(KEY_DRAFT_TEXT, "")
             if (draft.isNotBlank()) {
                 _uiState.update {
                     it.copy(
@@ -124,7 +121,7 @@ class CaptureViewModel @Inject constructor(
                 )
 
                 // 임시 저장 삭제
-                deleteDraftUseCase()
+                userPreferenceRepository.setString(KEY_DRAFT_TEXT, "")
 
                 _uiState.update {
                     it.copy(
@@ -168,7 +165,7 @@ class CaptureViewModel @Inject constructor(
         if (currentText.isBlank()) return
 
         viewModelScope.launch {
-            saveDraftUseCase(currentText)
+            userPreferenceRepository.setString(KEY_DRAFT_TEXT, currentText)
         }
     }
 

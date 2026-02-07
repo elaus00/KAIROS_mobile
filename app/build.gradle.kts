@@ -29,7 +29,6 @@ android {
         debug {
             // 에뮬레이터에서 localhost 접근을 위해 10.0.2.2 사용
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1\"")
-            buildConfigField("boolean", "USE_MOCK_API", "false")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         create("benchmark") {
@@ -38,7 +37,6 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1\"")
-            buildConfigField("boolean", "USE_MOCK_API", "false")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
@@ -48,7 +46,6 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_BASE_URL", "\"https://api.kairos.app/api/v1\"")
-            buildConfigField("boolean", "USE_MOCK_API", "false")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
         }
     }

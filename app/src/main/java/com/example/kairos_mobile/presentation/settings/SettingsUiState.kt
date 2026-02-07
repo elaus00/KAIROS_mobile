@@ -20,7 +20,11 @@ data class SettingsUiState(
     val isNotificationEnabled: Boolean = true,
 
     // 에러 메시지
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+
+    // 디버그: 이미지 캡처 제출 상태
+    val debugSubmitting: Boolean = false,
+    val debugResult: String? = null
 )
 
 /**

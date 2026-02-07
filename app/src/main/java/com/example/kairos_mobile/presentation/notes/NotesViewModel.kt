@@ -5,11 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
-import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
-import com.example.kairos_mobile.domain.usecase.folder.DeleteFolderUseCase
-import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
-import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
+import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
+import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
+import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
@@ -27,9 +26,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val getAllFoldersUseCase: GetAllFoldersUseCase,
+    private val folderRepository: FolderRepository,
     private val createFolderUseCase: CreateFolderUseCase,
-    private val deleteFolderUseCase: DeleteFolderUseCase,
     private val renameFolderUseCase: RenameFolderUseCase,
     private val noteRepository: NoteRepository
 ) : ViewModel() {
@@ -67,7 +65,7 @@ class NotesViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             combine(
-                getAllFoldersUseCase(),
+                folderRepository.getAllFolders(),
                 noteRepository.getFolderNoteCounts(),
                 noteRepository.getAllNotesWithActiveCapture()
             ) { folders, countMap, allNotes ->
@@ -187,7 +185,7 @@ class NotesViewModel @Inject constructor(
     private fun deleteFolder(folderId: String) {
         viewModelScope.launch {
             try {
-                deleteFolderUseCase(folderId)
+                folderRepository.deleteFolder(folderId)
                 // 삭제된 폴더가 현재 필터면 전체로 리셋
                 if (_uiState.value.selectedFilterFolderId == folderId) {
                     _uiState.update { it.copy(selectedFilterFolderId = null) }

@@ -3,10 +3,9 @@ package com.example.kairos_mobile.presentation.notes
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
+import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
-import com.example.kairos_mobile.domain.usecase.folder.DeleteFolderUseCase
-import com.example.kairos_mobile.domain.usecase.folder.GetAllFoldersUseCase
 import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -40,17 +39,15 @@ class NotesViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var getAllFoldersUseCase: GetAllFoldersUseCase
+    private lateinit var folderRepository: FolderRepository
     private lateinit var createFolderUseCase: CreateFolderUseCase
-    private lateinit var deleteFolderUseCase: DeleteFolderUseCase
     private lateinit var renameFolderUseCase: RenameFolderUseCase
     private lateinit var noteRepository: NoteRepository
 
     @Before
     fun setUp() {
-        getAllFoldersUseCase = mockk()
+        folderRepository = mockk()
         createFolderUseCase = mockk()
-        deleteFolderUseCase = mockk()
         renameFolderUseCase = mockk()
         noteRepository = mockk()
     }
@@ -66,13 +63,12 @@ class NotesViewModelTest {
         countMap: Map<String, Int> = emptyMap(),
         allNotes: List<NoteWithCapturePreview> = emptyList()
     ): NotesViewModel {
-        every { getAllFoldersUseCase() } returns flowOf(folders)
+        every { folderRepository.getAllFolders() } returns flowOf(folders)
         every { noteRepository.getFolderNoteCounts() } returns flowOf(countMap)
         every { noteRepository.getAllNotesWithActiveCapture() } returns flowOf(allNotes)
         return NotesViewModel(
-            getAllFoldersUseCase,
+            folderRepository,
             createFolderUseCase,
-            deleteFolderUseCase,
             renameFolderUseCase,
             noteRepository
         )
@@ -311,7 +307,7 @@ class NotesViewModelTest {
     @Test
     fun `deleteFolder_delegates`() = runTest {
         // Given
-        coEvery { deleteFolderUseCase(any()) } just runs
+        coEvery { folderRepository.deleteFolder(any()) } just runs
         val viewModel = createViewModel()
         advanceUntilIdle()
 
@@ -320,7 +316,7 @@ class NotesViewModelTest {
         advanceUntilIdle()
 
         // Then: UseCase 호출됨
-        coVerify(exactly = 1) { deleteFolderUseCase("f1") }
+        coVerify(exactly = 1) { folderRepository.deleteFolder("f1") }
     }
 
     @Test
@@ -329,7 +325,7 @@ class NotesViewModelTest {
         val folders = listOf(
             TestFixtures.folder(id = "f1", name = "내 폴더", type = FolderType.USER)
         )
-        coEvery { deleteFolderUseCase(any()) } just runs
+        coEvery { folderRepository.deleteFolder(any()) } just runs
         val viewModel = createViewModel(folders, mapOf("f1" to 1))
         advanceUntilIdle()
         viewModel.onEvent(NotesEvent.SelectFilter("f1"))

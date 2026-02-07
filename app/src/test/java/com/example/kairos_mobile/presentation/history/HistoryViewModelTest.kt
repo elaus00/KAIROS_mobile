@@ -3,12 +3,8 @@ package com.example.kairos_mobile.presentation.history
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteSubType
-import com.example.kairos_mobile.domain.usecase.capture.GetAllCapturesUseCase
-import com.example.kairos_mobile.domain.usecase.capture.GetFilteredCapturesUseCase
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.usecase.capture.HardDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.MoveToTrashUseCase
-import com.example.kairos_mobile.domain.usecase.capture.SoftDeleteCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.capture.UndoDeleteCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -40,12 +36,8 @@ class HistoryViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val getAllCapturesUseCase: GetAllCapturesUseCase = mockk()
-    private val getFilteredCapturesUseCase: GetFilteredCapturesUseCase = mockk()
-    private val softDeleteCaptureUseCase: SoftDeleteCaptureUseCase = mockk()
+    private val captureRepository: CaptureRepository = mockk()
     private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase = mockk()
-    private val undoDeleteCaptureUseCase: UndoDeleteCaptureUseCase = mockk()
-    private val moveToTrashUseCase: MoveToTrashUseCase = mockk()
     private val changeClassificationUseCase: ChangeClassificationUseCase = mockk()
 
     @Before
@@ -55,16 +47,12 @@ class HistoryViewModelTest {
 
     /**
      * ViewModel 생성 헬퍼 — init 블록에서 loadFirstPage() 호출되므로
-     * getAllCapturesUseCase(0, 20) mock이 반드시 먼저 설정되어야 함
+     * captureRepository.getAllCaptures(0, 20) mock이 반드시 먼저 설정되어야 함
      */
     private fun createViewModel(): HistoryViewModel {
         return HistoryViewModel(
-            getAllCapturesUseCase,
-            getFilteredCapturesUseCase,
-            softDeleteCaptureUseCase,
+            captureRepository,
             hardDeleteCaptureUseCase,
-            undoDeleteCaptureUseCase,
-            moveToTrashUseCase,
             changeClassificationUseCase
         )
     }
@@ -75,7 +63,7 @@ class HistoryViewModelTest {
     fun `init_loads_first_page`() = runTest {
         // given: 페이지 0에 20개 캡처 반환
         val captures = (1..20).map { TestFixtures.capture(id = "cap-$it") }
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         // when
         val viewModel = createViewModel()
@@ -91,7 +79,7 @@ class HistoryViewModelTest {
     @Test
     fun `hasMore_true_when_full_page`() = runTest {
         val captures = (1..20).map { TestFixtures.capture(id = "cap-$it") }
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -104,7 +92,7 @@ class HistoryViewModelTest {
     @Test
     fun `hasMore_false_when_partial`() = runTest {
         val captures = (1..10).map { TestFixtures.capture(id = "cap-$it") }
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -119,8 +107,8 @@ class HistoryViewModelTest {
         // given: 페이지 0 풀, 페이지 1 부분
         val page0 = (1..20).map { TestFixtures.capture(id = "cap-$it") }
         val page1 = (21..30).map { TestFixtures.capture(id = "cap-$it") }
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(page0)
-        every { getAllCapturesUseCase(offset = 20, limit = 20) } returns flowOf(page1)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(page0)
+        every { captureRepository.getAllCaptures(offset = 20, limit = 20) } returns flowOf(page1)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -139,8 +127,8 @@ class HistoryViewModelTest {
     fun `loadMore_prevents_duplicate`() = runTest {
         val page0 = (1..20).map { TestFixtures.capture(id = "cap-$it") }
         val page1 = (21..40).map { TestFixtures.capture(id = "cap-$it") }
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(page0)
-        every { getAllCapturesUseCase(offset = 20, limit = 20) } returns flowOf(page1)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(page0)
+        every { captureRepository.getAllCaptures(offset = 20, limit = 20) } returns flowOf(page1)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -164,8 +152,8 @@ class HistoryViewModelTest {
             TestFixtures.capture(id = "cap-20"),  // 중복
             TestFixtures.capture(id = "cap-21")
         )
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(page0)
-        every { getAllCapturesUseCase(offset = 20, limit = 20) } returns flowOf(page1)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(page0)
+        every { captureRepository.getAllCaptures(offset = 20, limit = 20) } returns flowOf(page1)
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -184,9 +172,9 @@ class HistoryViewModelTest {
             TestFixtures.capture(id = "cap-1"),
             TestFixtures.capture(id = "cap-2")
         )
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
-        coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { moveToTrashUseCase(any()) } returns Unit
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
+        coEvery { captureRepository.softDelete("cap-1") } returns Unit
+        coEvery { captureRepository.moveToTrash(any()) } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -197,7 +185,7 @@ class HistoryViewModelTest {
             advanceUntilIdle()
 
             // then: softDelete 호출됨
-            coVerify { softDeleteCaptureUseCase("cap-1") }
+            coVerify { captureRepository.softDelete("cap-1") }
             // UI에서 제거됨
             assertEquals(1, viewModel.uiState.value.captures.size)
             assertEquals("cap-2", viewModel.uiState.value.captures[0].id)
@@ -215,9 +203,9 @@ class HistoryViewModelTest {
     @Test
     fun `delete_schedules_move_to_trash_3s`() = runTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
-        coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { moveToTrashUseCase("cap-1") } returns Unit
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
+        coEvery { captureRepository.softDelete("cap-1") } returns Unit
+        coEvery { captureRepository.moveToTrash("cap-1") } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -227,11 +215,11 @@ class HistoryViewModelTest {
 
         // 2초 후 → moveToTrash 아직 미실행
         advanceTimeBy(2000)
-        coVerify(exactly = 0) { moveToTrashUseCase(any()) }
+        coVerify(exactly = 0) { captureRepository.moveToTrash(any()) }
 
         // 추가 1.5초 (총 3.5초) → moveToTrash 실행
         advanceTimeBy(1500)
-        coVerify(exactly = 1) { moveToTrashUseCase("cap-1") }
+        coVerify(exactly = 1) { captureRepository.moveToTrash("cap-1") }
     }
 
     // ── 9. undoDelete → hardDelete 취소 + undoDeleteCapture + 새로고침 ──
@@ -239,10 +227,10 @@ class HistoryViewModelTest {
     @Test
     fun `undo_cancels_hard_delete`() = runTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
-        coEvery { softDeleteCaptureUseCase("cap-1") } returns Unit
-        coEvery { moveToTrashUseCase("cap-1") } returns Unit
-        coEvery { undoDeleteCaptureUseCase("cap-1") } returns Unit
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
+        coEvery { captureRepository.softDelete("cap-1") } returns Unit
+        coEvery { captureRepository.moveToTrash("cap-1") } returns Unit
+        coEvery { captureRepository.undoSoftDelete("cap-1") } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -257,10 +245,10 @@ class HistoryViewModelTest {
             runCurrent()
 
             // then: undoDelete 호출됨
-            coVerify { undoDeleteCaptureUseCase("cap-1") }
+            coVerify { captureRepository.undoSoftDelete("cap-1") }
             // moveToTrash 예약 취소 확인
             advanceTimeBy(3500)
-            coVerify(exactly = 0) { moveToTrashUseCase("cap-1") }
+            coVerify(exactly = 0) { captureRepository.moveToTrash("cap-1") }
             // UndoSuccess 이벤트 발생
             val event = awaitItem()
             assertTrue(event is HistoryEvent.UndoSuccess)
@@ -274,7 +262,7 @@ class HistoryViewModelTest {
     @Test
     fun `changeClassification_delegates`() = runTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery {
             changeClassificationUseCase("cap-1", ClassifiedType.TODO, null)
         } returns Unit
@@ -295,7 +283,7 @@ class HistoryViewModelTest {
     @Test
     fun `changeClassification_error`() = runTest {
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
         coEvery {
             changeClassificationUseCase("cap-1", ClassifiedType.NOTES, NoteSubType.IDEA)
         } throws RuntimeException("분류 변경 실패")
@@ -317,13 +305,13 @@ class HistoryViewModelTest {
     fun `setTypeFilter_loads_filtered_captures`() = runTest {
         // given: 초기 로드
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         val filteredCaptures = listOf(
             TestFixtures.capture(id = "cap-2", classifiedType = ClassifiedType.TODO)
         )
         coEvery {
-            getFilteredCapturesUseCase(
+            captureRepository.getFilteredCaptures(
                 type = ClassifiedType.TODO,
                 startDate = null,
                 endDate = null,
@@ -351,13 +339,13 @@ class HistoryViewModelTest {
     fun `setDateRange_loads_filtered_captures`() = runTest {
         // given
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         val filteredCaptures = listOf(
             TestFixtures.capture(id = "cap-3", createdAt = 5000L)
         )
         coEvery {
-            getFilteredCapturesUseCase(
+            captureRepository.getFilteredCaptures(
                 type = null,
                 startDate = 1000L,
                 endDate = 9000L,
@@ -385,13 +373,13 @@ class HistoryViewModelTest {
     fun `clearFilters_reloads_all_captures`() = runTest {
         // given
         val captures = listOf(TestFixtures.capture(id = "cap-1"))
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
 
         val filteredCaptures = listOf(
             TestFixtures.capture(id = "cap-2", classifiedType = ClassifiedType.TODO)
         )
         coEvery {
-            getFilteredCapturesUseCase(
+            captureRepository.getFilteredCaptures(
                 type = ClassifiedType.TODO,
                 startDate = null,
                 endDate = null,
@@ -426,9 +414,9 @@ class HistoryViewModelTest {
             TestFixtures.capture(id = "cap-1"),
             TestFixtures.capture(id = "cap-2")
         )
-        every { getAllCapturesUseCase(offset = 0, limit = 20) } returns flowOf(captures)
-        coEvery { softDeleteCaptureUseCase(any()) } returns Unit
-        coEvery { moveToTrashUseCase(any()) } returns Unit
+        every { captureRepository.getAllCaptures(offset = 0, limit = 20) } returns flowOf(captures)
+        coEvery { captureRepository.softDelete(any()) } returns Unit
+        coEvery { captureRepository.moveToTrash(any()) } returns Unit
 
         val viewModel = createViewModel()
         advanceUntilIdle()
@@ -444,7 +432,7 @@ class HistoryViewModelTest {
         }.invoke(viewModel)
 
         // then: 두 캡처 모두 즉시 moveToTrash 실행
-        coVerify { moveToTrashUseCase("cap-1") }
-        coVerify { moveToTrashUseCase("cap-2") }
+        coVerify { captureRepository.moveToTrash("cap-1") }
+        coVerify { captureRepository.moveToTrash("cap-2") }
     }
 }
