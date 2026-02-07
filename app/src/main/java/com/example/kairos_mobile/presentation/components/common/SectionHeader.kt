@@ -41,32 +41,3 @@ fun SectionHeader(
         trailingContent?.invoke()
     }
 }
-
-/**
- * 섹션 헤더 (한글용, 대문자 변환 없음)
- */
-@Composable
-fun SectionHeaderKorean(
-    title: String,
-    modifier: Modifier = Modifier,
-    trailingContent: @Composable (() -> Unit)? = null
-) {
-    val colors = KairosTheme.colors
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            color = colors.textMuted,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 0.3.sp,
-            modifier = Modifier.weight(1f)
-        )
-        trailingContent?.invoke()
-    }
-}

@@ -39,29 +39,6 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * 노트 탭 메인 화면 (Scaffold 포함)
- * 노트 우선 뷰: 전체 노트 플랫 리스트 + 폴더 필터 칩
- */
-@Composable
-fun NotesScreen(
-    onNavigate: (String) -> Unit,
-    onSearchClick: () -> Unit = {},
-    onNoteClick: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
-    viewModel: NotesViewModel = hiltViewModel()
-) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    NotesContentInternal(
-        uiState = uiState,
-        onEvent = viewModel::onEvent,
-        onSearchClick = onSearchClick,
-        onNoteClick = onNoteClick,
-        modifier = modifier
-    )
-}
-
-/**
  * Notes 화면 내용 (Scaffold 없이)
  * MainScreen의 HorizontalPager에서 사용
  */
