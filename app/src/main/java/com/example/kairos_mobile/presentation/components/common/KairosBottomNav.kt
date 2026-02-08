@@ -122,19 +122,19 @@ enum class KairosTab(
     NOTES(
         filledIcon = Icons.Filled.Description,
         outlinedIcon = Icons.Outlined.Description,
-        label = "Notes",
+        label = "노트",
         route = "notes"
     ),
     HOME(
         filledIcon = Icons.Filled.Home,
         outlinedIcon = Icons.Outlined.Home,
-        label = "Home",
+        label = "홈",
         route = "home"
     ),
     CALENDAR(
         filledIcon = Icons.Filled.CalendarToday,
         outlinedIcon = Icons.Outlined.CalendarToday,
-        label = "Calendar",
+        label = "캘린더",
         route = "calendar"
     )
 }

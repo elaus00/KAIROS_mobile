@@ -174,7 +174,7 @@ private fun NotesHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Notes",
+            text = "노트",
             color = colors.text,
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold

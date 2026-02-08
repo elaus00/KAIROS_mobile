@@ -195,7 +195,7 @@ private fun TrashTopBar(
         IconButton(onClick = onNavigateBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "뒤로",
+                contentDescription = "뒤로가기",
                 tint = colors.text
             )
         }

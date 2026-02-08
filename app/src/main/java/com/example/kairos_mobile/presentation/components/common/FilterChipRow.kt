@@ -40,7 +40,7 @@ fun FilterChipRow(
             onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
         )
         KairosChip(
-            text = "할일",
+            text = "할 일",
             selected = selectedType == ClassifiedType.TODO,
             onClick = { onTypeSelected(ClassifiedType.TODO) }
         )
