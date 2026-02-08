@@ -9,7 +9,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,9 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.presentation.calendar.components.CalendarCard
 import com.example.kairos_mobile.presentation.calendar.components.ScheduleTimeline
@@ -69,16 +66,9 @@ fun CalendarContent(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // 화면 타이틀
-            Text(
-                text = "Calendar",
-                color = colors.text,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // 캘린더 카드 (날짜 헤더 + 주간/월간 뷰 포함)
+            // 캘린더 카드 (월 헤더 + 주간/월간 뷰 포함)
             CalendarCard(
                 selectedDate = uiState.selectedDate,
                 datesWithSchedules = uiState.datesWithSchedules,
@@ -142,11 +132,6 @@ fun CalendarContent(
                         },
                         onTaskDelete = { captureId ->
                             viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
-                        },
-                        completedTasks = uiState.completedTasks,
-                        showCompleted = uiState.showCompletedTasks,
-                        onToggleShowCompleted = {
-                            viewModel.onEvent(CalendarEvent.ToggleCompletedTasks)
                         }
                     )
 

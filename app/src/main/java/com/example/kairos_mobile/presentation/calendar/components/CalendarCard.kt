@@ -2,7 +2,6 @@ package com.example.kairos_mobile.presentation.calendar.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,7 +16,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
@@ -39,8 +38,6 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Locale
 import kotlin.math.abs
 
 /**
@@ -63,13 +60,6 @@ fun CalendarCard(
     val today = LocalDate.now()
     val currentMonth = YearMonth.from(selectedDate)
 
-    // 토글 버튼 회전 애니메이션
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (isExpanded) 180f else 0f,
-        animationSpec = tween(durationMillis = 200),
-        label = "rotation"
-    )
-
     // 스와이프 제스처 감지용 누적값
     var dragAmountX by remember { mutableFloatStateOf(0f) }
     var dragAmountY by remember { mutableFloatStateOf(0f) }
@@ -80,7 +70,7 @@ fun CalendarCard(
             .clip(RoundedCornerShape(12.dp))
             .background(colors.card)
             .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-            .pointerInput(isExpanded) {
+            .pointerInput(isExpanded, currentMonth) {
                 detectDragGestures(
                     onDragStart = {
                         dragAmountX = 0f
@@ -117,36 +107,45 @@ fun CalendarCard(
             }
             .padding(16.dp)
     ) {
-        // 날짜 헤더 + 토글 버튼
+        // 월 헤더 + 좌우 이동 버튼 + 토글 버튼
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onToggleExpand
-                ),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 날짜 텍스트: "1월 15일 수요일"
-            Text(
-                text = "${selectedDate.monthValue}월 ${selectedDate.dayOfMonth}일 ${
-                    selectedDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN)
-                }",
-                color = colors.text,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            // 토글 아이콘
+            // 이전 달 버튼 — 리플 복원
             Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = if (isExpanded) "접기" else "펼치기",
+                imageVector = Icons.Default.ChevronLeft,
+                contentDescription = "이전 달",
                 tint = colors.textSecondary,
                 modifier = Modifier
-                    .size(18.dp)
-                    .rotate(rotationAngle)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .clickable { onMonthChange(currentMonth.minusMonths(1)) }
+            )
+
+            // 월 텍스트 (클릭 시 펼침/접기)
+            Text(
+                text = "${currentMonth.monthValue}월",
+                color = colors.text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onToggleExpand
+                )
+            )
+
+            // 다음 달 버튼 — 리플 복원
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = "다음 달",
+                tint = colors.textSecondary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .clickable { onMonthChange(currentMonth.plusMonths(1)) }
             )
         }
 
