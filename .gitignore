@@ -17,3 +17,4 @@
 local.properties
 .kotlin/
 /.idea/gradle.xml
+/.idea/misc.xml

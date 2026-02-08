@@ -8,7 +8,7 @@ on:
       - "benchmark/**"
       - "baselineprofile/**"
       - "scripts/perf/**"
-      - "Docs/performance/**"
+      - "docs/performance/**"
 
 jobs:
   benchmark:

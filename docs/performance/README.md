@@ -75,12 +75,12 @@
 ```bash
 python3 scripts/perf/extract_current_metrics.py \
   --input benchmark/build/outputs/connected_android_test_additional_output/.../com.example.kairos_mobile.benchmark-benchmarkData.json \
-  --output Docs/performance/current_metrics.json
+  --output docs/performance/current_metrics.json
 
 python3 scripts/perf/perf_gate.py \
-  --baseline Docs/performance/perf_gate_baseline.json \
-  --current Docs/performance/current_metrics.json \
-  --report Docs/performance/perf_report.md
+  --baseline docs/performance/perf_gate_baseline.json \
+  --current docs/performance/current_metrics.json \
+  --report docs/performance/perf_report.md
 ```
 
 Rules:
