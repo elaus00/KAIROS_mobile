@@ -24,7 +24,11 @@ data class SettingsUiState(
 
     // 디버그: 이미지 캡처 제출 상태
     val debugSubmitting: Boolean = false,
-    val debugResult: String? = null
+    val debugResult: String? = null,
+
+    // 캘린더 연동 요청 상태
+    val calendarAuthLoading: Boolean = false,
+    val calendarAuthMessage: String? = null
 )
 
 /**

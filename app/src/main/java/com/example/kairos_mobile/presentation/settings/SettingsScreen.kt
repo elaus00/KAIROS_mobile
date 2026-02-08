@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +45,8 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
+    var showExchangeDialog by remember { mutableStateOf(false) }
+    var showTokenDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -141,6 +144,33 @@ fun SettingsScreen(
                         isSelected = uiState.calendarMode == "suggest",
                         onClick = { viewModel.setCalendarMode("suggest") }
                     )
+
+                    SettingsDivider()
+
+                    CalendarActionItem(
+                        title = "OAuth code 교환",
+                        description = "calendar/token/exchange 호출",
+                        enabled = !uiState.calendarAuthLoading,
+                        onClick = { showExchangeDialog = true }
+                    )
+
+                    SettingsDivider()
+
+                    CalendarActionItem(
+                        title = "토큰 직접 저장",
+                        description = "calendar/token 호출",
+                        enabled = !uiState.calendarAuthLoading,
+                        onClick = { showTokenDialog = true }
+                    )
+
+                    SettingsDivider()
+
+                    CalendarActionItem(
+                        title = "이벤트 조회 테스트",
+                        description = "calendar/events 조회",
+                        enabled = !uiState.calendarAuthLoading,
+                        onClick = { viewModel.fetchCalendarEventsPreview() }
+                    )
                 }
             }
 
@@ -202,6 +232,41 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+
+    if (showExchangeDialog) {
+        CalendarCodeExchangeDialog(
+            loading = uiState.calendarAuthLoading,
+            onDismiss = { showExchangeDialog = false },
+            onSubmit = { code, redirectUri ->
+                viewModel.exchangeCalendarCode(code, redirectUri)
+                showExchangeDialog = false
+            }
+        )
+    }
+
+    if (showTokenDialog) {
+        CalendarTokenSaveDialog(
+            loading = uiState.calendarAuthLoading,
+            onDismiss = { showTokenDialog = false },
+            onSubmit = { accessToken, refreshToken, expiresIn ->
+                viewModel.saveCalendarToken(accessToken, refreshToken, expiresIn)
+                showTokenDialog = false
+            }
+        )
+    }
+
+    if (uiState.calendarAuthMessage != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissCalendarAuthMessage() },
+            title = { Text("캘린더 연동 결과") },
+            text = { Text(uiState.calendarAuthMessage ?: "") },
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissCalendarAuthMessage() }) {
+                    Text("확인")
+                }
+            }
+        )
     }
 }
 
@@ -380,6 +445,144 @@ private fun ToggleSettingItem(
             )
         )
     }
+}
+
+@Composable
+private fun CalendarActionItem(
+    title: String,
+    description: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val colors = KairosTheme.colors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled) { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = if (enabled) colors.text else colors.textMuted,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = description,
+                color = colors.textMuted,
+                fontSize = 13.sp
+            )
+        }
+
+        if (enabled) {
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = colors.textMuted,
+                modifier = Modifier.size(20.dp)
+            )
+        } else {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp
+            )
+        }
+    }
+}
+
+@Composable
+private fun CalendarCodeExchangeDialog(
+    loading: Boolean,
+    onDismiss: () -> Unit,
+    onSubmit: (code: String, redirectUri: String) -> Unit
+) {
+    var code by remember { mutableStateOf("") }
+    var redirectUri by remember { mutableStateOf("com.kairos.app:/oauth2redirect") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("OAuth Code 교환") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = code,
+                    onValueChange = { code = it },
+                    label = { Text("authorization code") },
+                    singleLine = true,
+                    enabled = !loading
+                )
+                OutlinedTextField(
+                    value = redirectUri,
+                    onValueChange = { redirectUri = it },
+                    label = { Text("redirect_uri") },
+                    singleLine = true,
+                    enabled = !loading
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !loading,
+                onClick = { onSubmit(code, redirectUri) }
+            ) { Text("요청") }
+        },
+        dismissButton = {
+            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소") }
+        }
+    )
+}
+
+@Composable
+private fun CalendarTokenSaveDialog(
+    loading: Boolean,
+    onDismiss: () -> Unit,
+    onSubmit: (accessToken: String, refreshToken: String, expiresIn: String) -> Unit
+) {
+    var accessToken by remember { mutableStateOf("") }
+    var refreshToken by remember { mutableStateOf("") }
+    var expiresIn by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("토큰 직접 저장") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = accessToken,
+                    onValueChange = { accessToken = it },
+                    label = { Text("access_token") },
+                    singleLine = true,
+                    enabled = !loading
+                )
+                OutlinedTextField(
+                    value = refreshToken,
+                    onValueChange = { refreshToken = it },
+                    label = { Text("refresh_token (optional)") },
+                    singleLine = true,
+                    enabled = !loading
+                )
+                OutlinedTextField(
+                    value = expiresIn,
+                    onValueChange = { expiresIn = it },
+                    label = { Text("expires_in seconds (optional)") },
+                    singleLine = true,
+                    enabled = !loading,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !loading,
+                onClick = { onSubmit(accessToken, refreshToken, expiresIn) }
+            ) { Text("저장") }
+        },
+        dismissButton = {
+            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소") }
+        }
+    )
 }
 
 /**
