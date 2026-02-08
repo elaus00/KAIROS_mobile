@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import com.example.kairos_mobile.presentation.calendar.ScheduleDisplayItem
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -53,13 +55,14 @@ fun ScheduleTimeline(
                     .padding(horizontal = 20.dp)
             ) {
                 schedules.forEachIndexed { index, schedule ->
-                    val now = LocalTime.now()
-                    val scheduleTime = schedule.startTime?.let {
+                    // 날짜+시간 전체를 비교 (미래 일정이 dimmed 되지 않도록)
+                    val now = LocalDateTime.now()
+                    val scheduleDateTime = schedule.startTime?.let {
                         Instant.ofEpochMilli(it)
                             .atZone(ZoneId.systemDefault())
-                            .toLocalTime()
+                            .toLocalDateTime()
                     }
-                    val isPast = scheduleTime?.isBefore(now) ?: false
+                    val isPast = scheduleDateTime?.isBefore(now) ?: false
                     val isFirst = index == 0
                     val isLast = index == schedules.lastIndex
 
@@ -211,14 +214,18 @@ private fun ScheduleCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Icon(
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = "일정 삭제",
-                    tint = colors.textMuted,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable { onDelete() }
-                )
+                // 삭제 아이콘 - 48dp 터치 타겟 확보
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteOutline,
+                        contentDescription = "일정 삭제",
+                        tint = colors.textMuted,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             schedule.location?.let { location ->
@@ -283,9 +290,9 @@ private fun SyncStatusBadge(
     val colors = KairosTheme.colors
 
     val (label, badgeColor) = when (status) {
-        CalendarSyncStatus.SYNCED -> "동기화됨" to Color(0xFF4CAF50)
-        CalendarSyncStatus.SUGGESTION_PENDING -> "제안" to Color(0xFFFFA726)
-        CalendarSyncStatus.SYNC_FAILED -> "실패" to Color(0xFFEF5350)
+        CalendarSyncStatus.SYNCED -> "동기화됨" to colors.success
+        CalendarSyncStatus.SUGGESTION_PENDING -> "제안" to colors.warning
+        CalendarSyncStatus.SYNC_FAILED -> "실패" to colors.danger
         CalendarSyncStatus.REJECTED -> "거부됨" to colors.textMuted
         CalendarSyncStatus.NOT_LINKED -> return  // 배지 없음
     }

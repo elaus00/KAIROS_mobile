@@ -120,11 +120,22 @@ fun NoteDetailScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = uiState.error ?: "",
-                        color = colors.textMuted,
-                        fontSize = 14.sp
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = uiState.error ?: "",
+                            color = colors.textMuted,
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        TextButton(onClick = { viewModel.onRetry() }) {
+                            Text(
+                                text = "다시 시도",
+                                color = colors.accent,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
             }
             else -> {

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.kairos_mobile.BuildConfig
+import com.example.kairos_mobile.data.remote.oauth.GoogleOAuthUrlBuilder
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.ui.theme.KairosTheme
@@ -45,6 +48,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
+    val context = androidx.compose.ui.platform.LocalContext.current
     var showExchangeDialog by remember { mutableStateOf(false) }
     var showTokenDialog by remember { mutableStateOf(false) }
 
@@ -126,6 +130,25 @@ fun SettingsScreen(
                     onToggle = { viewModel.toggleCalendar(it) }
                 )
 
+                SettingsDivider()
+
+                CalendarActionItem(
+                    title = "Google OAuth 시작 (자동)",
+                    description = "브라우저 인증 후 앱으로 자동 복귀",
+                    enabled = !uiState.calendarAuthLoading,
+                    onClick = {
+                        val oauthUrl = GoogleOAuthUrlBuilder.buildAuthorizationUrl(
+                            clientId = BuildConfig.GOOGLE_OAUTH_CLIENT_ID
+                        )
+                        if (oauthUrl.isNullOrBlank()) {
+                            viewModel.showCalendarAuthMessage("GOOGLE_OAUTH_CLIENT_ID를 설정해야 합니다.")
+                        } else {
+                            CustomTabsIntent.Builder().build()
+                                .launchUrl(context, Uri.parse(oauthUrl))
+                        }
+                    }
+                )
+
                 if (uiState.isCalendarEnabled) {
                     SettingsDivider()
 
@@ -145,32 +168,35 @@ fun SettingsScreen(
                         onClick = { viewModel.setCalendarMode("suggest") }
                     )
 
-                    SettingsDivider()
+                    // 디버그 전용 항목
+                    if (BuildConfig.DEBUG) {
+                        SettingsDivider()
 
-                    CalendarActionItem(
-                        title = "OAuth code 교환",
-                        description = "calendar/token/exchange 호출",
-                        enabled = !uiState.calendarAuthLoading,
-                        onClick = { showExchangeDialog = true }
-                    )
+                        CalendarActionItem(
+                            title = "OAuth code 교환",
+                            description = "calendar/token/exchange 호출",
+                            enabled = !uiState.calendarAuthLoading,
+                            onClick = { showExchangeDialog = true }
+                        )
 
-                    SettingsDivider()
+                        SettingsDivider()
 
-                    CalendarActionItem(
-                        title = "토큰 직접 저장",
-                        description = "calendar/token 호출",
-                        enabled = !uiState.calendarAuthLoading,
-                        onClick = { showTokenDialog = true }
-                    )
+                        CalendarActionItem(
+                            title = "토큰 직접 저장",
+                            description = "calendar/token 호출",
+                            enabled = !uiState.calendarAuthLoading,
+                            onClick = { showTokenDialog = true }
+                        )
 
-                    SettingsDivider()
+                        SettingsDivider()
 
-                    CalendarActionItem(
-                        title = "이벤트 조회 테스트",
-                        description = "calendar/events 조회",
-                        enabled = !uiState.calendarAuthLoading,
-                        onClick = { viewModel.fetchCalendarEventsPreview() }
-                    )
+                        CalendarActionItem(
+                            title = "이벤트 조회 테스트",
+                            description = "calendar/events 조회",
+                            enabled = !uiState.calendarAuthLoading,
+                            onClick = { viewModel.fetchCalendarEventsPreview() }
+                        )
+                    }
                 }
             }
 

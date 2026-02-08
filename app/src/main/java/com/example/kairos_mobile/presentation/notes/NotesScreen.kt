@@ -7,7 +7,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -163,7 +163,7 @@ private fun NotesHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -310,13 +310,14 @@ private fun NotesList(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        items(
+        itemsIndexed(
             items = notes,
-            key = { it.noteId }
-        ) { note ->
+            key = { _, note -> note.noteId }
+        ) { index, note ->
             NoteListItem(
                 note = note,
-                onClick = { onNoteClick(note.noteId) }
+                onClick = { onNoteClick(note.noteId) },
+                showDivider = index < notes.lastIndex
             )
         }
     }
@@ -330,6 +331,7 @@ private fun NotesList(
 private fun NoteListItem(
     note: NoteWithCapture,
     onClick: () -> Unit,
+    showDivider: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -400,12 +402,14 @@ private fun NoteListItem(
             )
         }
 
-        // 구분선 (아이템 하단)
-        Spacer(modifier = Modifier.height(12.dp))
-        HorizontalDivider(
-            color = colors.divider,
-            thickness = 0.5.dp
-        )
+        // 구분선 (마지막 아이템 제외)
+        if (showDivider) {
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(
+                color = colors.divider,
+                thickness = 0.5.dp
+            )
+        }
     }
 }
 

@@ -1,8 +1,6 @@
 package com.example.kairos_mobile.presentation.trash
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +32,8 @@ fun TrashScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
+    var showEmptyTrashDialog by remember { mutableStateOf(false) }
+    var deleteTargetId by remember { mutableStateOf<String?>(null) }
 
     // 에러 메시지 표시
     LaunchedEffect(uiState.errorMessage) {
@@ -56,9 +56,7 @@ fun TrashScreen(
             // 상단 바: 뒤로 가기 + 제목 + 비우기 버튼
             TrashTopBar(
                 onNavigateBack = onNavigateBack,
-                onEmptyTrash = {
-                    viewModel.emptyTrash()
-                },
+                onEmptyTrash = { showEmptyTrashDialog = true },
                 hasItems = uiState.items.isNotEmpty()
             )
 
@@ -107,12 +105,72 @@ fun TrashScreen(
                             TrashItem(
                                 capture = item,
                                 onRestore = { viewModel.restoreItem(item.id) },
-                                onDelete = { viewModel.deleteItem(item.id) }
+                                onDelete = { deleteTargetId = item.id }
                             )
                         }
                     }
                 }
             }
+        }
+
+        // 휴지통 비우기 확인 다이얼로그
+        if (showEmptyTrashDialog) {
+            AlertDialog(
+                onDismissRequest = { showEmptyTrashDialog = false },
+                title = { Text("휴지통 비우기", color = colors.text) },
+                text = {
+                    Text(
+                        "모든 항목이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.",
+                        color = colors.textSecondary
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showEmptyTrashDialog = false
+                        viewModel.emptyTrash()
+                    }) {
+                        Text("삭제", color = colors.danger)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEmptyTrashDialog = false }) {
+                        Text("취소", color = colors.textSecondary)
+                    }
+                },
+                containerColor = colors.card,
+                titleContentColor = colors.text,
+                textContentColor = colors.textSecondary
+            )
+        }
+
+        // 개별 항목 완전 삭제 확인 다이얼로그
+        if (deleteTargetId != null) {
+            AlertDialog(
+                onDismissRequest = { deleteTargetId = null },
+                title = { Text("완전 삭제", color = colors.text) },
+                text = {
+                    Text(
+                        "이 항목을 영구적으로 삭제합니다.\n이 작업은 되돌릴 수 없습니다.",
+                        color = colors.textSecondary
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        deleteTargetId?.let { viewModel.deleteItem(it) }
+                        deleteTargetId = null
+                    }) {
+                        Text("삭제", color = colors.danger)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { deleteTargetId = null }) {
+                        Text("취소", color = colors.textSecondary)
+                    }
+                },
+                containerColor = colors.card,
+                titleContentColor = colors.text,
+                textContentColor = colors.textSecondary
+            )
         }
     }
 }
@@ -131,21 +189,16 @@ private fun TrashTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(start = 4.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "뒤로",
-            tint = colors.text,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onNavigateBack() }
-        )
+        IconButton(onClick = onNavigateBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "뒤로",
+                tint = colors.text
+            )
+        }
 
         Text(
             text = "휴지통",
@@ -156,16 +209,14 @@ private fun TrashTopBar(
         )
 
         if (hasItems) {
-            Text(
-                text = "비우기",
-                color = colors.accent,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onEmptyTrash() }
-            )
+            TextButton(onClick = onEmptyTrash) {
+                Text(
+                    text = "비우기",
+                    color = colors.danger,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }

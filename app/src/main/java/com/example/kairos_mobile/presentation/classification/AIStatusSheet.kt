@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -184,7 +183,7 @@ private fun StatusSheetHeader(
             )
         }
 
-        // 전체 확인 버튼
+        // 전체 확인 버튼 — 리플 복원
         if (count > 0) {
             Text(
                 text = "전체 확인",
@@ -192,10 +191,8 @@ private fun StatusSheetHeader(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onConfirmAll() }
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onConfirmAll() }
                     .padding(top = 4.dp)
             )
         }
@@ -246,15 +243,12 @@ private fun ClassificationItem(
             fontSize = 13.sp
         )
 
-        // 확인 버튼
+        // 확인 버튼 — 리플 복원
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.accentBg)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onConfirm() }
+                .clickable { onConfirm() }
                 .padding(horizontal = 12.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {

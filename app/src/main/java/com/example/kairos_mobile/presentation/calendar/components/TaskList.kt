@@ -19,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,9 +44,6 @@ fun TaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onTaskDelete: (String) -> Unit,
-    completedTasks: List<TodoDisplayItem> = emptyList(),
-    showCompleted: Boolean = false,
-    onToggleShowCompleted: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -63,43 +64,6 @@ fun TaskList(
                         onToggleComplete = { onTaskComplete(task.todoId) },
                         onDelete = { onTaskDelete(task.captureId) }
                     )
-                }
-            }
-        }
-
-        // 완료 항목 토글
-        val completedCount = completedTasks.size
-        if (completedCount > 0 || showCompleted) {
-            val colors = KairosTheme.colors
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
-                    .clickable { onToggleShowCompleted() },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (showCompleted) "완료 항목 숨기기" else "완료 항목 ($completedCount)",
-                    color = colors.textSecondary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            if (showCompleted) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    completedTasks.forEach { task ->
-                        TaskItem(
-                            task = task,
-                            onToggleComplete = { onTaskComplete(task.todoId) },
-                            onDelete = { onTaskDelete(task.captureId) }
-                        )
-                    }
                 }
             }
         }
@@ -210,22 +174,34 @@ private fun TaskCheckbox(
         label = "borderColor"
     )
 
+    // 48dp 터치 영역으로 감싸고, 시각적 크기 22dp 유지
     Box(
         modifier = modifier
-            .size(22.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(backgroundColor)
-            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp))
-            .clickable { onToggle() },
+            .size(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onToggle() }
+            .semantics {
+                role = Role.Checkbox
+                stateDescription = if (isChecked) "완료됨" else "미완료"
+            },
         contentAlignment = Alignment.Center
     ) {
-        if (isChecked) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "완료됨",
-                tint = if (colors.isDark) colors.background else Color.White,
-                modifier = Modifier.size(12.dp)
-            )
+        Box(
+            modifier = Modifier
+                .size(22.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(backgroundColor)
+                .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isChecked) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "완료됨",
+                    tint = if (colors.isDark) colors.background else Color.White,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
         }
     }
 }

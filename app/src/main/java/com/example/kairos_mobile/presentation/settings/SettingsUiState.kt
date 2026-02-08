@@ -30,10 +30,3 @@ data class SettingsUiState(
     val calendarAuthLoading: Boolean = false,
     val calendarAuthMessage: String? = null
 )
-
-/**
- * Settings 화면 이벤트
- */
-sealed class SettingsEvent {
-    data class ShowError(val message: String) : SettingsEvent()
-}

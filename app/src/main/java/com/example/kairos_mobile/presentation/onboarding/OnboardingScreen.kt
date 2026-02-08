@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -77,10 +78,7 @@ fun OnboardingScreen(
                 color = colors.textMuted,
                 fontSize = 14.sp,
                 modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { viewModel.skip() }
+                    .clickable { viewModel.skip() }
             )
         }
 
@@ -256,13 +254,13 @@ private fun OnboardingPageGoogle(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFF4CAF50).copy(alpha = 0.15f))
+                    .background(colors.success.copy(alpha = 0.15f))
                     .padding(horizontal = 24.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "연결됨",
-                    color = Color(0xFF4CAF50),
+                    color = colors.success,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -272,10 +270,7 @@ private fun OnboardingPageGoogle(
                 modifier = Modifier
                     .clip(RoundedCornerShape(24.dp))
                     .background(colors.accent)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onConnect() }
+                    .clickable { onConnect() }
                     .padding(horizontal = 24.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -309,7 +304,7 @@ private fun ClassificationChip(
 ) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(8.dp))
             .background(colors.chipBg)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
@@ -409,7 +404,7 @@ private fun OnboardingPage3(
                     )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
+                        indication = LocalIndication.current,
                         enabled = !isSubmitting && inputText.isNotBlank()
                     ) { onSubmit() },
                 contentAlignment = Alignment.Center
@@ -473,10 +468,7 @@ private fun OnboardingBottomBar(
             modifier = Modifier
                 .clip(RoundedCornerShape(24.dp))
                 .background(colors.accent)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onNext() }
+                .clickable { onNext() }
                 .padding(horizontal = 24.dp, vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {

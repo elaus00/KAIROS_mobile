@@ -167,6 +167,15 @@ class NoteDetailViewModel @Inject constructor(
     }
 
     /**
+     * 데이터 재로드 (에러 시 다시 시도)
+     */
+    fun onRetry() {
+        _uiState.update { it.copy(isLoading = true, error = null) }
+        loadNoteDetail()
+        loadFolders()
+    }
+
+    /**
      * 에러 메시지 닫기
      */
     fun onErrorDismissed() {

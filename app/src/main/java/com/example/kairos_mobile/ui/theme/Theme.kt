@@ -188,7 +188,7 @@ fun KAIROS_mobileTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
+            typography = KairosTypography,
             content = content
         )
     }

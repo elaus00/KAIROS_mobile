@@ -22,6 +22,7 @@ Docs/
 │   ├── phase2a/
 │   ├── phase2b/
 │   └── phase3/
+├── analysis/                # 분석 기록
 ├── insights/                # 개발 인사이트 기록
 ├── discussion/              # 논의 기록
 └── performance/             # 성능 기준/리포트 템플릿
@@ -100,6 +101,12 @@ Docs/
 | `2026-02-07_bugfix-retrospective.md` | 버그 수정 회고 | 2026-02-07 |
 | `2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 (Phase 1 MVP) | 2026-02-07 |
 
+### analysis/
+
+| 파일 | 설명 | 날짜 |
+|------|------|------|
+| `ui-improvement-report.md` | UI 디자이너 관점 개선 보고서 — 시각적 일관성, 접근성, 인터랙션 등 23개 항목 | 2026-02-08 |
+
 ### performance/
 
 | 파일 | 설명 | 날짜 |
@@ -139,3 +146,4 @@ Docs/
 | 2026-02-07 | `INDEX.md` | Phase 2b/3 문서 섹션 추가, 상태 "계획 수립"으로 변경 |
 | 2026-02-07 | `ROADMAP.md` | Phase 2b/3 상세 내용 업데이트 |
 | 2026-02-07 | `functional_spec.md` | v2.1 → v2.3: PRD 변경사항 반영 (BOOKMARK 장기 로드맵, 임시 저장 EncryptedSharedPreferences 제거, 수정 이력 기반 학습 Phase 2b~3b, 분류 프리셋/사용자 지시 Phase 3a, AI 통합 그룹화, Phase 로드맵 업데이트) |
+| 2026-02-08 | `analysis/ui-improvement-report.md` | UI 디자이너 관점 개선 보고서 작성 — P0 2건, P1 15건, P2 7건 |
