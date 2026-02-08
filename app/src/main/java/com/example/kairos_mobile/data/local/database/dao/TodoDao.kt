@@ -49,6 +49,21 @@ interface TodoDao {
     fun getActiveTodos(): Flow<List<TodoEntity>>
 
     /**
+     * 전체 할 일 조회 (완료 여부 무관, deadline 있는 것 우선 → deadline 오름차순, 없는 것은 created_at 역순)
+     */
+    @Query("""
+        SELECT t.* FROM todos t
+        INNER JOIN captures c ON c.id = t.capture_id
+        WHERE c.is_deleted = 0
+        AND c.is_trashed = 0
+        ORDER BY
+            CASE WHEN t.deadline IS NULL THEN 1 ELSE 0 END,
+            t.deadline ASC,
+            t.created_at DESC
+    """)
+    fun getAllTodos(): Flow<List<TodoEntity>>
+
+    /**
      * 완료된 할 일 조회 (완료 시각 역순)
      */
     @Query("""

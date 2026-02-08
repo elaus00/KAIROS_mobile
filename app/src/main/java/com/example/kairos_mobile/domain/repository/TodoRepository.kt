@@ -17,6 +17,9 @@ interface TodoRepository {
     /** 활성 할 일 목록 (is_completed=false, sort_order 순) */
     fun getActiveTodos(): Flow<List<Todo>>
 
+    /** 전체 할 일 목록 (완료 여부 무관) */
+    fun getAllTodos(): Flow<List<Todo>>
+
     /** 완료된 할 일 목록 */
     fun getCompletedTodos(): Flow<List<Todo>>
 

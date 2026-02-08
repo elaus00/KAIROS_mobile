@@ -70,7 +70,7 @@ class CalendarViewModelTest {
         // init에서 호출되는 3개 Repository 메서드에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
 
         return CalendarViewModel(
             scheduleRepository,
@@ -95,7 +95,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("cap-1") } returns capture
 
         // When
@@ -115,14 +115,14 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `init_loads_active_todos`() = runTest {
+    fun `init_loads_all_todos`() = runTest {
         // Given: 할일 1개 반환
         val todo = TestFixtures.todo(id = "todo-1", captureId = "cap-2", isCompleted = false)
         val capture = TestFixtures.capture(id = "cap-2", aiTitle = "보고서 작성")
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
+        every { todoRepository.getAllTodos() } returns flowOf(listOf(todo))
         coEvery { captureRepository.getCaptureById("cap-2") } returns capture
 
         // When
@@ -147,7 +147,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(epochDay))
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
 
         // When
         val viewModel = CalendarViewModel(
@@ -228,7 +228,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("c1") } returns cap1
         coEvery { captureRepository.getCaptureById("c2") } returns cap2
 
@@ -254,7 +254,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("missing-cap") } returns null
 
         // When

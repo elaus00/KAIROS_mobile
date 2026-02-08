@@ -36,6 +36,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="com.kairos.app"
+                    android:path="/oauth2redirect" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="com.kairos.app"
+                    android:host="oauth2redirect" />
+            </intent-filter>
+
             <!-- Share Intent Filter for Text and Images -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

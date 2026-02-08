@@ -49,7 +49,6 @@ class CalendarViewModel @Inject constructor(
 
     private var schedulesJob: Job? = null
     private var todosJob: Job? = null
-    private var completedTodosJob: Job? = null
     private var datesJob: Job? = null
 
     init {
@@ -69,7 +68,6 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.ToggleTaskComplete -> toggleTaskComplete(event.taskId)
             is CalendarEvent.DeleteTask -> deleteByCaptureId(event.captureId)
             is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
-            is CalendarEvent.ToggleCompletedTasks -> toggleCompletedTasks()
             is CalendarEvent.ApproveSuggestion -> approveCalendarSuggestion(event.scheduleId)
             is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
         }
@@ -154,12 +152,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 활성 할 일 로드
+     * 전체 할 일 로드 (완료 여부 무관, 체크해도 제자리 유지)
      */
     private fun loadTodos() {
         todosJob?.cancel()
         todosJob = viewModelScope.launch {
-            todoRepository.getActiveTodos()
+            todoRepository.getAllTodos()
                 .catch { /* 에러 무시 */ }
                 .collect { todos ->
                     val displayItems = todos.map { todo ->
@@ -209,21 +207,21 @@ class CalendarViewModel @Inject constructor(
 
     /**
      * 할 일 완료 토글
-     * 체크 애니메이션이 보이도록 즉시 UI 업데이트 후 딜레이
+     * 즉시 UI에 반영 후 DB 업데이트 (체크해도 제자리 유지)
      */
     private fun toggleTaskComplete(taskId: String) {
-        // 즉시 UI에 체크 상태 반영
+        // 즉시 UI에 토글 상태 반영
         _uiState.update { state ->
             state.copy(
                 tasks = state.tasks.map {
-                    if (it.todoId == taskId) it.copy(isCompleted = true) else it
+                    if (it.todoId == taskId) it.copy(isCompleted = !it.isCompleted) else it
                 }
             )
         }
         viewModelScope.launch {
-            delay(500) // 체크 애니메이션 표시
+            delay(300) // 체크 애니메이션 표시
             toggleTodoCompletion(taskId)
-            // Flow가 자동으로 UI 업데이트
+            // Flow(getAllTodos)가 자동으로 UI 업데이트 — 제자리 유지
         }
     }
 
@@ -250,45 +248,6 @@ class CalendarViewModel @Inject constructor(
                     it.copy(errorMessage = e.message ?: "삭제에 실패했습니다.")
                 }
             }
-        }
-    }
-
-    /**
-     * 완료 항목 표시/숨김 토글
-     */
-    private fun toggleCompletedTasks() {
-        val newShow = !_uiState.value.showCompletedTasks
-        _uiState.update { it.copy(showCompletedTasks = newShow) }
-        if (newShow) {
-            loadCompletedTodos()
-        } else {
-            completedTodosJob?.cancel()
-            _uiState.update { it.copy(completedTasks = emptyList()) }
-        }
-    }
-
-    /**
-     * 완료된 할 일 로드
-     */
-    private fun loadCompletedTodos() {
-        completedTodosJob?.cancel()
-        completedTodosJob = viewModelScope.launch {
-            todoRepository.getCompletedTodos()
-                .catch { /* 에러 무시 */ }
-                .collect { todos ->
-                    val displayItems = todos.map { todo ->
-                        val capture = captureRepository.getCaptureById(todo.captureId)
-                        TodoDisplayItem(
-                            todoId = todo.id,
-                            captureId = todo.captureId,
-                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
-                            deadline = todo.deadline,
-                            isCompleted = todo.isCompleted,
-                            deadlineSource = todo.deadlineSource?.name
-                        )
-                    }
-                    _uiState.update { it.copy(completedTasks = displayItems) }
-                }
         }
     }
 

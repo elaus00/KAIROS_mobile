@@ -31,6 +31,11 @@ class TodoRepositoryImpl @Inject constructor(
             .map { entities -> entities.map { todoMapper.toDomain(it) } }
     }
 
+    override fun getAllTodos(): Flow<List<Todo>> {
+        return todoDao.getAllTodos()
+            .map { entities -> entities.map { todoMapper.toDomain(it) } }
+    }
+
     override fun getCompletedTodos(): Flow<List<Todo>> {
         return todoDao.getCompletedTodos()
             .map { entities -> entities.map { todoMapper.toDomain(it) } }

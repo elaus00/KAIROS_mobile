@@ -25,10 +25,17 @@ android {
         testInstrumentationRunner = "com.example.kairos_mobile.HiltTestRunner"
     }
 
+    val debugApiBaseUrl = (project.findProperty("KAIROS_API_BASE_URL") as String?)
+        ?: "https://gifted-michiko-auric.ngrok-free.dev/api/v1"
+    val benchmarkApiBaseUrl = (project.findProperty("KAIROS_BENCHMARK_API_BASE_URL") as String?)
+        ?: debugApiBaseUrl
+
     buildTypes {
         debug {
-            // 에뮬레이터에서 localhost 접근을 위해 10.0.2.2 사용
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1\"")
+            // 기본값은 Android 에뮬레이터(localhost -> 10.0.2.2)
+            // 필요 시 -PKAIROS_API_BASE_URL=https://... 로 오버라이드 가능
+            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         create("benchmark") {
@@ -36,7 +43,8 @@ android {
             matchingFallbacks += listOf("release")
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1\"")
+            buildConfigField("String", "API_BASE_URL", "\"$benchmarkApiBaseUrl\"")
+            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
@@ -46,6 +54,7 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_BASE_URL", "\"https://api.kairos.app/api/v1\"")
+            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
         }
     }
