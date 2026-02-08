@@ -13,9 +13,6 @@ interface TagRepository {
     /** 캡처에 태그 연결 */
     suspend fun linkTagToCapture(captureId: String, tagId: String)
 
-    /** 캡처의 태그 목록 조회 */
-    suspend fun getTagsByCaptureId(captureId: String): List<Tag>
-
     /** 캡처의 태그 전체 삭제 */
     suspend fun deleteTagsByCaptureId(captureId: String)
 }

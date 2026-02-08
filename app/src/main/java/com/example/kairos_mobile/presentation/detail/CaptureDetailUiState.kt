@@ -20,7 +20,5 @@ data class CaptureDetailUiState(
     /** 연관된 Schedule ID (SCHEDULE 타입일 때) */
     val scheduleId: String? = null,
     /** Google Calendar 동기화 상태 (SCHEDULE 타입일 때만 의미) */
-    val calendarSyncStatus: CalendarSyncStatus? = null,
-    /** Google Calendar 이벤트 ID */
-    val googleEventId: String? = null
+    val calendarSyncStatus: CalendarSyncStatus? = null
 )

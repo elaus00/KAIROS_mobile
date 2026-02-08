@@ -46,7 +46,7 @@ import com.example.kairos_mobile.data.local.database.entities.TodoEntity
         ClassificationLogEntity::class,
         AnalyticsEventEntity::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = true
 )
 abstract class KairosDatabase : RoomDatabase() {

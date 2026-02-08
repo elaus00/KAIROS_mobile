@@ -69,8 +69,7 @@ class CaptureDetailViewModel @Inject constructor(
                         imageUri = capture.imageUri,
                         createdAt = capture.createdAt,
                         scheduleId = schedule?.id,
-                        calendarSyncStatus = schedule?.calendarSyncStatus,
-                        googleEventId = schedule?.googleEventId
+                        calendarSyncStatus = schedule?.calendarSyncStatus
                     )
                 }
 

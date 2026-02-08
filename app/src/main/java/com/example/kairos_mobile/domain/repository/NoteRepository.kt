@@ -13,12 +13,6 @@ interface NoteRepository {
     /** 노트 생성 */
     suspend fun createNote(note: Note)
 
-    /** 노트 조회 (capture_id 기준) */
-    suspend fun getNoteByCaptureId(captureId: String): Note?
-
-    /** 폴더별 노트 목록 */
-    fun getNotesByFolderId(folderId: String): Flow<List<Note>>
-
     /** 폴더 변경 */
     suspend fun moveToFolder(noteId: String, folderId: String)
 

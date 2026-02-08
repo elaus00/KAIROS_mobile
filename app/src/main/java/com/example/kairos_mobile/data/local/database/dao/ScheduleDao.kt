@@ -82,23 +82,6 @@ interface ScheduleDao {
     fun getDatesWithSchedules(startTime: Long, endTime: Long): Flow<List<Long>>
 
     /**
-     * 모든 일정 조회
-     */
-    @Query("""
-        SELECT s.* FROM schedules s
-        INNER JOIN captures c ON c.id = s.capture_id
-        WHERE c.is_deleted = 0
-        ORDER BY s.start_time ASC
-    """)
-    fun getAllSchedules(): Flow<List<ScheduleEntity>>
-
-    /**
-     * 일정 삭제
-     */
-    @Query("DELETE FROM schedules WHERE id = :id")
-    suspend fun deleteById(id: String)
-
-    /**
      * 캡처 ID로 일정 삭제
      */
     @Query("DELETE FROM schedules WHERE capture_id = :captureId")

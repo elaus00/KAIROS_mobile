@@ -38,12 +38,6 @@ interface FolderDao {
     suspend fun getByName(name: String): FolderEntity?
 
     /**
-     * 사용자 폴더 조회
-     */
-    @Query("SELECT * FROM folders WHERE type = 'USER' ORDER BY sort_order ASC, created_at ASC")
-    fun getUserFolders(): Flow<List<FolderEntity>>
-
-    /**
      * 폴더 이름 변경
      */
     @Query("UPDATE folders SET name = :newName WHERE id = :id")
@@ -55,9 +49,4 @@ interface FolderDao {
     @Query("DELETE FROM folders WHERE id = :id AND type = 'USER'")
     suspend fun deleteById(id: String)
 
-    /**
-     * 다음 정렬 순서 조회
-     */
-    @Query("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM folders")
-    suspend fun getNextSortOrder(): Int
 }

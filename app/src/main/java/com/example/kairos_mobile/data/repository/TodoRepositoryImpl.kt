@@ -26,10 +26,6 @@ class TodoRepositoryImpl @Inject constructor(
         return todoDao.getById(todoId)?.let { todoMapper.toDomain(it) }
     }
 
-    override suspend fun getTodoByCaptureId(captureId: String): Todo? {
-        return todoDao.getByCaptureId(captureId)?.let { todoMapper.toDomain(it) }
-    }
-
     override fun getActiveTodos(): Flow<List<Todo>> {
         return todoDao.getActiveTodos()
             .map { entities -> entities.map { todoMapper.toDomain(it) } }

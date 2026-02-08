@@ -159,11 +159,6 @@ class CaptureRepositoryImpl @Inject constructor(
             .map { captureMapper.toDomain(it) }
     }
 
-    override fun getChildCaptures(parentId: String): Flow<List<Capture>> {
-        return captureDao.getByParentCaptureId(parentId)
-            .map { entities -> entities.map { captureMapper.toDomain(it) } }
-    }
-
     override suspend fun getFilteredCaptures(
         type: ClassifiedType?,
         startDate: Long?,

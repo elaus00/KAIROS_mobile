@@ -6,8 +6,6 @@ package com.example.kairos_mobile.presentation.capture
 data class CaptureUiState(
     /** 입력 텍스트 */
     val inputText: String = "",
-    /** 현재 글자 수 */
-    val characterCount: Int = 0,
     /** 최대 글자 수 */
     val maxCharacterCount: Int = 5000,
     /** 미확인 AI 분류 수 (벨 뱃지) */

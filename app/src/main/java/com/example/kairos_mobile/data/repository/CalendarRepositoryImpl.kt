@@ -59,14 +59,6 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteFromCalendar(googleEventId: String) {
-        val response = api.deleteCalendarEvent(googleEventId)
-        val body = response.body()
-        if (!response.isSuccessful || body?.status != "ok" || body.data?.deleted != true) {
-            throw parseCalendarError(body?.error?.code, body?.error?.message)
-        }
-    }
-
     override suspend fun updateSyncStatus(scheduleId: String, status: CalendarSyncStatus, googleEventId: String?) {
         scheduleDao.updateCalendarSync(scheduleId, status.name, googleEventId)
     }

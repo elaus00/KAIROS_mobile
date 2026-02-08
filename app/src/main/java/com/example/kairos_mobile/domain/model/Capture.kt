@@ -28,8 +28,6 @@ data class Capture(
     val isDeleted: Boolean = false,
     /** 소프트 삭제 시점 */
     val deletedAt: Long? = null,
-    /** 임시 저장 텍스트 */
-    val draftText: String? = null,
     /** 생성 시각 (epoch ms) */
     val createdAt: Long = System.currentTimeMillis(),
     /** 최종 수정 시각 */

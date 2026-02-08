@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.kairos_mobile.data.local.database.entities.TagEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * 태그 DAO
@@ -26,12 +25,6 @@ interface TagDao {
     suspend fun insertAll(tags: List<TagEntity>)
 
     /**
-     * 모든 태그 조회
-     */
-    @Query("SELECT * FROM tags ORDER BY name ASC")
-    fun getAllTags(): Flow<List<TagEntity>>
-
-    /**
      * ID로 태그 조회
      */
     @Query("SELECT * FROM tags WHERE id = :id")
@@ -43,9 +36,4 @@ interface TagDao {
     @Query("SELECT * FROM tags WHERE name = :name LIMIT 1")
     suspend fun getByName(name: String): TagEntity?
 
-    /**
-     * 태그 삭제
-     */
-    @Query("DELETE FROM tags WHERE id = :id")
-    suspend fun deleteById(id: String)
 }

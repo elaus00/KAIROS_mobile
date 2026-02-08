@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.kairos_mobile.data.local.database.entities.ExtractedEntityEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * 추출 엔티티 DAO
@@ -26,22 +25,10 @@ interface ExtractedEntityDao {
     suspend fun insertAll(entities: List<ExtractedEntityEntity>)
 
     /**
-     * 캡처별 추출 엔티티 조회
-     */
-    @Query("SELECT * FROM entities WHERE capture_id = :captureId")
-    fun getEntitiesForCapture(captureId: String): Flow<List<ExtractedEntityEntity>>
-
-    /**
      * 캡처별 추출 엔티티 조회 (suspend)
      */
     @Query("SELECT * FROM entities WHERE capture_id = :captureId")
     suspend fun getEntitiesForCaptureSync(captureId: String): List<ExtractedEntityEntity>
-
-    /**
-     * 유형별 추출 엔티티 조회
-     */
-    @Query("SELECT * FROM entities WHERE type = :type")
-    fun getEntitiesByType(type: String): Flow<List<ExtractedEntityEntity>>
 
     /**
      * 캡처의 모든 추출 엔티티 삭제

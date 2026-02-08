@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.kairos_mobile.data.local.database.entities.SyncQueueEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * 동기화 큐 DAO
@@ -53,26 +52,10 @@ interface SyncQueueDao {
     suspend fun incrementRetry(id: String, nextRetryAt: Long)
 
     /**
-     * 재시도 초과 → FAILED 처리
-     */
-    @Query("""
-        UPDATE sync_queue
-        SET status = 'FAILED'
-        WHERE id = :id
-    """)
-    suspend fun markFailed(id: String)
-
-    /**
      * 완료 항목 삭제
      */
     @Query("DELETE FROM sync_queue WHERE status = 'COMPLETED'")
     suspend fun deleteCompleted()
-
-    /**
-     * 특정 항목 삭제
-     */
-    @Query("DELETE FROM sync_queue WHERE id = :id")
-    suspend fun deleteById(id: String)
 
     /**
      * PROCESSING 상태 → PENDING으로 리셋 (앱 재시작 시)
@@ -80,9 +63,4 @@ interface SyncQueueDao {
     @Query("UPDATE sync_queue SET status = 'PENDING' WHERE status = 'PROCESSING'")
     suspend fun resetProcessingToPending()
 
-    /**
-     * PENDING 항목 수 조회
-     */
-    @Query("SELECT COUNT(*) FROM sync_queue WHERE status = 'PENDING'")
-    fun getPendingCount(): Flow<Int>
 }

@@ -25,8 +25,6 @@ class NotificationHelper @Inject constructor(
     companion object {
         /** 일정 관련 알림 채널 */
         const val CHANNEL_CALENDAR = "kairos_calendar"
-        /** 일반 알림 채널 */
-        const val CHANNEL_GENERAL = "kairos_general"
 
         private var notificationId = 100
     }
@@ -47,16 +45,7 @@ class NotificationHelper @Inject constructor(
                 description = "일정 추가 확인 및 제안 알림"
             }
 
-            // 일반 알림 채널
-            val generalChannel = NotificationChannel(
-                CHANNEL_GENERAL,
-                "일반 알림",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "앱 일반 알림"
-            }
-
-            manager.createNotificationChannels(listOf(calendarChannel, generalChannel))
+            manager.createNotificationChannel(calendarChannel)
         }
     }
 

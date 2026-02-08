@@ -27,14 +27,12 @@ import com.example.kairos_mobile.presentation.trash.TrashScreen
 
 /**
  * Navigation 경로 정의
- * NOTES ← HOME → CALENDAR (3탭)
+ * HOME 화면에서 3탭 스와이프 네비게이션 포함
  * SETTINGS는 독립 화면
  */
 object NavRoutes {
-    // 메인 탭
+    // 메인
     const val HOME = "home"
-    const val CALENDAR = "calendar"
-    const val NOTES = "notes"
 
     // 독립 화면
     const val SETTINGS = "settings"

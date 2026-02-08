@@ -6,7 +6,6 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -45,7 +44,6 @@ class CalendarViewModelTest {
     private lateinit var todoRepository: TodoRepository
     private lateinit var captureRepository: CaptureRepository
     private lateinit var calendarRepository: CalendarRepository
-    private lateinit var reorderTodo: ReorderTodoUseCase
     private lateinit var toggleTodoCompletion: ToggleTodoCompletionUseCase
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
 
@@ -55,7 +53,6 @@ class CalendarViewModelTest {
         todoRepository = mockk()
         captureRepository = mockk()
         calendarRepository = mockk(relaxed = true)
-        reorderTodo = mockk()
         toggleTodoCompletion = mockk()
         approveSuggestion = mockk(relaxed = true)
     }
@@ -80,7 +77,6 @@ class CalendarViewModelTest {
             todoRepository,
             captureRepository,
             calendarRepository,
-            reorderTodo,
             toggleTodoCompletion,
             approveSuggestion
         )
@@ -105,7 +101,7 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
-            calendarRepository, reorderTodo, toggleTodoCompletion,
+            calendarRepository, toggleTodoCompletion,
             approveSuggestion
         )
         advanceUntilIdle()
@@ -132,7 +128,7 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
-            calendarRepository, reorderTodo, toggleTodoCompletion,
+            calendarRepository, toggleTodoCompletion,
             approveSuggestion
         )
         advanceUntilIdle()
@@ -156,7 +152,7 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
-            calendarRepository, reorderTodo, toggleTodoCompletion,
+            calendarRepository, toggleTodoCompletion,
             approveSuggestion
         )
         advanceUntilIdle()
@@ -239,7 +235,7 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
-            calendarRepository, reorderTodo, toggleTodoCompletion,
+            calendarRepository, toggleTodoCompletion,
             approveSuggestion
         )
         advanceUntilIdle()
@@ -264,7 +260,7 @@ class CalendarViewModelTest {
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
-            calendarRepository, reorderTodo, toggleTodoCompletion,
+            calendarRepository, toggleTodoCompletion,
             approveSuggestion
         )
         advanceUntilIdle()

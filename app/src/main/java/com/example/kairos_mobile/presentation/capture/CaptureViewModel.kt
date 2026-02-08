@@ -66,10 +66,7 @@ class CaptureViewModel @Inject constructor(
             val draft = userPreferenceRepository.getString(KEY_DRAFT_TEXT, "")
             if (draft.isNotBlank()) {
                 _uiState.update {
-                    it.copy(
-                        inputText = draft,
-                        characterCount = draft.length
-                    )
+                    it.copy(inputText = draft)
                 }
             }
         }
@@ -86,10 +83,7 @@ class CaptureViewModel @Inject constructor(
         }
         try {
             _uiState.update {
-                it.copy(
-                    inputText = text,
-                    characterCount = text.length
-                )
+                it.copy(inputText = text)
             }
         } finally {
             if (shouldTraceFirstInput) {
@@ -127,7 +121,6 @@ class CaptureViewModel @Inject constructor(
                     it.copy(
                         isSubmitting = false,
                         inputText = "",
-                        characterCount = 0,
                         imageUri = null
                     )
                 }

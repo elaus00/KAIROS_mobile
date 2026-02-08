@@ -75,9 +75,6 @@ interface CaptureRepository {
     /** 보존 기간 초과 항목 조회 */
     suspend fun getTrashedOverdue(thresholdMs: Long): List<Capture>
 
-    /** 자식 캡처 조회 (멀티 인텐트 분할) */
-    fun getChildCaptures(parentId: String): Flow<List<Capture>>
-
     /** 필터링된 캡처 조회 (분류 유형 + 날짜 범위, 페이징) */
     suspend fun getFilteredCaptures(
         type: ClassifiedType?,

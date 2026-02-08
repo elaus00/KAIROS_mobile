@@ -12,7 +12,4 @@ interface ClassificationLogRepository {
 
     /** 특정 캡처의 분류 로그 조회 */
     suspend fun getByCaptureId(captureId: String): List<ClassificationLog>
-
-    /** 최근 로그 조회 */
-    suspend fun getRecentLogs(limit: Int = 50): List<ClassificationLog>
 }

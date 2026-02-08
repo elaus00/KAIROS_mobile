@@ -114,13 +114,26 @@ class MockDataInitializer @Inject constructor(
         val zone = ZoneId.systemDefault()
         val today = LocalDate.now()
 
-        val scheduleCaptureId = UUID.randomUUID().toString()
-        val todoCaptureId = UUID.randomUUID().toString()
-        val noteCaptureId = UUID.randomUUID().toString()
+        // 일정 캡처 3건
+        val scheduleCaptureId1 = UUID.randomUUID().toString()
+        val scheduleCaptureId2 = UUID.randomUUID().toString()
+        val scheduleCaptureId3 = UUID.randomUUID().toString()
+
+        // 할일 캡처 3건
+        val todoCaptureId1 = UUID.randomUUID().toString()
+        val todoCaptureId2 = UUID.randomUUID().toString()
+        val todoCaptureId3 = UUID.randomUUID().toString()
+
+        // 노트 캡처 4건
+        val noteInboxCaptureId1 = UUID.randomUUID().toString()
+        val noteInboxCaptureId2 = UUID.randomUUID().toString()
+        val noteIdeaCaptureId1 = UUID.randomUUID().toString()
+        val noteIdeaCaptureId2 = UUID.randomUUID().toString()
 
         val captures = listOf(
+            // ── 일정 3건 ──
             CaptureEntity(
-                id = scheduleCaptureId,
+                id = scheduleCaptureId1,
                 originalText = "내일 오전 10시에 제품 회의실에서 주간 회의",
                 aiTitle = "주간 제품 회의",
                 classifiedType = "SCHEDULE",
@@ -132,7 +145,32 @@ class MockDataInitializer @Inject constructor(
                 classificationCompletedAt = now - 10_000
             ),
             CaptureEntity(
-                id = todoCaptureId,
+                id = scheduleCaptureId2,
+                originalText = "오늘 오후 1시에 팀 점심 식사 강남역 근처",
+                aiTitle = "팀 점심 식사",
+                classifiedType = "SCHEDULE",
+                confidence = "HIGH",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 9_000,
+                updatedAt = now - 9_000,
+                classificationCompletedAt = now - 9_000
+            ),
+            CaptureEntity(
+                id = scheduleCaptureId3,
+                originalText = "이번 주 금요일 종일 팀 워크숍 진행",
+                aiTitle = "팀 워크숍",
+                classifiedType = "SCHEDULE",
+                confidence = "MEDIUM",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 7_000,
+                updatedAt = now - 7_000,
+                classificationCompletedAt = now - 7_000
+            ),
+            // ── 할일 3건 ──
+            CaptureEntity(
+                id = todoCaptureId1,
                 originalText = "오늘 저녁까지 배포 체크리스트 정리하기",
                 aiTitle = "배포 체크리스트 정리",
                 classifiedType = "TODO",
@@ -144,7 +182,32 @@ class MockDataInitializer @Inject constructor(
                 classificationCompletedAt = now - 8_000
             ),
             CaptureEntity(
-                id = noteCaptureId,
+                id = todoCaptureId2,
+                originalText = "디자인 시스템 컴포넌트 리뷰 요청",
+                aiTitle = "디자인 시스템 리뷰",
+                classifiedType = "TODO",
+                confidence = "LOW",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 5_000,
+                updatedAt = now - 5_000,
+                classificationCompletedAt = now - 5_000
+            ),
+            CaptureEntity(
+                id = todoCaptureId3,
+                originalText = "API 문서 업데이트 완료함",
+                aiTitle = "API 문서 업데이트",
+                classifiedType = "TODO",
+                confidence = "HIGH",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 20_000,
+                updatedAt = now - 4_000,
+                classificationCompletedAt = now - 20_000
+            ),
+            // ── 노트 4건 ──
+            CaptureEntity(
+                id = noteInboxCaptureId1,
                 originalText = "신규 온보딩 개선 아이디어 메모",
                 aiTitle = "온보딩 개선 메모",
                 classifiedType = "NOTES",
@@ -155,28 +218,59 @@ class MockDataInitializer @Inject constructor(
                 createdAt = now - 6_000,
                 updatedAt = now - 6_000,
                 classificationCompletedAt = now - 6_000
+            ),
+            CaptureEntity(
+                id = noteInboxCaptureId2,
+                originalText = "프로젝트 회고 때 공유할 개선점 정리",
+                aiTitle = "프로젝트 회고 개선점",
+                classifiedType = "NOTES",
+                noteSubType = "INBOX",
+                confidence = "MEDIUM",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 3_000,
+                updatedAt = now - 3_000,
+                classificationCompletedAt = now - 3_000
+            ),
+            CaptureEntity(
+                id = noteIdeaCaptureId1,
+                originalText = "캡처 화면에서 음성 입력 지원하면 어떨까",
+                aiTitle = "음성 입력 아이디어",
+                classifiedType = "NOTES",
+                noteSubType = "IDEA",
+                confidence = "MEDIUM",
+                source = "APP",
+                isConfirmed = true,
+                createdAt = now - 2_000,
+                updatedAt = now - 2_000,
+                classificationCompletedAt = now - 2_000
+            ),
+            CaptureEntity(
+                id = noteIdeaCaptureId2,
+                originalText = "위젯에서 최근 할일 3개 바로 보여주는 기능",
+                aiTitle = "위젯 할일 미리보기",
+                classifiedType = "NOTES",
+                noteSubType = "IDEA",
+                confidence = "HIGH",
+                source = "WIDGET",
+                isConfirmed = true,
+                createdAt = now - 1_000,
+                updatedAt = now - 1_000,
+                classificationCompletedAt = now - 1_000
             )
         )
 
         captures.forEach { insertCaptureWithSearchIndex(it) }
 
-        val scheduleStart = today.plusDays(1)
-            .atTime(10, 0)
-            .atZone(zone)
-            .toInstant()
-            .toEpochMilli()
-        val scheduleEnd = today.plusDays(1)
-            .atTime(11, 0)
-            .atZone(zone)
-            .toInstant()
-            .toEpochMilli()
-
+        // ── 일정 엔티티 3건 ──
+        val scheduleStart1 = today.plusDays(1).atTime(10, 0).atZone(zone).toInstant().toEpochMilli()
+        val scheduleEnd1 = today.plusDays(1).atTime(11, 0).atZone(zone).toInstant().toEpochMilli()
         scheduleDao.insert(
             ScheduleEntity(
                 id = UUID.randomUUID().toString(),
-                captureId = scheduleCaptureId,
-                startTime = scheduleStart,
-                endTime = scheduleEnd,
+                captureId = scheduleCaptureId1,
+                startTime = scheduleStart1,
+                endTime = scheduleEnd1,
                 location = "제품 회의실",
                 isAllDay = false,
                 confidence = "HIGH",
@@ -185,16 +279,44 @@ class MockDataInitializer @Inject constructor(
             )
         )
 
-        val todoDeadline = today
-            .atTime(23, 59)
-            .atZone(zone)
-            .toInstant()
-            .toEpochMilli()
+        val scheduleStart2 = today.atTime(13, 0).atZone(zone).toInstant().toEpochMilli()
+        val scheduleEnd2 = today.atTime(14, 0).atZone(zone).toInstant().toEpochMilli()
+        scheduleDao.insert(
+            ScheduleEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = scheduleCaptureId2,
+                startTime = scheduleStart2,
+                endTime = scheduleEnd2,
+                location = "강남역 근처",
+                isAllDay = false,
+                confidence = "HIGH",
+                createdAt = now - 9_000,
+                updatedAt = now - 9_000
+            )
+        )
 
+        val friday = today.plusDays((5 - today.dayOfWeek.value.toLong() + 7) % 7)
+        val scheduleStart3 = friday.atStartOfDay(zone).toInstant().toEpochMilli()
+        scheduleDao.insert(
+            ScheduleEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = scheduleCaptureId3,
+                startTime = scheduleStart3,
+                endTime = null,
+                location = null,
+                isAllDay = true,
+                confidence = "MEDIUM",
+                createdAt = now - 7_000,
+                updatedAt = now - 7_000
+            )
+        )
+
+        // ── 할일 엔티티 3건 ──
+        val todoDeadline = today.atTime(23, 59).atZone(zone).toInstant().toEpochMilli()
         todoDao.insert(
             TodoEntity(
                 id = UUID.randomUUID().toString(),
-                captureId = todoCaptureId,
+                captureId = todoCaptureId1,
                 deadline = todoDeadline,
                 isCompleted = false,
                 completedAt = null,
@@ -204,17 +326,76 @@ class MockDataInitializer @Inject constructor(
             )
         )
 
+        // 마감 없는 할일
+        todoDao.insert(
+            TodoEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = todoCaptureId2,
+                deadline = null,
+                isCompleted = false,
+                completedAt = null,
+                sortOrder = 1,
+                createdAt = now - 5_000,
+                updatedAt = now - 5_000
+            )
+        )
+
+        // 완료된 할일
+        todoDao.insert(
+            TodoEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = todoCaptureId3,
+                deadline = today.minusDays(1).atTime(18, 0).atZone(zone).toInstant().toEpochMilli(),
+                isCompleted = true,
+                completedAt = now - 4_000,
+                sortOrder = 2,
+                createdAt = now - 20_000,
+                updatedAt = now - 4_000
+            )
+        )
+
+        // ── 노트 엔티티 4건 ──
         noteDao.insert(
             NoteEntity(
                 id = UUID.randomUUID().toString(),
-                captureId = noteCaptureId,
+                captureId = noteInboxCaptureId1,
                 folderId = "system-inbox",
                 createdAt = now - 6_000,
                 updatedAt = now - 6_000
             )
         )
 
-        Log.d(TAG, "Mock 데이터 삽입 완료: captures=3, schedules=1, todos=1, notes=1")
+        noteDao.insert(
+            NoteEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = noteInboxCaptureId2,
+                folderId = "system-inbox",
+                createdAt = now - 3_000,
+                updatedAt = now - 3_000
+            )
+        )
+
+        noteDao.insert(
+            NoteEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = noteIdeaCaptureId1,
+                folderId = SYSTEM_IDEAS_FOLDER_ID,
+                createdAt = now - 2_000,
+                updatedAt = now - 2_000
+            )
+        )
+
+        noteDao.insert(
+            NoteEntity(
+                id = UUID.randomUUID().toString(),
+                captureId = noteIdeaCaptureId2,
+                folderId = SYSTEM_IDEAS_FOLDER_ID,
+                createdAt = now - 1_000,
+                updatedAt = now - 1_000
+            )
+        )
+
+        Log.d(TAG, "Mock 데이터 삽입 완료: captures=10, schedules=3, todos=3, notes=4")
     }
 
     private suspend fun insertCaptureWithSearchIndex(capture: CaptureEntity) {

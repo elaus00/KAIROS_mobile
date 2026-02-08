@@ -63,10 +63,6 @@ data class CaptureEntity(
     @ColumnInfo(name = "deleted_at")
     val deletedAt: Long? = null,
 
-    // 임시 저장 텍스트
-    @ColumnInfo(name = "draft_text")
-    val draftText: String? = null,
-
     // 생성 시각 (epoch ms)
     @ColumnInfo(name = "created_at")
     val createdAt: Long,

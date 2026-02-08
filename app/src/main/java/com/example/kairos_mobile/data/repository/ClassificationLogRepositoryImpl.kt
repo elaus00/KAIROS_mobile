@@ -23,8 +23,4 @@ class ClassificationLogRepositoryImpl @Inject constructor(
     override suspend fun getByCaptureId(captureId: String): List<ClassificationLog> {
         return classificationLogDao.getByCaptureId(captureId).map { mapper.toDomain(it) }
     }
-
-    override suspend fun getRecentLogs(limit: Int): List<ClassificationLog> {
-        return classificationLogDao.getRecentLogs(limit).map { mapper.toDomain(it) }
-    }
 }

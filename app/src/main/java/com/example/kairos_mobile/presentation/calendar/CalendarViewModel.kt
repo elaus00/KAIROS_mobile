@@ -8,7 +8,6 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
-import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -39,7 +38,6 @@ class CalendarViewModel @Inject constructor(
     private val todoRepository: TodoRepository,
     private val captureRepository: CaptureRepository,
     private val calendarRepository: CalendarRepository,
-    private val reorderTodo: ReorderTodoUseCase,
     private val toggleTodoCompletion: ToggleTodoCompletionUseCase,
     private val approveSuggestion: ApproveCalendarSuggestionUseCase
 ) : ViewModel() {
@@ -72,7 +70,6 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.DeleteTask -> deleteByCaptureId(event.captureId)
             is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
             is CalendarEvent.ToggleCompletedTasks -> toggleCompletedTasks()
-            is CalendarEvent.ReorderTodos -> reorderTodos(event.todoIds)
             is CalendarEvent.ApproveSuggestion -> approveCalendarSuggestion(event.scheduleId)
             is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
         }
@@ -292,15 +289,6 @@ class CalendarViewModel @Inject constructor(
                     }
                     _uiState.update { it.copy(completedTasks = displayItems) }
                 }
-        }
-    }
-
-    /**
-     * 할 일 순서 변경
-     */
-    private fun reorderTodos(todoIds: List<String>) {
-        viewModelScope.launch {
-            reorderTodo(todoIds)
         }
     }
 

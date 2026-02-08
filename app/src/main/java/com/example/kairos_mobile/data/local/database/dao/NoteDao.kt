@@ -34,25 +34,6 @@ interface NoteDao {
     suspend fun getById(id: String): NoteEntity?
 
     /**
-     * 캡처 ID로 노트 조회
-     */
-    @Query("SELECT * FROM notes WHERE capture_id = :captureId")
-    suspend fun getByCaptureId(captureId: String): NoteEntity?
-
-    /**
-     * 폴더별 노트 조회 (최신순)
-     */
-    @Query("""
-        SELECT n.* FROM notes n
-        INNER JOIN captures c ON c.id = n.capture_id
-        WHERE n.folder_id = :folderId
-        AND c.is_deleted = 0
-        AND c.is_trashed = 0
-        ORDER BY n.updated_at DESC
-    """)
-    fun getNotesByFolder(folderId: String): Flow<List<NoteEntity>>
-
-    /**
      * 폴더별 노트 수 조회
      */
     @Query("""
@@ -99,22 +80,10 @@ interface NoteDao {
     suspend fun moveAllToInbox(folderId: String, updatedAt: Long)
 
     /**
-     * 노트 삭제
-     */
-    @Query("DELETE FROM notes WHERE id = :id")
-    suspend fun deleteById(id: String)
-
-    /**
      * 캡처 ID로 노트 삭제
      */
     @Query("DELETE FROM notes WHERE capture_id = :captureId")
     suspend fun deleteByCaptureId(captureId: String)
-
-    /**
-     * 모든 노트 조회
-     */
-    @Query("SELECT * FROM notes ORDER BY updated_at DESC")
-    fun getAllNotes(): Flow<List<NoteEntity>>
 
     /**
      * 폴더별 노트 + 활성 캡처 정보 조회

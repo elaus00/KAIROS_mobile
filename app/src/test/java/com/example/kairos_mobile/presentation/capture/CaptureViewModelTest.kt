@@ -95,7 +95,6 @@ class CaptureViewModelTest {
         // then: inputText에 로드됨
         val state = vm.uiState.value
         assertEquals("임시", state.inputText)
-        assertEquals(2, state.characterCount)
     }
 
     @Test
@@ -106,7 +105,6 @@ class CaptureViewModelTest {
 
         // then: 기본 상태 유지 (빈 문자열)
         assertEquals("", vm.uiState.value.inputText)
-        assertEquals(0, vm.uiState.value.characterCount)
     }
 
     @Test
@@ -129,9 +127,8 @@ class CaptureViewModelTest {
         // when: "안녕" 입력
         vm.updateInput("안녕")
 
-        // then: inputText와 characterCount 업데이트
+        // then: inputText 업데이트
         assertEquals("안녕", vm.uiState.value.inputText)
-        assertEquals(2, vm.uiState.value.characterCount)
     }
 
     @Test
@@ -149,7 +146,6 @@ class CaptureViewModelTest {
 
         // then: 이전 상태 유지 (무시됨)
         assertEquals(stateBefore.inputText, vm.uiState.value.inputText)
-        assertEquals(stateBefore.characterCount, vm.uiState.value.characterCount)
     }
 
     // ========== 제출 테스트 ==========
@@ -176,7 +172,6 @@ class CaptureViewModelTest {
 
         // then: 입력 초기화 + deleteDraft 호출
         assertEquals("", vm.uiState.value.inputText)
-        assertEquals(0, vm.uiState.value.characterCount)
         assertFalse(vm.uiState.value.isSubmitting)
         coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture", "") }
     }

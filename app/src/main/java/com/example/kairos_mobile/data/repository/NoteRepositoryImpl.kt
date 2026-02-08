@@ -54,15 +54,6 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNoteByCaptureId(captureId: String): Note? {
-        return noteDao.getByCaptureId(captureId)?.let { noteMapper.toDomain(it) }
-    }
-
-    override fun getNotesByFolderId(folderId: String): Flow<List<Note>> {
-        return noteDao.getNotesByFolder(folderId)
-            .map { entities -> entities.map { noteMapper.toDomain(it) } }
-    }
-
     override suspend fun moveToFolder(noteId: String, folderId: String) {
         noteDao.moveToFolder(noteId, folderId, System.currentTimeMillis())
     }

@@ -33,12 +33,6 @@ interface TodoDao {
     suspend fun getById(id: String): TodoEntity?
 
     /**
-     * 캡처 ID로 할 일 조회
-     */
-    @Query("SELECT * FROM todos WHERE capture_id = :captureId")
-    suspend fun getByCaptureId(captureId: String): TodoEntity?
-
-    /**
      * 활성 할 일 조회 (정렬: deadline 있는 것 우선 → deadline 오름차순, 없는 것은 created_at 역순)
      */
     @Query("""
@@ -78,12 +72,6 @@ interface TodoDao {
         WHERE id = :id
     """)
     suspend fun toggleCompletion(id: String, completedAt: Long, updatedAt: Long)
-
-    /**
-     * 할 일 삭제
-     */
-    @Query("DELETE FROM todos WHERE id = :id")
-    suspend fun deleteById(id: String)
 
     /**
      * 캡처 ID로 할 일 삭제

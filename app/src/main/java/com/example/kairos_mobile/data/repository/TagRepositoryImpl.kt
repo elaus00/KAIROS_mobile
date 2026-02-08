@@ -7,7 +7,6 @@ import com.example.kairos_mobile.data.local.database.entities.TagEntity
 import com.example.kairos_mobile.data.mapper.TagMapper
 import com.example.kairos_mobile.domain.model.Tag
 import com.example.kairos_mobile.domain.repository.TagRepository
-import kotlinx.coroutines.flow.first
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,12 +42,6 @@ class TagRepositoryImpl @Inject constructor(
         captureTagDao.insert(
             CaptureTagEntity(captureId = captureId, tagId = tagId)
         )
-    }
-
-    override suspend fun getTagsByCaptureId(captureId: String): List<Tag> {
-        return captureTagDao.getTagsForCapture(captureId)
-            .first()
-            .map { tagMapper.toDomain(it) }
     }
 
     override suspend fun deleteTagsByCaptureId(captureId: String) {

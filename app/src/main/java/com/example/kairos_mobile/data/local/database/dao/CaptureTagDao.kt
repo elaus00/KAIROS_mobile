@@ -5,8 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.kairos_mobile.data.local.database.entities.CaptureTagEntity
-import com.example.kairos_mobile.data.local.database.entities.TagEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * 캡처-태그 관계 DAO
@@ -25,16 +23,6 @@ interface CaptureTagDao {
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(captureTags: List<CaptureTagEntity>)
-
-    /**
-     * 캡처의 태그 조회
-     */
-    @Query("""
-        SELECT t.* FROM tags t
-        INNER JOIN capture_tags ct ON t.id = ct.tag_id
-        WHERE ct.capture_id = :captureId
-    """)
-    fun getTagsForCapture(captureId: String): Flow<List<TagEntity>>
 
     /**
      * 캡처의 모든 태그 관계 삭제

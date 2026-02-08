@@ -10,8 +10,6 @@ import java.time.LocalDate
 interface CalendarRepository {
     /** 일정을 Google Calendar에 동기화 */
     suspend fun syncToCalendar(scheduleId: String, title: String, startTime: Long, endTime: Long?, location: String?, isAllDay: Boolean): String
-    /** Google Calendar 이벤트 삭제 */
-    suspend fun deleteFromCalendar(googleEventId: String)
     /** 동기화 상태 업데이트 */
     suspend fun updateSyncStatus(scheduleId: String, status: CalendarSyncStatus, googleEventId: String? = null)
     /** OAuth code 교환 + 토큰 저장 */

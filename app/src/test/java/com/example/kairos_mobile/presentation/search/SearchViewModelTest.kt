@@ -1,6 +1,5 @@
 package com.example.kairos_mobile.presentation.search
 
-import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
@@ -20,7 +19,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -173,62 +171,4 @@ class SearchViewModelTest {
         assertEquals("c2", viewModel.uiState.value.searchResults[0].id)
     }
 
-    @Test
-    fun `setDateRange_triggers_filtered_search`() = runTest {
-        // given
-        val results = listOf(TestFixtures.capture(id = "c1"))
-        every { searchCapturesUseCase("테스트") } returns flowOf(results)
-
-        val filteredResults = listOf(
-            TestFixtures.capture(id = "c3", createdAt = 5000L)
-        )
-        coEvery {
-            searchCapturesUseCase.searchFiltered("테스트", null, 1000L, 9000L)
-        } returns filteredResults
-
-        // when
-        viewModel.onSearchTextChanged("테스트")
-        advanceTimeBy(350)
-        advanceUntilIdle()
-
-        viewModel.setDateRange(1000L, 9000L)
-        advanceUntilIdle()
-
-        // then
-        assertEquals(1000L, viewModel.uiState.value.startDate)
-        assertEquals(9000L, viewModel.uiState.value.endDate)
-        assertEquals(1, viewModel.uiState.value.searchResults.size)
-    }
-
-    @Test
-    fun `clearFilters_returns_to_flow_search`() = runTest {
-        // given
-        val results = listOf(TestFixtures.capture(id = "c1"))
-        every { searchCapturesUseCase("검색") } returns flowOf(results)
-
-        val filteredResults = listOf(
-            TestFixtures.capture(id = "c2", classifiedType = ClassifiedType.TODO)
-        )
-        coEvery {
-            searchCapturesUseCase.searchFiltered("검색", ClassifiedType.TODO, null, null)
-        } returns filteredResults
-
-        // 검색 + 필터 적용
-        viewModel.onSearchTextChanged("검색")
-        advanceTimeBy(350)
-        advanceUntilIdle()
-
-        viewModel.setTypeFilter(ClassifiedType.TODO)
-        advanceUntilIdle()
-        assertEquals(ClassifiedType.TODO, viewModel.uiState.value.selectedType)
-
-        // when: 필터 초기화
-        viewModel.clearFilters()
-        advanceUntilIdle()
-
-        // then: 필터 해제
-        assertNull(viewModel.uiState.value.selectedType)
-        assertNull(viewModel.uiState.value.startDate)
-        assertNull(viewModel.uiState.value.endDate)
-    }
 }

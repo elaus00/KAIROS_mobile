@@ -24,9 +24,4 @@ interface ClassificationLogDao {
     @Query("SELECT * FROM classification_logs WHERE capture_id = :captureId ORDER BY modified_at DESC")
     suspend fun getByCaptureId(captureId: String): List<ClassificationLogEntity>
 
-    /**
-     * 최근 로그 조회 (제한 개수)
-     */
-    @Query("SELECT * FROM classification_logs ORDER BY modified_at DESC LIMIT :limit")
-    suspend fun getRecentLogs(limit: Int = 50): List<ClassificationLogEntity>
 }

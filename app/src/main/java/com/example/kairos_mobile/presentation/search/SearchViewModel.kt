@@ -58,22 +58,6 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
-     * 날짜 범위 필터 변경
-     */
-    fun setDateRange(startDate: Long?, endDate: Long?) {
-        _uiState.update { it.copy(startDate = startDate, endDate = endDate) }
-        triggerSearch()
-    }
-
-    /**
-     * 필터 전체 초기화
-     */
-    fun clearFilters() {
-        _uiState.update { it.copy(selectedType = null, startDate = null, endDate = null) }
-        triggerSearch()
-    }
-
-    /**
      * 필터 변경 시 즉시 검색 재실행
      */
     private fun triggerSearch() {
@@ -94,7 +78,7 @@ class SearchViewModel @Inject constructor(
         val query = state.searchText
         if (query.isBlank()) return
 
-        val hasFilters = state.selectedType != null || state.startDate != null || state.endDate != null
+        val hasFilters = state.selectedType != null
 
         try {
             if (hasFilters) {
@@ -102,8 +86,8 @@ class SearchViewModel @Inject constructor(
                 val results = searchCapturesUseCase.searchFiltered(
                     query = query,
                     type = state.selectedType,
-                    startDate = state.startDate,
-                    endDate = state.endDate
+                    startDate = null,
+                    endDate = null
                 )
                 _uiState.update {
                     it.copy(searchResults = results, hasSearched = true)

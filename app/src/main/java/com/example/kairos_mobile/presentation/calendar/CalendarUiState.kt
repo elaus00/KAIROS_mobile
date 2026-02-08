@@ -87,8 +87,6 @@ sealed interface CalendarEvent {
     data class DeleteSchedule(val captureId: String) : CalendarEvent
     /** 완료 항목 표시/숨김 토글 */
     data object ToggleCompletedTasks : CalendarEvent
-    /** 할 일 순서 변경 (드래그 완료 후) */
-    data class ReorderTodos(val todoIds: List<String>) : CalendarEvent
     /** 캘린더 제안 승인 */
     data class ApproveSuggestion(val scheduleId: String) : CalendarEvent
     /** 캘린더 제안 거부 */
