@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.calendar.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -9,14 +10,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -59,11 +62,13 @@ fun TaskList(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 tasks.forEach { task ->
-                    TaskItem(
-                        task = task,
-                        onToggleComplete = { onTaskComplete(task.todoId) },
-                        onDelete = { onTaskDelete(task.captureId) }
-                    )
+                    key(task.todoId) {
+                        TaskItem(
+                            task = task,
+                            onToggleComplete = { onTaskComplete(task.todoId) },
+                            onDelete = { onTaskDelete(task.captureId) }
+                        )
+                    }
                 }
             }
         }
@@ -72,6 +77,7 @@ fun TaskList(
 
 /**
  * 할 일 아이템
+ * 클릭 시 확장하여 세부 정보 표시
  */
 @Composable
 private fun TaskItem(
@@ -81,7 +87,11 @@ private fun TaskItem(
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
-    val alpha = if (task.isCompleted) 0.6f else 1f
+    var isExpanded by remember { mutableStateOf(false) }
+
+    // 완료 상태에 따른 텍스트 색상
+    val titleColor = if (task.isCompleted) colors.textMuted else colors.text
+    val deadlineBaseColor = if (task.isCompleted) colors.textMuted else colors.textSecondary
 
     Box(
         modifier = modifier
@@ -89,64 +99,80 @@ private fun TaskItem(
             .clip(RoundedCornerShape(12.dp))
             .background(colors.card)
             .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-            .alpha(alpha)
-            .padding(12.dp, 14.dp)
+            .clickable { isExpanded = !isExpanded }
+            .padding(16.dp, 10.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 내용
-            Column(
-                modifier = Modifier.weight(1f)
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // 제목
-                Text(
-                    text = task.title,
-                    color = colors.text,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
-                )
+                // 내용
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // 제목
+                    Text(
+                        text = task.title,
+                        color = titleColor,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                        overflow = if (isExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
+                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+                    )
 
-                // 마감일 (있는 경우)
-                task.deadline?.let { deadlineMs ->
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val deadlineText = formatDeadline(deadlineMs)
-                        val isOverdue = deadlineMs < System.currentTimeMillis() && !task.isCompleted
-                        Text(
-                            text = deadlineText,
-                            color = if (isOverdue) colors.danger else colors.textSecondary,
-                            fontSize = 12.sp
-                        )
-                        // AI 마감일 배지
-                        if (task.deadlineSource == "AI") {
-                            Spacer(modifier = Modifier.width(6.dp))
+                    // 마감일 (있는 경우)
+                    task.deadline?.let { deadlineMs ->
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val deadlineText = formatDeadline(deadlineMs)
+                            val isOverdue = deadlineMs < System.currentTimeMillis() && !task.isCompleted
                             Text(
-                                text = "AI",
-                                color = colors.accent,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(colors.accent.copy(alpha = 0.15f))
-                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                                text = deadlineText,
+                                color = if (isOverdue) colors.danger else deadlineBaseColor,
+                                fontSize = 12.sp
                             )
+                            // AI 마감일 배지
+                            if (task.deadlineSource == "AI") {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "AI",
+                                    color = colors.accent,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(colors.accent.copy(alpha = 0.15f))
+                                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // 체크박스 (둥근 사각형)
+                TaskCheckbox(
+                    isChecked = task.isCompleted,
+                    onToggle = onToggleComplete
+                )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // 체크박스 (둥근 사각형)
-            TaskCheckbox(
-                isChecked = task.isCompleted,
-                onToggle = onToggleComplete
-            )
+            // 확장 시 세부 정보 표시
+            AnimatedVisibility(visible = isExpanded) {
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    // 마감일 전체 표시 (확장 시)
+                    task.deadline?.let { deadlineMs ->
+                        Text(
+                            text = "마감: ${formatDeadline(deadlineMs)}",
+                            color = deadlineBaseColor,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }

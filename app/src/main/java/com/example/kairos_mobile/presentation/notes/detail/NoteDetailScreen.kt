@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -19,8 +20,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,89 +149,79 @@ fun NoteDetailScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 제목 입력
-                    Text(
-                        text = "제목",
-                        color = colors.textSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = uiState.editedTitle,
-                        onValueChange = { viewModel.onTitleChanged(it) },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                text = "제목을 입력하세요",
-                                color = colors.placeholder
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colors.accent,
-                            unfocusedBorderColor = colors.border,
-                            focusedTextColor = colors.text,
-                            unfocusedTextColor = colors.text,
-                            cursorColor = colors.accent
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
 
                     // 분류 칩
                     uiState.noteDetail?.let { detail ->
-                        Text(
-                            text = "분류",
-                            color = colors.textSecondary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
                         ClassificationChip(
                             classifiedType = detail.classifiedType,
                             noteSubType = detail.noteSubType
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 본문 입력
-                    Text(
-                        text = "본문",
-                        color = colors.textSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
+                    // 제목 입력 (라벨 없이, 큰 폰트)
+                    BasicTextField(
+                        value = uiState.editedTitle,
+                        onValueChange = { viewModel.onTitleChanged(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(
+                            color = colors.text,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        cursorBrush = SolidColor(colors.accent),
+                        singleLine = true,
+                        decorationBox = { innerTextField ->
+                            Box {
+                                if (uiState.editedTitle.isEmpty()) {
+                                    Text(
+                                        text = "제목",
+                                        color = colors.placeholder,
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 제목과 본문 사이 구분선
+                    HorizontalDivider(
+                        color = colors.divider,
+                        thickness = 0.5.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 본문 입력 (라벨 없이, 자연스러운 텍스트 입력)
+                    BasicTextField(
                         value = uiState.editedBody,
                         onValueChange = { viewModel.onBodyChanged(it) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 120.dp),
-                        placeholder = {
-                            // body가 없으면 originalText 일부를 placeholder로 표시
-                            val placeholderText = uiState.noteDetail?.originalText
-                                ?.take(100)
-                                ?.let { if (it.length >= 100) "$it..." else it }
-                                ?: "본문을 입력하세요"
-                            Text(
-                                text = placeholderText,
-                                color = colors.placeholder
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colors.accent,
-                            unfocusedBorderColor = colors.border,
-                            focusedTextColor = colors.text,
-                            unfocusedTextColor = colors.text,
-                            cursorColor = colors.accent
+                            .defaultMinSize(minHeight = 200.dp),
+                        textStyle = TextStyle(
+                            color = colors.text,
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        cursorBrush = SolidColor(colors.accent),
+                        decorationBox = { innerTextField ->
+                            Box {
+                                if (uiState.editedBody.isEmpty()) {
+                                    Text(
+                                        text = "내용을 입력하세요...",
+                                        color = colors.placeholder,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))

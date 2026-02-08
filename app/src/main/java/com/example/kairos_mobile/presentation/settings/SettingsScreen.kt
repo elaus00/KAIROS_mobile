@@ -285,11 +285,14 @@ fun SettingsScreen(
     if (uiState.calendarAuthMessage != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissCalendarAuthMessage() },
-            title = { Text("캘린더 연동 결과") },
-            text = { Text(uiState.calendarAuthMessage ?: "") },
+            containerColor = colors.card,
+            titleContentColor = colors.text,
+            textContentColor = colors.text,
+            title = { Text("캘린더 연동 결과", color = colors.text) },
+            text = { Text(uiState.calendarAuthMessage ?: "", color = colors.text) },
             confirmButton = {
                 TextButton(onClick = { viewModel.dismissCalendarAuthMessage() }) {
-                    Text("확인")
+                    Text("확인", color = colors.accent)
                 }
             }
         )
@@ -514,7 +517,8 @@ private fun CalendarActionItem(
         } else {
             CircularProgressIndicator(
                 modifier = Modifier.size(18.dp),
-                strokeWidth = 2.dp
+                strokeWidth = 2.dp,
+                color = colors.textMuted
             )
         }
     }
@@ -526,11 +530,15 @@ private fun CalendarCodeExchangeDialog(
     onDismiss: () -> Unit,
     onSubmit: (code: String, redirectUri: String) -> Unit
 ) {
+    val colors = KairosTheme.colors
     var code by remember { mutableStateOf("") }
     var redirectUri by remember { mutableStateOf("com.kairos.app:/oauth2redirect") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("OAuth Code 교환") },
+        containerColor = colors.card,
+        titleContentColor = colors.text,
+        textContentColor = colors.text,
+        title = { Text("OAuth Code 교환", color = colors.text) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -538,14 +546,32 @@ private fun CalendarCodeExchangeDialog(
                     onValueChange = { code = it },
                     label = { Text("authorization code") },
                     singleLine = true,
-                    enabled = !loading
+                    enabled = !loading,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.accent,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.text,
+                        unfocusedTextColor = colors.text,
+                        focusedLabelColor = colors.accent,
+                        unfocusedLabelColor = colors.textSecondary,
+                        cursorColor = colors.accent
+                    )
                 )
                 OutlinedTextField(
                     value = redirectUri,
                     onValueChange = { redirectUri = it },
                     label = { Text("redirect_uri") },
                     singleLine = true,
-                    enabled = !loading
+                    enabled = !loading,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.accent,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.text,
+                        unfocusedTextColor = colors.text,
+                        focusedLabelColor = colors.accent,
+                        unfocusedLabelColor = colors.textSecondary,
+                        cursorColor = colors.accent
+                    )
                 )
             }
         },
@@ -553,10 +579,10 @@ private fun CalendarCodeExchangeDialog(
             TextButton(
                 enabled = !loading,
                 onClick = { onSubmit(code, redirectUri) }
-            ) { Text("요청") }
+            ) { Text("요청", color = colors.accent) }
         },
         dismissButton = {
-            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소") }
+            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소", color = colors.textSecondary) }
         }
     )
 }
@@ -567,12 +593,25 @@ private fun CalendarTokenSaveDialog(
     onDismiss: () -> Unit,
     onSubmit: (accessToken: String, refreshToken: String, expiresIn: String) -> Unit
 ) {
+    val colors = KairosTheme.colors
     var accessToken by remember { mutableStateOf("") }
     var refreshToken by remember { mutableStateOf("") }
     var expiresIn by remember { mutableStateOf("") }
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = colors.accent,
+        unfocusedBorderColor = colors.border,
+        focusedTextColor = colors.text,
+        unfocusedTextColor = colors.text,
+        focusedLabelColor = colors.accent,
+        unfocusedLabelColor = colors.textSecondary,
+        cursorColor = colors.accent
+    )
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("토큰 직접 저장") },
+        containerColor = colors.card,
+        titleContentColor = colors.text,
+        textContentColor = colors.text,
+        title = { Text("토큰 직접 저장", color = colors.text) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -580,14 +619,16 @@ private fun CalendarTokenSaveDialog(
                     onValueChange = { accessToken = it },
                     label = { Text("access_token") },
                     singleLine = true,
-                    enabled = !loading
+                    enabled = !loading,
+                    colors = textFieldColors
                 )
                 OutlinedTextField(
                     value = refreshToken,
                     onValueChange = { refreshToken = it },
                     label = { Text("refresh_token (optional)") },
                     singleLine = true,
-                    enabled = !loading
+                    enabled = !loading,
+                    colors = textFieldColors
                 )
                 OutlinedTextField(
                     value = expiresIn,
@@ -595,7 +636,8 @@ private fun CalendarTokenSaveDialog(
                     label = { Text("expires_in seconds (optional)") },
                     singleLine = true,
                     enabled = !loading,
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = textFieldColors
                 )
             }
         },
@@ -603,10 +645,10 @@ private fun CalendarTokenSaveDialog(
             TextButton(
                 enabled = !loading,
                 onClick = { onSubmit(accessToken, refreshToken, expiresIn) }
-            ) { Text("저장") }
+            ) { Text("저장", color = colors.accent) }
         },
         dismissButton = {
-            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소") }
+            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소", color = colors.textSecondary) }
         }
     )
 }

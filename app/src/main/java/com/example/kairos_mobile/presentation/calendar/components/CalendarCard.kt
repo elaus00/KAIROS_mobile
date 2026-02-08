@@ -18,11 +18,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -107,46 +112,87 @@ fun CalendarCard(
             }
             .padding(16.dp)
     ) {
-        // 월 헤더 + 좌우 이동 버튼 + 토글 버튼
+        // 월 헤더: "n월 n주차" 왼쪽 정렬 + 드롭다운 + 좌우 이동 버튼 (확장 시만)
+        val weekOfMonth = ((selectedDate.dayOfMonth - 1) / 7) + 1
+        var showMonthDropdown by remember { mutableStateOf(false) }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 이전 달 버튼 — 리플 복원
-            Icon(
-                imageVector = Icons.Default.ChevronLeft,
-                contentDescription = "이전 달",
-                tint = colors.textSecondary,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .clickable { onMonthChange(currentMonth.minusMonths(1)) }
-            )
+            // 왼쪽: 월 텍스트 + chevron 아이콘
+            Box {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            if (isExpanded) {
+                                showMonthDropdown = !showMonthDropdown
+                            } else {
+                                onToggleExpand()
+                            }
+                        }
+                    )
+                ) {
+                    Text(
+                        text = "${currentMonth.monthValue}월 ${weekOfMonth}주차",
+                        color = colors.text,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = if (isExpanded) "접기" else "펼치기",
+                        tint = colors.textSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
 
-            // 월 텍스트 (클릭 시 펼침/접기)
-            Text(
-                text = "${currentMonth.monthValue}월",
-                color = colors.text,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onToggleExpand
-                )
-            )
+                // 월 선택 드롭다운 메뉴 (확장 상태에서만)
+                DropdownMenu(
+                    expanded = showMonthDropdown,
+                    onDismissRequest = { showMonthDropdown = false }
+                ) {
+                    (1..12).forEach { month ->
+                        DropdownMenuItem(
+                            text = { Text("${month}월") },
+                            onClick = {
+                                showMonthDropdown = false
+                                onMonthChange(YearMonth.of(currentMonth.year, month))
+                            }
+                        )
+                    }
+                }
+            }
 
-            // 다음 달 버튼 — 리플 복원
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "다음 달",
-                tint = colors.textSecondary,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .clickable { onMonthChange(currentMonth.plusMonths(1)) }
-            )
+            // 오른쪽: 좌우 이동 버튼 (확장 시만 표시)
+            if (isExpanded) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronLeft,
+                        contentDescription = "이전 달",
+                        tint = colors.textSecondary,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .clickable { onMonthChange(currentMonth.minusMonths(1)) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "다음 달",
+                        tint = colors.textSecondary,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .clickable { onMonthChange(currentMonth.plusMonths(1)) }
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))

@@ -41,7 +41,7 @@ fun AIStatusSheet(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(colors.text.copy(alpha = 0.3f))
+            .background(colors.text.copy(alpha = 0.5f))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -102,7 +102,7 @@ fun AIStatusSheet(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.heightIn(max = 400.dp),
+                    modifier = Modifier.heightIn(max = 300.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(0.dp)
                 ) {
@@ -183,7 +183,7 @@ private fun StatusSheetHeader(
             )
         }
 
-        // 전체 확인 버튼 — 리플 복원
+        // 전체 확인 버튼 — 리플 복원, 최소 터치 타겟 48dp 확보
         if (count > 0) {
             Text(
                 text = "전체 확인",
@@ -193,7 +193,7 @@ private fun StatusSheetHeader(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onConfirmAll() }
-                    .padding(top = 4.dp)
+                    .padding(horizontal = 8.dp, vertical = 12.dp)
             )
         }
     }
@@ -243,13 +243,14 @@ private fun ClassificationItem(
             fontSize = 13.sp
         )
 
-        // 확인 버튼 — 리플 복원
+        // 확인 버튼 — 리플 복원, 최소 터치 타겟 48dp 확보
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.accentBg)
                 .clickable { onConfirm() }
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .defaultMinSize(minHeight = 36.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(

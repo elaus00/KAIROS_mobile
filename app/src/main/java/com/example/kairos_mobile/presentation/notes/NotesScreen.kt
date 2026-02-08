@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.notes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -25,9 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -210,9 +216,24 @@ private fun FolderFilterChips(
 ) {
     val colors = KairosTheme.colors
 
+    // 수평 스크롤이 부모 HorizontalPager에 전파되지 않도록 차단
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                // 남은 수평 스크롤을 부모에 전파하지 않음
+                return available.copy(y = 0f)
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                return available.copy(y = 0f)
+            }
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .nestedScroll(nestedScrollConnection)
             .horizontalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -308,16 +329,15 @@ private fun NotesList(
     LazyColumn(
         modifier = modifier.testTag("notes_list"),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         itemsIndexed(
             items = notes,
             key = { _, note -> note.noteId }
-        ) { index, note ->
+        ) { _, note ->
             NoteListItem(
                 note = note,
-                onClick = { onNoteClick(note.noteId) },
-                showDivider = index < notes.lastIndex
+                onClick = { onNoteClick(note.noteId) }
             )
         }
     }
@@ -331,7 +351,6 @@ private fun NotesList(
 private fun NoteListItem(
     note: NoteWithCapture,
     onClick: () -> Unit,
-    showDivider: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -351,8 +370,10 @@ private fun NoteListItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .border(0.5.dp, colors.border, RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 14.dp)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         // 첫 줄: 제목 + 날짜
         Row(
@@ -399,15 +420,6 @@ private fun NoteListItem(
                 color = colors.textMuted,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Normal
-            )
-        }
-
-        // 구분선 (마지막 아이템 제외)
-        if (showDivider) {
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(
-                color = colors.divider,
-                thickness = 0.5.dp
             )
         }
     }
