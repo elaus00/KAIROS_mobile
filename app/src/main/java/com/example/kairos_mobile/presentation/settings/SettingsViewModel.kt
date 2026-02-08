@@ -121,6 +121,10 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(calendarAuthMessage = null) }
     }
 
+    fun showCalendarAuthMessage(message: String) {
+        _uiState.update { it.copy(calendarAuthMessage = message) }
+    }
+
     fun exchangeCalendarCode(code: String, redirectUri: String) {
         if (code.isBlank() || redirectUri.isBlank()) {
             _uiState.update { it.copy(calendarAuthMessage = "code/redirect_uri를 입력해주세요.") }

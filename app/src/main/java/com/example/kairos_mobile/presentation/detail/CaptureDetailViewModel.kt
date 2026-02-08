@@ -107,6 +107,13 @@ class CaptureDetailViewModel @Inject constructor(
     }
 
     /**
+     * 데이터 재로드 (에러 시 다시 시도)
+     */
+    fun onRetry() {
+        loadCapture()
+    }
+
+    /**
      * 에러 메시지 닫기
      */
     fun onErrorDismissed() {

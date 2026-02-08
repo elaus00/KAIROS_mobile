@@ -15,8 +15,8 @@ object KairosLight {
     val borderLight = Color(0xFFF0F0F0)      // 연한 보더
     val text = Color(0xFF111111)             // 기본 텍스트
     val textSecondary = Color(0xFF888888)    // 보조 텍스트
-    val textMuted = Color(0xFFAAAAAA)        // 희미한 텍스트
-    val placeholder = Color(0xFFCCCCCC)      // 플레이스홀더
+    val textMuted = Color(0xFF999999)        // 희미한 텍스트 (대비 개선)
+    val placeholder = Color(0xFFBBBBBB)      // 플레이스홀더 (대비 개선)
     val accent = Color(0xFF111111)           // 강조 색상
     val accentBg = Color(0xFFF5F5F5)         // 강조 배경
     val chipBg = Color(0xFFF0F0F0)           // 칩 배경

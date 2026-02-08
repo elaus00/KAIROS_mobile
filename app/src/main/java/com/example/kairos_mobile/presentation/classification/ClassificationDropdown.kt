@@ -37,7 +37,7 @@ fun ClassificationDropdown(
         // 현재 분류 칩
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .background(colors.chipBg)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },

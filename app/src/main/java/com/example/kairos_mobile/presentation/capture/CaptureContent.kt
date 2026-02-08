@@ -221,62 +221,49 @@ private fun CaptureTopBar(
 
         // 오른쪽: 벨 + 히스토리 + 설정
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 벨 아이콘 (뱃지 포함)
-            BadgedBox(
-                badge = {
-                    if (unconfirmedCount > 0) {
-                        Badge(
-                            containerColor = colors.danger,
-                            contentColor = Color.White
-                        ) {
-                            Text(
-                                text = if (unconfirmedCount > 99) "99+" else "$unconfirmedCount",
-                                fontSize = 10.sp
-                            )
+            IconButton(onClick = onBellClick) {
+                BadgedBox(
+                    badge = {
+                        if (unconfirmedCount > 0) {
+                            Badge(
+                                containerColor = colors.danger,
+                                contentColor = Color.White
+                            ) {
+                                Text(
+                                    text = if (unconfirmedCount > 99) "99+" else "$unconfirmedCount",
+                                    fontSize = 10.sp
+                                )
+                            }
                         }
                     }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = "AI 분류 현황",
+                        tint = if (unconfirmedCount > 0) colors.text else colors.textMuted
+                    )
                 }
-            ) {
+            }
+
+            IconButton(onClick = onHistoryClick) {
                 Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "AI 분류 현황",
-                    tint = if (unconfirmedCount > 0) colors.text else colors.textMuted,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { onBellClick() }
+                    imageVector = Icons.Default.History,
+                    contentDescription = "전체 기록",
+                    tint = colors.text
                 )
             }
 
-            Icon(
-                imageVector = Icons.Default.History,
-                contentDescription = "전체 기록",
-                tint = colors.text,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onHistoryClick() }
-            )
-
             // 설정 아이콘
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "설정",
-                tint = colors.text,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onSettingsClick() }
-            )
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "설정",
+                    tint = colors.text
+                )
+            }
         }
     }
 }
@@ -332,18 +319,23 @@ private fun ImagePreview(
         )
 
         // 제거 버튼
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "이미지 제거",
-            tint = Color.White,
+        IconButton(
+            onClick = onRemove,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .size(20.dp)
-                .clip(CircleShape)
-                .background(colors.danger.copy(alpha = 0.8f))
-                .clickable { onRemove() }
-                .padding(2.dp)
-        )
+                .size(28.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "이미지 제거",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(colors.danger.copy(alpha = 0.8f))
+                    .padding(2.dp)
+            )
+        }
     }
 }
 
@@ -368,14 +360,13 @@ private fun CaptureToolBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // 이미지 아이콘
-        Icon(
-            imageVector = Icons.Outlined.Image,
-            contentDescription = "이미지 첨부",
-            tint = if (hasImage) colors.accent else colors.iconMuted,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onImageClick() }
-        )
+        IconButton(onClick = onImageClick) {
+            Icon(
+                imageVector = Icons.Outlined.Image,
+                contentDescription = "이미지 첨부",
+                tint = if (hasImage) colors.accent else colors.iconMuted
+            )
+        }
 
         // 전송 버튼
         Box(

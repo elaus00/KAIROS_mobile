@@ -2,13 +2,13 @@ package com.example.kairos_mobile.presentation.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -135,11 +135,27 @@ fun HistoryScreen(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "기록이 없습니다",
-                            color = colors.textMuted,
-                            fontSize = 14.sp
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.History,
+                                contentDescription = null,
+                                tint = colors.textMuted,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Text(
+                                text = "기록이 없습니다",
+                                color = colors.textMuted,
+                                fontSize = 15.sp
+                            )
+                            Text(
+                                text = "캡처한 내용이 여기에 시간순으로 표시됩니다",
+                                color = colors.textMuted.copy(alpha = 0.7f),
+                                fontSize = 13.sp
+                            )
+                        }
                     }
                 }
 
@@ -205,21 +221,16 @@ private fun HistoryTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(start = 4.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "뒤로",
-            tint = colors.text,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onNavigateBack() }
-        )
+        IconButton(onClick = onNavigateBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "뒤로",
+                tint = colors.text
+            )
+        }
 
         Text(
             text = "전체 기록",

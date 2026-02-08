@@ -25,7 +25,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.model.ClassifiedType
-import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -91,11 +90,22 @@ fun CaptureDetailScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = uiState.errorMessage ?: "",
-                    color = colors.textMuted,
-                    fontSize = 14.sp
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = uiState.errorMessage ?: "",
+                        color = colors.textMuted,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextButton(onClick = { viewModel.onRetry() }) {
+                        Text(
+                            text = "다시 시도",
+                            color = colors.accent,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         } else {
             Column(
@@ -324,9 +334,9 @@ private fun CalendarSyncSection(
             Column {
                 // 상태 텍스트
                 val (statusText, statusColor) = when (syncStatus) {
-                    CalendarSyncStatus.SYNCED -> "Google Calendar에 동기화됨" to androidx.compose.ui.graphics.Color(0xFF4CAF50)
-                    CalendarSyncStatus.SUGGESTION_PENDING -> "캘린더 추가를 제안합니다" to androidx.compose.ui.graphics.Color(0xFFFFA726)
-                    CalendarSyncStatus.SYNC_FAILED -> "동기화 실패" to androidx.compose.ui.graphics.Color(0xFFEF5350)
+                    CalendarSyncStatus.SYNCED -> "Google Calendar에 동기화됨" to colors.success
+                    CalendarSyncStatus.SUGGESTION_PENDING -> "캘린더 추가를 제안합니다" to colors.warning
+                    CalendarSyncStatus.SYNC_FAILED -> "동기화 실패" to colors.danger
                     CalendarSyncStatus.REJECTED -> "사용자가 거부함" to colors.textMuted
                     CalendarSyncStatus.NOT_LINKED -> "연결되지 않음" to colors.textMuted
                 }
