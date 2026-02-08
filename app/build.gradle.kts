@@ -26,7 +26,7 @@ android {
     }
 
     val debugApiBaseUrl = (project.findProperty("KAIROS_API_BASE_URL") as String?)
-        ?: "http://10.0.2.2:8000/api/v1"
+        ?: "https://gifted-michiko-auric.ngrok-free.dev/api/v1"
     val benchmarkApiBaseUrl = (project.findProperty("KAIROS_BENCHMARK_API_BASE_URL") as String?)
         ?: debugApiBaseUrl
 
