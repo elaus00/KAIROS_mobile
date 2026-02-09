@@ -25,4 +25,10 @@ interface ScheduleRepository {
 
     /** capture_id로 삭제 */
     suspend fun deleteByCaptureId(captureId: String)
+
+    /** Google Calendar에 동기화된 일정 목록 조회 */
+    suspend fun getSyncedSchedules(): List<Schedule>
+
+    /** 원격 데이터로 일정 업데이트 */
+    suspend fun updateFromRemote(scheduleId: String, title: String, startTime: Long, endTime: Long?, location: String?)
 }

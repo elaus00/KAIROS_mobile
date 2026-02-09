@@ -23,4 +23,14 @@ class ClassificationLogRepositoryImpl @Inject constructor(
     override suspend fun getByCaptureId(captureId: String): List<ClassificationLog> {
         return classificationLogDao.getByCaptureId(captureId).map { mapper.toDomain(it) }
     }
+
+    override suspend fun getModificationPatterns(): List<Triple<String, String, Int>> {
+        val all = classificationLogDao.getAll()
+        return all.groupBy { "${it.originalType}_${it.newType}" }
+            .map { (key, logs) ->
+                val parts = key.split("_", limit = 2)
+                Triple(parts[0], parts[1], logs.size)
+            }
+            .sortedByDescending { it.third }
+    }
 }

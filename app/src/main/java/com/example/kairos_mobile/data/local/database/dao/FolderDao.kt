@@ -49,4 +49,10 @@ interface FolderDao {
     @Query("DELETE FROM folders WHERE id = :id AND type = 'USER'")
     suspend fun deleteById(id: String)
 
+    /**
+     * 이름 + 유형으로 폴더 조회 (AI 그룹 폴더 재사용)
+     */
+    @Query("SELECT * FROM folders WHERE name = :name AND type = :type LIMIT 1")
+    suspend fun getByNameAndType(name: String, type: String): FolderEntity?
+
 }

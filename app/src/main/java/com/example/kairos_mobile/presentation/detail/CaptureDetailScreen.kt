@@ -1,6 +1,8 @@
 package com.example.kairos_mobile.presentation.detail
 
+import android.content.Intent
 import android.net.Uri
+import android.provider.CalendarContract
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,10 +41,24 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CaptureDetailScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
     viewModel: CaptureDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
+    val context = LocalContext.current
+
+    // 공유 텍스트가 설정되면 ShareSheet 실행
+    LaunchedEffect(uiState.shareText) {
+        uiState.shareText?.let { text ->
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, text)
+                type = "text/plain"
+            }
+            context.startActivity(Intent.createChooser(sendIntent, null))
+            viewModel.onShareHandled()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -60,6 +77,15 @@ fun CaptureDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "뒤로가기",
+                            tint = colors.text
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.onShare() }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "공유",
                             tint = colors.text
                         )
                     }
@@ -145,7 +171,11 @@ fun CaptureDetailScreen(
                         },
                         onReject = {
                             uiState.scheduleId?.let { viewModel.onRejectCalendarSync(it) }
-                        }
+                        },
+                        onOpenCalendar = {
+                            openGoogleCalendar(context, uiState.scheduleStartTime)
+                        },
+                        onConnectCalendar = onNavigateToSettings
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -309,6 +339,8 @@ private fun CalendarSyncSection(
     syncStatus: CalendarSyncStatus,
     onApprove: () -> Unit,
     onReject: () -> Unit,
+    onOpenCalendar: () -> Unit,
+    onConnectCalendar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -382,6 +414,30 @@ private fun CalendarSyncSection(
                         }
                     }
                 }
+
+                if (syncStatus == CalendarSyncStatus.SYNCED) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextButton(onClick = onOpenCalendar) {
+                        Text(
+                            text = "Google Calendar에서 보기",
+                            color = colors.accent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                if (syncStatus == CalendarSyncStatus.NOT_LINKED) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextButton(onClick = onConnectCalendar) {
+                        Text(
+                            text = "Google Calendar 연동하기",
+                            color = colors.accent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
@@ -395,4 +451,28 @@ private fun formatDateTime(epochMs: Long): String {
         .atZone(ZoneId.systemDefault())
         .toLocalDateTime()
     return dateTime.format(DateTimeFormatter.ofPattern("yyyy.M.d HH:mm"))
+}
+
+private fun openGoogleCalendar(context: android.content.Context, startTime: Long?) {
+    val targetTime = startTime ?: System.currentTimeMillis()
+    val deepLink = Uri.Builder()
+        .scheme("content")
+        .authority("com.android.calendar")
+        .appendPath("time")
+        .appendPath(targetTime.toString())
+        .build()
+
+    val appIntent = Intent(Intent.ACTION_VIEW).apply {
+        data = deepLink
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, targetTime)
+        setPackage("com.google.android.calendar")
+    }
+
+    val fallbackIntent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("https://calendar.google.com/calendar/r/day")
+    )
+
+    runCatching { context.startActivity(appIntent) }
+        .onFailure { context.startActivity(fallbackIntent) }
 }

@@ -3,6 +3,7 @@ package com.example.kairos_mobile.presentation.search
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.search.SemanticSearchUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
 import io.mockk.coEvery
@@ -40,13 +41,15 @@ class SearchViewModelTest {
 
     private lateinit var searchCapturesUseCase: SearchCapturesUseCase
     private lateinit var trackEventUseCase: TrackEventUseCase
+    private lateinit var semanticSearchUseCase: SemanticSearchUseCase
     private lateinit var viewModel: SearchViewModel
 
     @Before
     fun setup() {
         searchCapturesUseCase = mockk()
         trackEventUseCase = mockk(relaxed = true)
-        viewModel = SearchViewModel(searchCapturesUseCase, trackEventUseCase)
+        semanticSearchUseCase = mockk(relaxed = true)
+        viewModel = SearchViewModel(searchCapturesUseCase, trackEventUseCase, semanticSearchUseCase)
     }
 
     @After
@@ -169,6 +172,96 @@ class SearchViewModelTest {
         assertEquals(ClassifiedType.TODO, viewModel.uiState.value.selectedType)
         assertEquals(1, viewModel.uiState.value.searchResults.size)
         assertEquals("c2", viewModel.uiState.value.searchResults[0].id)
+    }
+
+    // ── 시맨틱 검색 테스트 ──
+
+    @Test
+    fun `toggleSemanticMode_activates_semantic_search`() = runTest {
+        // given: 시맨틱 검색 결과 mock
+        val semanticResults = listOf(
+            com.example.kairos_mobile.domain.model.SemanticSearchResult(
+                captureId = "c1",
+                score = 0.95,
+                snippet = "test snippet"
+            )
+        )
+        coEvery { semanticSearchUseCase("query") } returns semanticResults
+
+        // when: 검색어 입력 후 시맨틱 모드 활성화
+        viewModel.onSearchTextChanged("query")
+        advanceTimeBy(350)
+        advanceUntilIdle()
+
+        viewModel.toggleSemanticMode(true)
+        advanceUntilIdle()
+
+        // then: 시맨틱 모드 활성화 및 자동으로 시맨틱 검색 실행됨
+        assertTrue(viewModel.uiState.value.isSemanticMode)
+        assertEquals(1, viewModel.uiState.value.semanticResults.size)
+        assertEquals("c1", viewModel.uiState.value.semanticResults[0].captureId)
+    }
+
+    @Test
+    fun `semantic_search_returns_results`() = runTest {
+        // given: 시맨틱 검색 결과 mock
+        val semanticResults = listOf(
+            com.example.kairos_mobile.domain.model.SemanticSearchResult(
+                captureId = "c1",
+                score = 0.95,
+                snippet = "test snippet"
+            )
+        )
+        coEvery { semanticSearchUseCase("test query") } returns semanticResults
+
+        // when: 시맨틱 모드 활성화 후 검색
+        viewModel.toggleSemanticMode(true)
+        viewModel.onSearchTextChanged("test query")
+        advanceTimeBy(350)
+        advanceUntilIdle()
+
+        // then: 시맨틱 검색 결과 반영
+        assertEquals(1, viewModel.uiState.value.semanticResults.size)
+        assertEquals("c1", viewModel.uiState.value.semanticResults[0].captureId)
+        assertEquals(0.95, viewModel.uiState.value.semanticResults[0].score, 0.01)
+    }
+
+    @Test
+    fun `semantic_search_handles_subscription_error`() = runTest {
+        // given: 구독 필요 예외 발생
+        coEvery { semanticSearchUseCase("query") } throws
+            com.example.kairos_mobile.domain.model.ApiException.SubscriptionRequired("Premium required")
+
+        // when: 시맨틱 검색 실행
+        viewModel.toggleSemanticMode(true)
+        viewModel.onSearchTextChanged("query")
+        advanceTimeBy(350)
+        advanceUntilIdle()
+
+        // then: 시맨틱 모드 비활성화 및 에러 메시지 표시
+        assertFalse(viewModel.uiState.value.isSemanticMode)
+        assertEquals("Premium 구독이 필요합니다", viewModel.uiState.value.errorMessage)
+    }
+
+    @Test
+    fun `onErrorDismissed_clears_error_message`() = runTest {
+        // given: 에러 발생
+        coEvery { semanticSearchUseCase("query") } throws
+            com.example.kairos_mobile.domain.model.ApiException.SubscriptionRequired("Premium required")
+
+        viewModel.toggleSemanticMode(true)
+        viewModel.onSearchTextChanged("query")
+        advanceTimeBy(350)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.errorMessage != null)
+
+        // when: 에러 메시지 닫기
+        viewModel.onErrorDismissed()
+        advanceUntilIdle()
+
+        // then: 에러 메시지 초기화
+        assertEquals(null, viewModel.uiState.value.errorMessage)
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.presentation.notes.detail
 
+import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,6 +48,19 @@ fun NoteDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
+    val context = LocalContext.current
+
+    // 공유 텍스트가 설정되면 ShareSheet 실행
+    LaunchedEffect(uiState.shareText) {
+        uiState.shareText?.let { text ->
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, text)
+                type = "text/plain"
+            }
+            context.startActivity(Intent.createChooser(sendIntent, null))
+            viewModel.onShareHandled()
+        }
+    }
 
     // 폴더 선택 바텀시트 상태
     var showFolderSheet by remember { mutableStateOf(false) }
@@ -73,6 +86,14 @@ fun NoteDetailScreen(
                     }
                 },
                 actions = {
+                    // 공유 버튼
+                    IconButton(onClick = { viewModel.onShare() }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "공유",
+                            tint = colors.text
+                        )
+                    }
                     // 저장 버튼 (변경사항이 있을 때만 활성화)
                     if (uiState.hasChanges) {
                         IconButton(
@@ -223,55 +244,6 @@ fun NoteDetailScreen(
                             }
                         }
                     )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 원본 텍스트 (접힘/펼침)
-                    uiState.noteDetail?.let { detail ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { viewModel.onToggleOriginalText() }
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "원본 텍스트",
-                                color = colors.textSecondary,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                imageVector = if (uiState.showOriginalText) {
-                                    Icons.Default.KeyboardArrowUp
-                                } else {
-                                    Icons.Default.KeyboardArrowDown
-                                },
-                                contentDescription = if (uiState.showOriginalText) "접기" else "펼치기",
-                                tint = colors.textMuted,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        AnimatedVisibility(visible = uiState.showOriginalText) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(colors.card)
-                                    .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-                                    .padding(16.dp)
-                            ) {
-                                Text(
-                                    text = detail.originalText,
-                                    color = colors.text,
-                                    fontSize = 14.sp,
-                                    lineHeight = 20.sp
-                                )
-                            }
-                        }
-                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 

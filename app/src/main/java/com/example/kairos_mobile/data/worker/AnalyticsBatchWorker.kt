@@ -7,6 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.kairos_mobile.data.remote.ApiResponseHandler
 import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
 import com.example.kairos_mobile.data.remote.dto.v2.AnalyticsEventDto
@@ -39,19 +40,21 @@ class AnalyticsBatchWorker @AssistedInject constructor(
         val events = analyticsRepository.getUnsynced(100)
         if (events.isEmpty()) return Result.success()
 
-        val response = kairosApi.analyticsEvents(
-            AnalyticsEventsRequest(
-                deviceId = deviceIdProvider.getOrCreateDeviceId(),
-                events = events.map {
-                    AnalyticsEventDto(
-                        eventType = it.eventType,
-                        eventData = toEventDataObject(it.eventData),
-                        timestamp = toIsoOffsetDateTime(it.timestamp)
-                    )
-                }
+        try {
+            val response = kairosApi.analyticsEvents(
+                AnalyticsEventsRequest(
+                    deviceId = deviceIdProvider.getOrCreateDeviceId(),
+                    events = events.map {
+                        AnalyticsEventDto(
+                            eventType = it.eventType,
+                            eventData = toEventDataObject(it.eventData),
+                            timestamp = toIsoOffsetDateTime(it.timestamp)
+                        )
+                    }
+                )
             )
-        )
-        if (!response.isSuccessful || response.body()?.status != "ok") {
+            ApiResponseHandler.unwrap(response)
+        } catch (_: Exception) {
             return Result.retry()
         }
 

@@ -33,6 +33,12 @@ interface TodoDao {
     suspend fun getById(id: String): TodoEntity?
 
     /**
+     * capture_id로 할 일 조회
+     */
+    @Query("SELECT * FROM todos WHERE capture_id = :captureId LIMIT 1")
+    suspend fun getByCaptureId(captureId: String): TodoEntity?
+
+    /**
      * 활성 할 일 조회 (정렬: deadline 있는 것 우선 → deadline 오름차순, 없는 것은 created_at 역순)
      */
     @Query("""

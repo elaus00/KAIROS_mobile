@@ -2,9 +2,11 @@ package com.example.kairos_mobile.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.model.ApiException
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
+import com.example.kairos_mobile.domain.usecase.search.SemanticSearchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchCapturesUseCase: SearchCapturesUseCase,
-    private val trackEventUseCase: TrackEventUseCase
+    private val trackEventUseCase: TrackEventUseCase,
+    private val semanticSearchUseCase: SemanticSearchUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -39,13 +42,17 @@ class SearchViewModel @Inject constructor(
 
         searchJob?.cancel()
         if (text.isBlank()) {
-            _uiState.update { it.copy(searchResults = emptyList(), hasSearched = false) }
+            _uiState.update { it.copy(searchResults = emptyList(), semanticResults = emptyList(), hasSearched = false) }
             return
         }
 
         searchJob = viewModelScope.launch {
             delay(300)
-            executeSearch()
+            if (_uiState.value.isSemanticMode) {
+                executeSemanticSearch()
+            } else {
+                executeSearch()
+            }
         }
     }
 
@@ -121,6 +128,56 @@ class SearchViewModel @Inject constructor(
         } catch (e: Exception) {
             _uiState.update {
                 it.copy(errorMessage = e.message ?: "검색 실패")
+            }
+        }
+    }
+
+    /**
+     * AI 시맨틱 검색 모드 토글
+     */
+    fun toggleSemanticMode(enabled: Boolean) {
+        _uiState.update { it.copy(isSemanticMode = enabled, semanticResults = emptyList()) }
+        if (enabled && _uiState.value.searchText.isNotBlank()) {
+            executeSemanticSearch()
+        } else if (!enabled && _uiState.value.searchText.isNotBlank()) {
+            triggerSearch()
+        }
+    }
+
+    /**
+     * 시맨틱 검색 실행
+     */
+    private fun executeSemanticSearch() {
+        val query = _uiState.value.searchText
+        if (query.isBlank()) return
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            _uiState.update { it.copy(isSemanticLoading = true) }
+            try {
+                val results = semanticSearchUseCase(query)
+                _uiState.update {
+                    it.copy(
+                        semanticResults = results,
+                        isSemanticLoading = false,
+                        hasSearched = true
+                    )
+                }
+            } catch (e: ApiException.SubscriptionRequired) {
+                _uiState.update {
+                    it.copy(
+                        isSemanticMode = false,
+                        isSemanticLoading = false,
+                        errorMessage = "Premium 구독이 필요합니다"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isSemanticLoading = false,
+                        errorMessage = e.message ?: "시맨틱 검색 실패"
+                    )
+                }
             }
         }
     }

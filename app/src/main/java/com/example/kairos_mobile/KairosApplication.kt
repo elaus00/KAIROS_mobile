@@ -7,6 +7,8 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.example.kairos_mobile.data.debug.MockDataInitializer
 import com.example.kairos_mobile.data.notification.NotificationHelper
+import com.example.kairos_mobile.data.worker.AutoGroupWorker
+import com.example.kairos_mobile.data.worker.InboxClassifyWorker
 import com.example.kairos_mobile.data.worker.ReclassifyTempWorker
 import com.example.kairos_mobile.data.worker.TrashCleanupWorker
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
@@ -82,6 +84,14 @@ class KairosApplication : Application(), Configuration.Provider {
         // 1시간 주기 캘린더 동기화 재시도 Worker 등록
         com.example.kairos_mobile.data.worker.CalendarSyncWorker.enqueuePeriodicWork(workManager)
         Log.d(TAG, "CalendarSyncWorker 등록 완료")
+
+        // 1시간 주기 AI 노트 자동 그룹화 Worker 등록 (Premium)
+        AutoGroupWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "AutoGroupWorker 등록 완료")
+
+        // 1시간 주기 Inbox 자동 분류 Worker 등록 (Premium)
+        InboxClassifyWorker.enqueuePeriodicWork(workManager)
+        Log.d(TAG, "InboxClassifyWorker 등록 완료")
     }
 
     /**

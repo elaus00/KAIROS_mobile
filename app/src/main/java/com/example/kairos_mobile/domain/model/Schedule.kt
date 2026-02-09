@@ -10,6 +10,8 @@ data class Schedule(
     val id: String = UUID.randomUUID().toString(),
     /** FK → Capture.id (1:1) */
     val captureId: String,
+    /** 일정 제목 (Capture 텍스트에서 파생) */
+    val title: String = "",
     /** 시작 일시 (epoch ms) */
     val startTime: Long? = null,
     /** 종료 일시 (epoch ms) */

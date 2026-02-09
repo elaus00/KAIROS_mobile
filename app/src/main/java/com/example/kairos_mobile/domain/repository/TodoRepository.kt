@@ -14,6 +14,9 @@ interface TodoRepository {
     /** 할 일 조회 (ID 기준) */
     suspend fun getTodoById(todoId: String): Todo?
 
+    /** 할 일 조회 (capture_id 기준) */
+    suspend fun getTodoByCaptureId(captureId: String): Todo?
+
     /** 활성 할 일 목록 (is_completed=false, sort_order 순) */
     fun getActiveTodos(): Flow<List<Todo>>
 

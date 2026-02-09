@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.presentation.notes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,11 +14,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.StickyNote2
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +56,7 @@ fun NotesContent(
     onSearchClick: () -> Unit = {},
     onNoteClick: (String) -> Unit = {},
     onTrashClick: () -> Unit = {},
+    onReorganizeClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel = hiltViewModel()
 ) {
@@ -64,6 +68,7 @@ fun NotesContent(
         onSearchClick = onSearchClick,
         onNoteClick = onNoteClick,
         onTrashClick = onTrashClick,
+        onReorganizeClick = onReorganizeClick,
         modifier = modifier
     )
 }
@@ -79,6 +84,7 @@ private fun NotesContentInternal(
     onSearchClick: () -> Unit,
     onNoteClick: (String) -> Unit,
     onTrashClick: () -> Unit = {},
+    onReorganizeClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
@@ -107,7 +113,8 @@ private fun NotesContentInternal(
         // 상단 헤더
         NotesHeader(
             onTrashClick = onTrashClick,
-            onSearchClick = onSearchClick
+            onSearchClick = onSearchClick,
+            onReorganizeClick = onReorganizeClick
         )
 
         // 폴더 필터 칩
@@ -162,7 +169,8 @@ private fun NotesContentInternal(
 @Composable
 private fun NotesHeader(
     onTrashClick: () -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onReorganizeClick: () -> Unit = {}
 ) {
     val colors = KairosTheme.colors
 
@@ -181,6 +189,13 @@ private fun NotesHeader(
         )
 
         Row {
+            IconButton(onClick = onReorganizeClick) {
+                Icon(
+                    imageVector = Icons.Default.AutoFixHigh,
+                    contentDescription = "AI 재구성",
+                    tint = colors.icon
+                )
+            }
             IconButton(onClick = onTrashClick) {
                 Icon(
                     imageVector = Icons.Outlined.DeleteOutline,
@@ -230,89 +245,94 @@ private fun FolderFilterChips(
         }
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .nestedScroll(nestedScrollConnection)
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    // overscroll 효과 비활성화로 스크롤 범위 초과 방지
+    CompositionLocalProvider(
+        LocalOverscrollConfiguration provides null
     ) {
-        // "전체" 칩
-        KairosChip(
-            text = "전체",
-            selected = selectedFolderId == null,
-            onClick = { onFilterSelect(null) }
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .nestedScroll(nestedScrollConnection)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // "전체" 칩
+            KairosChip(
+                text = "전체",
+                selected = selectedFolderId == null,
+                onClick = { onFilterSelect(null) }
+            )
 
-        // 폴더 칩
-        folders.forEach { folderWithCount ->
-            val folder = folderWithCount.folder
-            val isUserFolder = folder.type == FolderType.USER
-            val chipText = if (folderWithCount.noteCount > 0) {
-                "${folder.name} ${folderWithCount.noteCount}"
-            } else {
-                folder.name
-            }
+            // 폴더 칩
+            folders.forEach { folderWithCount ->
+                val folder = folderWithCount.folder
+                val isUserFolder = folder.type == FolderType.USER
+                val chipText = if (folderWithCount.noteCount > 0) {
+                    "${folder.name} ${folderWithCount.noteCount}"
+                } else {
+                    folder.name
+                }
 
-            if (isUserFolder) {
-                // 사용자 폴더: 롱프레스 시 메뉴
-                var showMenu by remember { mutableStateOf(false) }
-                Box {
+                if (isUserFolder) {
+                    // 사용자 폴더: 롱프레스 시 메뉴
+                    var showMenu by remember { mutableStateOf(false) }
+                    Box {
+                        KairosChip(
+                            text = chipText,
+                            selected = selectedFolderId == folder.id,
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onFilterSelect(folder.id) },
+                                onLongClick = { showMenu = true }
+                            )
+                        )
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("이름 변경") },
+                                onClick = {
+                                    showMenu = false
+                                    onRenameFolder(folder)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("삭제", color = colors.danger) },
+                                onClick = {
+                                    showMenu = false
+                                    onDeleteFolder(folder.id)
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    // 시스템 폴더
                     KairosChip(
                         text = chipText,
                         selected = selectedFolderId == folder.id,
-                        modifier = Modifier.combinedClickable(
-                            onClick = { onFilterSelect(folder.id) },
-                            onLongClick = { showMenu = true }
-                        )
+                        onClick = { onFilterSelect(folder.id) }
                     )
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("이름 변경") },
-                            onClick = {
-                                showMenu = false
-                                onRenameFolder(folder)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("삭제", color = colors.danger) },
-                            onClick = {
-                                showMenu = false
-                                onDeleteFolder(folder.id)
-                            }
-                        )
-                    }
                 }
-            } else {
-                // 시스템 폴더
-                KairosChip(
-                    text = chipText,
-                    selected = selectedFolderId == folder.id,
-                    onClick = { onFilterSelect(folder.id) }
+            }
+
+            // 새 폴더 추가 버튼
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(colors.chipBg)
+                    .clickable { onCreateFolder() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "새 폴더",
+                    tint = colors.chipText,
+                    modifier = Modifier.size(16.dp)
                 )
             }
-        }
-
-        // 새 폴더 추가 버튼
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(colors.chipBg)
-                .clickable { onCreateFolder() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "새 폴더",
-                tint = colors.chipText,
-                modifier = Modifier.size(16.dp)
-            )
         }
     }
 }

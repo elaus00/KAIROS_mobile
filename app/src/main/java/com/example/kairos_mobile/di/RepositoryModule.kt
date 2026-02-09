@@ -1,7 +1,10 @@
 package com.example.kairos_mobile.di
 
 import com.example.kairos_mobile.data.notification.NotificationHelper
+import com.example.kairos_mobile.data.repository.AuthRepositoryImpl
 import com.example.kairos_mobile.data.repository.AnalyticsRepositoryImpl
+import com.example.kairos_mobile.data.repository.NoteAiRepositoryImpl
+import com.example.kairos_mobile.data.repository.SubscriptionRepositoryImpl
 import com.example.kairos_mobile.data.repository.CalendarRepositoryImpl
 import com.example.kairos_mobile.data.repository.ImageRepositoryImpl
 import com.example.kairos_mobile.data.repository.CaptureRepositoryImpl
@@ -14,7 +17,10 @@ import com.example.kairos_mobile.data.repository.SyncQueueRepositoryImpl
 import com.example.kairos_mobile.data.repository.TagRepositoryImpl
 import com.example.kairos_mobile.data.repository.TodoRepositoryImpl
 import com.example.kairos_mobile.data.repository.UserPreferenceRepositoryImpl
+import com.example.kairos_mobile.domain.repository.AuthRepository
 import com.example.kairos_mobile.domain.repository.AnalyticsRepository
+import com.example.kairos_mobile.domain.repository.NoteAiRepository
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.usecase.calendar.CalendarNotifier
@@ -124,4 +130,22 @@ abstract class RepositoryModule {
     abstract fun bindCalendarNotifier(
         impl: NotificationHelper
     ): CalendarNotifier
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        impl: AuthRepositoryImpl
+    ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSubscriptionRepository(
+        impl: SubscriptionRepositoryImpl
+    ): SubscriptionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNoteAiRepository(
+        impl: NoteAiRepositoryImpl
+    ): NoteAiRepository
 }

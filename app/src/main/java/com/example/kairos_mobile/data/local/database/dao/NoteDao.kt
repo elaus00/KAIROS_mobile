@@ -133,6 +133,18 @@ interface NoteDao {
     suspend fun updateBody(noteId: String, body: String?, updatedAt: Long)
 
     /**
+     * 폴더 미지정(Inbox) 활성 노트 ID 목록 조회 (AI 그룹화 대상)
+     */
+    @Query("""
+        SELECT n.id FROM notes n
+        INNER JOIN captures c ON c.id = n.capture_id
+        WHERE (n.folder_id IS NULL OR n.folder_id = 'system-inbox')
+        AND c.is_deleted = 0
+        AND c.is_trashed = 0
+    """)
+    suspend fun getUngroupedNoteIds(): List<String>
+
+    /**
      * 노트 상세 조회 (캡처 정보 포함)
      */
     @Query("""

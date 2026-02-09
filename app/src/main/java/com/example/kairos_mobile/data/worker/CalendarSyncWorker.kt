@@ -12,6 +12,8 @@ import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import java.time.LocalDate
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
@@ -26,7 +28,8 @@ class CalendarSyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val scheduleDao: ScheduleDao,
     private val calendarRepository: CalendarRepository,
-    private val captureRepository: CaptureRepository
+    private val captureRepository: CaptureRepository,
+    private val scheduleRepository: ScheduleRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -63,8 +66,61 @@ class CalendarSyncWorker @AssistedInject constructor(
             }
         }
 
-        Log.d(TAG, "CalendarSyncWorker 완료: $retryCount 건 재시도 성공")
+        Log.d(TAG, "재시도 완료: $retryCount 건 성공")
+
+        // 양방향 동기화: 서버 변경 → 로컬 반영
+        syncRemoteChanges()
+
         return Result.success()
+    }
+
+    /**
+     * 서버 캘린더 이벤트를 가져와 로컬 일정과 비교/반영
+     * 충돌 없는 변경만 자동 반영
+     */
+    private suspend fun syncRemoteChanges() {
+        try {
+            val today = LocalDate.now()
+            val endDate = today.plusDays(30)
+            val remoteEvents = calendarRepository.getCalendarEvents(today, endDate)
+
+            if (remoteEvents.isEmpty()) {
+                Log.d(TAG, "원격 이벤트 없음")
+                return
+            }
+
+            // 로컬 동기화된 일정 맵 (googleEventId → Schedule)
+            val syncedSchedules = scheduleRepository.getSyncedSchedules()
+            val localMap = syncedSchedules
+                .filter { it.googleEventId != null }
+                .associateBy { it.googleEventId!! }
+
+            var updatedCount = 0
+            for (event in remoteEvents) {
+                val localSchedule = localMap[event.googleEventId] ?: continue
+
+                // 로컬과 원격 시간이 다르면 원격 우선 반영 (충돌 없는 경우)
+                val hasTimeChange = localSchedule.startTime != event.startTime
+                        || localSchedule.endTime != event.endTime
+                val hasLocationChange = localSchedule.location != event.location
+
+                if (hasTimeChange || hasLocationChange) {
+                    scheduleRepository.updateFromRemote(
+                        scheduleId = localSchedule.id,
+                        title = event.title,
+                        startTime = event.startTime,
+                        endTime = event.endTime,
+                        location = event.location
+                    )
+                    updatedCount++
+                    Log.d(TAG, "원격 변경 반영: ${localSchedule.id}")
+                }
+            }
+
+            Log.d(TAG, "양방향 동기화 완료: $updatedCount 건 업데이트")
+        } catch (e: Exception) {
+            Log.e(TAG, "양방향 동기화 실패", e)
+        }
     }
 
     companion object {

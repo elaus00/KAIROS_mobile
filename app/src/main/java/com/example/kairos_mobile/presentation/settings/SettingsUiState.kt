@@ -1,10 +1,13 @@
 package com.example.kairos_mobile.presentation.settings
 
+import com.example.kairos_mobile.domain.model.ClassificationPreset
+import com.example.kairos_mobile.domain.model.SubscriptionFeatures
+import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.model.User
 
 /**
  * Settings 화면 UI 상태
- * 다크모드 3옵션만 관리
  */
 data class SettingsUiState(
     // 테마 설정 (LIGHT / DARK / SYSTEM)
@@ -28,5 +31,15 @@ data class SettingsUiState(
 
     // 캘린더 연동 요청 상태
     val calendarAuthLoading: Boolean = false,
-    val calendarAuthMessage: String? = null
+    val calendarAuthMessage: String? = null,
+
+    // 계정 정보
+    val user: User? = null,
+    val subscriptionTier: SubscriptionTier = SubscriptionTier.FREE,
+    val features: SubscriptionFeatures = SubscriptionFeatures(),
+
+    // AI 분류 설정
+    val presets: List<ClassificationPreset> = emptyList(),
+    val selectedPresetId: String = "default",
+    val customInstruction: String = ""
 )

@@ -13,15 +13,23 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.kairos_mobile.data.mapper.ClassificationMapper
+import com.example.kairos_mobile.data.remote.ApiResponseHandler
 import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
 import com.example.kairos_mobile.data.remote.dto.v2.ClassifyRequest
+import com.example.kairos_mobile.data.remote.dto.v2.UserContextDto
+import com.example.kairos_mobile.domain.model.ApiException
 import com.example.kairos_mobile.domain.model.SyncQueueStatus
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import com.example.kairos_mobile.domain.usecase.classification.BuildModificationHistoryUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ProcessClassificationResultUseCase
+import com.example.kairos_mobile.domain.usecase.subscription.CheckFeatureUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.util.concurrent.TimeUnit
 
 /**
@@ -37,7 +45,10 @@ class ClassifyCaptureWorker @AssistedInject constructor(
     private val api: KairosApi,
     private val deviceIdProvider: DeviceIdProvider,
     private val classificationMapper: ClassificationMapper,
-    private val processClassificationResult: ProcessClassificationResultUseCase
+    private val processClassificationResult: ProcessClassificationResultUseCase,
+    private val userPreferenceRepository: UserPreferenceRepository,
+    private val buildModificationHistoryUseCase: BuildModificationHistoryUseCase,
+    private val checkFeatureUseCase: CheckFeatureUseCase
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TAG = "ClassifyCaptureWorker"
@@ -45,12 +56,6 @@ class ClassifyCaptureWorker @AssistedInject constructor(
         private const val INITIAL_BACKOFF_MS = 5_000L
         private const val BACKOFF_MULTIPLIER = 3
         private const val TRACE_AI_CLASSIFICATION_COMPLETION = "ai_classification_completion"
-        private val NON_RETRYABLE_ERROR_CODES = setOf(
-            "INVALID_REQUEST",
-            "TEXT_EMPTY",
-            "TEXT_TOO_LONG",
-            "RATE_LIMITED"
-        )
 
         /**
          * 분류 작업 즉시 실행 (SyncQueue 항목 추가 시 호출)
@@ -106,42 +111,64 @@ class ClassifyCaptureWorker @AssistedInject constructor(
 
                 Trace.beginSection(TRACE_AI_CLASSIFICATION_COMPLETION)
                 try {
+                    // 이미지 캡처인 경우 OCR 선처리
+                    var textToClassify = capture.originalText
+                    val canUseOcr = checkFeatureUseCase("ocr")
+                    if (canUseOcr && capture.imageUri != null && capture.originalText.isBlank()) {
+                        try {
+                            val imageFile = java.io.File(java.net.URI(capture.imageUri))
+                            val requestBody = imageFile.asRequestBody("image/*".toMediaType())
+                            val imagePart = okhttp3.MultipartBody.Part.createFormData(
+                                "image", imageFile.name, requestBody
+                            )
+                            val ocrResponse = ApiResponseHandler.safeCall { api.ocr(imagePart) }
+                            textToClassify = ocrResponse.extractedText
+                            Log.d(TAG, "OCR 완료: $captureId (${textToClassify.length}자)")
+                        } catch (e: Exception) {
+                            Log.w(TAG, "OCR 실패, 원본 텍스트로 분류: ${e.message}")
+                        }
+                    }
+
                     // API 호출
                     val source = when (capture.source.name) {
                         "APP", "SHARE_INTENT", "WIDGET" -> capture.source.name
                         else -> "APP"
                     }
+                    // 사용자 분류 프리셋/커스텀 지시 주입
+                    val presetId = userPreferenceRepository.getString("classification_preset_id", "default")
+                    val customInstruction = userPreferenceRepository.getString("classification_custom_instruction", "")
+                    val modificationHistory = buildModificationHistoryUseCase()
+                    val userContext = UserContextDto(
+                        modificationHistory = modificationHistory.takeIf { it.isNotEmpty() },
+                        presetId = presetId.takeIf { it != "default" },
+                        customInstruction = customInstruction.takeIf { it.isNotBlank() }
+                    )
+
                     val request = ClassifyRequest(
-                        text = capture.originalText,
+                        text = textToClassify,
                         source = source,
-                        deviceId = deviceIdProvider.getOrCreateDeviceId()
+                        deviceId = deviceIdProvider.getOrCreateDeviceId(),
+                        userContext = userContext
                     )
                     val response = api.classify(request)
-                    val responseBody = response.body()
+                    val data = ApiResponseHandler.unwrap(response)
 
-                    if (
-                        response.isSuccessful &&
-                        responseBody?.status == "ok" &&
-                        responseBody.data != null
-                    ) {
-                        // 분류 결과 적용
-                        val classification = classificationMapper.toDomain(responseBody.data)
-                        processClassificationResult(captureId, classification)
+                    // 분류 결과 적용
+                    val classification = classificationMapper.toDomain(data)
+                    processClassificationResult(captureId, classification)
 
-                        // 완료 처리
-                        syncQueueRepository.updateStatus(item.id, SyncQueueStatus.COMPLETED)
-                        successCount++
-                        Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
+                    // 완료 처리
+                    syncQueueRepository.updateStatus(item.id, SyncQueueStatus.COMPLETED)
+                    successCount++
+                    Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
+                } catch (e: ApiException) {
+                    if (e.isRetryable) {
+                        handleRetry(item.id, item.retryCount, item.maxRetries)
                     } else {
-                        val errorCode = responseBody?.error?.code
-                        if (errorCode in NON_RETRYABLE_ERROR_CODES) {
-                            syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
-                        } else {
-                            handleRetry(item.id, item.retryCount, item.maxRetries)
-                        }
-                        failCount++
-                        Log.w(TAG, "API 응답 실패: ${response.code()}, code=$errorCode")
+                        syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
                     }
+                    failCount++
+                    Log.w(TAG, "API 응답 실패: code=${e.errorCode}, ${e.message}")
                 } finally {
                     Trace.endSection()
                 }

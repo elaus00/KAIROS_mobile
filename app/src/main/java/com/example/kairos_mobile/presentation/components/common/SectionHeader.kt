@@ -20,6 +20,7 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 fun SectionHeader(
     title: String,
     modifier: Modifier = Modifier,
+    fontSize: androidx.compose.ui.unit.TextUnit = 12.sp,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     val colors = KairosTheme.colors
@@ -33,7 +34,7 @@ fun SectionHeader(
         Text(
             text = title,
             color = colors.textSecondary,
-            fontSize = 12.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.5.sp,
             modifier = Modifier.weight(1f)

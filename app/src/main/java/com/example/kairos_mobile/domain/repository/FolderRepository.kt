@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.domain.repository
 
 import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.FolderType
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,4 +23,7 @@ interface FolderRepository {
 
     /** 이름 중복 확인 */
     suspend fun existsByName(name: String): Boolean
+
+    /** 이름으로 폴더 조회, 없으면 생성 */
+    suspend fun getOrCreateFolder(name: String, type: FolderType): Folder
 }

@@ -50,7 +50,7 @@ fun TaskList(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        SectionHeader(title = "할 일")
+        SectionHeader(title = "할 일", fontSize = 15.sp)
 
         if (tasks.isEmpty()) {
             TaskEmptyState()

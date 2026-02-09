@@ -11,6 +11,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
+import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,8 @@ class CaptureDetailViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val approveSuggestion: ApproveCalendarSuggestionUseCase,
     private val calendarRepository: CalendarRepository,
-    private val trackEventUseCase: TrackEventUseCase
+    private val trackEventUseCase: TrackEventUseCase,
+    private val formatCaptureForShare: FormatCaptureForShareUseCase
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -69,6 +71,7 @@ class CaptureDetailViewModel @Inject constructor(
                         imageUri = capture.imageUri,
                         createdAt = capture.createdAt,
                         scheduleId = schedule?.id,
+                        scheduleStartTime = schedule?.startTime,
                         calendarSyncStatus = schedule?.calendarSyncStatus
                     )
                 }
@@ -146,5 +149,24 @@ class CaptureDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(errorMessage = e.message) }
             }
         }
+    }
+
+    /**
+     * 공유용 텍스트 생성
+     */
+    fun onShare() {
+        viewModelScope.launch {
+            val text = formatCaptureForShare(captureId)
+            if (text.isNotBlank()) {
+                _uiState.update { it.copy(shareText = text) }
+            }
+        }
+    }
+
+    /**
+     * 공유 텍스트 소비 후 초기화
+     */
+    fun onShareHandled() {
+        _uiState.update { it.copy(shareText = null) }
     }
 }

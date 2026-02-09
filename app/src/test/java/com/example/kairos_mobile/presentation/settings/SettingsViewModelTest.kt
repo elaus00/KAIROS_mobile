@@ -1,10 +1,15 @@
 package com.example.kairos_mobile.presentation.settings
 
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.domain.repository.AuthRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.classification.GetPresetsUseCase
+import com.example.kairos_mobile.domain.usecase.classification.SetCustomInstructionUseCase
+import com.example.kairos_mobile.domain.usecase.classification.SetPresetUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
@@ -40,6 +45,11 @@ class SettingsViewModelTest {
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
     private lateinit var submitCaptureUseCase: SubmitCaptureUseCase
     private lateinit var imageRepository: ImageRepository
+    private lateinit var authRepository: AuthRepository
+    private lateinit var subscriptionRepository: SubscriptionRepository
+    private lateinit var getPresetsUseCase: GetPresetsUseCase
+    private lateinit var setPresetUseCase: SetPresetUseCase
+    private lateinit var setCustomInstructionUseCase: SetCustomInstructionUseCase
 
     @Before
     fun setUp() {
@@ -49,6 +59,13 @@ class SettingsViewModelTest {
         setCalendarSettingsUseCase = mockk(relaxed = true)
         submitCaptureUseCase = mockk(relaxed = true)
         imageRepository = mockk(relaxed = true)
+        authRepository = mockk(relaxed = true)
+        subscriptionRepository = mockk(relaxed = true)
+        getPresetsUseCase = mockk(relaxed = true)
+        setPresetUseCase = mockk(relaxed = true)
+        setCustomInstructionUseCase = mockk(relaxed = true)
+        // loadPresets()에서 호출되는 getString mock 설정
+        coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
     }
 
     @After
@@ -66,7 +83,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
         // when - ViewModel 생성 시 init에서 loadPreferences 호출
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         // then
@@ -82,7 +99,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
         coEvery { userPreferenceRepository.setThemePreference(any()) } returns Unit
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         // when
@@ -102,7 +119,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.isCalendarEnabled() } returns false
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         // when
@@ -119,7 +136,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "auto"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns false
 
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         assertEquals(true, viewModel.uiState.value.isCalendarEnabled)
@@ -134,7 +151,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         viewModel.toggleCalendar(true)
@@ -150,7 +167,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         viewModel.setCalendarMode("auto")
@@ -166,7 +183,7 @@ class SettingsViewModelTest {
         coEvery { getCalendarSettingsUseCase.getCalendarMode() } returns "suggest"
         coEvery { getCalendarSettingsUseCase.isNotificationEnabled() } returns true
 
-        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository)
+        val viewModel = SettingsViewModel(userPreferenceRepository, calendarRepository, getCalendarSettingsUseCase, setCalendarSettingsUseCase, submitCaptureUseCase, imageRepository, authRepository, subscriptionRepository, getPresetsUseCase, setPresetUseCase, setCustomInstructionUseCase)
         advanceUntilIdle()
 
         viewModel.toggleNotification(false)

@@ -44,6 +44,8 @@ Docs/
 | `data_model_spec.md` | 데이터모델 명세서 — 스키마, 관계, 상태 머신 | v2.0 | PRD v10.0, 기능명세서 v2.0 | 2026-02-06 |
 | — | 화면정의서 (`screen_spec.md`) | 작성 예정 | — | — |
 | `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.0 | PRD v10.0, 기능명세서 v2.1, 데이터모델 v2.0 | 2026-02-07 |
+| `design-guide.md` | 디자인 가이드 — 색상/타이포/간격/컴포넌트/금지사항 | v1.0 | PRD v10.0 | 2026-02-08 |
+| `ux-writing-audit.md` | UX 라이팅 감사 — 가이드라인/텍스트 인벤토리/개선 제안(P0 8건, P1 16건, P2 17건) | v1.0 | PRD v10.0, design-guide v1.0 | 2026-02-08 |
 
 ### plan/
 
@@ -52,8 +54,8 @@ Docs/
 | `phase1/` | Phase 1 (MVP) 계획 문서 보관 디렉토리 | **정리 완료 (문서 비움)** |
 | `phase2/` | Phase 2 공통 참고/템플릿 문서 | 진행 중 |
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | **완료** |
-| `phase2b/` | Phase 2b (사용성 확장) 개발 계획 | **계획 수립** |
-| `phase3/` | Phase 3 (서버 연동) 개발 계획 | **계획 수립** |
+| `phase2b/` | Phase 2b (사용성 확장) 개발 계획 + 구현 보고서 | **구현 완료 (테스트 보강 중)** |
+| `phase3/` | Phase 3 (서버 연동) 개발 계획 | **구현 진행 중 (3-0, 3-1, 3-6 완료)** |
 
 #### Phase 1 상세 문서
 
@@ -66,18 +68,20 @@ Docs/
 | 파일 | 설명 | 상태 |
 |------|------|------|
 | `phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 — 10개 서브페이즈, 81개 파일 | 완료 |
+| `phase2a/qa_plan.md` | Phase 1+2a QA 계획서 — 6영역(테스트갭/핵심플로우/Worker/화면별/엣지케이스/아키텍처), 37건 | 미착수 |
 
 #### Phase 2b 문서
 
 | 파일 | 설명 | 상태 |
 |------|------|------|
 | `phase2b/implementation_plan.md` | Phase 2b 구현 계획서 — 9개 서브페이즈, ~52개 파일 | 계획 수립 |
+| `phase2b/implementation_report.md` | Phase 2b 구현 완료 보고서 — 전체 서브페이즈 구현 완료, 테스트 보강 중 | 구현 완료 |
 
 #### Phase 3 문서
 
 | 파일 | 설명 | 상태 |
 |------|------|------|
-| `phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 — Mock 삭제 → 실제 API 연결, 8개 서브페이즈 | 계획 수립 |
+| `phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 — 8개 서브페이즈 중 3-0/3-1/3-6 완료 | 구현 진행 중 |
 
 #### Phase 2 공통 문서
 
@@ -147,3 +151,11 @@ Docs/
 | 2026-02-07 | `ROADMAP.md` | Phase 2b/3 상세 내용 업데이트 |
 | 2026-02-07 | `functional_spec.md` | v2.1 → v2.3: PRD 변경사항 반영 (BOOKMARK 장기 로드맵, 임시 저장 EncryptedSharedPreferences 제거, 수정 이력 기반 학습 Phase 2b~3b, 분류 프리셋/사용자 지시 Phase 3a, AI 통합 그룹화, Phase 로드맵 업데이트) |
 | 2026-02-08 | `analysis/ui-improvement-report.md` | UI 디자이너 관점 개선 보고서 작성 — P0 2건, P1 15건, P2 7건 |
+| 2026-02-08 | `specs/design-guide.md` | 디자인 가이드 v1.0 작성 — 색상/타이포/간격/컴포넌트/금지사항 체크리스트 |
+| 2026-02-08 | `specs/ux-writing-audit.md` | UX 라이팅 감사 v1.0 작성 — 가이드라인, 19개 화면 ~170항목 텍스트 인벤토리, 개선 제안 P0/P1/P2 |
+| 2026-02-09 | `plan/phase2a/qa_plan.md` | Phase 1+2a QA 계획서 v1.0 작성 — 6영역 37건, 테스트 갭 7건 + 핵심 플로우 6건 + Worker 5건 + 화면별 11건 + 엣지 5건 + 아키텍처 3건 |
+| 2026-02-09 | `plan/phase2b/implementation_report.md` | Phase 2b 구현 완료 보고서 작성 — 계획서 대비 전체 서브페이즈(2b-0~2b-7) 구현 완료 확인, 테스트 갭 4건 식별 |
+| 2026-02-09 | `ROADMAP.md` | Phase 2b 상태를 "구현 완료"로 업데이트 |
+| 2026-02-09 | `INDEX.md` | Phase 2b 보고서 문서 추가, 상태 변경 |
+| 2026-02-09 | `plan/phase3/server_integration_plan.md` | v1.0→v2.0: 3-0/3-1/3-6 완료 반영, 에러 레이어(ApiException/ApiResponseHandler/ErrorInterceptor) 구현 완료 기록 |
+| 2026-02-09 | `INDEX.md` | Phase 3 상태를 "구현 진행 중"으로 업데이트 |

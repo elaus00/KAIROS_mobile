@@ -54,7 +54,7 @@ class NoteDetailViewModel @Inject constructor(
                                 isLoading = false,
                                 noteDetail = noteDetail,
                                 editedTitle = noteDetail.aiTitle ?: "",
-                                editedBody = noteDetail.body ?: "",
+                                editedBody = noteDetail.body ?: noteDetail.originalText,
                                 selectedFolderId = noteDetail.folderId
                             )
                         }
@@ -183,6 +183,32 @@ class NoteDetailViewModel @Inject constructor(
     }
 
     /**
+     * 공유용 텍스트 생성
+     */
+    fun onShare() {
+        val detail = _uiState.value.noteDetail ?: return
+        val title = _uiState.value.editedTitle.ifBlank {
+            detail.aiTitle ?: detail.originalText.take(50)
+        }
+        val content = _uiState.value.editedBody.ifBlank {
+            detail.body ?: detail.originalText
+        }
+        val text = buildString {
+            appendLine(title)
+            appendLine()
+            append(content)
+        }
+        _uiState.update { it.copy(shareText = text) }
+    }
+
+    /**
+     * 공유 텍스트 소비 후 초기화
+     */
+    fun onShareHandled() {
+        _uiState.update { it.copy(shareText = null) }
+    }
+
+    /**
      * 변경 여부 확인
      */
     private fun checkChanges(
@@ -192,7 +218,7 @@ class NoteDetailViewModel @Inject constructor(
     ): Boolean {
         val noteDetail = _uiState.value.noteDetail ?: return false
         return title != (noteDetail.aiTitle ?: "") ||
-                body != (noteDetail.body ?: "") ||
+                body != (noteDetail.body ?: noteDetail.originalText) ||
                 folderId != noteDetail.folderId
     }
 }

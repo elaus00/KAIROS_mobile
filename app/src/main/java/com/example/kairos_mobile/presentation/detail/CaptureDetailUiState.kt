@@ -19,6 +19,10 @@ data class CaptureDetailUiState(
     val errorMessage: String? = null,
     /** 연관된 Schedule ID (SCHEDULE 타입일 때) */
     val scheduleId: String? = null,
+    /** 일정 시작 시각 (Google Calendar 열기용) */
+    val scheduleStartTime: Long? = null,
     /** Google Calendar 동기화 상태 (SCHEDULE 타입일 때만 의미) */
-    val calendarSyncStatus: CalendarSyncStatus? = null
+    val calendarSyncStatus: CalendarSyncStatus? = null,
+    /** 공유용 텍스트 (한 번 소비 후 null 초기화) */
+    val shareText: String? = null
 )

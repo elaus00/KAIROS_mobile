@@ -246,6 +246,9 @@ dependencies {
     implementation(libs.browser)
     implementation(libs.androidx.profileinstaller)
 
+    // Google Play Billing
+    implementation("com.android.billingclient:billing-ktx:7.0.0")
+
     // Testing - Unit Tests
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

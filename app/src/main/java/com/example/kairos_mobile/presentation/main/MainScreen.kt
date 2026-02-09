@@ -37,6 +37,7 @@ fun MainScreen(
     onNavigateToHistory: () -> Unit = {},
     onNavigateToNoteDetail: (String) -> Unit = {},
     onNavigateToTrash: () -> Unit = {},
+    onNavigateToReorganize: () -> Unit = {},
     captureViewModel: CaptureViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -80,7 +81,8 @@ fun MainScreen(
                 KairosTab.NOTES -> NotesContent(
                     onSearchClick = onNavigateToSearch,
                     onNoteClick = { noteId -> onNavigateToNoteDetail(noteId) },
-                    onTrashClick = onNavigateToTrash
+                    onTrashClick = onNavigateToTrash,
+                    onReorganizeClick = onNavigateToReorganize
                 )
 
                 KairosTab.HOME -> CaptureContent(

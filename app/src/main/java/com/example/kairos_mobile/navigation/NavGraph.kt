@@ -21,8 +21,12 @@ import com.example.kairos_mobile.presentation.onboarding.OnboardingScreen
 import com.example.kairos_mobile.presentation.search.SearchScreen
 import com.example.kairos_mobile.presentation.settings.PrivacyPolicyScreen
 import com.example.kairos_mobile.presentation.notes.detail.NoteDetailScreen
+import com.example.kairos_mobile.presentation.auth.LoginScreen
+import com.example.kairos_mobile.presentation.notes.reorganize.ReorganizeScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
 import com.example.kairos_mobile.presentation.settings.TermsOfServiceScreen
+import com.example.kairos_mobile.presentation.settings.analytics.AnalyticsDashboardScreen
+import com.example.kairos_mobile.presentation.subscription.SubscriptionScreen
 import com.example.kairos_mobile.presentation.trash.TrashScreen
 
 /**
@@ -46,6 +50,10 @@ object NavRoutes {
     const val TRASH = "trash"
     const val PRIVACY_POLICY = "privacy-policy"
     const val TERMS_OF_SERVICE = "terms-of-service"
+    const val LOGIN = "login"
+    const val SUBSCRIPTION = "subscription"
+    const val REORGANIZE = "reorganize"
+    const val ANALYTICS = "analytics"
 
     /**
      * CaptureDetailScreen 라우트 생성
@@ -120,6 +128,9 @@ fun KairosNavGraph(
                 onNavigateToNoteDetail = navigateToNoteDetail,
                 onNavigateToTrash = {
                     navController.navigate(NavRoutes.TRASH)
+                },
+                onNavigateToReorganize = {
+                    navController.navigate(NavRoutes.REORGANIZE)
                 }
             )
         }
@@ -138,6 +149,54 @@ fun KairosNavGraph(
                 },
                 onNavigateToTrash = {
                     navController.navigate(NavRoutes.TRASH)
+                },
+                onNavigateToLogin = {
+                    navController.navigate(NavRoutes.LOGIN)
+                },
+                onNavigateToSubscription = {
+                    navController.navigate(NavRoutes.SUBSCRIPTION)
+                },
+                onNavigateToAnalytics = {
+                    navController.navigate(NavRoutes.ANALYTICS)
+                }
+            )
+        }
+
+        // 로그인 화면 (LOGIN)
+        composable(NavRoutes.LOGIN) {
+            LoginScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onLoginSuccess = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // 구독 관리 화면 (SUBSCRIPTION)
+        composable(NavRoutes.SUBSCRIPTION) {
+            SubscriptionScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // AI 노트 재구성 화면 (REORGANIZE)
+        composable(NavRoutes.REORGANIZE) {
+            ReorganizeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // 분석 대시보드 화면 (ANALYTICS)
+        composable(NavRoutes.ANALYTICS) {
+            AnalyticsDashboardScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -152,6 +211,9 @@ fun KairosNavGraph(
             CaptureDetailScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToSettings = {
+                    navController.navigate(NavRoutes.SETTINGS)
                 }
             )
         }

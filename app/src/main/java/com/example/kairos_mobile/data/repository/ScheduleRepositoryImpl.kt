@@ -42,4 +42,29 @@ class ScheduleRepositoryImpl @Inject constructor(
     override suspend fun deleteByCaptureId(captureId: String) {
         scheduleDao.deleteByCaptureId(captureId)
     }
+
+    override suspend fun getSyncedSchedules(): List<Schedule> {
+        return scheduleDao.getByCalendarSyncStatus("SYNCED")
+            .map { scheduleMapper.toDomain(it) }
+    }
+
+    override suspend fun updateFromRemote(
+        scheduleId: String,
+        title: String,
+        startTime: Long,
+        endTime: Long?,
+        location: String?
+    ) {
+        // ScheduleEntity에는 title이 없음 (title은 CaptureEntity에 저장)
+        // 시간/장소 등 일정 고유 필드만 업데이트
+        val entity = scheduleDao.getById(scheduleId) ?: return
+        scheduleDao.update(
+            entity.copy(
+                startTime = startTime,
+                endTime = endTime,
+                location = location,
+                updatedAt = System.currentTimeMillis()
+            )
+        )
+    }
 }

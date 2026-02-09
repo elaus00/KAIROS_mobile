@@ -24,4 +24,10 @@ interface ClassificationLogDao {
     @Query("SELECT * FROM classification_logs WHERE capture_id = :captureId ORDER BY modified_at DESC")
     suspend fun getByCaptureId(captureId: String): List<ClassificationLogEntity>
 
+    /**
+     * 전체 분류 로그 조회
+     */
+    @Query("SELECT * FROM classification_logs ORDER BY modified_at DESC")
+    suspend fun getAll(): List<ClassificationLogEntity>
+
 }

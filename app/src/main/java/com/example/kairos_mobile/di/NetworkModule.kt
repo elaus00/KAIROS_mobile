@@ -2,7 +2,9 @@ package com.example.kairos_mobile.di
 
 import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.data.remote.api.KairosApi
+import com.example.kairos_mobile.data.remote.interceptor.AuthInterceptor
 import com.example.kairos_mobile.data.remote.interceptor.DeviceIdInterceptor
+import com.example.kairos_mobile.data.remote.interceptor.ErrorInterceptor
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -28,9 +30,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        deviceIdInterceptor: DeviceIdInterceptor
+        deviceIdInterceptor: DeviceIdInterceptor,
+        errorInterceptor: ErrorInterceptor,
+        authInterceptor: AuthInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(errorInterceptor)
+            .addInterceptor(authInterceptor)
             .addInterceptor(deviceIdInterceptor)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = if (BuildConfig.DEBUG) {

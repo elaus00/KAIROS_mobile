@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
@@ -121,45 +119,29 @@ fun CalendarCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 왼쪽: 월 텍스트 + chevron 아이콘
+            // 왼쪽: 월 텍스트 (클릭 시 월 선택 드롭다운)
             Box {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                Text(
+                    text = if (isExpanded) "${currentMonth.monthValue}월" else "${currentMonth.monthValue}월 ${weekOfMonth}주차",
+                    color = colors.text,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = {
-                            if (isExpanded) {
-                                showMonthDropdown = !showMonthDropdown
-                            } else {
-                                onToggleExpand()
-                            }
-                        }
+                        onClick = { showMonthDropdown = !showMonthDropdown }
                     )
-                ) {
-                    Text(
-                        text = "${currentMonth.monthValue}월 ${weekOfMonth}주차",
-                        color = colors.text,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = if (isExpanded) "접기" else "펼치기",
-                        tint = colors.textSecondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                )
 
-                // 월 선택 드롭다운 메뉴 (확장 상태에서만)
+                // 월 선택 드롭다운 메뉴
                 DropdownMenu(
                     expanded = showMonthDropdown,
-                    onDismissRequest = { showMonthDropdown = false }
+                    onDismissRequest = { showMonthDropdown = false },
+                    modifier = Modifier.heightIn(max = 200.dp)
                 ) {
                     (1..12).forEach { month ->
                         DropdownMenuItem(
-                            text = { Text("${month}월") },
+                            text = { Text("${month}월", color = colors.text) },
                             onClick = {
                                 showMonthDropdown = false
                                 onMonthChange(YearMonth.of(currentMonth.year, month))
@@ -169,30 +151,16 @@ fun CalendarCard(
                 }
             }
 
-            // 오른쪽: 좌우 이동 버튼 (확장 시만 표시)
-            if (isExpanded) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "이전 달",
-                        tint = colors.textSecondary,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .clickable { onMonthChange(currentMonth.minusMonths(1)) }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "다음 달",
-                        tint = colors.textSecondary,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .clickable { onMonthChange(currentMonth.plusMonths(1)) }
-                    )
-                }
-            }
+            // 오른쪽: 펼치기/접기 아이콘 (항상 표시)
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = if (isExpanded) "접기" else "펼치기",
+                tint = colors.textSecondary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .clickable { onToggleExpand() }
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))

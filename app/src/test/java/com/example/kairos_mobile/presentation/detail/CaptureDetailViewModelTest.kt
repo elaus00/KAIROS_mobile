@@ -8,6 +8,7 @@ import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
+import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -42,6 +43,7 @@ class CaptureDetailViewModelTest {
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var trackEventUseCase: TrackEventUseCase
+    private lateinit var formatCaptureForShare: FormatCaptureForShareUseCase
 
     @Before
     fun setUp() {
@@ -51,6 +53,7 @@ class CaptureDetailViewModelTest {
         approveSuggestion = mockk(relaxed = true)
         calendarRepository = mockk(relaxed = true)
         trackEventUseCase = mockk(relaxed = true)
+        formatCaptureForShare = mockk(relaxed = true)
     }
 
     @After
@@ -79,7 +82,8 @@ class CaptureDetailViewModelTest {
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
-            trackEventUseCase = trackEventUseCase
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare
         )
         advanceUntilIdle()
 
@@ -108,7 +112,8 @@ class CaptureDetailViewModelTest {
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
-            trackEventUseCase = trackEventUseCase
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare
         )
         advanceUntilIdle()
 
@@ -131,7 +136,8 @@ class CaptureDetailViewModelTest {
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
-            trackEventUseCase = trackEventUseCase
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare
         )
         advanceUntilIdle()
 
@@ -161,7 +167,8 @@ class CaptureDetailViewModelTest {
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
-            trackEventUseCase = trackEventUseCase
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare
         )
         advanceUntilIdle()
 
@@ -185,7 +192,8 @@ class CaptureDetailViewModelTest {
             scheduleRepository = scheduleRepository,
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
-            trackEventUseCase = trackEventUseCase
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)

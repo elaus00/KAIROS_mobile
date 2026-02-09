@@ -131,4 +131,8 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun updateNoteBody(noteId: String, body: String?) {
         noteDao.updateBody(noteId, body, System.currentTimeMillis())
     }
+
+    override suspend fun getUngroupedNoteIds(): List<String> {
+        return noteDao.getUngroupedNoteIds()
+    }
 }

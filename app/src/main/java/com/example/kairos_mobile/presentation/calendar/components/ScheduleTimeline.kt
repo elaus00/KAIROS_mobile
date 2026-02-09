@@ -6,10 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,7 +40,7 @@ fun ScheduleTimeline(
     onRejectSuggestion: (String) -> Unit = {}
 ) {
     Column(modifier = modifier) {
-        SectionHeader(title = "일정")
+        SectionHeader(title = "일정", fontSize = 15.sp)
 
         if (schedules.isEmpty()) {
             ScheduleEmptyState()
@@ -107,7 +103,7 @@ private fun ScheduleTimelineItem(
     ) {
         // 왼쪽: 시간 + 타임라인
         Row(
-            modifier = Modifier.width(70.dp),
+            modifier = Modifier.width(60.dp),
             verticalAlignment = Alignment.Top
         ) {
             // 시간 텍스트
@@ -150,7 +146,7 @@ private fun ScheduleTimelineItem(
             }
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         // 오른쪽: 일정 카드
         ScheduleCard(
@@ -214,18 +210,8 @@ private fun ScheduleCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // 삭제 아이콘 - 48dp 터치 타겟 확보
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "일정 삭제",
-                        tint = colors.textMuted,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
+                // 체크박스 (체크 시 삭제)
+                ScheduleCheckbox(onToggle = onDelete)
             }
 
             schedule.location?.let { location ->
@@ -275,6 +261,35 @@ private fun ScheduleCard(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * 일정 체크박스 (체크 시 삭제 동작)
+ */
+@Composable
+private fun ScheduleCheckbox(
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+    // 48dp 터치 영역, 22dp 시각적 크기
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onToggle() },
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(22.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .border(1.5.dp, colors.border, RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            // 빈 체크박스 (일정은 완료 개념 없음, 체크하면 삭제됨)
         }
     }
 }

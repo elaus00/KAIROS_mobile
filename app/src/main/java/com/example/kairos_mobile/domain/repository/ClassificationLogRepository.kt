@@ -12,4 +12,7 @@ interface ClassificationLogRepository {
 
     /** 특정 캡처의 분류 로그 조회 */
     suspend fun getByCaptureId(captureId: String): List<ClassificationLog>
+
+    /** 분류 수정 패턴 집계 (fromType, toType, count) */
+    suspend fun getModificationPatterns(): List<Triple<String, String, Int>>
 }

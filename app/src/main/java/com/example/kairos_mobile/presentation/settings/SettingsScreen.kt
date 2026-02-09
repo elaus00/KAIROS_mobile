@@ -29,8 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.data.remote.oauth.GoogleOAuthUrlBuilder
+import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.model.ThemePreference
+import com.example.kairos_mobile.presentation.components.common.PremiumBadge
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
+import com.example.kairos_mobile.presentation.subscription.PremiumGateSheet
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -44,13 +47,20 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToPrivacyPolicy: () -> Unit = {},
     onNavigateToTermsOfService: () -> Unit = {},
-    onNavigateToTrash: () -> Unit = {}
+    onNavigateToTrash: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
+    onNavigateToSubscription: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
     val context = androidx.compose.ui.platform.LocalContext.current
     var showExchangeDialog by remember { mutableStateOf(false) }
     var showTokenDialog by remember { mutableStateOf(false) }
+    var showPresetDropdown by remember { mutableStateOf(false) }
+    var showPremiumGateSheet by remember { mutableStateOf(false) }
+    var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
+    val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
 
     Scaffold(
         topBar = {
@@ -216,6 +226,197 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // AI 분류 섹션
+            SectionHeader(title = "AI 분류")
+
+            SettingsCard {
+                val isPremium = isPremiumSubscriber
+
+                // 분류 프리셋 드롭다운
+                Box {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (isPremium) {
+                                    showPresetDropdown = true
+                                } else {
+                                    premiumGateFeatureName = "AI 분류 설정"
+                                    showPremiumGateSheet = true
+                                }
+                            }
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "분류 프리셋",
+                                    color = colors.text,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                if (!isPremium) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    PremiumBadge()
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = uiState.presets.find { it.id == uiState.selectedPresetId }?.name ?: "기본",
+                                color = colors.textMuted,
+                                fontSize = 13.sp
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = null,
+                            tint = colors.textMuted,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    // 프리셋 드롭다운 메뉴
+                    DropdownMenu(
+                        expanded = showPresetDropdown,
+                        onDismissRequest = { showPresetDropdown = false }
+                    ) {
+                        uiState.presets.forEach { preset ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(
+                                            text = preset.name,
+                                            fontWeight = if (preset.id == uiState.selectedPresetId) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                        Text(
+                                            text = preset.description,
+                                            fontSize = 12.sp,
+                                            color = colors.textMuted
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    viewModel.setPreset(preset.id)
+                                    showPresetDropdown = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                SettingsDivider()
+
+                // 분류 규칙 (커스텀 인스트럭션)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (!isPremium) {
+                                premiumGateFeatureName = "AI 분류 설정"
+                                showPremiumGateSheet = true
+                            }
+                        }
+                        .padding(horizontal = 16.dp, vertical = 14.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "분류 규칙",
+                            color = colors.text,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        if (!isPremium) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            PremiumBadge()
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = uiState.customInstruction,
+                        onValueChange = { viewModel.setCustomInstruction(it) },
+                        placeholder = { Text("예: 업무 관련 내용은 일정으로 분류", color = colors.placeholder) },
+                        enabled = isPremium,
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        maxLines = 4,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colors.accent,
+                            unfocusedBorderColor = colors.border,
+                            focusedTextColor = colors.text,
+                            unfocusedTextColor = colors.text,
+                            disabledTextColor = colors.textMuted,
+                            disabledBorderColor = colors.borderLight,
+                            cursorColor = colors.accent
+                        )
+                    )
+                    if (isPremium && uiState.customInstruction.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextButton(
+                            onClick = { viewModel.saveCustomInstruction() },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text("저장", color = colors.accent, fontSize = 14.sp)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 계정 섹션
+            SectionHeader(title = "계정")
+
+            SettingsCard {
+                if (uiState.user != null) {
+                    // 로그인 상태: 이메일 + 로그아웃
+                    NavigationSettingItem(
+                        title = uiState.user!!.email,
+                        showArrow = false,
+                        onClick = { }
+                    )
+                    SettingsDivider()
+                    NavigationSettingItem(
+                        title = "로그아웃",
+                        onClick = { viewModel.logout() }
+                    )
+                } else {
+                    // 미로그인 상태
+                    NavigationSettingItem(
+                        title = "로그인",
+                        onClick = onNavigateToLogin
+                    )
+                }
+                SettingsDivider()
+                NavigationSettingItem(
+                    title = "구독 관리",
+                    onClick = onNavigateToSubscription
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 분석 섹션
+            SectionHeader(title = "분석")
+
+            SettingsCard {
+                NavigationSettingItem(
+                    title = "사용 분석",
+                    description = "캡처 통계 및 분류 현황",
+                    onClick = {
+                        if (isPremiumSubscriber) {
+                            onNavigateToAnalytics()
+                        } else {
+                            premiumGateFeatureName = "사용 분석"
+                            showPremiumGateSheet = true
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // 정보 섹션
             SectionHeader(title = "정보")
 
@@ -279,6 +480,18 @@ fun SettingsScreen(
                 viewModel.saveCalendarToken(accessToken, refreshToken, expiresIn)
                 showTokenDialog = false
             }
+        )
+    }
+
+    // Premium 게이트 시트
+    if (showPremiumGateSheet) {
+        PremiumGateSheet(
+            featureName = premiumGateFeatureName,
+            onUpgrade = {
+                showPremiumGateSheet = false
+                onNavigateToSubscription()
+            },
+            onDismiss = { showPremiumGateSheet = false }
         )
     }
 

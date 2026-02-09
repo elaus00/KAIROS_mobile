@@ -30,7 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kairos_mobile.domain.model.Capture
 import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.SemanticSearchResult
 import com.example.kairos_mobile.presentation.components.common.FilterChipRow
+import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -143,90 +145,180 @@ fun SearchScreen(
                     }
                 }
 
+                // AI 시맨틱 검색 토글
+                KairosChip(
+                    text = "AI",
+                    selected = uiState.isSemanticMode,
+                    onClick = { viewModel.toggleSemanticMode(!uiState.isSemanticMode) }
+                )
+
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
-            // 분류 유형 필터 칩
-            FilterChipRow(
-                selectedType = uiState.selectedType,
-                onTypeSelected = { type -> viewModel.setTypeFilter(type) }
-            )
+            // 분류 유형 필터 칩 (시맨틱 모드가 아닐 때만)
+            if (!uiState.isSemanticMode) {
+                FilterChipRow(
+                    selectedType = uiState.selectedType,
+                    onTypeSelected = { type -> viewModel.setTypeFilter(type) }
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // 검색 결과
-            when {
-                !uiState.hasSearched -> {
-                    // 초기 상태
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+            if (uiState.isSemanticMode) {
+                // 시맨틱 검색 결과
+                when {
+                    uiState.isSemanticLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                                tint = colors.textMuted.copy(alpha = 0.5f),
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Text(
-                                text = "캡처를 검색하세요",
-                                color = colors.textMuted,
-                                fontSize = 15.sp
+                            CircularProgressIndicator(
+                                color = colors.accent,
+                                modifier = Modifier.size(32.dp)
                             )
                         }
                     }
-                }
-                uiState.searchResults.isEmpty() -> {
-                    // 결과 없음
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                    !uiState.hasSearched -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = colors.textMuted.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "AI로 의미 기반 검색",
+                                    color = colors.textMuted,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                    uiState.semanticResults.isEmpty() -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.SearchOff,
+                                    contentDescription = null,
+                                    tint = colors.textMuted,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "결과 없음",
+                                    color = colors.textMuted,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag("semantic_results_list"),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.SearchOff,
-                                contentDescription = null,
-                                tint = colors.textMuted,
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Text(
-                                text = "결과 없음",
-                                color = colors.textMuted,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = "다른 키워드로 검색해보세요",
-                                color = colors.textMuted.copy(alpha = 0.7f),
-                                fontSize = 13.sp
-                            )
+                            items(
+                                items = uiState.semanticResults,
+                                key = { it.captureId }
+                            ) { result ->
+                                SemanticResultItem(
+                                    result = result,
+                                    onClick = { onCaptureClick(result.captureId) }
+                                )
+                            }
                         }
                     }
                 }
-                else -> {
-                    // 검색 결과 리스트
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .testTag("search_results_list"),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(
-                            items = uiState.searchResults,
-                            key = { it.id }
-                        ) { capture ->
-                            SearchResultItem(
-                                capture = capture,
-                                onClick = { onCaptureClick(capture.id) }
-                            )
+            } else {
+                // FTS 검색 결과
+                when {
+                    !uiState.hasSearched -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = colors.textMuted.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "캡처를 검색하세요",
+                                    color = colors.textMuted,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                    uiState.searchResults.isEmpty() -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.SearchOff,
+                                    contentDescription = null,
+                                    tint = colors.textMuted,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    text = "결과 없음",
+                                    color = colors.textMuted,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "다른 키워드로 검색해보세요",
+                                    color = colors.textMuted.copy(alpha = 0.7f),
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag("search_results_list"),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(
+                                items = uiState.searchResults,
+                                key = { it.id }
+                            ) { capture ->
+                                SearchResultItem(
+                                    capture = capture,
+                                    onClick = { onCaptureClick(capture.id) }
+                                )
+                            }
                         }
                     }
                 }
@@ -297,6 +389,64 @@ private fun SearchResultItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = preview,
+                    color = colors.textMuted,
+                    fontSize = 13.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 시맨틱 검색 결과 아이템
+ */
+@Composable
+private fun SemanticResultItem(
+    result: SemanticSearchResult,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+    val scorePercent = (result.score * 100).toInt()
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = result.snippet.take(40),
+                    color = colors.text,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "${scorePercent}%",
+                    color = colors.accent,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(colors.accent.copy(alpha = 0.15f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+            }
+            if (result.snippet.length > 40) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = result.snippet,
                     color = colors.textMuted,
                     fontSize = 13.sp,
                     maxLines = 2,

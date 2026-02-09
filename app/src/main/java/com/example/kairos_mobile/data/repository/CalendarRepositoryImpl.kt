@@ -1,11 +1,13 @@
 package com.example.kairos_mobile.data.repository
 
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
+import com.example.kairos_mobile.data.remote.ApiResponseHandler
 import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
 import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventRequest
 import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenExchangeRequest
 import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenRequest
+import com.example.kairos_mobile.domain.model.ApiException
 import com.example.kairos_mobile.domain.model.CalendarApiException
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.model.RemoteCalendarEvent
@@ -47,15 +49,14 @@ class CalendarRepositoryImpl @Inject constructor(
             location = location,
             isAllDay = isAllDay
         )
-        val response = api.createCalendarEvent(request)
-        val body = response.body()
-        if (response.isSuccessful && body?.status == "ok" && body.data != null) {
-            val eventId = body.data.googleEventId
+        try {
+            val data = ApiResponseHandler.safeCall { api.createCalendarEvent(request) }
+            val eventId = data.googleEventId
             scheduleDao.updateCalendarSync(scheduleId, CalendarSyncStatus.SYNCED.name, eventId)
             return eventId
-        } else {
+        } catch (e: Exception) {
             scheduleDao.updateCalendarSync(scheduleId, CalendarSyncStatus.SYNC_FAILED.name, null)
-            throw parseCalendarError(body?.error?.code, body?.error?.message)
+            throw toCalendarException(e)
         }
     }
 
@@ -64,52 +65,58 @@ class CalendarRepositoryImpl @Inject constructor(
     }
 
     override suspend fun exchangeCalendarToken(code: String, redirectUri: String): Boolean {
-        val response = api.exchangeCalendarToken(
-            CalendarTokenExchangeRequest(
-                deviceId = deviceIdProvider.getOrCreateDeviceId(),
-                code = code,
-                redirectUri = redirectUri
-            )
-        )
-        val body = response.body()
-        if (!response.isSuccessful || body?.status != "ok" || body.data == null) {
-            throw parseCalendarError(body?.error?.code, body?.error?.message)
+        try {
+            val data = ApiResponseHandler.safeCall {
+                api.exchangeCalendarToken(
+                    CalendarTokenExchangeRequest(
+                        deviceId = deviceIdProvider.getOrCreateDeviceId(),
+                        code = code,
+                        redirectUri = redirectUri
+                    )
+                )
+            }
+            return data.connected
+        } catch (e: Exception) {
+            throw toCalendarException(e)
         }
-        return body.data.connected
     }
 
     override suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresIn: Long?): Boolean {
-        val response = api.saveCalendarToken(
-            CalendarTokenRequest(
-                deviceId = deviceIdProvider.getOrCreateDeviceId(),
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-                expiresIn = expiresIn
-            )
-        )
-        val body = response.body()
-        if (!response.isSuccessful || body?.status != "ok" || body.data == null) {
-            throw parseCalendarError(body?.error?.code, body?.error?.message)
+        try {
+            val data = ApiResponseHandler.safeCall {
+                api.saveCalendarToken(
+                    CalendarTokenRequest(
+                        deviceId = deviceIdProvider.getOrCreateDeviceId(),
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                        expiresIn = expiresIn
+                    )
+                )
+            }
+            return data.connected
+        } catch (e: Exception) {
+            throw toCalendarException(e)
         }
-        return body.data.connected
     }
 
     override suspend fun getCalendarEvents(startDate: LocalDate, endDate: LocalDate): List<RemoteCalendarEvent> {
-        val response = api.getCalendarEvents(startDate.toString(), endDate.toString())
-        val body = response.body()
-        if (!response.isSuccessful || body?.status != "ok" || body.data == null) {
-            throw parseCalendarError(body?.error?.code, body?.error?.message)
-        }
-        return body.data.events.map { event ->
-            RemoteCalendarEvent(
-                googleEventId = event.googleEventId,
-                title = event.title,
-                startTime = parseIsoDateTimeToEpochMs(event.startTime) ?: 0L,
-                endTime = parseIsoDateTimeToEpochMs(event.endTime),
-                location = event.location,
-                isAllDay = event.isAllDay,
-                source = event.source
-            )
+        try {
+            val data = ApiResponseHandler.safeCall {
+                api.getCalendarEvents(startDate.toString(), endDate.toString())
+            }
+            return data.events.map { event ->
+                RemoteCalendarEvent(
+                    googleEventId = event.googleEventId,
+                    title = event.title,
+                    startTime = parseIsoDateTimeToEpochMs(event.startTime) ?: 0L,
+                    endTime = parseIsoDateTimeToEpochMs(event.endTime),
+                    location = event.location,
+                    isAllDay = event.isAllDay,
+                    source = event.source
+                )
+            }
+        } catch (e: Exception) {
+            throw toCalendarException(e)
         }
     }
 
@@ -128,13 +135,20 @@ class CalendarRepositoryImpl @Inject constructor(
             .getOrNull()
     }
 
-    private fun parseCalendarError(code: String?, message: String?): Throwable {
-        val resolved = message ?: "캘린더 요청 실패"
+    /**
+     * ApiException → CalendarApiException 변환
+     * 캘린더 전용 에러 코드는 CalendarApiException으로 매핑하고,
+     * 이미 CalendarApiException이면 그대로 전달
+     */
+    private fun toCalendarException(e: Exception): Throwable {
+        if (e is CalendarApiException) return e
+        val code = (e as? ApiException)?.errorCode
+        val msg = e.message ?: "캘린더 요청 실패"
         return when (code) {
-            "GOOGLE_AUTH_REQUIRED" -> CalendarApiException.GoogleAuthRequired(resolved)
-            "GOOGLE_TOKEN_EXPIRED" -> CalendarApiException.GoogleTokenExpired(resolved)
-            "GOOGLE_API_ERROR" -> CalendarApiException.GoogleApiError(resolved)
-            else -> CalendarApiException.Unknown(resolved)
+            "GOOGLE_AUTH_REQUIRED" -> CalendarApiException.GoogleAuthRequired(msg)
+            "GOOGLE_TOKEN_EXPIRED" -> CalendarApiException.GoogleTokenExpired(msg)
+            "GOOGLE_API_ERROR" -> CalendarApiException.GoogleApiError(msg)
+            else -> CalendarApiException.Unknown(msg)
         }
     }
 }

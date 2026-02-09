@@ -7,6 +7,7 @@ import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.mapper.FolderMapper
 import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -50,5 +51,16 @@ class FolderRepositoryImpl @Inject constructor(
 
     override suspend fun existsByName(name: String): Boolean {
         return folderDao.getByName(name) != null
+    }
+
+    override suspend fun getOrCreateFolder(name: String, type: FolderType): Folder {
+        // 같은 이름 + 유형의 기존 폴더가 있으면 재사용
+        val existing = folderDao.getByNameAndType(name, type.name)
+        if (existing != null) {
+            return folderMapper.toDomain(existing)
+        }
+        val folder = Folder(name = name, type = type)
+        folderDao.insert(folderMapper.toEntity(folder))
+        return folder
     }
 }

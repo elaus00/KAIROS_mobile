@@ -36,4 +36,7 @@ interface NoteRepository {
 
     /** 노트 본문 업데이트 */
     suspend fun updateNoteBody(noteId: String, body: String?)
+
+    /** 폴더 미지정(Inbox) 노트 ID 목록 */
+    suspend fun getUngroupedNoteIds(): List<String>
 }

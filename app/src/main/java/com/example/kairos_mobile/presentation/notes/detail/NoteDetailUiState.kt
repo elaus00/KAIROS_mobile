@@ -16,5 +16,7 @@ data class NoteDetailUiState(
     val isSaving: Boolean = false,
     val error: String? = null,
     val showOriginalText: Boolean = false,
-    val folders: List<Folder> = emptyList()
+    val folders: List<Folder> = emptyList(),
+    /** 공유용 텍스트 (한 번 소비 후 null 초기화) */
+    val shareText: String? = null
 )
