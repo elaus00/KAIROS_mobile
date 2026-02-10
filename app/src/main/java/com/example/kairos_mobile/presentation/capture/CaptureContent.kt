@@ -4,6 +4,18 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -122,7 +134,7 @@ fun CaptureContent(
             // 날짜 표시
             DateDisplay()
 
-            // 전체 화면 텍스트 입력 영역 (위에서부터 작성)
+            // 전체 화면 텍스트 입력 영역 — 브런치 스타일 타이포그래피
             BasicTextField(
                 value = uiState.inputText,
                 onValueChange = { viewModel.updateInput(it) },
@@ -133,8 +145,9 @@ fun CaptureContent(
                     .testTag("capture_input"),
                 textStyle = TextStyle(
                     color = colors.text,
-                    fontSize = 16.sp,
-                    lineHeight = 24.sp
+                    fontSize = 20.sp,
+                    lineHeight = 34.sp,
+                    letterSpacing = 0.3.sp
                 ),
                 cursorBrush = SolidColor(colors.accent),
                 singleLine = false,
@@ -142,14 +155,22 @@ fun CaptureContent(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                            .padding(horizontal = 28.dp, vertical = 24.dp),
                         contentAlignment = Alignment.TopStart
                     ) {
-                        if (uiState.inputText.isEmpty()) {
+                        // 플레이스홀더 알파 페이드 애니메이션
+                        val placeholderAlpha by animateFloatAsState(
+                            targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
+                            animationSpec = tween(200),
+                            label = "placeholderAlpha"
+                        )
+                        if (placeholderAlpha > 0f) {
                             Text(
-                                text = "떠오르는 생각을 캡처하세요...",
-                                color = colors.placeholder,
-                                fontSize = 16.sp
+                                text = "떠오르는 생각을 자유롭게...",
+                                color = colors.placeholder.copy(alpha = placeholderAlpha),
+                                fontSize = 20.sp,
+                                lineHeight = 34.sp,
+                                letterSpacing = 0.3.sp
                             )
                         }
                         innerTextField()
@@ -157,8 +178,15 @@ fun CaptureContent(
                 }
             )
 
-            // 이미지 미리보기 (첨부된 경우)
-            uiState.imageUri?.let { imageUri ->
+            // 이미지 미리보기 — 부드러운 등장/퇴장 애니메이션
+            // ColumnScope 오버로드를 사용하여 수직 슬라이드 적용
+            this@Column.AnimatedVisibility(
+                visible = uiState.imageUri != null,
+                enter = expandVertically(tween(250)) + fadeIn(tween(200)),
+                exit = shrinkVertically(tween(200)) + fadeOut(tween(150))
+            ) {
+                // AnimatedVisibility 내부에서는 remember로 마지막 유효 URI 유지
+                val imageUri = uiState.imageUri ?: return@AnimatedVisibility
                 ImagePreview(
                     imageUri = imageUri,
                     onRemove = { viewModel.removeImage() }
@@ -340,7 +368,7 @@ private fun ImagePreview(
 }
 
 /**
- * 하단 툴바: 이미지 첨부 아이콘 + 전송 버튼
+ * 하단 툴바: 이미지 첨부 아이콘 + 전송 버튼 (애니메이션 적용)
  */
 @Composable
 private fun CaptureToolBar(
@@ -351,6 +379,29 @@ private fun CaptureToolBar(
     onImageClick: () -> Unit
 ) {
     val colors = KairosTheme.colors
+
+    // 이미지 아이콘 색상 전환 애니메이션
+    val imageIconColor by animateColorAsState(
+        targetValue = if (hasImage) colors.accent else colors.iconMuted,
+        animationSpec = tween(250),
+        label = "imageIconColor"
+    )
+
+    // 전송 버튼 배경 색상 전환 애니메이션
+    val submitBgColor by animateColorAsState(
+        targetValue = if (canSubmit) colors.accent else colors.accentBg,
+        animationSpec = tween(250),
+        label = "submitBgColor"
+    )
+
+    // 전송 아이콘 색상 전환 애니메이션
+    val submitIconColor by animateColorAsState(
+        targetValue = if (canSubmit) {
+            if (colors.isDark) colors.background else Color.White
+        } else colors.textMuted,
+        animationSpec = tween(250),
+        label = "submitIconColor"
+    )
 
     Row(
         modifier = Modifier
@@ -364,20 +415,17 @@ private fun CaptureToolBar(
             Icon(
                 imageVector = Icons.Outlined.Image,
                 contentDescription = "이미지 첨부",
-                tint = if (hasImage) colors.accent else colors.iconMuted
+                tint = imageIconColor
             )
         }
 
-        // 전송 버튼
+        // 전송 버튼 — AnimatedContent로 아이콘/로딩 전환
         Box(
             modifier = Modifier
                 .testTag("capture_submit")
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(
-                    if (canSubmit) colors.accent
-                    else colors.accentBg
-                )
+                .background(submitBgColor)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -385,21 +433,28 @@ private fun CaptureToolBar(
                 ) { onSubmit() },
             contentAlignment = Alignment.Center
         ) {
-            if (isSubmitting) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = if (colors.isDark) colors.background else Color.White
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.ArrowUpward,
-                    contentDescription = "전송",
-                    tint = if (canSubmit) {
-                        if (colors.isDark) colors.background else Color.White
-                    } else colors.textMuted,
-                    modifier = Modifier.size(22.dp)
-                )
+            AnimatedContent(
+                targetState = isSubmitting,
+                transitionSpec = {
+                    (fadeIn(tween(200)) + scaleIn(tween(200), initialScale = 0.8f))
+                        .togetherWith(fadeOut(tween(150)) + scaleOut(tween(150), targetScale = 0.8f))
+                },
+                label = "submitContent"
+            ) { submitting ->
+                if (submitting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = if (colors.isDark) colors.background else Color.White
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.ArrowUpward,
+                        contentDescription = "전송",
+                        tint = submitIconColor,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
             }
         }
     }

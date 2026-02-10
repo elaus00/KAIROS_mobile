@@ -114,7 +114,8 @@ private fun NotesContentInternal(
         NotesHeader(
             onTrashClick = onTrashClick,
             onSearchClick = onSearchClick,
-            onReorganizeClick = onReorganizeClick
+            onReorganizeClick = onReorganizeClick,
+            showReorganize = uiState.isPremium
         )
 
         // 폴더 필터 칩
@@ -170,7 +171,8 @@ private fun NotesContentInternal(
 private fun NotesHeader(
     onTrashClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onReorganizeClick: () -> Unit = {}
+    onReorganizeClick: () -> Unit = {},
+    showReorganize: Boolean = false
 ) {
     val colors = KairosTheme.colors
 
@@ -189,12 +191,15 @@ private fun NotesHeader(
         )
 
         Row {
-            IconButton(onClick = onReorganizeClick) {
-                Icon(
-                    imageVector = Icons.Default.AutoFixHigh,
-                    contentDescription = "AI 재구성",
-                    tint = colors.icon
-                )
+            // AI 재구성 버튼 — 프리미엄 구독자에게만 표시
+            if (showReorganize) {
+                IconButton(onClick = onReorganizeClick) {
+                    Icon(
+                        imageVector = Icons.Default.AutoFixHigh,
+                        contentDescription = "AI 재구성",
+                        tint = colors.icon
+                    )
+                }
             }
             IconButton(onClick = onTrashClick) {
                 Icon(
@@ -254,7 +259,7 @@ private fun FolderFilterChips(
                 .fillMaxWidth()
                 .nestedScroll(nestedScrollConnection)
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 4.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -321,7 +326,7 @@ private fun FolderFilterChips(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(colors.chipBg)
                     .clickable { onCreateFolder() },
                 contentAlignment = Alignment.Center
@@ -348,8 +353,8 @@ private fun NotesList(
 ) {
     LazyColumn(
         modifier = modifier.testTag("notes_list"),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(
             items = notes,
@@ -389,11 +394,11 @@ private fun NoteListItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(colors.card)
-            .border(0.5.dp, colors.border, RoundedCornerShape(12.dp))
+            .border(0.5.dp, colors.border, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         // 첫 줄: 제목 + 날짜
         Row(
@@ -421,20 +426,20 @@ private fun NoteListItem(
 
         // 본문 미리보기
         if (preview != null) {
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = preview,
                 color = colors.textSecondary,
                 fontSize = 13.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                lineHeight = 18.sp
+                lineHeight = 20.sp
             )
         }
 
         // 폴더 태그
         if (note.folderName != null) {
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = note.folderName,
                 color = colors.textMuted,

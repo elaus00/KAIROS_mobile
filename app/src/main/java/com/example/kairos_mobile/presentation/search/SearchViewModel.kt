@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ApiException
 import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.SubscriptionTier
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.search.SemanticSearchUseCase
@@ -26,13 +28,24 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val searchCapturesUseCase: SearchCapturesUseCase,
     private val trackEventUseCase: TrackEventUseCase,
-    private val semanticSearchUseCase: SemanticSearchUseCase
+    private val semanticSearchUseCase: SemanticSearchUseCase,
+    private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     private var searchJob: Job? = null
+
+    init {
+        loadSubscriptionStatus()
+    }
+
+    /** 구독 상태 로드 — AI 시맨틱 검색 토글 표시 제어 */
+    private fun loadSubscriptionStatus() {
+        val isPremium = subscriptionRepository.getCachedTier() == SubscriptionTier.PREMIUM
+        _uiState.update { it.copy(isPremium = isPremium) }
+    }
 
     /**
      * 검색 텍스트 변경 (디바운싱 적용)

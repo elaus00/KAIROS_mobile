@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
+import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +31,8 @@ class NotesViewModel @Inject constructor(
     private val folderRepository: FolderRepository,
     private val createFolderUseCase: CreateFolderUseCase,
     private val renameFolderUseCase: RenameFolderUseCase,
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -38,7 +41,14 @@ class NotesViewModel @Inject constructor(
     private var dataJob: Job? = null
 
     init {
+        loadSubscriptionStatus()
         loadData()
+    }
+
+    /** 구독 상태 로드 — 프리미엄 기능 UI 표시 제어 */
+    private fun loadSubscriptionStatus() {
+        val isPremium = subscriptionRepository.getCachedTier() == SubscriptionTier.PREMIUM
+        _uiState.update { it.copy(isPremium = isPremium) }
     }
 
     fun onEvent(event: NotesEvent) {

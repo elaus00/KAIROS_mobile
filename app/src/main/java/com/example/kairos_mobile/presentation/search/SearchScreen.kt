@@ -145,12 +145,14 @@ fun SearchScreen(
                     }
                 }
 
-                // AI 시맨틱 검색 토글
-                KairosChip(
-                    text = "AI",
-                    selected = uiState.isSemanticMode,
-                    onClick = { viewModel.toggleSemanticMode(!uiState.isSemanticMode) }
-                )
+                // AI 시맨틱 검색 토글 — 프리미엄 구독자에게만 표시
+                if (uiState.isPremium) {
+                    KairosChip(
+                        text = "AI",
+                        selected = uiState.isSemanticMode,
+                        onClick = { viewModel.toggleSemanticMode(!uiState.isSemanticMode) }
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(8.dp))
             }

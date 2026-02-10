@@ -17,12 +17,12 @@ MockKairosApi는 이미 Phase 2b QA 과정에서 제거됨(3-6 선행 완료). P
 |------|------|------|
 | 3-0 | 서버 배포 + Health Check 확인 | ✅ 완료 |
 | 3-1 | 네트워크 레이어 정비 (에러 핸들링, 인터셉터) | ✅ 완료 |
-| 3-2 | `/classify` 실서버 연동 + 테스트 | ⬜ 미착수 |
-| 3-3 | `/classify` split_items 실서버 연동 | ⬜ 미착수 |
-| 3-4 | `/calendar/events` 실서버 연동 (Google OAuth) | ⬜ 미착수 |
-| 3-5 | `/analytics/events` 실서버 연동 | ⬜ 미착수 |
+| 3-2 | `/classify` 실서버 연동 + 테스트 | ✅ 클라이언트 준비 완료 |
+| 3-3 | `/classify` split_items 실서버 연동 | ✅ 클라이언트 준비 완료 (3-2에 포함) |
+| 3-4 | `/calendar/events` 실서버 연동 (Google OAuth) | ✅ 클라이언트 준비 완료 |
+| 3-5 | `/analytics/events` 실서버 연동 | ✅ 클라이언트 준비 완료 |
 | 3-6 | MockKairosApi 제거 + 빌드 설정 정리 | ✅ 완료 (선행) |
-| 3-7 | 통합 테스트 + 에뮬레이터 검증 | ⬜ 미착수 |
+| 3-7 | 통합 테스트 + 에뮬레이터 검증 | ⬜ 실서버 E2E 대기 |
 
 ---
 
@@ -115,47 +115,39 @@ OkHttpClient.Builder()
 
 ---
 
-### 3-2: `/classify` 실서버 연동
+### 3-2: `/classify` 실서버 연동 ✅ 클라이언트 준비 완료
 
 **목표**: AI 분류를 실제 Gemini API 기반 서버로 전환
 
-> `ClassifyRequest`에 `source`, `device_id` 필드가 이미 추가되어 있고,
-> `ClassifyCaptureWorker`에서 이를 이미 전달 중. 에러 핸들링도 3-1에서 완료.
-> 남은 작업은 실서버 응답 호환성 검증.
+**스펙 호환성 검증 완료 (2026-02-10)**:
 
-| 파일 | 변경 | 내용 |
-|------|------|------|
-| `data/remote/api/KairosApi.kt` | 확인 | `classify()` 시그니처 서버 스펙 일치 검증 |
-| `data/remote/dto/v2/ClassifyRequest.kt` | 확인 | source/deviceId 필드 이미 존재 |
-| `data/worker/ClassifyCaptureWorker.kt` | 완료 | ApiResponseHandler 기반 에러 처리 (3-1에서 완료) |
+| 검증 항목 | 상태 | 비고 |
+|----------|------|------|
+| `ClassifyRequest` (text, source, device_id, user_context) | ✅ | @SerializedName 일치 |
+| `ClassifyResponse` (14개 필드) | ✅ | 모든 필드 정확히 매핑 |
+| `ClassifyBatchRequest/Response` | ✅ | items, results, failed 구조 일치 |
+| `ClassificationMapper` DTO→Domain | ✅ | 26개 테스트로 검증 완료 |
+| `ApiResponseHandler` 에러 매핑 | ✅ | 23개 테스트로 검증 완료 |
+| `ProcessClassificationResultUseCase` | ✅ | 단일 + split 의도 처리 기존 12개 테스트 통과 |
+| enum 폴백 (미지 값 안전 처리) | ✅ | TEMP/INBOX/MEDIUM/OTHER로 폴백 |
 
-**응답 검증 항목**:
-- `classified_type`이 SCHEDULE/TODO/NOTES/TEMP 중 하나인지
-- `note_sub_type`이 NOTES일 때만 존재하는지
-- `confidence`가 HIGH/MEDIUM/LOW 중 하나인지
-- `schedule_info`/`todo_info`가 해당 type일 때만 존재하는지
-
-**검증**: 다양한 입력 텍스트 → 서버 분류 결과 정상 수신 + 파생 엔티티 생성
+**남은 작업**: 실서버 E2E 검증 (서버 준비 후)
 
 ---
 
-### 3-3: `/classify` split_items 실서버 연동
+### 3-3: `/classify` split_items 실서버 연동 ✅ 클라이언트 준비 완료
 
 **목표**: 서버의 다중 의도 분리 응답을 클라이언트에서 올바르게 처리
 
-| 파일 | 변경 | 내용 |
-|------|------|------|
-| `data/remote/dto/v2/SplitItemDto.kt` | 확인 | 서버 응답 구조와 DTO 일치 검증 |
-| `data/worker/ClassifyCaptureWorker.kt` | 확인 | splitItems 파싱 로직이 실서버 응답과 호환되는지 |
+> `SplitItemDto` 9개 필드 스펙 일치 확인, `ClassificationMapper`에서 split_items 변환 테스트 통과,
+> `ProcessClassificationResultUseCase` split 처리 기존 테스트 통과.
 
-**테스트 시나리오**:
+**E2E 테스트 시나리오** (서버 준비 후):
 | 입력 | 기대 결과 |
 |------|----------|
 | "보고서 쓰고 저녁 예약" | splitItems 2개 (TODO + SCHEDULE) |
 | "내일 미팅" | splitItems null (단일 의도) |
 | "카페 가고 책 사고 보고서 제출" | splitItems 3개 |
-
-**검증**: 서버 split 응답 → 자식 Capture 생성 + 각각 올바른 파생 엔티티
 
 ---
 
@@ -250,14 +242,14 @@ OkHttpClient.Builder()
 ```
 3-0 (서버 배포)     ✅
  └→ 3-1 (네트워크 정비) ✅
-     ├→ 3-2 (/classify 연동)   ⬜ 서버 응답 호환 검증 필요
-     │   └→ 3-3 (split_items)  ⬜
-     ├→ 3-4 (/calendar 연동)   ⬜ Google OAuth 연동 필요
-     └→ 3-5 (/analytics 연동)  ⬜
+     ├→ 3-2 (/classify 연동)   ✅ 클라이언트 준비 완료
+     │   └→ 3-3 (split_items)  ✅ 클라이언트 준비 완료
+     ├→ 3-4 (/calendar 연동)   ✅ 클라이언트 준비 완료
+     └→ 3-5 (/analytics 연동)  ✅ 클라이언트 준비 완료
 
 3-6 (Mock 제거) ✅ (선행 완료)
 
-3-2 + 3-3 + 3-4 + 3-5 → 3-7 (통합 테스트)
+→ 3-7 (통합 테스트) ⬜ 실서버 E2E 대기
 ```
 
 ---

@@ -3,8 +3,10 @@ package com.example.kairos_mobile.presentation.notes
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.domain.model.FolderType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
+import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.usecase.folder.CreateFolderUseCase
 import com.example.kairos_mobile.domain.usecase.folder.RenameFolderUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
@@ -43,6 +45,7 @@ class NotesViewModelTest {
     private lateinit var createFolderUseCase: CreateFolderUseCase
     private lateinit var renameFolderUseCase: RenameFolderUseCase
     private lateinit var noteRepository: NoteRepository
+    private lateinit var subscriptionRepository: SubscriptionRepository
 
     @Before
     fun setUp() {
@@ -50,6 +53,8 @@ class NotesViewModelTest {
         createFolderUseCase = mockk()
         renameFolderUseCase = mockk()
         noteRepository = mockk()
+        subscriptionRepository = mockk()
+        every { subscriptionRepository.getCachedTier() } returns SubscriptionTier.FREE
     }
 
     @After
@@ -70,7 +75,8 @@ class NotesViewModelTest {
             folderRepository,
             createFolderUseCase,
             renameFolderUseCase,
-            noteRepository
+            noteRepository,
+            subscriptionRepository
         )
     }
 

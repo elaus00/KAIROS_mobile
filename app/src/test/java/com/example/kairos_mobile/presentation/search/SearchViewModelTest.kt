@@ -1,6 +1,8 @@
 package com.example.kairos_mobile.presentation.search
 
 import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.SubscriptionTier
+import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.search.SearchCapturesUseCase
 import com.example.kairos_mobile.domain.usecase.search.SemanticSearchUseCase
@@ -42,6 +44,7 @@ class SearchViewModelTest {
     private lateinit var searchCapturesUseCase: SearchCapturesUseCase
     private lateinit var trackEventUseCase: TrackEventUseCase
     private lateinit var semanticSearchUseCase: SemanticSearchUseCase
+    private lateinit var subscriptionRepository: SubscriptionRepository
     private lateinit var viewModel: SearchViewModel
 
     @Before
@@ -49,7 +52,9 @@ class SearchViewModelTest {
         searchCapturesUseCase = mockk()
         trackEventUseCase = mockk(relaxed = true)
         semanticSearchUseCase = mockk(relaxed = true)
-        viewModel = SearchViewModel(searchCapturesUseCase, trackEventUseCase, semanticSearchUseCase)
+        subscriptionRepository = mockk()
+        every { subscriptionRepository.getCachedTier() } returns SubscriptionTier.FREE
+        viewModel = SearchViewModel(searchCapturesUseCase, trackEventUseCase, semanticSearchUseCase, subscriptionRepository)
     }
 
     @After

@@ -20,7 +20,9 @@ data class NotesUiState(
     /** 폴더 이름 변경 다이얼로그 대상 */
     val renamingFolder: Folder? = null,
     /** 에러 메시지 */
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** 프리미엄 구독 여부 (AI 재구성 버튼 표시 제어) */
+    val isPremium: Boolean = false
 )
 
 /**

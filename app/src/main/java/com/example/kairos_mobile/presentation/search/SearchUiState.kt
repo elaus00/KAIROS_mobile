@@ -24,5 +24,7 @@ data class SearchUiState(
     /** 시맨틱 검색 결과 */
     val semanticResults: List<SemanticSearchResult> = emptyList(),
     /** 시맨틱 검색 로딩 */
-    val isSemanticLoading: Boolean = false
+    val isSemanticLoading: Boolean = false,
+    /** 프리미엄 구독 여부 (AI 시맨틱 검색 토글 표시 제어) */
+    val isPremium: Boolean = false
 )
