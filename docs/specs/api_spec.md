@@ -1,7 +1,7 @@
 # KAIROS — API 명세서
 
-> **Version**: 2.4
-**작성일**: 2026-02-07
+> **Version**: 2.5
+**작성일**: 2026-02-10
 **기준**: PRD v10.0, 기능명세서 v2.3, 데이터 모델 명세서 v2.0
 **서버 프레임워크**: FastAPI (Python 3.11+)
 **Base URL**: `https://api.kairos.app/api/v1`
@@ -19,6 +19,7 @@
 | 2.2 | 2026-02-07 | Phase 2a OAuth 코드 교환 경로 추가. (1) POST /calendar/token/exchange 추가 — authorization code를 토큰으로 교환 후 저장, (2) 캘린더 API 섹션/요약 테이블 갱신 |
 | 2.3 | 2026-02-07 | PRD v10.0 우선 정렬. (1) user_context.modification_history를 Phase 2b로 조정, (2) 수정 이력 기반 학습(modification_learning) Phase를 3b→2b로 조정 |
 | 2.4 | 2026-02-07 | PRD 충돌 정렬. (1) 수정 이력 기반 학습을 2b(초안)/3b(고도화)로 분리, (2) 분류 프리셋/사용자 지시를 3a로 조정, (3) AI 자동 그룹화 명칭을 AI 통합 그룹화로 통일 |
+| 2.5 | 2026-02-10 | API 계약 정렬. (1) 구독 features에 `analytics_dashboard`/`ocr` 추가, (2) OCR 엔드포인트 추가 (`POST /ocr/extract`, JSON+Base64), (3) Auth refresh 응답 `user` nullable 명시, (4) Auth/me에 `google_calendar_connected` 필드 명시, (5) 시맨틱 검색/대시보드 엔드포인트 추가, (6) 요약 테이블 갱신 |
 
 ---
 
@@ -596,7 +597,7 @@ Google OAuth 완료 후 디바이스별 access_token/refresh_token을 서버에 
 }
 ```
 
-**Response (200):** 새 access_token + expires_in 반환.
+**Response (200):** 새 access_token + expires_in 반환. `user` 필드는 선택적(nullable)이며, 포함되지 않을 수 있다. 클라이언트는 `user` 없을 때 기존 캐시된 사용자 정보를 유지해야 한다.
 
 ### 5.3 GET /auth/me — 현재 사용자 정보
 
@@ -636,7 +637,9 @@ Google OAuth 완료 후 디바이스별 access_token/refresh_token을 서버에 
       "classification_preset": false,
       "custom_instruction": false,
       "semantic_search": false,
-      "modification_learning": false
+      "modification_learning": false,
+      "analytics_dashboard": false,
+      "ocr": false
     }
   }
 }
@@ -670,7 +673,9 @@ Google Play Billing 영수증 검증.
       "classification_preset": true,
       "custom_instruction": true,
       "semantic_search": true,
-      "modification_learning": true
+      "modification_learning": true,
+      "analytics_dashboard": true,
+      "ocr": true
     }
   }
 }
@@ -687,6 +692,8 @@ Google Play Billing 영수증 검증.
 | custom_instruction | 사용자 분류 지시 | 3a |
 | semantic_search | AI 시맨틱 검색 | 3a |
 | modification_learning | 수정 이력 기반 학습 (고도화) | 3b |
+| analytics_dashboard | 분석 대시보드 | 3b |
+| ocr | 이미지 OCR 텍스트 추출 | 3b |
 
 ---
 
@@ -865,11 +872,96 @@ Inbox에 쌓인 미분류 노트를 AI가 적절한 폴더로 자동 배치한�
 | assignments[].new_note_sub_type | 변경될 note_sub_type |
 | new_folders | 신규 생성이 필요한 폴더 목록: [{"name": "...", "type": "AI_GROUP"}] |
 
+### 7.4 POST /notes/search-semantic — 시맨틱 검색 (Phase 3a, 구독)
+
+**Request:**
+
+```json
+{
+  "query": "프론트엔드 상태 관리",
+  "limit": 20
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "results": [
+      {"capture_id": "uuid-1", "score": 0.95, "snippet": "React 상태 관리 패턴..."},
+      {"capture_id": "uuid-2", "score": 0.82, "snippet": "Vue vs React 비교..."}
+    ]
+  }
+}
+```
+
+### 7.5 GET /analytics/dashboard — 분석 대시보드 (Phase 3b, 구독)
+
+**Response (200):**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "total_captures": 142,
+    "captures_by_type": {"TODO": 45, "SCHEDULE": 30, "NOTES": 60, "TEMP": 7},
+    "captures_by_day": {"2026-02-08": 5, "2026-02-09": 8, "2026-02-10": 3},
+    "avg_classification_time_ms": 1200,
+    "top_tags": [{"tag": "개발", "count": 25}, {"tag": "회의", "count": 18}]
+  }
+}
+```
+
 ---
 
-## 8. 서버 구현 구조 (FastAPI)
+## 8. OCR API (Phase 3b, 구독)
 
-### 8.1 프로젝트 구조
+### 8.1 POST /ocr/extract — 이미지 텍스트 추출
+
+이미지를 Base64로 인코딩하여 전송, 서버에서 OCR 처리 후 텍스트를 반환한다.
+
+**Request:**
+
+```json
+{
+  "image_data": "base64-encoded-image-data...",
+  "image_type": "jpeg",
+  "language_hint": "ko",
+  "extract_structure": false
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| image_data | string | ✓ | Base64 인코딩된 이미지 데이터 |
+| image_type | string | | 이미지 형식 (jpeg, png, webp). 기본값: jpeg |
+| language_hint | string | | 언어 힌트 (ko, en 등) |
+| extract_structure | boolean | | 구조화된 콘텐츠 추출 여부. 기본값: false |
+
+**Response (200):**
+
+```json
+{
+  "status": "ok",
+  "data": {
+    "success": true,
+    "text": "추출된 텍스트 내용...",
+    "confidence": 0.95,
+    "language": "ko",
+    "word_count": 42,
+    "has_structure": false,
+    "structured_content": null
+  }
+}
+```
+
+---
+
+## 9. 서버 구현 구조 (FastAPI)
+
+### 9.1 프로젝트 구조
 
 ```
 kairos-server/
@@ -900,7 +992,7 @@ kairos-server/
 └── Dockerfile
 ```
 
-### 8.2 AI 분류 서비스 흐름
+### 9.2 AI 분류 서비스 흐름
 
 ```
 classify 요청 수신
@@ -917,7 +1009,7 @@ classify 요청 수신
   → 클라이언트 응답 반환
 ```
 
-### 8.3 Rate Limiting
+### 9.3 Rate Limiting
 
 | 엔드포인트 | 제한 | 기준 |
 | --- | --- | --- |
@@ -929,7 +1021,7 @@ classify 요청 수신
 
 ---
 
-## 9. Phase별 엔드포인트 요약
+## 10. Phase별 엔드포인트 요약
 
 | 엔드포인트 | 메서드 | Phase | 설명 |
 | --- | --- | --- | --- |
@@ -944,6 +1036,9 @@ classify 요청 수신
 | /notes/group | POST | 3a | AI 통합 그룹화 (구독) |
 | /notes/reorganize | POST | 3a | 전체 재정리 (구독) |
 | /notes/inbox-classify | POST | 3a | Inbox AI 자동 분류 (구독) |
+| /notes/search-semantic | POST | 3a | 시맨틱 검색 (구독) |
+| /analytics/dashboard | GET | 3b | 분석 대시보드 (구독) |
+| /ocr/extract | POST | 3b | 이미지 OCR 텍스트 추출 (구독) |
 | /auth/google | POST | 3a | Google OAuth 로그인 |
 | /auth/refresh | POST | 3a | 토큰 갱신 |
 | /auth/me | GET | 3a | 현재 사용자 정보 |
@@ -952,4 +1047,4 @@ classify 요청 수신
 
 ---
 
-*Document Version: 2.4 | Last Updated: 2026-02-07*
+*Document Version: 2.5 | Last Updated: 2026-02-10*

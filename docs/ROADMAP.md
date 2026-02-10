@@ -96,16 +96,38 @@
 
 **개발 계획**: `Docs/plan/phase3/server_integration_plan.md`
 
-## Phase 3a+: 고도화 및 지속 가능성
+## Phase 3a: 서비스 지속성 — 구현 완료
 
 **목표**: 서비스 지속 가능성 확보. 인증/과금 도입, AI 개인화
 
-| 기능 | 범위 |
-|------|------|
-| 사용자 인증 | Google OAuth 기반 인증 (JWT Bearer) |
-| 구독 모델 | 과금 기준 적용 (Google Play Billing) |
-| 일정 관리 | 양방향 Google Calendar 동기화 |
-| 노트 | AI 자동 그룹화(구독), 재정리(구독), 시맨틱 검색(구독) |
-| AI 분류 | 분류 프리셋(구독), 사용자 지시(구독), 수정 이력 학습 |
+| 기능 | 범위 | 상태 |
+|------|------|------|
+| 사용자 인증 | Google OAuth 기반 인증 (JWT Bearer) | **완료** |
+| 구독 모델 | 과금 기준 적용 (Google Play Billing) | **완료** |
+| 일정 관리 | 양방향 Google Calendar 동기화 + 충돌 해결 | **완료** |
+| 노트 | AI 자동 그룹화(구독), 재정리(구독), 시맨틱 검색(구독) | **완료** |
+| AI 분류 | 분류 프리셋(구독), 사용자 지시(구독), 수정 이력 학습 | **완료** |
 
-**개발 계획**: 별도 수립 예정
+## Phase 3b: 외부 확장 — 구현 완료
+
+**목표**: 외부 서비스 연동, 프리미엄 기능 확장
+
+| 기능 | 범위 | 상태 |
+|------|------|------|
+| 공유 | 캡처/노트 외부 공유 | **완료** |
+| OCR | 이미지 텍스트 추출 (Base64 JSON) | **완료** |
+| 분석 대시보드 | 캡처 통계 시각화 | **완료** |
+
+## API 계약 정렬 — 완료 (2026-02-10)
+
+**목표**: 모바일 클라이언트 DTO/Repository를 서버 스펙에 맞춰 수정
+
+| 항목 | 문제 | 수정 내용 |
+|------|------|-----------|
+| Subscription | @SerializedName 3개 불일치 | `auto_grouping`/`inbox_auto_classify`/`reorganize`로 수정, `modification_learning`/`analytics_dashboard`/`ocr` 추가 |
+| Notes AI | 요청/응답 구조 완전 불일치 (3개 엔드포인트) | NoteAiInput/InboxClassifyResult/ProposedStructure 도메인 모델 도입, DTO/Repository/Worker/UseCase 전면 재작성 |
+| OCR | 경로 + 프로토콜 불일치 | `/ocr` → `/ocr/extract`, Multipart → JSON+Base64 |
+| Calendar | `expires_in` vs `expires_at` | ISO 8601 datetime 형식으로 전환 |
+| Auth | refresh user NPE, 누락 필드 | `user` nullable 처리, `google_calendar_connected` 추가 |
+
+**검증**: 컴파일 통과 + 전체 유닛 테스트 통과 + 서버 91개 테스트 통과

@@ -43,7 +43,7 @@ Docs/
 | `functional_spec.md` | 기능명세서 — 동작 규칙, 상태 전이, 엣지 케이스 | v2.3 | PRD v10.0, 데이터모델 v2.0 | 2026-02-07 |
 | `data_model_spec.md` | 데이터모델 명세서 — 스키마, 관계, 상태 머신 | v2.0 | PRD v10.0, 기능명세서 v2.0 | 2026-02-06 |
 | — | 화면정의서 (`screen_spec.md`) | 작성 예정 | — | — |
-| `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.0 | PRD v10.0, 기능명세서 v2.1, 데이터모델 v2.0 | 2026-02-07 |
+| `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.5 | PRD v10.0, 기능명세서 v2.3, 데이터모델 v2.0 | 2026-02-10 |
 | `design-guide.md` | 디자인 가이드 — 색상/타이포/간격/컴포넌트/금지사항 | v1.0 | PRD v10.0 | 2026-02-08 |
 | `ux-writing-audit.md` | UX 라이팅 감사 — 가이드라인/텍스트 인벤토리/개선 제안(P0 8건, P1 16건, P2 17건) | v1.0 | PRD v10.0, design-guide v1.0 | 2026-02-08 |
 
@@ -55,7 +55,7 @@ Docs/
 | `phase2/` | Phase 2 공통 참고/템플릿 문서 | 진행 중 |
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | **완료** |
 | `phase2b/` | Phase 2b (사용성 확장) 개발 계획 + 구현 보고서 | **구현 완료 (테스트 보강 중)** |
-| `phase3/` | Phase 3 (서버 연동) 개발 계획 | **구현 진행 중 (3-0, 3-1, 3-6 완료)** |
+| `phase3/` | Phase 3 (서버 연동) 개발 계획 | **구현 완료 (Phase 3a/3b/API 정렬 포함)** |
 
 #### Phase 1 상세 문서
 
@@ -159,3 +159,6 @@ Docs/
 | 2026-02-09 | `INDEX.md` | Phase 2b 보고서 문서 추가, 상태 변경 |
 | 2026-02-09 | `plan/phase3/server_integration_plan.md` | v1.0→v2.0: 3-0/3-1/3-6 완료 반영, 에러 레이어(ApiException/ApiResponseHandler/ErrorInterceptor) 구현 완료 기록 |
 | 2026-02-09 | `INDEX.md` | Phase 3 상태를 "구현 진행 중"으로 업데이트 |
+| 2026-02-10 | `specs/api_spec.md` | v2.4→v2.5: API 계약 정렬 — 구독 features 추가(analytics_dashboard/ocr), OCR 엔드포인트(/ocr/extract), Auth refresh user nullable, 시맨틱검색/대시보드 엔드포인트 추가, 요약 테이블 갱신 |
+| 2026-02-10 | `ROADMAP.md` | Phase 3a/3b 구현 완료 + API 계약 정렬 완료 섹션 추가 |
+| 2026-02-10 | `INDEX.md` | Phase 3 상태 "구현 완료"로 업데이트, api_spec 버전 갱신 |
