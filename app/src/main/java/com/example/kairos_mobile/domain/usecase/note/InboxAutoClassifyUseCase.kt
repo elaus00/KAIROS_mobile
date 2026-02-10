@@ -1,6 +1,9 @@
 package com.example.kairos_mobile.domain.usecase.note
 
 import com.example.kairos_mobile.domain.model.ApiException
+import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.InboxClassifyResult
+import com.example.kairos_mobile.domain.model.NoteAiInput
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.repository.NoteAiRepository
 import com.example.kairos_mobile.domain.repository.SubscriptionRepository
@@ -11,10 +14,10 @@ class InboxAutoClassifyUseCase @Inject constructor(
     private val noteAiRepository: NoteAiRepository,
     private val subscriptionRepository: SubscriptionRepository
 ) {
-    suspend operator fun invoke(captureIds: List<String>): List<Triple<String, String, Double>> {
+    suspend operator fun invoke(notes: List<NoteAiInput>, folders: List<Folder>): InboxClassifyResult {
         if (subscriptionRepository.getCachedTier() != SubscriptionTier.PREMIUM) {
             throw ApiException.SubscriptionRequired()
         }
-        return noteAiRepository.inboxClassify(captureIds)
+        return noteAiRepository.inboxClassify(notes, folders)
     }
 }

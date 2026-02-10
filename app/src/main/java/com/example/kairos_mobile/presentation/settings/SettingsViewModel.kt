@@ -46,11 +46,16 @@ class SettingsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
+    companion object {
+        private const val KEY_CAPTURE_FONT_SIZE = "capture_font_size"
+    }
+
     init {
         loadPreferences()
         loadCalendarSettings()
         loadAccountInfo()
         loadPresets()
+        loadCaptureFontSize()
     }
 
     /**
@@ -111,6 +116,26 @@ class SettingsViewModel @Inject constructor(
                     customInstruction = currentInstruction
                 )
             }
+        }
+    }
+
+    /**
+     * 캡처 글씨 크기 로드
+     */
+    private fun loadCaptureFontSize() {
+        viewModelScope.launch {
+            val size = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
+            _uiState.update { it.copy(captureFontSize = size) }
+        }
+    }
+
+    /**
+     * 캡처 글씨 크기 변경
+     */
+    fun setCaptureFontSize(size: String) {
+        viewModelScope.launch {
+            userPreferenceRepository.setString(KEY_CAPTURE_FONT_SIZE, size)
+            _uiState.update { it.copy(captureFontSize = size) }
         }
     }
 
@@ -247,14 +272,17 @@ class SettingsViewModel @Inject constructor(
             _uiState.update { it.copy(calendarAuthMessage = "access_token을 입력해주세요.") }
             return
         }
-        val expiresInLong = expiresIn?.trim()?.takeIf { it.isNotEmpty() }?.toLongOrNull()
+        // expires_in(초)를 expires_at(ISO 8601)로 변환
+        val expiresAt = expiresIn?.trim()?.takeIf { it.isNotEmpty() }?.toLongOrNull()?.let {
+            java.time.Instant.now().plusSeconds(it).toString()
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(calendarAuthLoading = true, calendarAuthMessage = null) }
             runCatching {
                 calendarRepository.saveCalendarToken(
                     accessToken = accessToken.trim(),
                     refreshToken = refreshToken?.trim()?.ifEmpty { null },
-                    expiresIn = expiresInLong
+                    expiresAt = expiresAt
                 )
             }.onSuccess { connected ->
                 if (connected) {

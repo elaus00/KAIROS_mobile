@@ -81,7 +81,7 @@ class CalendarRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresIn: Long?): Boolean {
+    override suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresAt: String?): Boolean {
         try {
             val data = ApiResponseHandler.safeCall {
                 api.saveCalendarToken(
@@ -89,7 +89,7 @@ class CalendarRepositoryImpl @Inject constructor(
                         deviceId = deviceIdProvider.getOrCreateDeviceId(),
                         accessToken = accessToken,
                         refreshToken = refreshToken,
-                        expiresIn = expiresIn
+                        expiresAt = expiresAt
                     )
                 )
             }

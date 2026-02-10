@@ -11,6 +11,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.model.NoteAiInput
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteAiRepository
@@ -18,6 +19,7 @@ import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 
 /**
@@ -61,16 +63,38 @@ class AutoGroupWorker @AssistedInject constructor(
         }
 
         return try {
-            val ungroupedNotes = noteRepository.getUngroupedNoteIds()
-            if (ungroupedNotes.isEmpty()) {
+            val ungroupedNoteIds = noteRepository.getUngroupedNoteIds()
+            if (ungroupedNoteIds.isEmpty()) {
                 Log.d(TAG, "그룹화 대상 노트 없음")
                 return Result.success()
             }
 
-            val groups = noteAiRepository.groupNotes(ungroupedNotes)
+            // 노트 입력 데이터 + captureId→noteId 매핑 구축
+            val captureToNoteMap = mutableMapOf<String, String>()
+            val noteInputs = ungroupedNoteIds.mapNotNull { noteId ->
+                val detail = noteRepository.getNoteDetail(noteId).first() ?: return@mapNotNull null
+                captureToNoteMap[detail.captureId] = noteId
+                NoteAiInput(
+                    captureId = detail.captureId,
+                    aiTitle = detail.aiTitle ?: "",
+                    tags = emptyList(),
+                    noteSubType = detail.noteSubType?.name,
+                    folderId = detail.folderId
+                )
+            }
+
+            val folderList = folderRepository.getAllFolders().first()
+            val groups = noteAiRepository.groupNotes(noteInputs, folderList)
+
             for (group in groups) {
-                val folder = folderRepository.getOrCreateFolder(group.groupName, FolderType.AI_GROUP)
-                for (noteId in group.noteIds) {
+                val folderType = try {
+                    FolderType.valueOf(group.folderType.uppercase())
+                } catch (_: Exception) {
+                    FolderType.AI_GROUP
+                }
+                val folder = folderRepository.getOrCreateFolder(group.folderName, folderType)
+                for (captureId in group.captureIds) {
+                    val noteId = captureToNoteMap[captureId] ?: continue
                     noteRepository.moveToFolder(noteId, folder.id)
                 }
             }

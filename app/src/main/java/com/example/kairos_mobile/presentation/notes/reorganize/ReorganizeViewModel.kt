@@ -3,6 +3,9 @@ package com.example.kairos_mobile.presentation.notes.reorganize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ApiException
+import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.model.NoteAiInput
+import com.example.kairos_mobile.domain.model.ProposedStructure
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.note.ReorganizeNotesUseCase
@@ -10,18 +13,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * 이동 제안 아이템
+ * 재구성 제안 아이템
  */
-data class MoveItem(
-    val noteId: String,
-    val noteTitle: String,
-    val currentFolder: String,
-    val suggestedFolder: String
+data class ProposedItem(
+    val folderName: String,
+    val folderType: String,
+    val action: String?,
+    val captureIds: List<String>
 )
 
 /**
@@ -30,7 +34,7 @@ data class MoveItem(
 data class ReorganizeUiState(
     val isLoading: Boolean = true,
     val isApplying: Boolean = false,
-    val moves: List<MoveItem> = emptyList(),
+    val proposals: List<ProposedItem> = emptyList(),
     val error: String? = null
 )
 
@@ -48,8 +52,8 @@ class ReorganizeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReorganizeUiState())
     val uiState: StateFlow<ReorganizeUiState> = _uiState.asStateFlow()
 
-    // 원본 이동 데이터 (noteId → 새 folderId)
-    private var rawMoves: List<Pair<String, String>> = emptyList()
+    // 원본 제안 구조
+    private var rawProposals: List<ProposedStructure> = emptyList()
 
     init {
         loadReorganization()
@@ -62,20 +66,32 @@ class ReorganizeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val (moves, _) = reorganizeNotesUseCase()
-                rawMoves = moves
+                // 전체 노트 + 폴더 조회
+                val allNotes = noteRepository.getAllNotesWithActiveCapture().first()
+                val noteInputs = allNotes.map { note ->
+                    NoteAiInput(
+                        captureId = note.captureId,
+                        aiTitle = note.aiTitle ?: "",
+                        tags = emptyList(),
+                        noteSubType = null,
+                        folderId = note.folderId
+                    )
+                }
+                val folders = folderRepository.getAllFolders().first()
 
-                // 이동 목록을 UI용으로 변환 (제목/폴더명 표시)
-                val moveItems = moves.map { (noteId, newFolderId) ->
-                    MoveItem(
-                        noteId = noteId,
-                        noteTitle = noteId.take(8), // placeholder
-                        currentFolder = "현재 폴더",
-                        suggestedFolder = newFolderId
+                val proposals = reorganizeNotesUseCase(noteInputs, folders)
+                rawProposals = proposals
+
+                val proposedItems = proposals.map {
+                    ProposedItem(
+                        folderName = it.folderName,
+                        folderType = it.folderType,
+                        action = it.action,
+                        captureIds = it.captureIds
                     )
                 }
                 _uiState.update {
-                    it.copy(isLoading = false, moves = moveItems)
+                    it.copy(isLoading = false, proposals = proposedItems)
                 }
             } catch (e: ApiException.SubscriptionRequired) {
                 _uiState.update {
@@ -90,18 +106,28 @@ class ReorganizeViewModel @Inject constructor(
     }
 
     /**
-     * 제안 적용 (노트 폴더 이동)
+     * 제안 적용 (폴더 생성 + 노트 이동)
      */
     fun onApply() {
         viewModelScope.launch {
             _uiState.update { it.copy(isApplying = true) }
             try {
-                rawMoves.forEach { (noteId, newFolderId) ->
-                    noteRepository.moveToFolder(noteId, newFolderId)
+                val allNotes = noteRepository.getAllNotesWithActiveCapture().first()
+                val captureToNoteMap = allNotes.associate { it.captureId to it.noteId }
+
+                for (proposal in rawProposals) {
+                    val folderType = try {
+                        FolderType.valueOf(proposal.folderType.uppercase())
+                    } catch (_: Exception) {
+                        FolderType.USER
+                    }
+                    val folder = folderRepository.getOrCreateFolder(proposal.folderName, folderType)
+                    for (captureId in proposal.captureIds) {
+                        val noteId = captureToNoteMap[captureId] ?: continue
+                        noteRepository.moveToFolder(noteId, folder.id)
+                    }
                 }
-                _uiState.update {
-                    it.copy(isApplying = false, moves = emptyList())
-                }
+                _uiState.update { it.copy(isApplying = false, proposals = emptyList()) }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(isApplying = false, error = e.message ?: "적용 실패")

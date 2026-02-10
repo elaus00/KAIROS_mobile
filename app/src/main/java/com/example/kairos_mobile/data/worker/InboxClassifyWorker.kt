@@ -10,16 +10,20 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.ConfidenceLevel
+import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.model.NoteAiInput
+import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.repository.CaptureRepository
+import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteAiRepository
+import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.SubscriptionRepository
-import com.example.kairos_mobile.domain.usecase.classification.ProcessClassificationResultUseCase
-import com.example.kairos_mobile.domain.model.ClassifiedType
-import com.example.kairos_mobile.domain.model.Classification
-import com.example.kairos_mobile.domain.model.ConfidenceLevel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 
 /**
@@ -32,6 +36,8 @@ class InboxClassifyWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val noteAiRepository: NoteAiRepository,
     private val captureRepository: CaptureRepository,
+    private val noteRepository: NoteRepository,
+    private val folderRepository: FolderRepository,
     private val subscriptionRepository: SubscriptionRepository
 ) : CoroutineWorker(context, params) {
 
@@ -68,30 +74,49 @@ class InboxClassifyWorker @AssistedInject constructor(
                 return Result.success()
             }
 
-            val captureIds = tempCaptures.map { it.id }
-            val classifications = noteAiRepository.inboxClassify(captureIds)
+            // 노트 입력 데이터 구축
+            val noteInputs = tempCaptures.map { capture ->
+                NoteAiInput(
+                    captureId = capture.id,
+                    aiTitle = capture.aiTitle ?: "",
+                    tags = emptyList(),
+                    noteSubType = capture.noteSubType?.name,
+                    folderId = null
+                )
+            }
+            val folderList = folderRepository.getAllFolders().first()
 
-            for ((captureId, suggestedType, confidence) in classifications) {
+            val result = noteAiRepository.inboxClassify(noteInputs, folderList)
+
+            // 새 폴더 생성
+            for (newFolder in result.newFolders) {
+                val folderType = try {
+                    FolderType.valueOf(newFolder.type.uppercase())
+                } catch (_: Exception) {
+                    FolderType.USER
+                }
+                folderRepository.getOrCreateFolder(newFolder.name, folderType)
+            }
+
+            // 분류 결과 적용
+            for (assignment in result.assignments) {
                 try {
-                    val type = ClassifiedType.valueOf(suggestedType.uppercase())
-                    val confidenceLevel = when {
-                        confidence >= 0.8 -> ConfidenceLevel.HIGH
-                        confidence >= 0.5 -> ConfidenceLevel.MEDIUM
-                        else -> ConfidenceLevel.LOW
+                    val noteSubType = assignment.newNoteSubType.takeIf { it.isNotBlank() }?.let {
+                        try { NoteSubType.valueOf(it.uppercase()) } catch (_: Exception) { null }
                     }
                     captureRepository.updateClassification(
-                        captureId = captureId,
-                        classifiedType = type,
-                        noteSubType = null,
+                        captureId = assignment.captureId,
+                        classifiedType = ClassifiedType.NOTES,
+                        noteSubType = noteSubType,
                         aiTitle = "",
-                        confidence = confidenceLevel
+                        confidence = ConfidenceLevel.HIGH
                     )
                 } catch (e: Exception) {
-                    Log.w(TAG, "캡처 $captureId 분류 적용 실패", e)
+                    Log.w(TAG, "캡처 ${assignment.captureId} 분류 적용 실패", e)
                 }
             }
 
-            Log.d(TAG, "${classifications.size}개 캡처 Inbox 분류 완료")
+            Log.d(TAG, "${result.assignments.size}개 캡처 Inbox 분류 완료")
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Inbox 분류 실패", e)

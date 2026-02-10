@@ -13,7 +13,7 @@ data class AuthResponse(
     @SerializedName("access_token") val accessToken: String,
     @SerializedName("refresh_token") val refreshToken: String,
     @SerializedName("expires_in") val expiresIn: Long,
-    @SerializedName("user") val user: UserResponse
+    @SerializedName("user") val user: UserResponse? = null
 )
 
 /** 토큰 갱신 요청 */
@@ -25,5 +25,6 @@ data class AuthRefreshRequest(
 data class UserResponse(
     @SerializedName("id") val id: String,
     @SerializedName("email") val email: String,
-    @SerializedName("subscription_tier") val subscriptionTier: String
+    @SerializedName("subscription_tier") val subscriptionTier: String,
+    @SerializedName("google_calendar_connected") val googleCalendarConnected: Boolean = false
 )

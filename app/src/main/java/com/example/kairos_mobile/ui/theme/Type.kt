@@ -2,10 +2,18 @@ package com.example.kairos_mobile.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Kairos 앱 타이포그래피 정의
+/**
+ * 글쓰기 전용 세리프 폰트 (캡처 입력 영역)
+ * 대부분의 한국어 Android 기기에서 Noto Serif CJK KR로 렌더링됨
+ * UI 폰트(고딕)와 분리하여 "글을 쓰는 느낌"을 부여
+ */
+val KairosWritingFontFamily = FontFamily.Serif
+
+// Kairos 앱 타이포그래피 정의 (UI용 — 기본 시스템 고딕)
 val KairosTypography = Typography(
     headlineLarge = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.sp),
     headlineSmall = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.sp),

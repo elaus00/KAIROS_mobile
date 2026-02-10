@@ -2,12 +2,20 @@ package com.example.kairos_mobile.data.repository
 
 import com.example.kairos_mobile.data.remote.ApiResponseHandler
 import com.example.kairos_mobile.data.remote.api.KairosApi
+import com.example.kairos_mobile.data.remote.dto.v2.FolderItemDto
 import com.example.kairos_mobile.data.remote.dto.v2.InboxClassifyRequest
+import com.example.kairos_mobile.data.remote.dto.v2.NoteAiItemDto
 import com.example.kairos_mobile.data.remote.dto.v2.NoteGroupRequest
 import com.example.kairos_mobile.data.remote.dto.v2.NoteReorganizeRequest
 import com.example.kairos_mobile.data.remote.dto.v2.SemanticSearchRequest
 import com.example.kairos_mobile.domain.model.AnalyticsDashboard
+import com.example.kairos_mobile.domain.model.Folder
+import com.example.kairos_mobile.domain.model.InboxAssignment
+import com.example.kairos_mobile.domain.model.InboxClassifyResult
+import com.example.kairos_mobile.domain.model.NewFolderSuggestion
+import com.example.kairos_mobile.domain.model.NoteAiInput
 import com.example.kairos_mobile.domain.model.NoteGroup
+import com.example.kairos_mobile.domain.model.ProposedStructure
 import com.example.kairos_mobile.domain.model.SemanticSearchResult
 import com.example.kairos_mobile.domain.repository.NoteAiRepository
 import javax.inject.Inject
@@ -22,31 +30,55 @@ class NoteAiRepositoryImpl @Inject constructor(
     private val api: KairosApi
 ) : NoteAiRepository {
 
-    override suspend fun groupNotes(noteIds: List<String>): List<NoteGroup> {
+    override suspend fun groupNotes(notes: List<NoteAiInput>, folders: List<Folder>): List<NoteGroup> {
         val response = ApiResponseHandler.safeCall {
-            api.groupNotes(NoteGroupRequest(noteIds))
+            api.groupNotes(NoteGroupRequest(
+                notes = notes.map { it.toDto() },
+                existingFolders = folders.map { it.toDto() }
+            ))
         }
         return response.groups.map {
-            NoteGroup(groupName = it.groupName, noteIds = it.noteIds)
+            NoteGroup(folderName = it.folderName, folderType = it.folderType, captureIds = it.captureIds)
         }
     }
 
-    override suspend fun inboxClassify(captureIds: List<String>): List<Triple<String, String, Double>> {
+    override suspend fun inboxClassify(notes: List<NoteAiInput>, folders: List<Folder>): InboxClassifyResult {
         val response = ApiResponseHandler.safeCall {
-            api.inboxClassify(InboxClassifyRequest(captureIds))
+            api.inboxClassify(InboxClassifyRequest(
+                notes = notes.map { it.toDto() },
+                existingFolders = folders.map { it.toDto() }
+            ))
         }
-        return response.classifications.map {
-            Triple(it.captureId, it.suggestedType, it.confidence)
-        }
+        return InboxClassifyResult(
+            assignments = response.assignments.map {
+                InboxAssignment(
+                    captureId = it.captureId,
+                    targetFolderId = it.targetFolderId,
+                    targetFolderName = it.targetFolderName,
+                    newNoteSubType = it.newNoteSubType
+                )
+            },
+            newFolders = response.newFolders.map {
+                NewFolderSuggestion(name = it.name, type = it.type)
+            }
+        )
     }
 
-    override suspend fun reorganize(folderId: String?): Pair<List<Pair<String, String>>, List<Pair<String, String>>> {
+    override suspend fun reorganize(notes: List<NoteAiInput>, folders: List<Folder>): List<ProposedStructure> {
         val response = ApiResponseHandler.safeCall {
-            api.reorganizeNotes(NoteReorganizeRequest(folderId))
+            api.reorganizeNotes(NoteReorganizeRequest(
+                notes = notes.map { it.toDto() },
+                existingFolders = folders.map { it.toDto() }
+            ))
         }
-        val before = response.before.map { it.noteId to it.folderName }
-        val after = response.after.map { it.noteId to it.folderName }
-        return before to after
+        return response.proposedStructure.map {
+            ProposedStructure(
+                folderName = it.folderName,
+                folderType = it.folderType,
+                action = it.action,
+                captureIds = it.captureIds
+            )
+        }
     }
 
     override suspend fun semanticSearch(query: String, limit: Int): List<SemanticSearchResult> {
@@ -54,11 +86,7 @@ class NoteAiRepositoryImpl @Inject constructor(
             api.semanticSearch(SemanticSearchRequest(query, limit))
         }
         return response.results.map {
-            SemanticSearchResult(
-                captureId = it.captureId,
-                score = it.score,
-                snippet = it.snippet
-            )
+            SemanticSearchResult(captureId = it.captureId, score = it.score, snippet = it.snippet)
         }
     }
 
@@ -72,4 +100,20 @@ class NoteAiRepositoryImpl @Inject constructor(
             topTags = data.topTags.map { it.tag to it.count }
         )
     }
+
+    /** NoteAiInput → DTO 변환 */
+    private fun NoteAiInput.toDto() = NoteAiItemDto(
+        captureId = captureId,
+        aiTitle = aiTitle,
+        tags = tags,
+        noteSubType = noteSubType,
+        folderId = folderId
+    )
+
+    /** Folder → DTO 변환 */
+    private fun Folder.toDto() = FolderItemDto(
+        folderId = id,
+        name = name,
+        type = type.name
+    )
 }

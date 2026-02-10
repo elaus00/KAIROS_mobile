@@ -33,6 +33,7 @@ class CaptureViewModel @Inject constructor(
     companion object {
         private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
         private const val KEY_DRAFT_TEXT = "draft_capture"
+        private const val KEY_CAPTURE_FONT_SIZE = "capture_font_size"
     }
 
 
@@ -45,6 +46,7 @@ class CaptureViewModel @Inject constructor(
     init {
         observeUnconfirmedCount()
         loadDraft()
+        loadFontSize()
     }
 
     /**
@@ -69,6 +71,21 @@ class CaptureViewModel @Inject constructor(
                     it.copy(inputText = draft)
                 }
             }
+        }
+    }
+
+    /**
+     * 글씨 크기 설정 로드
+     */
+    private fun loadFontSize() {
+        viewModelScope.launch {
+            val sizeKey = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
+            val (fontSize, lineHeight) = when (sizeKey) {
+                "SMALL" -> 16 to 28
+                "LARGE" -> 24 to 40
+                else -> 20 to 34
+            }
+            _uiState.update { it.copy(fontSize = fontSize, lineHeight = lineHeight) }
         }
     }
 

@@ -75,6 +75,7 @@ class CaptureViewModelTest {
         unconfirmedCount: Int = 0
     ): CaptureViewModel {
         coEvery { userPreferenceRepository.getString("draft_capture", "") } returns draftText
+        coEvery { userPreferenceRepository.getString("capture_font_size", "MEDIUM") } returns "MEDIUM"
         every { captureRepository.getUnconfirmedCount() } returns flowOf(unconfirmedCount)
         return CaptureViewModel(
             submitCaptureUseCase,

@@ -137,26 +137,26 @@ fun ReorganizeScreen(
                         )
                     }
 
-                    // 이동 목록
+                    // 재구성 제안 목록
                     LazyColumn(
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(
-                            items = uiState.moves,
-                            key = { it.noteId }
-                        ) { move ->
+                            items = uiState.proposals,
+                            key = { it.folderName }
+                        ) { proposal ->
                             MoveComparisonRow(
-                                noteTitle = move.noteTitle,
-                                currentFolder = move.currentFolder,
-                                suggestedFolder = move.suggestedFolder
+                                noteTitle = "${proposal.captureIds.size}개 노트",
+                                currentFolder = proposal.action ?: "이동",
+                                suggestedFolder = proposal.folderName
                             )
                         }
                     }
 
                     // 적용 버튼
-                    if (uiState.moves.isNotEmpty()) {
+                    if (uiState.proposals.isNotEmpty()) {
                         Button(
                             onClick = { viewModel.onApply() },
                             enabled = !uiState.isApplying,
@@ -177,7 +177,7 @@ fun ReorganizeScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "제안 적용 (${uiState.moves.size}건)",
+                                    text = "제안 적용 (${uiState.proposals.size}건)",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
                                 )

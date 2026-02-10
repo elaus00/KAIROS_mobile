@@ -142,6 +142,35 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 글씨 크기 섹션
+            SectionHeader(title = "글씨 크기")
+
+            SettingsCard {
+                ThemeOptionItem(
+                    title = "작게",
+                    isSelected = uiState.captureFontSize == "SMALL",
+                    onClick = { viewModel.setCaptureFontSize("SMALL") }
+                )
+
+                SettingsDivider()
+
+                ThemeOptionItem(
+                    title = "보통",
+                    isSelected = uiState.captureFontSize == "MEDIUM",
+                    onClick = { viewModel.setCaptureFontSize("MEDIUM") }
+                )
+
+                SettingsDivider()
+
+                ThemeOptionItem(
+                    title = "크게",
+                    isSelected = uiState.captureFontSize == "LARGE",
+                    onClick = { viewModel.setCaptureFontSize("LARGE") }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // 캘린더 섹션
             SectionHeader(title = "Google Calendar")
 

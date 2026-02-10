@@ -8,11 +8,13 @@ import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.mapper.NoteMapper
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteAiInput
 import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -134,5 +136,18 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun getUngroupedNoteIds(): List<String> {
         return noteDao.getUngroupedNoteIds()
+    }
+
+    override suspend fun getNoteAiInputs(noteIds: List<String>): List<NoteAiInput> {
+        return noteIds.mapNotNull { noteId ->
+            val row = noteDao.getNoteWithCapture(noteId).first() ?: return@mapNotNull null
+            NoteAiInput(
+                captureId = row.captureId,
+                aiTitle = row.aiTitle ?: "",
+                tags = emptyList(),
+                noteSubType = row.noteSubType,
+                folderId = row.folderId
+            )
+        }
     }
 }

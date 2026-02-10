@@ -9,5 +9,6 @@ data class SubscriptionFeatures(
     val analyticsDashboard: Boolean = false,
     val ocr: Boolean = false,
     val classificationPreset: Boolean = false,
-    val customInstruction: Boolean = false
+    val customInstruction: Boolean = false,
+    val modificationLearning: Boolean = false
 )

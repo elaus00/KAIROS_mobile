@@ -4,5 +4,6 @@ package com.example.kairos_mobile.domain.model
 data class User(
     val id: String,
     val email: String,
-    val subscriptionTier: String
+    val subscriptionTier: String,
+    val googleCalendarConnected: Boolean = false
 )

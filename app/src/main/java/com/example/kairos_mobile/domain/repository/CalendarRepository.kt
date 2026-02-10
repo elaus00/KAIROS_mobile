@@ -15,7 +15,7 @@ interface CalendarRepository {
     /** OAuth code 교환 + 토큰 저장 */
     suspend fun exchangeCalendarToken(code: String, redirectUri: String): Boolean
     /** 토큰 직접 저장 */
-    suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresIn: Long?): Boolean
+    suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresAt: String?): Boolean
     /** 서버 캘린더 이벤트 조회 */
     suspend fun getCalendarEvents(startDate: LocalDate, endDate: LocalDate): List<RemoteCalendarEvent>
 }

@@ -23,6 +23,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +57,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.kairos_mobile.presentation.classification.AIStatusSheet
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import com.example.kairos_mobile.ui.theme.KairosWritingFontFamily
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -135,48 +139,61 @@ fun CaptureContent(
             DateDisplay()
 
             // 전체 화면 텍스트 입력 영역 — 브런치 스타일 타이포그래피
-            BasicTextField(
-                value = uiState.inputText,
-                onValueChange = { viewModel.updateInput(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .focusRequester(focusRequester)
-                    .testTag("capture_input"),
-                textStyle = TextStyle(
-                    color = colors.text,
-                    fontSize = 20.sp,
-                    lineHeight = 34.sp,
-                    letterSpacing = 0.3.sp
-                ),
-                cursorBrush = SolidColor(colors.accent),
-                singleLine = false,
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 28.dp, vertical = 24.dp),
-                        contentAlignment = Alignment.TopStart
-                    ) {
-                        // 플레이스홀더 알파 페이드 애니메이션
-                        val placeholderAlpha by animateFloatAsState(
-                            targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
-                            animationSpec = tween(200),
-                            label = "placeholderAlpha"
-                        )
-                        if (placeholderAlpha > 0f) {
-                            Text(
-                                text = "떠오르는 생각을 자유롭게...",
-                                color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                fontSize = 20.sp,
-                                lineHeight = 34.sp,
-                                letterSpacing = 0.3.sp
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
+            // 커서 핸들(물방울) 숨김
+            val noHandleSelectionColors = TextSelectionColors(
+                handleColor = Color.Transparent,
+                backgroundColor = colors.accent.copy(alpha = 0.3f)
             )
+            CompositionLocalProvider(
+                LocalTextSelectionColors provides noHandleSelectionColors
+            ) {
+                val fontSize = uiState.fontSize.sp
+                val lineHeight = uiState.lineHeight.sp
+                BasicTextField(
+                    value = uiState.inputText,
+                    onValueChange = { viewModel.updateInput(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .focusRequester(focusRequester)
+                        .testTag("capture_input"),
+                    textStyle = TextStyle(
+                        fontFamily = KairosWritingFontFamily,
+                        color = colors.text,
+                        fontSize = fontSize,
+                        lineHeight = lineHeight,
+                        letterSpacing = 0.3.sp
+                    ),
+                    cursorBrush = SolidColor(colors.accent),
+                    singleLine = false,
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 28.dp, vertical = 24.dp),
+                            contentAlignment = Alignment.TopStart
+                        ) {
+                            // 플레이스홀더 알파 페이드 애니메이션
+                            val placeholderAlpha by animateFloatAsState(
+                                targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
+                                animationSpec = tween(200),
+                                label = "placeholderAlpha"
+                            )
+                            if (placeholderAlpha > 0f) {
+                                Text(
+                                    text = "떠오르는 생각을 자유롭게...",
+                                    fontFamily = KairosWritingFontFamily,
+                                    color = colors.placeholder.copy(alpha = placeholderAlpha),
+                                    fontSize = fontSize,
+                                    lineHeight = lineHeight,
+                                    letterSpacing = 0.3.sp
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+            }
 
             // 이미지 미리보기 — 부드러운 등장/퇴장 애니메이션
             // ColumnScope 오버로드를 사용하여 수직 슬라이드 적용

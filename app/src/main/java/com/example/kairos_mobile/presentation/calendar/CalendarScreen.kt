@@ -63,147 +63,72 @@ fun CalendarContent(
             .fillMaxSize()
             .background(colors.background)
     ) {
-        if (uiState.isMonthExpanded) {
-            // 월간 확장 시: 캘린더 카드도 스크롤에 포함
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
+        // 월간/주간 모두 캘린더 카드가 콘텐츠와 함께 스크롤
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CalendarCard(
+                selectedDate = uiState.selectedDate,
+                datesWithSchedules = uiState.datesWithSchedules,
+                isExpanded = uiState.isMonthExpanded,
+                onDateSelected = { date ->
+                    viewModel.onEvent(CalendarEvent.SelectDate(date))
+                },
+                onToggleExpand = {
+                    viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
+                },
+                onMonthChange = { yearMonth ->
+                    viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
+                },
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = colors.accent,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            } else {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                CalendarCard(
-                    selectedDate = uiState.selectedDate,
-                    datesWithSchedules = uiState.datesWithSchedules,
-                    isExpanded = true,
-                    onDateSelected = { date ->
-                        viewModel.onEvent(CalendarEvent.SelectDate(date))
+                ScheduleTimeline(
+                    schedules = uiState.schedules,
+                    onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
+                    onScheduleDelete = { captureId ->
+                        viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))
                     },
-                    onToggleExpand = {
-                        viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
+                    onApproveSuggestion = { scheduleId ->
+                        viewModel.onEvent(CalendarEvent.ApproveSuggestion(scheduleId))
                     },
-                    onMonthChange = { yearMonth ->
-                        viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
-                    },
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    onRejectSuggestion = { scheduleId ->
+                        viewModel.onEvent(CalendarEvent.RejectSuggestion(scheduleId))
+                    }
                 )
 
-                if (uiState.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = colors.accent,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                } else {
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    ScheduleTimeline(
-                        schedules = uiState.schedules,
-                        onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
-                        onScheduleDelete = { captureId ->
-                            viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))
-                        },
-                        onApproveSuggestion = { scheduleId ->
-                            viewModel.onEvent(CalendarEvent.ApproveSuggestion(scheduleId))
-                        },
-                        onRejectSuggestion = { scheduleId ->
-                            viewModel.onEvent(CalendarEvent.RejectSuggestion(scheduleId))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    TaskList(
-                        tasks = uiState.tasks,
-                        onTaskComplete = { taskId ->
-                            viewModel.onEvent(CalendarEvent.ToggleTaskComplete(taskId))
-                        },
-                        onTaskDelete = { captureId ->
-                            viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-        } else {
-            // 주간 뷰: 캘린더 카드 상단 고정
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                CalendarCard(
-                    selectedDate = uiState.selectedDate,
-                    datesWithSchedules = uiState.datesWithSchedules,
-                    isExpanded = false,
-                    onDateSelected = { date ->
-                        viewModel.onEvent(CalendarEvent.SelectDate(date))
+                TaskList(
+                    tasks = uiState.tasks,
+                    onTaskComplete = { taskId ->
+                        viewModel.onEvent(CalendarEvent.ToggleTaskComplete(taskId))
                     },
-                    onToggleExpand = {
-                        viewModel.onEvent(CalendarEvent.ToggleMonthExpand)
-                    },
-                    onMonthChange = { yearMonth ->
-                        viewModel.onEvent(CalendarEvent.ChangeMonth(yearMonth))
-                    },
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    onTaskDelete = { captureId ->
+                        viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
+                    }
                 )
 
-                if (uiState.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = colors.accent,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        ScheduleTimeline(
-                            schedules = uiState.schedules,
-                            onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
-                            onScheduleDelete = { captureId ->
-                                viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))
-                            },
-                            onApproveSuggestion = { scheduleId ->
-                                viewModel.onEvent(CalendarEvent.ApproveSuggestion(scheduleId))
-                            },
-                            onRejectSuggestion = { scheduleId ->
-                                viewModel.onEvent(CalendarEvent.RejectSuggestion(scheduleId))
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        TaskList(
-                            tasks = uiState.tasks,
-                            onTaskComplete = { taskId ->
-                                viewModel.onEvent(CalendarEvent.ToggleTaskComplete(taskId))
-                            },
-                            onTaskDelete = { captureId ->
-                                viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 

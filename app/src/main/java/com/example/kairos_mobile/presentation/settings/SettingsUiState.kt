@@ -41,5 +41,8 @@ data class SettingsUiState(
     // AI 분류 설정
     val presets: List<ClassificationPreset> = emptyList(),
     val selectedPresetId: String = "default",
-    val customInstruction: String = ""
+    val customInstruction: String = "",
+
+    // 캡처 글씨 크기 (SMALL / MEDIUM / LARGE)
+    val captureFontSize: String = "MEDIUM"
 )

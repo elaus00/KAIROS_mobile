@@ -48,6 +48,7 @@ class AuthRepositoryImplTest {
         every { prefs.edit() } returns editor
         every { editor.putString(any(), any()) } returns editor
         every { editor.putLong(any(), any()) } returns editor
+        every { editor.putBoolean(any(), any()) } returns editor
         every { editor.remove(any()) } returns editor
         every { editor.apply() } just Runs
         every { deviceIdProvider.getOrCreateDeviceId() } returns "test-device-id"
@@ -140,6 +141,26 @@ class AuthRepositoryImplTest {
         verify { editor.putString("auth_refresh_token", "new-refresh") }
     }
 
+    @Test
+    fun `refreshToken - user 없는 응답에서도 성공`() = runTest {
+        // Given
+        every { prefs.getString("auth_refresh_token", null) } returns "old-refresh-token"
+        val authResponse = AuthResponse(
+            accessToken = "new-access", refreshToken = "new-refresh", expiresIn = 7200,
+            user = null  // 서버가 user를 포함하지 않는 경우
+        )
+        coEvery { api.authRefresh(any()) } returns Response.success(
+            ApiEnvelope(status = "ok", data = authResponse)
+        )
+
+        // When
+        val token = repository.refreshToken()
+
+        // Then — NPE 없이 토큰 반환
+        assertEquals("new-access", token.accessToken)
+        assertEquals("new-refresh", token.refreshToken)
+    }
+
     @Test(expected = IllegalStateException::class)
     fun `refreshToken - 리프레시 토큰 없으면 예외`() = runTest {
         // Given — 저장된 리프레시 토큰 없음
@@ -192,6 +213,7 @@ class AuthRepositoryImplTest {
         verify { editor.remove("auth_user_id") }
         verify { editor.remove("auth_user_email") }
         verify { editor.remove("auth_subscription_tier") }
+        verify { editor.remove("auth_google_calendar_connected") }
         verify { editor.apply() }
     }
 
@@ -203,6 +225,7 @@ class AuthRepositoryImplTest {
         every { prefs.getString("auth_user_id", null) } returns "user-1"
         every { prefs.getString("auth_user_email", null) } returns "test@example.com"
         every { prefs.getString("auth_subscription_tier", "FREE") } returns "PREMIUM"
+        every { prefs.getBoolean("auth_google_calendar_connected", false) } returns false
 
         // When
         val user = repository.getCurrentUser()
@@ -212,6 +235,7 @@ class AuthRepositoryImplTest {
         assertEquals("user-1", user?.id)
         assertEquals("test@example.com", user?.email)
         assertEquals("PREMIUM", user?.subscriptionTier)
+        assertFalse(user!!.googleCalendarConnected)
     }
 
     @Test

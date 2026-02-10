@@ -24,20 +24,18 @@ import com.example.kairos_mobile.data.remote.dto.v2.NoteGroupRequest
 import com.example.kairos_mobile.data.remote.dto.v2.NoteGroupResponse
 import com.example.kairos_mobile.data.remote.dto.v2.NoteReorganizeRequest
 import com.example.kairos_mobile.data.remote.dto.v2.NoteReorganizeResponse
+import com.example.kairos_mobile.data.remote.dto.v2.OcrRequest
 import com.example.kairos_mobile.data.remote.dto.v2.OcrResponse
 import com.example.kairos_mobile.data.remote.dto.v2.SemanticSearchRequest
 import com.example.kairos_mobile.data.remote.dto.v2.SemanticSearchResponse
 import com.example.kairos_mobile.data.remote.dto.v2.SubscriptionResponse
 import com.example.kairos_mobile.data.remote.dto.v2.SubscriptionVerifyRequest
 import com.example.kairos_mobile.data.remote.dto.v2.UserResponse
-import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -150,7 +148,6 @@ interface KairosApi {
     // --- OCR ---
 
     /** 이미지 OCR */
-    @Multipart
-    @POST("ocr")
-    suspend fun ocr(@Part image: MultipartBody.Part): Response<ApiEnvelope<OcrResponse>>
+    @POST("ocr/extract")
+    suspend fun ocr(@Body request: OcrRequest): Response<ApiEnvelope<OcrResponse>>
 }

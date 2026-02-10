@@ -31,6 +31,7 @@ class AuthRepositoryImpl @Inject constructor(
         private const val KEY_USER_ID = "auth_user_id"
         private const val KEY_USER_EMAIL = "auth_user_email"
         private const val KEY_SUBSCRIPTION_TIER = "auth_subscription_tier"
+        private const val KEY_GOOGLE_CALENDAR_CONNECTED = "auth_google_calendar_connected"
     }
 
     override suspend fun loginWithGoogle(idToken: String): User {
@@ -40,10 +41,13 @@ class AuthRepositoryImpl @Inject constructor(
         )
         val response = ApiResponseHandler.safeCall { api.authGoogle(request) }
         saveTokens(response.accessToken, response.refreshToken, response.expiresIn)
+        val userDto = response.user
+            ?: throw IllegalStateException("로그인 응답에 사용자 정보가 없습니다.")
         val user = User(
-            id = response.user.id,
-            email = response.user.email,
-            subscriptionTier = response.user.subscriptionTier
+            id = userDto.id,
+            email = userDto.email,
+            subscriptionTier = userDto.subscriptionTier,
+            googleCalendarConnected = userDto.googleCalendarConnected
         )
         saveUser(user)
         return user
@@ -56,12 +60,16 @@ class AuthRepositoryImpl @Inject constructor(
             api.authRefresh(AuthRefreshRequest(refreshToken))
         }
         saveTokens(response.accessToken, response.refreshToken, response.expiresIn)
-        val user = User(
-            id = response.user.id,
-            email = response.user.email,
-            subscriptionTier = response.user.subscriptionTier
-        )
-        saveUser(user)
+        // 리프레시 응답에 user가 포함되면 업데이트, 없으면 기존 캐시 유지
+        response.user?.let { userDto ->
+            val user = User(
+                id = userDto.id,
+                email = userDto.email,
+                subscriptionTier = userDto.subscriptionTier,
+                googleCalendarConnected = userDto.googleCalendarConnected
+            )
+            saveUser(user)
+        }
         return AuthToken(
             accessToken = response.accessToken,
             refreshToken = response.refreshToken,
@@ -77,6 +85,7 @@ class AuthRepositoryImpl @Inject constructor(
             .remove(KEY_USER_ID)
             .remove(KEY_USER_EMAIL)
             .remove(KEY_SUBSCRIPTION_TIER)
+            .remove(KEY_GOOGLE_CALENDAR_CONNECTED)
             .apply()
     }
 
@@ -84,7 +93,8 @@ class AuthRepositoryImpl @Inject constructor(
         val id = prefs.getString(KEY_USER_ID, null) ?: return null
         val email = prefs.getString(KEY_USER_EMAIL, null) ?: return null
         val tier = prefs.getString(KEY_SUBSCRIPTION_TIER, "FREE") ?: "FREE"
-        return User(id = id, email = email, subscriptionTier = tier)
+        val calendarConnected = prefs.getBoolean(KEY_GOOGLE_CALENDAR_CONNECTED, false)
+        return User(id = id, email = email, subscriptionTier = tier, googleCalendarConnected = calendarConnected)
     }
 
     override fun isLoggedIn(): Boolean {
@@ -105,6 +115,7 @@ class AuthRepositoryImpl @Inject constructor(
             .putString(KEY_USER_ID, user.id)
             .putString(KEY_USER_EMAIL, user.email)
             .putString(KEY_SUBSCRIPTION_TIER, user.subscriptionTier)
+            .putBoolean(KEY_GOOGLE_CALENDAR_CONNECTED, user.googleCalendarConnected)
             .apply()
     }
 }

@@ -48,8 +48,8 @@ data class CalendarTokenRequest(
     @SerializedName("refresh_token")
     val refreshToken: String?,
 
-    @SerializedName("expires_in")
-    val expiresIn: Long?
+    @SerializedName("expires_at")
+    val expiresAt: String?
 )
 
 data class CalendarTokenResponse(

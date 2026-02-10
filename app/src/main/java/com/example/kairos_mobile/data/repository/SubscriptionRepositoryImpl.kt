@@ -64,6 +64,7 @@ class SubscriptionRepositoryImpl @Inject constructor(
             "ocr" -> features.ocr
             "classification_preset" -> features.classificationPreset
             "custom_instruction" -> features.customInstruction
+            "modification_learning" -> features.modificationLearning
             else -> false
         }
     }
@@ -100,7 +101,8 @@ class SubscriptionRepositoryImpl @Inject constructor(
             analyticsDashboard = dto.analyticsDashboard,
             ocr = dto.ocr,
             classificationPreset = dto.classificationPreset,
-            customInstruction = dto.customInstruction
+            customInstruction = dto.customInstruction,
+            modificationLearning = dto.modificationLearning
         )
     }
 

@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.domain.repository
 
 import com.example.kairos_mobile.domain.model.Note
+import com.example.kairos_mobile.domain.model.NoteAiInput
 import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import kotlinx.coroutines.flow.Flow
@@ -39,4 +40,7 @@ interface NoteRepository {
 
     /** 폴더 미지정(Inbox) 노트 ID 목록 */
     suspend fun getUngroupedNoteIds(): List<String>
+
+    /** AI 분석용 노트 입력 데이터 조회 */
+    suspend fun getNoteAiInputs(noteIds: List<String>): List<NoteAiInput>
 }

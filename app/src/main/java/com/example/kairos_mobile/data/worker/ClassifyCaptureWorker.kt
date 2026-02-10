@@ -28,8 +28,7 @@ import com.example.kairos_mobile.domain.usecase.classification.ProcessClassifica
 import com.example.kairos_mobile.domain.usecase.subscription.CheckFeatureUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.asRequestBody
+import com.example.kairos_mobile.data.remote.dto.v2.OcrRequest
 import java.util.concurrent.TimeUnit
 
 /**
@@ -117,12 +116,19 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                     if (canUseOcr && capture.imageUri != null && capture.originalText.isBlank()) {
                         try {
                             val imageFile = java.io.File(java.net.URI(capture.imageUri))
-                            val requestBody = imageFile.asRequestBody("image/*".toMediaType())
-                            val imagePart = okhttp3.MultipartBody.Part.createFormData(
-                                "image", imageFile.name, requestBody
+                            val imageBytes = imageFile.readBytes()
+                            val base64Data = android.util.Base64.encodeToString(imageBytes, android.util.Base64.NO_WRAP)
+                            val imageType = when (imageFile.extension.lowercase()) {
+                                "png" -> "png"
+                                "webp" -> "webp"
+                                else -> "jpeg"
+                            }
+                            val ocrRequest = OcrRequest(
+                                imageData = base64Data,
+                                imageType = imageType
                             )
-                            val ocrResponse = ApiResponseHandler.safeCall { api.ocr(imagePart) }
-                            textToClassify = ocrResponse.extractedText
+                            val ocrResponse = ApiResponseHandler.safeCall { api.ocr(ocrRequest) }
+                            textToClassify = ocrResponse.text
                             Log.d(TAG, "OCR 완료: $captureId (${textToClassify.length}자)")
                         } catch (e: Exception) {
                             Log.w(TAG, "OCR 실패, 원본 텍스트로 분류: ${e.message}")
