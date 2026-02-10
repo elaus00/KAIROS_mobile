@@ -75,9 +75,9 @@ class CaptureViewModel @Inject constructor(
     }
 
     /**
-     * 글씨 크기 설정 로드
+     * 글씨 크기 설정 로드 (설정 변경 후 화면 복귀 시 재호출)
      */
-    private fun loadFontSize() {
+    fun loadFontSize() {
         viewModelScope.launch {
             val sizeKey = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
             val (fontSize, lineHeight) = when (sizeKey) {

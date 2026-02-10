@@ -98,11 +98,13 @@ fun CaptureContent(
         }
     }
 
-    // 화면 이탈/백그라운드 시 임시 저장
+    // 화면 복귀 시 글씨 크기 재로드 + 이탈 시 임시 저장
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                viewModel.saveDraft()
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> viewModel.loadFontSize()
+                Lifecycle.Event.ON_STOP -> viewModel.saveDraft()
+                else -> Unit
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)

@@ -147,9 +147,6 @@ fun KairosNavGraph(
                 onNavigateToTermsOfService = {
                     navController.navigate(NavRoutes.TERMS_OF_SERVICE)
                 },
-                onNavigateToTrash = {
-                    navController.navigate(NavRoutes.TRASH)
-                },
                 onNavigateToLogin = {
                     navController.navigate(NavRoutes.LOGIN)
                 },

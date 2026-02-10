@@ -47,7 +47,6 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToPrivacyPolicy: () -> Unit = {},
     onNavigateToTermsOfService: () -> Unit = {},
-    onNavigateToTrash: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
     onNavigateToSubscription: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {}
@@ -59,6 +58,7 @@ fun SettingsScreen(
     var showTokenDialog by remember { mutableStateOf(false) }
     var showPresetDropdown by remember { mutableStateOf(false) }
     var showPremiumGateSheet by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
     val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
     val snackbarHostState = remember { SnackbarHostState() }
@@ -111,8 +111,8 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 테마 섹션
-            SectionHeader(title = "테마")
+            // 화면 섹션 (테마 + 글씨 크기 통합)
+            SectionHeader(title = "화면")
 
             SettingsCard {
                 // 다크모드 3옵션
@@ -138,14 +138,16 @@ fun SettingsScreen(
                     isSelected = uiState.themePreference == ThemePreference.DARK,
                     onClick = { viewModel.setTheme(ThemePreference.DARK) }
                 )
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                // 굵은 구분선 (테마 ↔ 글씨 크기)
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 1.dp,
+                    color = colors.border
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // 글씨 크기 섹션
-            SectionHeader(title = "글씨 크기")
-
-            SettingsCard {
                 ThemeOptionItem(
                     title = "작게",
                     isSelected = uiState.captureFontSize == "SMALL",
@@ -220,6 +222,16 @@ fun SettingsScreen(
                         onClick = { viewModel.setCalendarMode("suggest") }
                     )
 
+                    // 알림 (캘린더 활성화 시에만 의미 있음)
+                    SettingsDivider()
+
+                    ToggleSettingItem(
+                        title = "알림",
+                        description = "일정 추가 확인 및 제안 알림",
+                        isChecked = uiState.isNotificationEnabled,
+                        onToggle = { viewModel.toggleNotification(it) }
+                    )
+
                     // 디버그 전용 항목
                     if (BuildConfig.DEBUG) {
                         SettingsDivider()
@@ -250,20 +262,6 @@ fun SettingsScreen(
                         )
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 알림 섹션
-            SectionHeader(title = "알림")
-
-            SettingsCard {
-                ToggleSettingItem(
-                    title = "알림",
-                    description = "일정 추가 확인 및 제안 알림",
-                    isChecked = uiState.isNotificationEnabled,
-                    onToggle = { viewModel.toggleNotification(it) }
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -351,56 +349,63 @@ fun SettingsScreen(
                 SettingsDivider()
 
                 // 분류 규칙 (커스텀 인스트럭션)
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
+                Box {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "분류 규칙",
+                                color = colors.text,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                             if (!isPremium) {
-                                premiumGateFeatureName = "AI 분류 설정"
-                                showPremiumGateSheet = true
+                                Spacer(modifier = Modifier.width(8.dp))
+                                PremiumBadge()
                             }
                         }
-                        .padding(horizontal = 16.dp, vertical = 14.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "분류 규칙",
-                            color = colors.text,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = uiState.customInstruction,
+                            onValueChange = { viewModel.setCustomInstruction(it) },
+                            placeholder = { Text("예: 업무 관련 내용은 일정으로 분류", color = colors.placeholder) },
+                            enabled = isPremium,
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2,
+                            maxLines = 4,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = colors.accent,
+                                unfocusedBorderColor = colors.border,
+                                focusedTextColor = colors.text,
+                                unfocusedTextColor = colors.text,
+                                disabledTextColor = colors.textMuted,
+                                disabledBorderColor = colors.borderLight,
+                                cursorColor = colors.accent
+                            )
                         )
-                        if (!isPremium) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            PremiumBadge()
+                        if (isPremium && uiState.customInstruction.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TextButton(
+                                onClick = { viewModel.saveCustomInstruction() },
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text("저장", color = colors.accent, fontSize = 14.sp)
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = uiState.customInstruction,
-                        onValueChange = { viewModel.setCustomInstruction(it) },
-                        placeholder = { Text("예: 업무 관련 내용은 일정으로 분류", color = colors.placeholder) },
-                        enabled = isPremium,
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                        maxLines = 4,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colors.accent,
-                            unfocusedBorderColor = colors.border,
-                            focusedTextColor = colors.text,
-                            unfocusedTextColor = colors.text,
-                            disabledTextColor = colors.textMuted,
-                            disabledBorderColor = colors.borderLight,
-                            cursorColor = colors.accent
+                    // 비프리미엄 시 TextField 터치를 가로채는 투명 오버레이
+                    if (!isPremium) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clickable {
+                                    premiumGateFeatureName = "AI 분류 설정"
+                                    showPremiumGateSheet = true
+                                }
                         )
-                    )
-                    if (isPremium && uiState.customInstruction.isNotBlank()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TextButton(
-                            onClick = { viewModel.saveCustomInstruction() },
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Text("저장", color = colors.accent, fontSize = 14.sp)
-                        }
                     }
                 }
             }
@@ -421,7 +426,7 @@ fun SettingsScreen(
                     SettingsDivider()
                     NavigationSettingItem(
                         title = "로그아웃",
-                        onClick = { viewModel.logout() }
+                        onClick = { showLogoutDialog = true }
                     )
                 } else {
                     // 미로그인 상태
@@ -435,14 +440,7 @@ fun SettingsScreen(
                     title = "구독 관리",
                     onClick = onNavigateToSubscription
                 )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 분석 섹션
-            SectionHeader(title = "분석")
-
-            SettingsCard {
+                SettingsDivider()
                 NavigationSettingItem(
                     title = "사용 분석",
                     description = "캡처 통계 및 분류 현황",
@@ -479,24 +477,26 @@ fun SettingsScreen(
 
                 NavigationSettingItem(
                     title = "앱 버전",
-                    description = "1.0.0",
+                    description = BuildConfig.VERSION_NAME,
                     showArrow = false,
                     onClick = { }
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // 개발자 도구 (디버그 빌드에서만 노출)
+            if (BuildConfig.DEBUG) {
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // 개발자 도구 (디버그)
-            SectionHeader(title = "개발자 도구")
+                SectionHeader(title = "개발자 도구")
 
-            SettingsCard {
-                DebugImageUploadItem(
-                    isSubmitting = uiState.debugSubmitting,
-                    result = uiState.debugResult,
-                    onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
-                    onDismissResult = { viewModel.dismissDebugResult() }
-                )
+                SettingsCard {
+                    DebugImageUploadItem(
+                        isSubmitting = uiState.debugSubmitting,
+                        result = uiState.debugResult,
+                        onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
+                        onDismissResult = { viewModel.dismissDebugResult() }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -534,6 +534,30 @@ fun SettingsScreen(
                 onNavigateToSubscription()
             },
             onDismiss = { showPremiumGateSheet = false }
+        )
+    }
+
+    // 로그아웃 확인 다이얼로그
+    if (showLogoutDialog) {
+        val dialogColors = KairosTheme.colors
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            containerColor = dialogColors.card,
+            titleContentColor = dialogColors.text,
+            textContentColor = dialogColors.text,
+            title = { Text("로그아웃", color = dialogColors.text) },
+            text = { Text("로그아웃하시겠습니까?", color = dialogColors.text) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.logout()
+                    showLogoutDialog = false
+                }) { Text("로그아웃", color = dialogColors.danger) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("취소", color = dialogColors.textSecondary)
+                }
+            }
         )
     }
 }
