@@ -1,5 +1,7 @@
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -30,6 +32,22 @@ android {
     val benchmarkApiBaseUrl = (project.findProperty("KAIROS_BENCHMARK_API_BASE_URL") as String?)
         ?: debugApiBaseUrl
 
+    // Keystore 설정 로드 (릴리스 서명용)
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias") ?: ""
+            keyPassword = keystoreProperties.getProperty("keyPassword") ?: ""
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { path -> file(path) }
+            storePassword = keystoreProperties.getProperty("storePassword") ?: ""
+        }
+    }
+
     buildTypes {
         debug {
             // 기본값은 Android 에뮬레이터(localhost -> 10.0.2.2)
@@ -48,11 +66,13 @@ android {
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "API_BASE_URL", "\"https://api.kairos.app/api/v1\"")
             buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")

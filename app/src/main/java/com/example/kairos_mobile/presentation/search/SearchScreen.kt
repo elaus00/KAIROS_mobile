@@ -101,7 +101,7 @@ fun SearchScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = null,
+                            contentDescription = "검색",
                             tint = colors.textMuted,
                             modifier = Modifier.size(20.dp)
                         )

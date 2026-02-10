@@ -165,4 +165,44 @@ class OnboardingViewModelTest {
         }
         assertTrue(viewModel.uiState.value.isGoogleConnected)
     }
+
+    /** connectGoogle 실패 시 에러 메시지가 설정된다 */
+    @Test
+    fun connectGoogle_failure_sets_error_message() = runTest {
+        // given - setString 호출 시 예외 발생
+        coEvery {
+            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+        } throws RuntimeException("연결 실패")
+
+        // when
+        viewModel.connectGoogle()
+        advanceUntilIdle()
+
+        // then - 에러 메시지 설정됨
+        assertEquals("연결에 실패했습니다. 다시 시도해주세요.", viewModel.uiState.value.googleConnectionError)
+        assertFalse(viewModel.uiState.value.isGoogleConnected)
+    }
+
+    /** connectGoogle 재시도 시 에러 메시지가 초기화된다 */
+    @Test
+    fun connectGoogle_retry_clears_error() = runTest {
+        // given - 첫 시도 실패
+        coEvery {
+            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+        } throws RuntimeException("연결 실패")
+        viewModel.connectGoogle()
+        advanceUntilIdle()
+        assertEquals("연결에 실패했습니다. 다시 시도해주세요.", viewModel.uiState.value.googleConnectionError)
+
+        // when - 재시도 (성공)
+        coEvery {
+            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+        } returns Unit
+        viewModel.connectGoogle()
+        advanceUntilIdle()
+
+        // then - 에러 메시지 초기화됨
+        assertEquals(null, viewModel.uiState.value.googleConnectionError)
+        assertTrue(viewModel.uiState.value.isGoogleConnected)
+    }
 }

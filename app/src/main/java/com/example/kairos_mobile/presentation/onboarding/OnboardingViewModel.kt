@@ -23,7 +23,9 @@ data class OnboardingUiState(
     val inputText: String = "",
     val isSubmitting: Boolean = false,
     /** Google Calendar 연결 상태 (Mock) */
-    val isGoogleConnected: Boolean = false
+    val isGoogleConnected: Boolean = false,
+    /** Google Calendar 연결 실패 에러 메시지 */
+    val googleConnectionError: String? = null
 )
 
 /**
@@ -109,8 +111,16 @@ class OnboardingViewModel @Inject constructor(
      */
     fun connectGoogle() {
         viewModelScope.launch {
-            userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
-            _uiState.update { it.copy(isGoogleConnected = true) }
+            try {
+                // 에러 상태 초기화
+                _uiState.update { it.copy(googleConnectionError = null) }
+
+                userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+                _uiState.update { it.copy(isGoogleConnected = true) }
+            } catch (e: Exception) {
+                // 실패 시 에러 메시지 설정 (현재는 발생하지 않음)
+                _uiState.update { it.copy(googleConnectionError = "연결에 실패했습니다. 다시 시도해주세요.") }
+            }
         }
     }
 }

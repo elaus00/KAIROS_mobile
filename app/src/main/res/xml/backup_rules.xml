@@ -1,13 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   KAIROS Mobile 백업 규칙
+   API 31+ 디바이스에서 전체 백업 정책 정의
    See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
     <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+        보안상 중요한 데이터는 백업에서 제외
+        - Room 데이터베이스: 로컬 전용 데이터
+        - SharedPreferences: 토큰, 디바이스 ID 등 민감 정보
+        - EncryptedSharedPreferences: 암호화된 토큰 저장소
+    -->
+
+    <!-- Room 데이터베이스 제외 -->
+    <exclude domain="database" path="."/>
+
+    <!-- SharedPreferences 제외 (토큰, 디바이스 ID 등) -->
+    <exclude domain="sharedpref" path="."/>
+
+    <!-- 내부 저장소 파일 제외 (캡처 이미지 등) -->
+    <exclude domain="file" path="."/>
+
+    <!-- 캐시 제외 -->
+    <exclude domain="cache" path="."/>
 </full-backup-content>

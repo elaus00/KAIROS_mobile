@@ -61,8 +61,21 @@ fun SettingsScreen(
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
     val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 캘린더 인증 메시지 Snackbar 표시
+    LaunchedEffect(uiState.calendarAuthMessage) {
+        uiState.calendarAuthMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.dismissCalendarAuthMessage()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -492,22 +505,6 @@ fun SettingsScreen(
                 onNavigateToSubscription()
             },
             onDismiss = { showPremiumGateSheet = false }
-        )
-    }
-
-    if (uiState.calendarAuthMessage != null) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissCalendarAuthMessage() },
-            containerColor = colors.card,
-            titleContentColor = colors.text,
-            textContentColor = colors.text,
-            title = { Text("캘린더 연동 결과", color = colors.text) },
-            text = { Text(uiState.calendarAuthMessage ?: "", color = colors.text) },
-            confirmButton = {
-                TextButton(onClick = { viewModel.dismissCalendarAuthMessage() }) {
-                    Text("확인", color = colors.accent)
-                }
-            }
         )
     }
 }

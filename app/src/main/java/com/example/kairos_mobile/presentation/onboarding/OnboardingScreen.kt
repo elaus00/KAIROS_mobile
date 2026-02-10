@@ -93,6 +93,7 @@ fun OnboardingScreen(
                 2 -> OnboardingPageGoogle(
                     colors = colors,
                     isConnected = uiState.isGoogleConnected,
+                    errorMessage = uiState.googleConnectionError,
                     onConnect = viewModel::connectGoogle
                 )
                 3 -> OnboardingPage3(
@@ -219,6 +220,7 @@ private fun OnboardingPage2(colors: com.example.kairos_mobile.ui.theme.KairosCol
 private fun OnboardingPageGoogle(
     colors: com.example.kairos_mobile.ui.theme.KairosColors,
     isConnected: Boolean,
+    errorMessage: String?,
     onConnect: () -> Unit
 ) {
     Column(
@@ -249,6 +251,17 @@ private fun OnboardingPageGoogle(
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        // 에러 메시지 표시
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = colors.danger,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         // 연결 버튼 / 연결됨 상태
         if (isConnected) {
             Box(
@@ -275,7 +288,7 @@ private fun OnboardingPageGoogle(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Google Calendar 연결",
+                    text = if (errorMessage != null) "다시 시도" else "Google Calendar 연결",
                     color = if (colors.isDark) colors.background else Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold

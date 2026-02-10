@@ -1,19 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   KAIROS Mobile 데이터 추출 규칙
+   API 31+ 디바이스에서 클라우드 백업 및 기기 간 전송 정책 정의
    See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
 -->
 <data-extraction-rules>
+    <!-- 클라우드 백업: Google Drive 자동 백업 -->
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
+        <!--
+            보안상 모든 데이터를 클라우드 백업에서 제외
+            - 데이터베이스: 서버 동기화 가능
+            - SharedPreferences: 토큰 등 민감 정보
+            - 파일: 서버에 업로드된 캡처 이미지
         -->
+
+        <!-- Room 데이터베이스 제외 -->
+        <exclude domain="database" path="."/>
+
+        <!-- SharedPreferences 제외 (토큰, 디바이스 ID 등) -->
+        <exclude domain="sharedpref" path="."/>
+
+        <!-- 내부 저장소 파일 제외 (캡처 이미지 등) -->
+        <exclude domain="file" path="."/>
     </cloud-backup>
-    <!--
+
+    <!-- 디바이스 전송: 기기 간 직접 전송 (Android 12+ Smart Switch 등) -->
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!--
+            기기 전송 시에도 보안상 데이터 전송 제외
+            새 기기에서 로그인 시 서버 동기화로 데이터 복원 가능
+        -->
+
+        <!-- Room 데이터베이스 제외 -->
+        <exclude domain="database" path="."/>
+
+        <!-- SharedPreferences 제외 (토큰, 디바이스 ID 등) -->
+        <exclude domain="sharedpref" path="."/>
+
+        <!-- 내부 저장소 파일 제외 (캡처 이미지 등) -->
+        <exclude domain="file" path="."/>
     </device-transfer>
-    -->
 </data-extraction-rules>
