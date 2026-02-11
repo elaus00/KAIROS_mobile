@@ -413,14 +413,14 @@ private fun CaptureToolBar(
     // 이미지 아이콘 색상 전환 애니메이션
     val imageIconColor by animateColorAsState(
         targetValue = if (hasImage) colors.accent else colors.iconMuted,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "imageIconColor"
     )
 
     // 전송 버튼 배경 색상 전환 애니메이션
     val submitBgColor by animateColorAsState(
         targetValue = if (canSubmit) colors.accent else colors.accentBg,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "submitBgColor"
     )
 
@@ -429,7 +429,7 @@ private fun CaptureToolBar(
         targetValue = if (canSubmit) {
             if (colors.isDark) colors.background else Color.White
         } else colors.textMuted,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "submitIconColor"
     )
 

@@ -52,10 +52,10 @@ fun KairosBottomNav(
         Row(
             modifier = Modifier
                 .shadow(
-                    elevation = 16.dp,
+                    elevation = 8.dp,
                     shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.15f),
-                    spotColor = Color.Black.copy(alpha = 0.15f)
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
                 )
                 .clip(RoundedCornerShape(20.dp))
                 .background(colors.card)

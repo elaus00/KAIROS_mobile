@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.kairos_mobile.presentation.calendar.TodoDisplayItem
@@ -102,6 +104,7 @@ private fun DraggableTaskList(
     onReorder: (List<String>) -> Unit
 ) {
     val colors = KairosTheme.colors
+    val haptic = LocalHapticFeedback.current
 
     // 드래그 상태 관리
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
@@ -131,8 +134,10 @@ private fun DraggableTaskList(
                 ) {
                     TaskItemWithDragHandle(
                         task = task,
+                        isDragging = isDragging,
                         onToggleComplete = { onTaskComplete(task.todoId) },
                         onDragStart = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             draggingIndex = index
                             dragOffsetY = 0f
                         },
@@ -164,6 +169,7 @@ private fun DraggableTaskList(
 @Composable
 private fun TaskItemWithDragHandle(
     task: TodoDisplayItem,
+    isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
@@ -173,12 +179,19 @@ private fun TaskItemWithDragHandle(
     val colors = KairosTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
 
+    // 드래그 중 배경색 변경
+    val cardBackground by animateColorAsState(
+        targetValue = if (isDragging) colors.accentBg else colors.card,
+        animationSpec = tween(durationMillis = 150),
+        label = "dragBg"
+    )
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(colors.card)
-            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
+            .background(cardBackground)
+            .border(1.dp, if (isDragging) colors.accent.copy(alpha = 0.3f) else colors.border, RoundedCornerShape(12.dp))
             .clickable { isExpanded = !isExpanded }
             .padding(start = 4.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
     ) {
@@ -410,7 +423,7 @@ private fun TaskCheckbox(
         label = "borderColor"
     )
 
-    // 48dp 터치 영역으로 감싸고, 시각적 크기 22dp 유지
+    // 48dp 터치 영역, 24dp 시각적 크기
     Box(
         modifier = modifier
             .size(48.dp)
@@ -424,7 +437,7 @@ private fun TaskCheckbox(
     ) {
         Box(
             modifier = Modifier
-                .size(22.dp)
+                .size(24.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(backgroundColor)
                 .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),

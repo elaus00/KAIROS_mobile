@@ -1,5 +1,7 @@
 package com.example.kairos_mobile.presentation.calendar
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +31,7 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
  * Calendar 화면 내용 (Scaffold 없이)
  * MainScreen의 HorizontalPager에서 사용
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarContent(
     modifier: Modifier = Modifier,
@@ -102,12 +105,13 @@ fun CalendarContent(
                     ) {
                         CircularProgressIndicator(
                             color = colors.accent,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(40.dp),
+                            strokeWidth = 3.dp
                         )
                         Text(
                             text = "로드 중...",
                             color = colors.textMuted,
-                            fontSize = 13.sp
+                            fontSize = 14.sp
                         )
                     }
                 }

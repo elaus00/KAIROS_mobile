@@ -199,9 +199,9 @@ fun NoteDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             color = colors.text,
-                            fontSize = 26.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
-                            lineHeight = 32.sp
+                            lineHeight = 36.sp
                         ),
                         cursorBrush = SolidColor(colors.accent),
                         singleLine = false,
@@ -211,7 +211,7 @@ fun NoteDetailScreen(
                                     Text(
                                         text = "제목",
                                         color = colors.placeholder,
-                                        fontSize = 26.sp,
+                                        fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
