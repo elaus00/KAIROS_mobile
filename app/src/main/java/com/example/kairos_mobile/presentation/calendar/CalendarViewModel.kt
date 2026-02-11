@@ -8,6 +8,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -39,6 +40,7 @@ class CalendarViewModel @Inject constructor(
     private val captureRepository: CaptureRepository,
     private val calendarRepository: CalendarRepository,
     private val toggleTodoCompletion: ToggleTodoCompletionUseCase,
+    private val reorderTodo: ReorderTodoUseCase,
     private val approveSuggestion: ApproveCalendarSuggestionUseCase
 ) : ViewModel() {
 
@@ -70,6 +72,8 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
             is CalendarEvent.ApproveSuggestion -> approveCalendarSuggestion(event.scheduleId)
             is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
+            is CalendarEvent.ToggleShowCompleted -> toggleShowCompleted()
+            is CalendarEvent.ReorderTasks -> reorderTasks(event.todoIds)
         }
     }
 
@@ -152,12 +156,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 전체 할 일 로드 (완료 여부 무관, 체크해도 제자리 유지)
+     * 할 일 로드 — 미완료/완료 분리
      */
     private fun loadTodos() {
         todosJob?.cancel()
         todosJob = viewModelScope.launch {
-            todoRepository.getAllTodos()
+            todoRepository.getActiveTodos()
                 .catch { /* 에러 무시 */ }
                 .collect { todos ->
                     val displayItems = todos.map { todo ->
@@ -167,13 +171,55 @@ class CalendarViewModel @Inject constructor(
                             captureId = todo.captureId,
                             title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
                             deadline = todo.deadline,
-                            isCompleted = todo.isCompleted,
+                            isCompleted = false,
                             deadlineSource = todo.deadlineSource?.name
                         )
                     }
-
                     _uiState.update { it.copy(tasks = displayItems) }
                 }
+        }
+        // 완료 할 일 별도 로드
+        viewModelScope.launch {
+            todoRepository.getCompletedTodos()
+                .catch { /* 에러 무시 */ }
+                .collect { todos ->
+                    val displayItems = todos.map { todo ->
+                        val capture = captureRepository.getCaptureById(todo.captureId)
+                        TodoDisplayItem(
+                            todoId = todo.id,
+                            captureId = todo.captureId,
+                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
+                            deadline = todo.deadline,
+                            isCompleted = true,
+                            deadlineSource = todo.deadlineSource?.name
+                        )
+                    }
+                    _uiState.update { it.copy(completedTasks = displayItems) }
+                }
+        }
+    }
+
+    /**
+     * 완료 항목 표시 토글
+     */
+    private fun toggleShowCompleted() {
+        _uiState.update { it.copy(showCompleted = !it.showCompleted) }
+    }
+
+    /**
+     * 할 일 드래그 순서 변경
+     */
+    private fun reorderTasks(todoIds: List<String>) {
+        // 즉시 UI 반영
+        _uiState.update { state ->
+            val reordered = todoIds.mapNotNull { id ->
+                state.tasks.find { it.todoId == id }
+            }
+            state.copy(tasks = reordered)
+        }
+        // DB 업데이트
+        viewModelScope.launch {
+            reorderTodo(todoIds)
         }
     }
 

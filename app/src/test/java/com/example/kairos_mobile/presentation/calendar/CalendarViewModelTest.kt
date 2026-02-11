@@ -6,6 +6,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
+import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
@@ -45,6 +46,7 @@ class CalendarViewModelTest {
     private lateinit var captureRepository: CaptureRepository
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var toggleTodoCompletion: ToggleTodoCompletionUseCase
+    private lateinit var reorderTodo: ReorderTodoUseCase
     private lateinit var approveSuggestion: ApproveCalendarSuggestionUseCase
 
     @Before
@@ -54,6 +56,7 @@ class CalendarViewModelTest {
         captureRepository = mockk()
         calendarRepository = mockk(relaxed = true)
         toggleTodoCompletion = mockk()
+        reorderTodo = mockk(relaxed = true)
         approveSuggestion = mockk(relaxed = true)
     }
 
@@ -67,10 +70,11 @@ class CalendarViewModelTest {
      * 기본 빈 Flow 설정 후 ViewModel 생성 헬퍼
      */
     private fun createViewModel(): CalendarViewModel {
-        // init에서 호출되는 3개 Repository 메서드에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
+        // init에서 호출되는 Repository 메서드에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
 
         return CalendarViewModel(
             scheduleRepository,
@@ -78,6 +82,7 @@ class CalendarViewModelTest {
             captureRepository,
             calendarRepository,
             toggleTodoCompletion,
+            reorderTodo,
             approveSuggestion
         )
     }
@@ -95,14 +100,15 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("cap-1") } returns capture
 
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
-            approveSuggestion
+            reorderTodo, approveSuggestion
         )
         advanceUntilIdle()
 
@@ -122,14 +128,15 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getAllTodos() } returns flowOf(listOf(todo))
+        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("cap-2") } returns capture
 
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
-            approveSuggestion
+            reorderTodo, approveSuggestion
         )
         advanceUntilIdle()
 
@@ -147,13 +154,14 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(epochDay))
-        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
 
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
-            approveSuggestion
+            reorderTodo, approveSuggestion
         )
         advanceUntilIdle()
 
@@ -228,7 +236,8 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("c1") } returns cap1
         coEvery { captureRepository.getCaptureById("c2") } returns cap2
 
@@ -236,7 +245,7 @@ class CalendarViewModelTest {
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
-            approveSuggestion
+            reorderTodo, approveSuggestion
         )
         advanceUntilIdle()
 
@@ -254,14 +263,15 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("missing-cap") } returns null
 
         // When
         val viewModel = CalendarViewModel(
             scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
-            approveSuggestion
+            reorderTodo, approveSuggestion
         )
         advanceUntilIdle()
 

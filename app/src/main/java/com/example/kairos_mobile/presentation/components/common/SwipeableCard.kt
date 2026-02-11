@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -104,11 +107,24 @@ private fun SwipeBackground(
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = "삭제",
-            tint = Color.White,
+        // HIG 2.2: 색상만으로 의미 전달하지 않는다 — 아이콘 + 텍스트 병행
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.scale(iconScale)
-        )
+        ) {
+            Text(
+                text = "삭제",
+                color = Color.White,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "삭제",
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

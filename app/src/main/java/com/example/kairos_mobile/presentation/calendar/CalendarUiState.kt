@@ -20,8 +20,14 @@ data class CalendarUiState(
     // 선택된 날짜의 일정 목록 (표시용)
     val schedules: List<ScheduleDisplayItem> = emptyList(),
 
-    // 할 일 목록 (완료 여부 무관, 체크해도 제자리 유지)
+    // 미완료 할 일 목록
     val tasks: List<TodoDisplayItem> = emptyList(),
+
+    // 완료된 할 일 목록
+    val completedTasks: List<TodoDisplayItem> = emptyList(),
+
+    // 완료 항목 표시 여부
+    val showCompleted: Boolean = false,
 
     // 일정이 있는 날짜 목록 (dot 표시용)
     val datesWithSchedules: Set<LocalDate> = emptySet(),
@@ -83,6 +89,10 @@ sealed interface CalendarEvent {
     data class ApproveSuggestion(val scheduleId: String) : CalendarEvent
     /** 캘린더 제안 거부 */
     data class RejectSuggestion(val scheduleId: String) : CalendarEvent
+    /** 완료 항목 표시 토글 */
+    data object ToggleShowCompleted : CalendarEvent
+    /** 할 일 드래그 순서 변경 */
+    data class ReorderTasks(val todoIds: List<String>) : CalendarEvent
 }
 
 /**
