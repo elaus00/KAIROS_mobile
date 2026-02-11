@@ -69,11 +69,21 @@ fun TrashScreen(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = colors.textMuted
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp,
+                                color = colors.textMuted
+                            )
+                            Text(
+                                text = "로드 중...",
+                                color = colors.textMuted,
+                                fontSize = 13.sp
+                            )
+                        }
                     }
                 }
 

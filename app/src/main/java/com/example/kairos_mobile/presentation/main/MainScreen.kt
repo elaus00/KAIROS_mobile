@@ -13,6 +13,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -118,20 +122,33 @@ fun MainScreen(
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(colors.warning.copy(alpha = 0.15f))
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(vertical = 4.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "오프라인 상태입니다 · 연결되면 자동 동기화",
                         color = colors.warning,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
+                        modifier = Modifier.weight(1f)
                     )
+                    IconButton(
+                        onClick = {
+                            // TODO: ViewModel의 수동 동기화 함수 호출
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Refresh,
+                            contentDescription = "새로고침",
+                            tint = colors.warning,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
 

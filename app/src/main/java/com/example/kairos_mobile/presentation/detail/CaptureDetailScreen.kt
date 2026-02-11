@@ -15,6 +15,10 @@ import com.example.kairos_mobile.presentation.components.common.KairosChip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LinkOff
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -379,21 +383,52 @@ private fun CalendarSyncSection(
                 .padding(16.dp)
         ) {
             Column {
-                // 상태 텍스트
-                val (statusText, statusColor) = when (syncStatus) {
-                    CalendarSyncStatus.SYNCED -> "Google Calendar에 동기화됨" to colors.success
-                    CalendarSyncStatus.SUGGESTION_PENDING -> "캘린더 추가를 제안합니다" to colors.warning
-                    CalendarSyncStatus.SYNC_FAILED -> "동기화 실패" to colors.danger
-                    CalendarSyncStatus.REJECTED -> "사용자가 거부함" to colors.textMuted
-                    CalendarSyncStatus.NOT_LINKED -> "연결되지 않음" to colors.textMuted
+                // 상태 텍스트 + 아이콘 (색맹 접근성)
+                val (statusText, statusColor, statusIcon) = when (syncStatus) {
+                    CalendarSyncStatus.SYNCED -> Triple(
+                        "Google Calendar에 동기화됨",
+                        colors.success,
+                        Icons.Outlined.Check
+                    )
+                    CalendarSyncStatus.SUGGESTION_PENDING -> Triple(
+                        "캘린더 추가를 제안합니다",
+                        colors.warning,
+                        Icons.Outlined.Info
+                    )
+                    CalendarSyncStatus.SYNC_FAILED -> Triple(
+                        "동기화 실패",
+                        colors.danger,
+                        Icons.Outlined.Warning
+                    )
+                    CalendarSyncStatus.REJECTED -> Triple(
+                        "사용자가 거부함",
+                        colors.textMuted,
+                        Icons.Outlined.LinkOff
+                    )
+                    CalendarSyncStatus.NOT_LINKED -> Triple(
+                        "연결되지 않음",
+                        colors.textMuted,
+                        Icons.Outlined.LinkOff
+                    )
                 }
 
-                Text(
-                    text = statusText,
-                    color = statusColor,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = statusIcon,
+                        contentDescription = null,
+                        tint = statusColor,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = statusText,
+                        color = statusColor,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
                 // SUGGESTION_PENDING일 때 승인/거부 버튼
                 if (syncStatus == CalendarSyncStatus.SUGGESTION_PENDING) {

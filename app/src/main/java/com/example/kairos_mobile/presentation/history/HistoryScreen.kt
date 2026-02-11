@@ -2,10 +2,12 @@ package com.example.kairos_mobile.presentation.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.History
@@ -17,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.kairos_mobile.presentation.components.common.FilterChipRow
+import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.presentation.components.common.SwipeableCard
 import com.example.kairos_mobile.presentation.history.components.HistoryItem
@@ -97,15 +99,10 @@ fun HistoryScreen(
             // 상단 바: 뒤로 가기 + 제목
             HistoryTopBar(onNavigateBack = onNavigateBack)
 
-            // 분류 유형 필터 칩
-            FilterChipRow(
+            // 필터 칩 (유형 + 날짜 범위 통합 1열)
+            HistoryFilterRow(
                 selectedType = uiState.selectedType,
                 onTypeSelected = { viewModel.setTypeFilter(it) },
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-
-            // 날짜 범위 필터 칩
-            DateRangeChipRow(
                 startDate = uiState.startDate,
                 endDate = uiState.endDate,
                 onDateRangeSelected = { start, end -> viewModel.setDateRange(start, end) }
@@ -120,11 +117,21 @@ fun HistoryScreen(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = colors.textMuted
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp,
+                                color = colors.textMuted
+                            )
+                            Text(
+                                text = "로드 중...",
+                                color = colors.textMuted,
+                                fontSize = 13.sp
+                            )
+                        }
                     }
                 }
 
@@ -242,18 +249,23 @@ private fun HistoryTopBar(
 }
 
 /**
- * 날짜 범위 필터 칩 Row
- * 오늘 / 이번 주 / 이번 달 / 전체
+ * 유형 + 날짜 범위 필터 통합 1열
+ * 유형 칩 | 세로 구분선 | 날짜 범위 칩
+ * HIG 2.3: 터치 타겟 44pt 이상, 8pt 그리드 준수
  */
 @Composable
-private fun DateRangeChipRow(
+private fun HistoryFilterRow(
+    selectedType: ClassifiedType?,
+    onTypeSelected: (ClassifiedType?) -> Unit,
     startDate: Long?,
     endDate: Long?,
     onDateRangeSelected: (Long?, Long?) -> Unit
 ) {
+    val colors = KairosTheme.colors
+    val scrollState = rememberScrollState()
+
     val now = remember { System.currentTimeMillis() }
 
-    // 오늘 시작 시각 계산
     val todayStart = remember {
         Calendar.getInstance().apply {
             timeInMillis = now
@@ -264,7 +276,6 @@ private fun DateRangeChipRow(
         }.timeInMillis
     }
 
-    // 이번 주 시작 시각 (월요일)
     val weekStart = remember {
         Calendar.getInstance().apply {
             timeInMillis = now
@@ -276,7 +287,6 @@ private fun DateRangeChipRow(
         }.timeInMillis
     }
 
-    // 이번 달 시작 시각
     val monthStart = remember {
         Calendar.getInstance().apply {
             timeInMillis = now
@@ -288,7 +298,6 @@ private fun DateRangeChipRow(
         }.timeInMillis
     }
 
-    // 현재 선택된 범위 판별
     val selectedRange = when {
         startDate == null && endDate == null -> "전체"
         startDate == todayStart -> "오늘"
@@ -298,9 +307,44 @@ private fun DateRangeChipRow(
     }
 
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        // 유형 필터
+        KairosChip(
+            text = "전체",
+            selected = selectedType == null,
+            onClick = { onTypeSelected(null) }
+        )
+        KairosChip(
+            text = "일정",
+            selected = selectedType == ClassifiedType.SCHEDULE,
+            onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
+        )
+        KairosChip(
+            text = "할 일",
+            selected = selectedType == ClassifiedType.TODO,
+            onClick = { onTypeSelected(ClassifiedType.TODO) }
+        )
+        KairosChip(
+            text = "노트",
+            selected = selectedType == ClassifiedType.NOTES,
+            onClick = { onTypeSelected(ClassifiedType.NOTES) }
+        )
+
+        // 세로 구분선
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .height(20.dp)
+                .background(colors.border)
+        )
+
+        // 날짜 범위 필터
         KairosChip(
             text = "전체",
             selected = selectedRange == "전체",

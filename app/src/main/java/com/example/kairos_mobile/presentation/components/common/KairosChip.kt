@@ -3,6 +3,7 @@ package com.example.kairos_mobile.presentation.components.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 /**
  * Kairos Chip 컴포넌트 (PRD v4.0)
  * AI 분류 결과 표시용
+ * 터치 영역 최소 36dp 확보 (Apple HIG 권장 44dp 고려)
  */
 @Composable
 fun KairosChip(
@@ -38,6 +40,7 @@ fun KairosChip(
 
     Box(
         modifier = modifier
+            .defaultMinSize(minHeight = 36.dp) // 터치 영역 최소 높이 확보
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .then(
@@ -47,7 +50,7 @@ fun KairosChip(
                     Modifier
                 }
             )
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp), // vertical 6dp → 10dp 확대
         contentAlignment = Alignment.Center
     ) {
         Text(

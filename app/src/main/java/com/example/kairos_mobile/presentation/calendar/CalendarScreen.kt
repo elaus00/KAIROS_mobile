@@ -9,6 +9,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.presentation.calendar.components.CalendarCard
 import com.example.kairos_mobile.presentation.calendar.components.ScheduleTimeline
@@ -94,10 +96,20 @@ fun CalendarContent(
                         .padding(vertical = 48.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        color = colors.accent,
-                        modifier = Modifier.size(32.dp)
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            color = colors.accent,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Text(
+                            text = "로드 중...",
+                            color = colors.textMuted,
+                            fontSize = 13.sp
+                        )
+                    }
                 }
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -120,11 +132,19 @@ fun CalendarContent(
 
                 TaskList(
                     tasks = uiState.tasks,
+                    completedTasks = uiState.completedTasks,
+                    showCompleted = uiState.showCompleted,
                     onTaskComplete = { taskId ->
                         viewModel.onEvent(CalendarEvent.ToggleTaskComplete(taskId))
                     },
                     onTaskDelete = { captureId ->
                         viewModel.onEvent(CalendarEvent.DeleteTask(captureId))
+                    },
+                    onReorder = { todoIds ->
+                        viewModel.onEvent(CalendarEvent.ReorderTasks(todoIds))
+                    },
+                    onToggleShowCompleted = {
+                        viewModel.onEvent(CalendarEvent.ToggleShowCompleted)
                     }
                 )
 
