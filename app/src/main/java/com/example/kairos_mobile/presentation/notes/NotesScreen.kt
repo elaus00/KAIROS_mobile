@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.domain.model.FolderType
+import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.presentation.components.common.KairosChip
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.text.SimpleDateFormat
@@ -353,7 +354,7 @@ private fun NotesList(
 ) {
     LazyColumn(
         modifier = modifier.testTag("notes_list"),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 100.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(
@@ -437,16 +438,51 @@ private fun NoteListItem(
             )
         }
 
-        // 폴더 태그
-        if (note.folderName != null) {
+        // 분류 칩 + 폴더 태그 (§4.3 분류 칩 항상 표시)
+        val subTypeLabel = noteSubTypeLabel(note.noteSubType)
+        if (subTypeLabel != null || note.folderName != null) {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = note.folderName,
-                color = colors.textMuted,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Normal
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 서브타입 칩 (IDEA, BOOKMARK 등)
+                if (subTypeLabel != null) {
+                    Text(
+                        text = subTypeLabel,
+                        color = colors.accent,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.accentBg)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+                // 폴더 이름
+                if (note.folderName != null) {
+                    Text(
+                        text = note.folderName,
+                        color = colors.textMuted,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
         }
+    }
+}
+
+/**
+ * NoteSubType → 표시 라벨 변환
+ * INBOX/USER_FOLDER는 별도 칩 불필요 (폴더 이름으로 표시)
+ */
+private fun noteSubTypeLabel(subType: String?): String? {
+    return when (subType) {
+        NoteSubType.IDEA.name -> "Idea"
+        NoteSubType.BOOKMARK.name -> "Bookmark"
+        NoteSubType.INBOX.name -> "Inbox"
+        else -> null
     }
 }
 

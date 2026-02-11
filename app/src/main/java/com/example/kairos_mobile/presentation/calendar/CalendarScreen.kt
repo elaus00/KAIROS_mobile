@@ -164,7 +164,7 @@ fun CalendarContent(
                     onTaskAction = { task -> selectedTask = task }
                 )
 
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 

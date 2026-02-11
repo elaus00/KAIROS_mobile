@@ -58,7 +58,7 @@ fun KairosBottomNav(
                     spotColor = Color.Black.copy(alpha = 0.08f)
                 )
                 .clip(RoundedCornerShape(20.dp))
-                .background(colors.card.copy(alpha = 0.85f))
+                .background(colors.card)
                 .padding(horizontal = 28.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(36.dp),
             verticalAlignment = Alignment.CenterVertically
