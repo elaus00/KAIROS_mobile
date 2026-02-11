@@ -66,6 +66,7 @@ fun TaskList(
     onTaskDelete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
     onToggleShowCompleted: () -> Unit,
+    onTaskAction: (TodoDisplayItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -78,7 +79,8 @@ fun TaskList(
             DraggableTaskList(
                 tasks = tasks,
                 onTaskComplete = onTaskComplete,
-                onReorder = onReorder
+                onReorder = onReorder,
+                onTaskAction = onTaskAction
             )
 
             // 완료 항목 토글
@@ -101,7 +103,8 @@ fun TaskList(
 private fun DraggableTaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
-    onReorder: (List<String>) -> Unit
+    onReorder: (List<String>) -> Unit,
+    onTaskAction: (TodoDisplayItem) -> Unit = {}
 ) {
     val colors = KairosTheme.colors
     val haptic = LocalHapticFeedback.current
@@ -136,6 +139,7 @@ private fun DraggableTaskList(
                         task = task,
                         isDragging = isDragging,
                         onToggleComplete = { onTaskComplete(task.todoId) },
+                        onTaskAction = { onTaskAction(task) },
                         onDragStart = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             draggingIndex = index
@@ -171,6 +175,7 @@ private fun TaskItemWithDragHandle(
     task: TodoDisplayItem,
     isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
+    onTaskAction: () -> Unit = {},
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
@@ -178,6 +183,9 @@ private fun TaskItemWithDragHandle(
 ) {
     val colors = KairosTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
+
+    // 확장 가능 여부 판단
+    val hasExpandableContent = task.deadline != null || task.title.length > 25
 
     // 드래그 중 배경색 변경
     val cardBackground by animateColorAsState(
@@ -192,7 +200,15 @@ private fun TaskItemWithDragHandle(
             .clip(RoundedCornerShape(12.dp))
             .background(cardBackground)
             .border(1.dp, if (isDragging) colors.accent.copy(alpha = 0.3f) else colors.border, RoundedCornerShape(12.dp))
-            .clickable { isExpanded = !isExpanded }
+            .clickable {
+                if (isExpanded) {
+                    onTaskAction()
+                } else if (hasExpandableContent) {
+                    isExpanded = true
+                } else {
+                    onTaskAction()
+                }
+            }
             .padding(start = 4.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
     ) {
         Column {
@@ -204,7 +220,7 @@ private fun TaskItemWithDragHandle(
                 Icon(
                     imageVector = Icons.Default.DragHandle,
                     contentDescription = "순서 변경",
-                    tint = colors.textMuted,
+                    tint = colors.textMuted.copy(alpha = 0.3f),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(12.dp)
@@ -267,13 +283,14 @@ private fun TaskItemWithDragHandle(
                 )
             }
 
-            AnimatedVisibility(visible = isExpanded) {
+            AnimatedVisibility(visible = isExpanded && hasExpandableContent) {
                 Column(modifier = Modifier.padding(top = 8.dp, start = 48.dp)) {
-                    task.deadline?.let { deadlineMs ->
+                    // 확장 시 제목 전문 표시 (긴 제목일 때)
+                    if (task.title.length > 25) {
                         Text(
-                            text = "마감: ${formatDeadline(deadlineMs)}",
+                            text = task.title,
                             color = colors.textSecondary,
-                            fontSize = 12.sp
+                            fontSize = 13.sp
                         )
                     }
                 }

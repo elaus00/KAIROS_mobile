@@ -46,7 +46,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -175,7 +177,12 @@ fun CaptureContent(
                         color = colors.text,
                         fontSize = fontSize,
                         lineHeight = lineHeight,
-                        letterSpacing = 0.3.sp
+                        letterSpacing = 0.3.sp,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Top,
+                            trim = LineHeightStyle.Trim.None
+                        )
                     ),
                     cursorBrush = SolidColor(colors.accent),
                     singleLine = false,
@@ -195,11 +202,18 @@ fun CaptureContent(
                             if (placeholderAlpha > 0f) {
                                 Text(
                                     text = "떠오르는 생각을 자유롭게...",
-                                    fontFamily = KairosWritingFontFamily,
-                                    color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                    fontSize = fontSize,
-                                    lineHeight = lineHeight,
-                                    letterSpacing = 0.3.sp
+                                    style = TextStyle(
+                                        fontFamily = KairosWritingFontFamily,
+                                        color = colors.placeholder.copy(alpha = placeholderAlpha),
+                                        fontSize = fontSize,
+                                        lineHeight = lineHeight,
+                                        letterSpacing = 0.3.sp,
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Top,
+                                            trim = LineHeightStyle.Trim.None
+                                        )
+                                    )
                                 )
                             }
                             innerTextField()

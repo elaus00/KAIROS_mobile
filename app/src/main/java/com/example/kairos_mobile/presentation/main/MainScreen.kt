@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -97,24 +96,13 @@ fun MainScreen(
         derivedStateOf { KairosTab.entries[pagerState.currentPage] }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = {
-            KairosBottomNav(
-                selectedTab = currentTab,
-                onTabSelected = { tab ->
-                    scope.launch {
-                        pagerState.animateScrollToPage(KairosTab.entries.indexOf(tab))
-                    }
-                }
-            )
-        },
-        containerColor = colors.background
-    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize()
         ) {
             // 오프라인 배너
             AnimatedVisibility(
@@ -179,5 +167,22 @@ fun MainScreen(
                 }
             }
         }
+
+        KairosBottomNav(
+            selectedTab = currentTab,
+            onTabSelected = { tab ->
+                scope.launch {
+                    pagerState.animateScrollToPage(KairosTab.entries.indexOf(tab))
+                }
+            },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp)
+        )
     }
 }
