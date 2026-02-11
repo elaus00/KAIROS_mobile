@@ -16,7 +16,7 @@ object KairosLight {
     val text = Color(0xFF111111)             // 기본 텍스트
     val textSecondary = Color(0xFF888888)    // 보조 텍스트
     val textMuted = Color(0xFF737373)        // 희미한 텍스트 (WCAG AA 4.54:1 vs #FAFAFA)
-    val placeholder = Color(0xFF8C8C8C)      // 플레이스홀더 (3.17:1 vs #FAFAFA)
+    val placeholder = Color(0xFF737373)      // 플레이스홀더 (WCAG AA 4.54:1 vs #FAFAFA)
     val accent = Color(0xFF111111)           // 강조 색상
     val accentBg = Color(0xFFF5F5F5)         // 강조 배경
     val chipBg = Color(0xFFF0F0F0)           // 칩 배경
@@ -41,7 +41,7 @@ object KairosDark {
     val text = Color(0xCCFFFFFF)             // 기본 텍스트 (80% white)
     val textSecondary = Color(0xFF888888)    // 보조 텍스트
     val textMuted = Color(0xFF7A7A7A)        // 희미한 텍스트 (WCAG AA 4.61:1 vs #0A0A0A)
-    val placeholder = Color(0xFF6E6E6E)      // 플레이스홀더 (3.88:1 vs #0A0A0A)
+    val placeholder = Color(0xFF7A7A7A)      // 플레이스홀더 (WCAG AA 4.61:1 vs #0A0A0A)
     val accent = Color(0xCCFFFFFF)           // 강조 색상
     val accentBg = Color(0xFF252525)         // 강조 배경
     val chipBg = Color(0xFF2A2A2A)           // 칩 배경

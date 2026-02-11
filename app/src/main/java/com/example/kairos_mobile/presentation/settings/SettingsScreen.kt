@@ -726,7 +726,7 @@ private fun ToggleSettingItem(
         Switch(
             checked = isChecked,
             onCheckedChange = onToggle,
-            modifier = Modifier.scale(0.85f),
+            modifier = Modifier.scale(0.9f),
             colors = SwitchDefaults.colors(
                 checkedThumbColor = colors.accent,
                 checkedTrackColor = colors.accent.copy(alpha = 0.3f),

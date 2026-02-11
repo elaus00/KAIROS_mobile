@@ -290,7 +290,7 @@ private fun ClassificationChipRow(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         ClassificationChip(
             label = "할 일",

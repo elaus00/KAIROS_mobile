@@ -43,7 +43,8 @@ fun ClassificationDropdown(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) { expanded = true }
-                .padding(horizontal = 10.dp, vertical = 4.dp),
+                .defaultMinSize(minHeight = 44.dp)
+                .padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {

@@ -109,7 +109,7 @@ fun CalendarCard(
                     }
                 )
             }
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 16.dp)
     ) {
         // 월 헤더: "n월 n주차" 왼쪽 정렬 + 드롭다운 + 좌우 이동 버튼 (확장 시만)
         val weekOfMonth = ((selectedDate.dayOfMonth - 1) / 7) + 1
@@ -169,10 +169,10 @@ fun CalendarCard(
         AnimatedContent(
             targetState = isExpanded,
             transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith
+                fadeIn(animationSpec = tween(200)) togetherWith
                     fadeOut(animationSpec = tween(200)) using
                     SizeTransform(clip = false) { _, _ ->
-                        tween(350)
+                        tween(200)
                     }
             },
             label = "calendarExpand"
@@ -262,7 +262,7 @@ private fun CalendarDayCell(
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) colors.accent else Color.Transparent,
-        animationSpec = tween(durationMillis = 150),
+        animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 
@@ -423,7 +423,7 @@ private fun MonthDayCell(
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) colors.accent else Color.Transparent,
-        animationSpec = tween(durationMillis = 150),
+        animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 

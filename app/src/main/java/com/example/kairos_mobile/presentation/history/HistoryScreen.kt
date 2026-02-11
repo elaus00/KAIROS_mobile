@@ -15,6 +15,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -263,6 +266,7 @@ private fun HistoryFilterRow(
 ) {
     val colors = KairosTheme.colors
     val scrollState = rememberScrollState()
+    val bgColor = colors.background
 
     val now = remember { System.currentTimeMillis() }
 
@@ -306,64 +310,84 @@ private fun HistoryFilterRow(
         else -> "기타"
     }
 
-    Row(
+    // 스크롤 가능 표시를 위해 Box로 감싸고 오른쪽 페이드 그래디언트 추가
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .drawWithContent {
+                drawContent()
+                // 오른쪽 끝 페이드 그래디언트 (더 스크롤 가능 표시)
+                if (scrollState.maxValue > 0 && scrollState.value < scrollState.maxValue) {
+                    val fadeWidth = 32.dp.toPx()
+                    drawRect(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(Color.Transparent, bgColor),
+                            startX = size.width - fadeWidth,
+                            endX = size.width
+                        )
+                    )
+                }
+            }
     ) {
-        // 유형 필터
-        KairosChip(
-            text = "전체",
-            selected = selectedType == null,
-            onClick = { onTypeSelected(null) }
-        )
-        KairosChip(
-            text = "일정",
-            selected = selectedType == ClassifiedType.SCHEDULE,
-            onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
-        )
-        KairosChip(
-            text = "할 일",
-            selected = selectedType == ClassifiedType.TODO,
-            onClick = { onTypeSelected(ClassifiedType.TODO) }
-        )
-        KairosChip(
-            text = "노트",
-            selected = selectedType == ClassifiedType.NOTES,
-            onClick = { onTypeSelected(ClassifiedType.NOTES) }
-        )
-
-        // 세로 구분선
-        Box(
+        Row(
             modifier = Modifier
-                .width(1.dp)
-                .height(20.dp)
-                .background(colors.border)
-        )
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 유형 필터
+            KairosChip(
+                text = "전체",
+                selected = selectedType == null,
+                onClick = { onTypeSelected(null) }
+            )
+            KairosChip(
+                text = "일정",
+                selected = selectedType == ClassifiedType.SCHEDULE,
+                onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
+            )
+            KairosChip(
+                text = "할 일",
+                selected = selectedType == ClassifiedType.TODO,
+                onClick = { onTypeSelected(ClassifiedType.TODO) }
+            )
+            KairosChip(
+                text = "노트",
+                selected = selectedType == ClassifiedType.NOTES,
+                onClick = { onTypeSelected(ClassifiedType.NOTES) }
+            )
 
-        // 날짜 범위 필터
-        KairosChip(
-            text = "전체",
-            selected = selectedRange == "전체",
-            onClick = { onDateRangeSelected(null, null) }
-        )
-        KairosChip(
-            text = "오늘",
-            selected = selectedRange == "오늘",
-            onClick = { onDateRangeSelected(todayStart, null) }
-        )
-        KairosChip(
-            text = "이번 주",
-            selected = selectedRange == "이번 주",
-            onClick = { onDateRangeSelected(weekStart, null) }
-        )
-        KairosChip(
-            text = "이번 달",
-            selected = selectedRange == "이번 달",
-            onClick = { onDateRangeSelected(monthStart, null) }
-        )
+            // 세로 구분선
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .height(20.dp)
+                    .background(colors.border)
+            )
+
+            // 날짜 범위 필터
+            KairosChip(
+                text = "전체",
+                selected = selectedRange == "전체",
+                onClick = { onDateRangeSelected(null, null) }
+            )
+            KairosChip(
+                text = "오늘",
+                selected = selectedRange == "오늘",
+                onClick = { onDateRangeSelected(todayStart, null) }
+            )
+            KairosChip(
+                text = "이번 주",
+                selected = selectedRange == "이번 주",
+                onClick = { onDateRangeSelected(weekStart, null) }
+            )
+            KairosChip(
+                text = "이번 달",
+                selected = selectedRange == "이번 달",
+                onClick = { onDateRangeSelected(monthStart, null) }
+            )
+        }
     }
 }

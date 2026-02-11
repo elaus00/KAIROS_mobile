@@ -12,9 +12,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -199,9 +199,9 @@ fun NoteDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             color = colors.text,
-                            fontSize = 26.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
-                            lineHeight = 32.sp
+                            lineHeight = 36.sp
                         ),
                         cursorBrush = SolidColor(colors.accent),
                         singleLine = false,
@@ -211,7 +211,7 @@ fun NoteDetailScreen(
                                     Text(
                                         text = "제목",
                                         color = colors.placeholder,
-                                        fontSize = 26.sp,
+                                        fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -335,7 +335,10 @@ private fun NoteMoreMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
-        containerColor = colors.card
+        shape = RoundedCornerShape(12.dp),
+        containerColor = colors.card,
+        shadowElevation = 4.dp,
+        modifier = Modifier.widthIn(min = 200.dp)
     ) {
         // 공유
         DropdownMenuItem(
@@ -377,7 +380,7 @@ private fun NoteMoreMenu(
             },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
+                    imageVector = Icons.Outlined.FolderOpen,
                     contentDescription = null,
                     tint = colors.textSecondary,
                     modifier = Modifier.size(18.dp)

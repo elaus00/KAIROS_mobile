@@ -20,7 +20,7 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 /**
  * Kairos Chip 컴포넌트 (PRD v4.0)
  * AI 분류 결과 표시용
- * 터치 영역 최소 36dp 확보 (Apple HIG 권장 44dp 고려)
+ * 터치 영역 최소 44dp 확보 (Apple HIG 권장)
  */
 @Composable
 fun KairosChip(
@@ -40,7 +40,7 @@ fun KairosChip(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = 36.dp) // 터치 영역 최소 높이 확보
+            .defaultMinSize(minHeight = 44.dp) // Apple HIG 최소 터치 영역
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .then(
@@ -50,7 +50,7 @@ fun KairosChip(
                     Modifier
                 }
             )
-            .padding(horizontal = 12.dp, vertical = 10.dp), // vertical 6dp → 10dp 확대
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

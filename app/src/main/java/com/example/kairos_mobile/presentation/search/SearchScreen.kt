@@ -96,7 +96,7 @@ fun SearchScreen(
                         .weight(1f)
                         .clip(RoundedCornerShape(12.dp))
                         .background(colors.card)
-                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(

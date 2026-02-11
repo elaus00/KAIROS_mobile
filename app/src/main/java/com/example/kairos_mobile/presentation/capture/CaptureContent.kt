@@ -46,7 +46,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -175,7 +177,12 @@ fun CaptureContent(
                         color = colors.text,
                         fontSize = fontSize,
                         lineHeight = lineHeight,
-                        letterSpacing = 0.3.sp
+                        letterSpacing = 0.3.sp,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Top,
+                            trim = LineHeightStyle.Trim.None
+                        )
                     ),
                     cursorBrush = SolidColor(colors.accent),
                     singleLine = false,
@@ -195,11 +202,18 @@ fun CaptureContent(
                             if (placeholderAlpha > 0f) {
                                 Text(
                                     text = "떠오르는 생각을 자유롭게...",
-                                    fontFamily = KairosWritingFontFamily,
-                                    color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                    fontSize = fontSize,
-                                    lineHeight = lineHeight,
-                                    letterSpacing = 0.3.sp
+                                    style = TextStyle(
+                                        fontFamily = KairosWritingFontFamily,
+                                        color = colors.placeholder.copy(alpha = placeholderAlpha),
+                                        fontSize = fontSize,
+                                        lineHeight = lineHeight,
+                                        letterSpacing = 0.3.sp,
+                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Top,
+                                            trim = LineHeightStyle.Trim.None
+                                        )
+                                    )
                                 )
                             }
                             innerTextField()
@@ -413,14 +427,14 @@ private fun CaptureToolBar(
     // 이미지 아이콘 색상 전환 애니메이션
     val imageIconColor by animateColorAsState(
         targetValue = if (hasImage) colors.accent else colors.iconMuted,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "imageIconColor"
     )
 
     // 전송 버튼 배경 색상 전환 애니메이션
     val submitBgColor by animateColorAsState(
         targetValue = if (canSubmit) colors.accent else colors.accentBg,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "submitBgColor"
     )
 
@@ -429,7 +443,7 @@ private fun CaptureToolBar(
         targetValue = if (canSubmit) {
             if (colors.isDark) colors.background else Color.White
         } else colors.textMuted,
-        animationSpec = tween(250),
+        animationSpec = tween(200),
         label = "submitIconColor"
     )
 

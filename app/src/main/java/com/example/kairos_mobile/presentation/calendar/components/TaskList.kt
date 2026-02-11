@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.kairos_mobile.presentation.calendar.TodoDisplayItem
@@ -64,6 +66,7 @@ fun TaskList(
     onTaskDelete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
     onToggleShowCompleted: () -> Unit,
+    onTaskAction: (TodoDisplayItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -76,7 +79,8 @@ fun TaskList(
             DraggableTaskList(
                 tasks = tasks,
                 onTaskComplete = onTaskComplete,
-                onReorder = onReorder
+                onReorder = onReorder,
+                onTaskAction = onTaskAction
             )
 
             // 완료 항목 토글
@@ -99,9 +103,11 @@ fun TaskList(
 private fun DraggableTaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
-    onReorder: (List<String>) -> Unit
+    onReorder: (List<String>) -> Unit,
+    onTaskAction: (TodoDisplayItem) -> Unit = {}
 ) {
     val colors = KairosTheme.colors
+    val haptic = LocalHapticFeedback.current
 
     // 드래그 상태 관리
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
@@ -131,8 +137,11 @@ private fun DraggableTaskList(
                 ) {
                     TaskItemWithDragHandle(
                         task = task,
+                        isDragging = isDragging,
                         onToggleComplete = { onTaskComplete(task.todoId) },
+                        onTaskAction = { onTaskAction(task) },
                         onDragStart = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             draggingIndex = index
                             dragOffsetY = 0f
                         },
@@ -164,7 +173,9 @@ private fun DraggableTaskList(
 @Composable
 private fun TaskItemWithDragHandle(
     task: TodoDisplayItem,
+    isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
+    onTaskAction: () -> Unit = {},
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
@@ -173,13 +184,31 @@ private fun TaskItemWithDragHandle(
     val colors = KairosTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
 
+    // 확장 가능 여부 판단
+    val hasExpandableContent = task.deadline != null || task.title.length > 25
+
+    // 드래그 중 배경색 변경
+    val cardBackground by animateColorAsState(
+        targetValue = if (isDragging) colors.accentBg else colors.card,
+        animationSpec = tween(durationMillis = 150),
+        label = "dragBg"
+    )
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(colors.card)
-            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-            .clickable { isExpanded = !isExpanded }
+            .background(cardBackground)
+            .border(1.dp, if (isDragging) colors.accent.copy(alpha = 0.3f) else colors.border, RoundedCornerShape(12.dp))
+            .clickable {
+                if (isExpanded) {
+                    onTaskAction()
+                } else if (hasExpandableContent) {
+                    isExpanded = true
+                } else {
+                    onTaskAction()
+                }
+            }
             .padding(start = 4.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
     ) {
         Column {
@@ -191,7 +220,7 @@ private fun TaskItemWithDragHandle(
                 Icon(
                     imageVector = Icons.Default.DragHandle,
                     contentDescription = "순서 변경",
-                    tint = colors.textMuted,
+                    tint = colors.textMuted.copy(alpha = 0.3f),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(12.dp)
@@ -254,13 +283,14 @@ private fun TaskItemWithDragHandle(
                 )
             }
 
-            AnimatedVisibility(visible = isExpanded) {
+            AnimatedVisibility(visible = isExpanded && hasExpandableContent) {
                 Column(modifier = Modifier.padding(top = 8.dp, start = 48.dp)) {
-                    task.deadline?.let { deadlineMs ->
+                    // 확장 시 제목 전문 표시 (긴 제목일 때)
+                    if (task.title.length > 25) {
                         Text(
-                            text = "마감: ${formatDeadline(deadlineMs)}",
+                            text = task.title,
                             color = colors.textSecondary,
-                            fontSize = 12.sp
+                            fontSize = 13.sp
                         )
                     }
                 }
@@ -410,7 +440,7 @@ private fun TaskCheckbox(
         label = "borderColor"
     )
 
-    // 48dp 터치 영역으로 감싸고, 시각적 크기 22dp 유지
+    // 48dp 터치 영역, 24dp 시각적 크기
     Box(
         modifier = modifier
             .size(48.dp)
@@ -424,7 +454,7 @@ private fun TaskCheckbox(
     ) {
         Box(
             modifier = Modifier
-                .size(22.dp)
+                .size(24.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(backgroundColor)
                 .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),

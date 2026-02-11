@@ -1,5 +1,7 @@
 package com.example.kairos_mobile.presentation.calendar.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +32,7 @@ import java.time.format.DateTimeFormatter
  * ScheduleTimeline 컴포넌트
  * 시간 기반 일정 목록 (타임라인 형태)
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleTimeline(
     schedules: List<ScheduleDisplayItem>,
@@ -81,6 +84,7 @@ fun ScheduleTimeline(
 /**
  * 타임라인 일정 아이템
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun ScheduleTimelineItem(
     schedule: ScheduleDisplayItem,
@@ -274,7 +278,7 @@ private fun ScheduleCheckbox(
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
-    // 48dp 터치 영역, 22dp 시각적 크기
+    // 48dp 터치 영역, 24dp 시각적 크기
     Box(
         modifier = modifier
             .size(48.dp)
@@ -284,7 +288,7 @@ private fun ScheduleCheckbox(
     ) {
         Box(
             modifier = Modifier
-                .size(22.dp)
+                .size(24.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .border(1.5.dp, colors.border, RoundedCornerShape(6.dp)),
             contentAlignment = Alignment.Center
@@ -330,6 +334,7 @@ private fun SyncStatusBadge(
 /**
  * 시간 포맷 (epoch ms → "HH:mm" 또는 "종일")
  */
+@RequiresApi(Build.VERSION_CODES.O)
 private fun formatTime(epochMs: Long?, isAllDay: Boolean): String {
     if (isAllDay) return "종일"
     if (epochMs == null) return ""
