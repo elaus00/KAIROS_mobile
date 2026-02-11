@@ -1,13 +1,7 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/inspectionProfiles
+/.idea/
 .DS_Store
 /build
 **/build/
@@ -16,8 +10,6 @@
 .cxx
 local.properties
 .kotlin/
-/.idea/gradle.xml
-/.idea/misc.xml
 
 # Release signing
 keystore.properties
