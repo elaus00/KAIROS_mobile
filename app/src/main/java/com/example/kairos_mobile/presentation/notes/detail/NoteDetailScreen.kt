@@ -3,7 +3,6 @@ package com.example.kairos_mobile.presentation.notes.detail
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.Folder
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.time.Instant
@@ -38,7 +37,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
- * 노트 상세/편집 화면
+ * 노트 상세/편집 화면 (Apple Notes 스타일)
+ * 콘텐츠 중심 — 제목/본문이 자연스럽게 이어지는 에디터
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,18 +64,13 @@ fun NoteDetailScreen(
 
     // 폴더 선택 바텀시트 상태
     var showFolderSheet by remember { mutableStateOf(false) }
+    // 더보기 메뉴 상태
+    var showMoreMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "노트",
-                        color = colors.text,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -86,15 +81,7 @@ fun NoteDetailScreen(
                     }
                 },
                 actions = {
-                    // 공유 버튼
-                    IconButton(onClick = { viewModel.onShare() }) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "공유",
-                            tint = colors.text
-                        )
-                    }
-                    // 저장 버튼 (변경사항이 있을 때만 활성화)
+                    // 저장 버튼 (변경사항이 있을 때만)
                     if (uiState.hasChanges) {
                         IconButton(
                             onClick = { viewModel.onSave() },
@@ -102,7 +89,7 @@ fun NoteDetailScreen(
                         ) {
                             if (uiState.isSaving) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(18.dp),
                                     color = colors.accent,
                                     strokeWidth = 2.dp
                                 )
@@ -114,6 +101,31 @@ fun NoteDetailScreen(
                                 )
                             }
                         }
+                    }
+                    // 더보기 메뉴 (공유, 폴더 이동, 정보)
+                    Box {
+                        IconButton(onClick = { showMoreMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreHoriz,
+                                contentDescription = "더보기",
+                                tint = colors.text
+                            )
+                        }
+                        NoteMoreMenu(
+                            expanded = showMoreMenu,
+                            onDismiss = { showMoreMenu = false },
+                            onShare = {
+                                showMoreMenu = false
+                                viewModel.onShare()
+                            },
+                            onMoveFolder = {
+                                showMoreMenu = false
+                                showFolderSheet = true
+                            },
+                            noteDetail = uiState.noteDetail,
+                            folders = uiState.folders,
+                            selectedFolderId = uiState.selectedFolderId
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -170,37 +182,37 @@ fun NoteDetailScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // 분류 칩
+                    // 날짜 (작은 텍스트로 최상단)
                     uiState.noteDetail?.let { detail ->
-                        ClassificationChip(
-                            classifiedType = detail.classifiedType,
-                            noteSubType = detail.noteSubType
+                        Text(
+                            text = formatDateCompact(detail.updatedAt),
+                            color = colors.textMuted,
+                            fontSize = 13.sp
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    // 제목 입력 (라벨 없이, 큰 폰트)
+                    // 제목 입력 (큰 폰트, Apple Notes 스타일)
                     BasicTextField(
                         value = uiState.editedTitle,
                         onValueChange = { viewModel.onTitleChanged(it) },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             color = colors.text,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 32.sp
                         ),
                         cursorBrush = SolidColor(colors.accent),
-                        singleLine = true,
+                        singleLine = false,
                         decorationBox = { innerTextField ->
                             Box {
                                 if (uiState.editedTitle.isEmpty()) {
                                     Text(
                                         text = "제목",
                                         color = colors.placeholder,
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontSize = 26.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                                 innerTextField()
@@ -208,27 +220,26 @@ fun NoteDetailScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    // 태그 칩 (있을 때만 표시)
+                    val tags = uiState.noteDetail?.tags ?: emptyList()
+                    if (tags.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        TagRow(tags = tags)
+                    }
 
-                    // 제목과 본문 사이 구분선
-                    HorizontalDivider(
-                        color = colors.divider,
-                        thickness = 0.5.dp
-                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // 본문 입력 (라벨 없이, 자연스러운 텍스트 입력)
+                    // 본문 입력 (자연스러운 연속 영역)
                     BasicTextField(
                         value = uiState.editedBody,
                         onValueChange = { viewModel.onBodyChanged(it) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .defaultMinSize(minHeight = 200.dp),
+                            .defaultMinSize(minHeight = 300.dp),
                         textStyle = TextStyle(
                             color = colors.text,
                             fontSize = 16.sp,
-                            lineHeight = 24.sp
+                            lineHeight = 26.sp
                         ),
                         cursorBrush = SolidColor(colors.accent),
                         decorationBox = { innerTextField ->
@@ -245,17 +256,9 @@ fun NoteDetailScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 첨부 이미지
+                    // 첨부 이미지 (라벨 없이, 라운드 카드)
                     uiState.noteDetail?.imageUri?.let { imageUri ->
-                        Text(
-                            text = "첨부 이미지",
-                            color = colors.textSecondary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(Uri.parse(imageUri))
@@ -267,41 +270,9 @@ fun NoteDetailScreen(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
                     }
 
-                    // 폴더 선택
-                    Text(
-                        text = "폴더",
-                        color = colors.textSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    FolderSelector(
-                        folders = uiState.folders,
-                        selectedFolderId = uiState.selectedFolderId,
-                        onClick = { showFolderSheet = true }
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 날짜 표시
-                    uiState.noteDetail?.let { detail ->
-                        Text(
-                            text = "생성일: ${formatDateTime(detail.createdAt)}",
-                            color = colors.textMuted,
-                            fontSize = 12.sp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "수정일: ${formatDateTime(detail.updatedAt)}",
-                            color = colors.textMuted,
-                            fontSize = 12.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
             }
         }
@@ -322,75 +293,119 @@ fun NoteDetailScreen(
 }
 
 /**
- * 분류 칩 표시
+ * 태그 가로 나열 (# 접두사, 작은 칩)
  */
 @Composable
-private fun ClassificationChip(
-    classifiedType: ClassifiedType,
-    noteSubType: com.example.kairos_mobile.domain.model.NoteSubType?,
+private fun TagRow(
+    tags: List<String>,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
-    val label = when {
-        classifiedType == ClassifiedType.NOTES && noteSubType == com.example.kairos_mobile.domain.model.NoteSubType.IDEA -> "아이디어"
-        classifiedType == ClassifiedType.NOTES && noteSubType == com.example.kairos_mobile.domain.model.NoteSubType.BOOKMARK -> "북마크"
-        classifiedType == ClassifiedType.NOTES -> "노트"
-        classifiedType == ClassifiedType.TODO -> "할 일"
-        classifiedType == ClassifiedType.SCHEDULE -> "일정"
-        else -> "임시"
-    }
 
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(colors.chipBg)
-            .padding(horizontal = 14.dp, vertical = 8.dp)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text(
-            text = label,
-            color = colors.chipText,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
+        tags.forEach { tag ->
+            Text(
+                text = "#$tag",
+                color = colors.textMuted,
+                fontSize = 13.sp
+            )
+        }
     }
 }
 
 /**
- * 폴더 선택 버튼
+ * 더보기 드롭다운 메뉴 (공유, 폴더 이동, 노트 정보)
  */
 @Composable
-private fun FolderSelector(
+private fun NoteMoreMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onShare: () -> Unit,
+    onMoveFolder: () -> Unit,
+    noteDetail: com.example.kairos_mobile.domain.model.NoteDetail?,
     folders: List<Folder>,
-    selectedFolderId: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    selectedFolderId: String?
 ) {
     val colors = KairosTheme.colors
-    val folderName = folders.find { it.id == selectedFolderId }?.name ?: "없음"
+    val folderName = folders.find { it.id == selectedFolderId }?.name
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+        containerColor = colors.card
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = folderName,
-                color = colors.text,
-                fontSize = 15.sp
-            )
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "폴더 선택",
-                tint = colors.textMuted,
-                modifier = Modifier.size(20.dp)
+        // 공유
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = "공유",
+                    color = colors.text,
+                    fontSize = 15.sp
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = null,
+                    tint = colors.textSecondary,
+                    modifier = Modifier.size(18.dp)
+                )
+            },
+            onClick = onShare
+        )
+        // 폴더 이동
+        DropdownMenuItem(
+            text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "폴더",
+                        color = colors.text,
+                        fontSize = 15.sp
+                    )
+                    if (folderName != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = folderName,
+                            color = colors.textMuted,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = colors.textSecondary,
+                    modifier = Modifier.size(18.dp)
+                )
+            },
+            onClick = onMoveFolder
+        )
+        // 노트 정보 (날짜)
+        noteDetail?.let { detail ->
+            HorizontalDivider(color = colors.divider)
+            DropdownMenuItem(
+                text = {
+                    Column {
+                        Text(
+                            text = "생성  ${formatDateTime(detail.createdAt)}",
+                            color = colors.textMuted,
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "수정  ${formatDateTime(detail.updatedAt)}",
+                            color = colors.textMuted,
+                            fontSize = 12.sp
+                        )
+                    }
+                },
+                onClick = {},
+                enabled = false
             )
         }
     }
@@ -462,7 +477,17 @@ private fun FolderBottomSheet(
 }
 
 /**
- * 시간 포맷 (epoch ms -> "yyyy.M.d HH:mm")
+ * 간결한 날짜 포맷 (예: "2월 11일")
+ */
+private fun formatDateCompact(epochMs: Long): String {
+    val dateTime = Instant.ofEpochMilli(epochMs)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime()
+    return dateTime.format(DateTimeFormatter.ofPattern("M월 d일"))
+}
+
+/**
+ * 상세 날짜 포맷 (예: "2026.2.11 14:30")
  */
 private fun formatDateTime(epochMs: Long): String {
     val dateTime = Instant.ofEpochMilli(epochMs)

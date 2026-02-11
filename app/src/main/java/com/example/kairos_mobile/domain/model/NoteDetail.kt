@@ -14,6 +14,7 @@ data class NoteDetail(
     val noteSubType: NoteSubType?,
     val folderId: String?,
     val imageUri: String?,
+    val tags: List<String> = emptyList(),
     val createdAt: Long,
     val updatedAt: Long
 )

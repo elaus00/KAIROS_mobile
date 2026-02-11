@@ -3,6 +3,7 @@ package com.example.kairos_mobile.data.repository
 import android.database.sqlite.SQLiteConstraintException
 import android.util.Log
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
 import com.example.kairos_mobile.data.local.database.dao.FolderDao
 import com.example.kairos_mobile.data.local.database.dao.NoteDao
 import com.example.kairos_mobile.data.mapper.NoteMapper
@@ -13,9 +14,11 @@ import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.NoteWithCapturePreview
 import com.example.kairos_mobile.domain.repository.NoteRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,6 +30,7 @@ class NoteRepositoryImpl @Inject constructor(
     private val noteDao: NoteDao,
     private val captureDao: CaptureDao,
     private val folderDao: FolderDao,
+    private val captureTagDao: CaptureTagDao,
     private val noteMapper: NoteMapper
 ) : NoteRepository {
     companion object {
@@ -99,10 +103,12 @@ class NoteRepositoryImpl @Inject constructor(
             folderId = folderId
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getNoteDetail(noteId: String): Flow<NoteDetail?> {
         return noteDao.getNoteWithCapture(noteId)
-            .map { row ->
+            .mapLatest { row ->
                 row?.let {
+                    val tags = captureTagDao.getTagNamesByCaptureId(it.captureId)
                     NoteDetail(
                         noteId = it.noteId,
                         captureId = it.captureId,
@@ -123,6 +129,7 @@ class NoteRepositoryImpl @Inject constructor(
                         },
                         folderId = it.folderId,
                         imageUri = it.imageUri,
+                        tags = tags,
                         createdAt = it.createdAt,
                         updatedAt = it.updatedAt
                     )

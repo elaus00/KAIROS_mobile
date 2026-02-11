@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
@@ -95,7 +98,11 @@ private fun KairosNavItem(
     Box(
         modifier = modifier
             .testTag("tab_${tab.route}")
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -103,7 +110,7 @@ private fun KairosNavItem(
             imageVector = if (selected) tab.filledIcon else tab.outlinedIcon,
             contentDescription = tab.label,
             tint = iconColor,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(tab.iconSize)
         )
     }
 }
@@ -117,24 +124,28 @@ enum class KairosTab(
     val filledIcon: ImageVector,
     val outlinedIcon: ImageVector,
     val label: String,
-    val route: String
+    val route: String,
+    val iconSize: Dp = 22.dp
 ) {
     NOTES(
         filledIcon = Icons.Filled.Description,
         outlinedIcon = Icons.Outlined.Description,
         label = "노트",
-        route = "notes"
+        route = "notes",
+        iconSize = 21.dp
     ),
     HOME(
         filledIcon = Icons.Filled.Home,
         outlinedIcon = Icons.Outlined.Home,
         label = "홈",
-        route = "home"
+        route = "home",
+        iconSize = 24.dp
     ),
     CALENDAR(
         filledIcon = Icons.Filled.CalendarToday,
         outlinedIcon = Icons.Outlined.CalendarToday,
         label = "캘린더",
-        route = "calendar"
+        route = "calendar",
+        iconSize = 20.dp
     )
 }
