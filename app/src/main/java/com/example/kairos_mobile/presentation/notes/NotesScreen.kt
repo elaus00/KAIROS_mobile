@@ -325,7 +325,7 @@ private fun FolderFilterChips(
             // 새 폴더 추가 버튼
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(44.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(colors.chipBg)
                     .clickable { onCreateFolder() },
@@ -335,7 +335,7 @@ private fun FolderFilterChips(
                     imageVector = Icons.Default.Add,
                     contentDescription = "새 폴더",
                     tint = colors.chipText,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

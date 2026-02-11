@@ -193,7 +193,7 @@ private fun StatusSheetHeader(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onConfirmAll() }
-                    .padding(horizontal = 8.dp, vertical = 12.dp)
+                    .padding(horizontal = 12.dp, vertical = 14.dp)
             )
         }
     }

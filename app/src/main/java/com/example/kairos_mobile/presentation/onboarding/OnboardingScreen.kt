@@ -78,7 +78,9 @@ fun OnboardingScreen(
                 color = colors.textMuted,
                 fontSize = 14.sp,
                 modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
                     .clickable { viewModel.skip() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             )
         }
 

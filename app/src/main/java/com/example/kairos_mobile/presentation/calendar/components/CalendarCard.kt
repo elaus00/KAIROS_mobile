@@ -169,10 +169,10 @@ fun CalendarCard(
         AnimatedContent(
             targetState = isExpanded,
             transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith
+                fadeIn(animationSpec = tween(200)) togetherWith
                     fadeOut(animationSpec = tween(200)) using
                     SizeTransform(clip = false) { _, _ ->
-                        tween(350)
+                        tween(200)
                     }
             },
             label = "calendarExpand"
@@ -262,7 +262,7 @@ private fun CalendarDayCell(
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) colors.accent else Color.Transparent,
-        animationSpec = tween(durationMillis = 150),
+        animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 
@@ -423,7 +423,7 @@ private fun MonthDayCell(
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) colors.accent else Color.Transparent,
-        animationSpec = tween(durationMillis = 150),
+        animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 
