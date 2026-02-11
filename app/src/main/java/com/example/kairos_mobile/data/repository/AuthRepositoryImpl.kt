@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.data.repository
 
 import android.content.SharedPreferences
+import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.remote.ApiResponseHandler
 import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
@@ -9,6 +10,8 @@ import com.example.kairos_mobile.data.remote.dto.v2.AuthRefreshRequest
 import com.example.kairos_mobile.domain.model.AuthToken
 import com.example.kairos_mobile.domain.model.User
 import com.example.kairos_mobile.domain.repository.AuthRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -21,7 +24,8 @@ import javax.inject.Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val api: KairosApi,
     private val deviceIdProvider: DeviceIdProvider,
-    @Named("encrypted_prefs") private val prefs: SharedPreferences
+    @Named("encrypted_prefs") private val prefs: SharedPreferences,
+    private val database: KairosDatabase
 ) : AuthRepository {
 
     companion object {
@@ -78,6 +82,12 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
+        // 로컬 DB 데이터 전체 삭제 (계정 간 데이터 혼재 방지)
+        // clearAllTables()는 동기 API이므로 IO 디스패처에서 실행
+        withContext(Dispatchers.IO) {
+            database.clearAllTables()
+        }
+
         prefs.edit()
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_REFRESH_TOKEN)

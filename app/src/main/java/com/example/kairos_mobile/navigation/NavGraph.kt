@@ -75,7 +75,8 @@ object NavRoutes {
 @OptIn(ExperimentalComposeUiApi::class)
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavRoutes.HOME
+    startDestination: String = NavRoutes.HOME,
+    autoFocusCapture: Boolean = false
 ) {
     // 캡처 상세 화면으로 네비게이션
     val navigateToDetail: (String) -> Unit = { captureId ->
@@ -117,6 +118,7 @@ fun KairosNavGraph(
         composable(NavRoutes.HOME) {
             MainScreen(
                 initialTab = KairosTab.HOME,
+                autoFocusCapture = autoFocusCapture,
                 onNavigateToCapture = navigateToDetail,
                 onNavigateToSearch = navigateToSearch,
                 onNavigateToSettings = {

@@ -6,6 +6,7 @@ import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
+import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
@@ -44,6 +45,7 @@ class CaptureDetailViewModelTest {
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var trackEventUseCase: TrackEventUseCase
     private lateinit var formatCaptureForShare: FormatCaptureForShareUseCase
+    private lateinit var tagRepository: TagRepository
 
     @Before
     fun setUp() {
@@ -54,6 +56,7 @@ class CaptureDetailViewModelTest {
         calendarRepository = mockk(relaxed = true)
         trackEventUseCase = mockk(relaxed = true)
         formatCaptureForShare = mockk(relaxed = true)
+        tagRepository = mockk(relaxed = true)
     }
 
     @After
@@ -83,7 +86,8 @@ class CaptureDetailViewModelTest {
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
-            formatCaptureForShare = formatCaptureForShare
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -113,7 +117,8 @@ class CaptureDetailViewModelTest {
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
-            formatCaptureForShare = formatCaptureForShare
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -137,7 +142,8 @@ class CaptureDetailViewModelTest {
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
-            formatCaptureForShare = formatCaptureForShare
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -168,7 +174,8 @@ class CaptureDetailViewModelTest {
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
-            formatCaptureForShare = formatCaptureForShare
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -193,7 +200,8 @@ class CaptureDetailViewModelTest {
             approveSuggestion = approveSuggestion,
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
-            formatCaptureForShare = formatCaptureForShare
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)
@@ -203,5 +211,31 @@ class CaptureDetailViewModelTest {
 
         // then
         assertNull(viewModel.uiState.value.errorMessage)
+    }
+
+    /** init 시 태그도 함께 로드된다 */
+    @Test
+    fun init_loads_tags_for_capture() = runTest {
+        // given
+        val capture = TestFixtures.capture(id = "cap-1")
+        coEvery { captureRepository.getCaptureById("cap-1") } returns capture
+        coEvery { tagRepository.getTagsForCapture("cap-1") } returns listOf("회의", "중요")
+
+        // when
+        val viewModel = CaptureDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("captureId" to "cap-1")),
+            captureRepository = captureRepository,
+            changeClassification = changeClassificationUseCase,
+            scheduleRepository = scheduleRepository,
+            approveSuggestion = approveSuggestion,
+            calendarRepository = calendarRepository,
+            trackEventUseCase = trackEventUseCase,
+            formatCaptureForShare = formatCaptureForShare,
+            tagRepository = tagRepository
+        )
+        advanceUntilIdle()
+
+        // then
+        assertEquals(listOf("회의", "중요"), viewModel.uiState.value.tags)
     }
 }

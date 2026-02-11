@@ -35,4 +35,14 @@ interface CaptureTagDao {
      */
     @Query("DELETE FROM capture_tags WHERE capture_id = :captureId AND tag_id = :tagId")
     suspend fun delete(captureId: String, tagId: String)
+
+    /**
+     * 캡처에 연결된 태그 이름 목록 조회
+     */
+    @Query("""
+        SELECT t.name FROM tags t
+        INNER JOIN capture_tags ct ON t.id = ct.tag_id
+        WHERE ct.capture_id = :captureId
+    """)
+    suspend fun getTagNamesByCaptureId(captureId: String): List<String>
 }

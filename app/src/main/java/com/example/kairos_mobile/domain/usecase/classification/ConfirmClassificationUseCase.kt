@@ -14,12 +14,15 @@ class ConfirmClassificationUseCase @Inject constructor(
     private val trackEventUseCase: TrackEventUseCase
 ) {
     suspend operator fun invoke(captureId: String) {
+        // 분류 확인 전 캡처 정보 조회 (메트릭 데이터용)
+        val capture = captureRepository.getCaptureById(captureId)
+
         captureRepository.confirmClassification(captureId)
 
-        // 분석 이벤트 추적
+        // 분석 이벤트 추적 — capture_id, confirmed_type, changed 포함
         trackEventUseCase(
             eventType = "classification_confirmed",
-            eventData = null
+            eventData = """{"capture_id":"$captureId","confirmed_type":"${capture?.classifiedType?.name ?: "UNKNOWN"}","changed":false}"""
         )
     }
 }

@@ -7,9 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import com.example.kairos_mobile.presentation.components.common.KairosChip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -37,7 +39,7 @@ import java.time.format.DateTimeFormatter
  * 캡처 상세 화면
  * 분류 칩 변경 + 원문 확인 (최소 구현)
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CaptureDetailScreen(
     onNavigateBack: () -> Unit = {},
@@ -159,6 +161,19 @@ fun CaptureDetailScreen(
                         viewModel.onChangeClassification(type)
                     }
                 )
+
+                // AI 자동 태그 표시
+                if (uiState.tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        uiState.tags.forEach { tag ->
+                            KairosChip(text = "#$tag")
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
 import com.example.kairos_mobile.data.local.database.dao.CaptureSearchDao
+import com.example.kairos_mobile.data.local.database.dao.CaptureTagDao
 import com.example.kairos_mobile.data.local.database.entities.CaptureSearchFts
 import com.example.kairos_mobile.data.mapper.CaptureMapper
 import com.example.kairos_mobile.domain.model.Capture
@@ -24,6 +25,7 @@ class CaptureRepositoryImpl @Inject constructor(
     private val database: KairosDatabase,
     private val captureDao: CaptureDao,
     private val captureSearchDao: CaptureSearchDao,
+    private val captureTagDao: CaptureTagDao,
     private val captureMapper: CaptureMapper
 ) : CaptureRepository {
 
@@ -69,12 +71,15 @@ class CaptureRepositoryImpl @Inject constructor(
             captureSearchDao.deleteForUpdate(captureId)
             val capture = captureDao.getById(captureId)
             if (capture != null) {
+                // 태그 이름을 FTS 인덱스에 포함하여 태그 기반 검색 지원
+                val tagNames = captureTagDao.getTagNamesByCaptureId(captureId)
+                val tagText = tagNames.joinToString(" ")
                 captureSearchDao.insert(
                     CaptureSearchFts(
                         captureId = captureId,
                         titleText = aiTitle,
                         originalText = capture.originalText,
-                        tagText = "",
+                        tagText = tagText,
                         entityText = ""
                     )
                 )

@@ -29,6 +29,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
@@ -72,6 +73,7 @@ fun CaptureContent(
     onNavigateToSettings: () -> Unit,
     onNavigateToHistory: () -> Unit = {},
     snackbarHostState: SnackbarHostState,
+    autoFocusCapture: Boolean = false,
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel
 ) {
@@ -115,6 +117,15 @@ fun CaptureContent(
     }
 
     val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // 위젯에서 진입 시 자동 포커스 + 키보드 표시
+    LaunchedEffect(autoFocusCapture) {
+        if (autoFocusCapture) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
+    }
 
     // 갤러리 이미지 선택 런처
     val photoPickerLauncher = rememberLauncherForActivityResult(

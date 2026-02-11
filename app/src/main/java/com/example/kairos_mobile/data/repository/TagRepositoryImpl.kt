@@ -47,4 +47,8 @@ class TagRepositoryImpl @Inject constructor(
     override suspend fun deleteTagsByCaptureId(captureId: String) {
         captureTagDao.deleteAllForCapture(captureId)
     }
+
+    override suspend fun getTagsForCapture(captureId: String): List<String> {
+        return captureTagDao.getTagNamesByCaptureId(captureId)
+    }
 }

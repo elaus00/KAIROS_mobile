@@ -9,6 +9,7 @@ import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
@@ -34,7 +35,8 @@ class CaptureDetailViewModel @Inject constructor(
     private val approveSuggestion: ApproveCalendarSuggestionUseCase,
     private val calendarRepository: CalendarRepository,
     private val trackEventUseCase: TrackEventUseCase,
-    private val formatCaptureForShare: FormatCaptureForShareUseCase
+    private val formatCaptureForShare: FormatCaptureForShareUseCase,
+    private val tagRepository: TagRepository
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -60,6 +62,9 @@ class CaptureDetailViewModel @Inject constructor(
                     scheduleRepository.getScheduleByCaptureId(capture.id)
                 } else null
 
+                // 캡처에 연결된 태그 조회
+                val tags = tagRepository.getTagsForCapture(capture.id)
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -72,7 +77,8 @@ class CaptureDetailViewModel @Inject constructor(
                         createdAt = capture.createdAt,
                         scheduleId = schedule?.id,
                         scheduleStartTime = schedule?.startTime,
-                        calendarSyncStatus = schedule?.calendarSyncStatus
+                        calendarSyncStatus = schedule?.calendarSyncStatus,
+                        tags = tags
                     )
                 }
 

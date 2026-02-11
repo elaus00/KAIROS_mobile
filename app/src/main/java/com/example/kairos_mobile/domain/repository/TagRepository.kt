@@ -15,4 +15,7 @@ interface TagRepository {
 
     /** 캡처의 태그 전체 삭제 */
     suspend fun deleteTagsByCaptureId(captureId: String)
+
+    /** 캡처에 연결된 태그 이름 목록 조회 */
+    suspend fun getTagsForCapture(captureId: String): List<String>
 }

@@ -241,12 +241,20 @@ class ClassificationUseCasesTest {
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val confirmOne = ConfirmClassificationUseCase(captureRepository, trackEventUseCase)
 
+        val capture = Capture(id = "cap-1", originalText = "test", classifiedType = ClassifiedType.TODO)
+        coEvery { captureRepository.getCaptureById("cap-1") } returns capture
         coEvery { captureRepository.confirmClassification("cap-1") } just runs
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         confirmOne("cap-1")
 
         coVerify(exactly = 1) { captureRepository.confirmClassification("cap-1") }
+        coVerify(exactly = 1) {
+            trackEventUseCase(
+                "classification_confirmed",
+                match { it != null && it.contains("cap-1") && it.contains("TODO") }
+            )
+        }
     }
 
     @Test

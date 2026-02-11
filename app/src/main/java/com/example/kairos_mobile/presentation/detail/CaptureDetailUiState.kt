@@ -24,5 +24,7 @@ data class CaptureDetailUiState(
     /** Google Calendar 동기화 상태 (SCHEDULE 타입일 때만 의미) */
     val calendarSyncStatus: CalendarSyncStatus? = null,
     /** 공유용 텍스트 (한 번 소비 후 null 초기화) */
-    val shareText: String? = null
+    val shareText: String? = null,
+    /** AI 자동 생성 태그 목록 */
+    val tags: List<String> = emptyList()
 )

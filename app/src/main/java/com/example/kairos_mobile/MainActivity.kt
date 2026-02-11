@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
@@ -41,8 +42,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var calendarRepository: CalendarRepository
 
+    /** 위젯에서 진입 시 캡처 입력 자동 포커스 (Compose 재합성 트리거) */
+    private val autoFocusCapture = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 위젯 딥링크 처리
+        autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
 
         // OAuth 딥링크 콜백 처리 (자동 코드 교환)
         handleOAuthCallback(intent)
@@ -68,7 +75,8 @@ class MainActivity : ComponentActivity() {
                 startDestination?.let { destination ->
                     KairosNavGraph(
                         navController = rememberNavController(),
-                        startDestination = destination
+                        startDestination = destination,
+                        autoFocusCapture = autoFocusCapture.value
                     )
                 }
             }
@@ -78,6 +86,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
         handleOAuthCallback(intent)
         handleShareIntent(intent)
     }

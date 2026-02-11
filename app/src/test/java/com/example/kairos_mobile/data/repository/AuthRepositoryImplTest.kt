@@ -1,6 +1,7 @@
 package com.example.kairos_mobile.data.repository
 
 import android.content.SharedPreferences
+import com.example.kairos_mobile.data.local.database.KairosDatabase
 import com.example.kairos_mobile.data.remote.DeviceIdProvider
 import com.example.kairos_mobile.data.remote.api.KairosApi
 import com.example.kairos_mobile.data.remote.dto.v2.ApiEnvelope
@@ -38,6 +39,7 @@ class AuthRepositoryImplTest {
     @MockK lateinit var deviceIdProvider: DeviceIdProvider
     @MockK lateinit var prefs: SharedPreferences
     @MockK lateinit var editor: SharedPreferences.Editor
+    @MockK lateinit var database: KairosDatabase
 
     private lateinit var repository: AuthRepositoryImpl
 
@@ -52,8 +54,9 @@ class AuthRepositoryImplTest {
         every { editor.remove(any()) } returns editor
         every { editor.apply() } just Runs
         every { deviceIdProvider.getOrCreateDeviceId() } returns "test-device-id"
+        every { database.clearAllTables() } just Runs
 
-        repository = AuthRepositoryImpl(api, deviceIdProvider, prefs)
+        repository = AuthRepositoryImpl(api, deviceIdProvider, prefs, database)
     }
 
     // ── loginWithGoogle ──
@@ -207,6 +210,7 @@ class AuthRepositoryImplTest {
         repository.logout()
 
         // Then
+        verify { database.clearAllTables() }
         verify { editor.remove("auth_access_token") }
         verify { editor.remove("auth_refresh_token") }
         verify { editor.remove("auth_token_expires_at") }

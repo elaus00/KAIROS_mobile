@@ -56,6 +56,7 @@ Docs/
 | `phase2a/` | Phase 2a (코어 루프 완성) 개발 계획 | **완료** |
 | `phase2b/` | Phase 2b (사용성 확장) 개발 계획 + 구현 보고서 | **구현 완료 (테스트 보강 중)** |
 | `phase3/` | Phase 3 (서버 연동) 개발 계획 | **구현 완료 (Phase 3a/3b/API 정렬 포함)** |
+| `phase4/` | Phase 4 (실시간 인식 피드백) 연구 문서 | 연구 단계 |
 
 #### Phase 1 상세 문서
 
@@ -83,6 +84,12 @@ Docs/
 |------|------|------|
 | `phase3/server_integration_plan.md` | Phase 3 서버 연동 계획서 — 8개 서브페이즈 중 3-0/3-1/3-6 완료 | 구현 진행 중 |
 
+#### Phase 4 문서
+
+| 파일 | 설명 | 상태 |
+|------|------|------|
+| `phase4/realtime_recognition_plan.md` | 실시간 인식 피드백 기능 연구 — 로컬 파싱/AI 디바운스/하이브리드 3안 비교, 권장안 C(하이브리드) | 연구 단계 |
+
 #### Phase 2 공통 문서
 
 | 파일 | 설명 | 상태 |
@@ -104,6 +111,7 @@ Docs/
 | `architecture_conventions.md` | 아키텍처 컨벤션 정리 | 2026-02-07 |
 | `2026-02-07_bugfix-retrospective.md` | 버그 수정 회고 | 2026-02-07 |
 | `2026-02-07_multi-agent-insights.md` | 멀티 에이전트 개발 인사이트 (Phase 1 MVP) | 2026-02-07 |
+| `2026-02-11_branding-marketing-report.md` | 브랜딩 & 마케팅 전략 보고서 — 네이밍 22개 분석, GTM 전략, Must-Have 기능, 고도화 영역 | 2026-02-11 |
 
 ### analysis/
 
@@ -162,3 +170,7 @@ Docs/
 | 2026-02-10 | `specs/api_spec.md` | v2.4→v2.5: API 계약 정렬 — 구독 features 추가(analytics_dashboard/ocr), OCR 엔드포인트(/ocr/extract), Auth refresh user nullable, 시맨틱검색/대시보드 엔드포인트 추가, 요약 테이블 갱신 |
 | 2026-02-10 | `ROADMAP.md` | Phase 3a/3b 구현 완료 + API 계약 정렬 완료 섹션 추가 |
 | 2026-02-10 | `INDEX.md` | Phase 3 상태 "구현 완료"로 업데이트, api_spec 버전 갱신 |
+| 2026-02-11 | `insights/2026-02-11_branding-marketing-report.md` | 브랜딩 & 마케팅 전략 보고서 v1.0 작성 — 네이밍 진단(22개 후보), 포지셔닝, GTM, 채널 전략, Must-Have/고도화 영역 |
+| 2026-02-11 | `INDEX.md` | 브랜딩 보고서 문서 추가 |
+| 2026-02-11 | `plan/phase4/realtime_recognition_plan.md` | 실시간 인식 피드백 기능 연구 문서 v1.0 작성 — 3안 비교, 하이브리드 C 권장 |
+| 2026-02-11 | `INDEX.md` | Phase 4 문서 섹션 추가 |
