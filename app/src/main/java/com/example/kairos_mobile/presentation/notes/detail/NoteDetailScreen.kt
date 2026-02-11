@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.presentation.notes.detail
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -261,7 +261,7 @@ fun NoteDetailScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(Uri.parse(imageUri))
+                                .data(imageUri.toUri())
                                 .crossfade(true)
                                 .build(),
                             contentDescription = "첨부 이미지",

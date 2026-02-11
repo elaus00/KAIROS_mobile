@@ -31,8 +31,11 @@ benchmarkMacro = "1.3.4"
 uiautomator = "2.3.0"
 baselineProfilePlugin = "1.3.4"
 profileinstaller = "1.4.1"
+desugarJdkLibs = "2.1.4"
 
 [libraries]
+# Core library desugaring (java.time 등 API 24-25 지원)
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
