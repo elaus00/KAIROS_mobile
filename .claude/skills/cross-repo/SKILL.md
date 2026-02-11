@@ -89,12 +89,37 @@ Content-Type: application/json
 
 | 구분 | 경로 |
 |------|------|
-| API 인터페이스 | `app/src/main/.../data/remote/KairosApi.kt` |
-| DTO | `app/src/main/.../data/remote/dto/` |
-| Interceptor | `app/src/main/.../data/remote/interceptor/` |
-| Repository | `app/src/main/.../data/repository/` |
-| UseCase | `app/src/main/.../domain/usecase/` |
-| ViewModel | `app/src/main/.../presentation/viewmodel/` |
+| API 인터페이스 | `app/src/main/java/com/example/kairos_mobile/data/remote/api/KairosApi.kt` |
+| DTO (v2) | `app/src/main/java/com/example/kairos_mobile/data/remote/dto/v2/` |
+| Interceptor | `app/src/main/java/com/example/kairos_mobile/data/remote/interceptor/` |
+| Repository (인터페이스) | `app/src/main/java/com/example/kairos_mobile/domain/repository/` |
+| Repository (구현) | `app/src/main/java/com/example/kairos_mobile/data/repository/` |
+| UseCase | `app/src/main/java/com/example/kairos_mobile/domain/usecase/` |
+| ViewModel | `app/src/main/java/com/example/kairos_mobile/presentation/viewmodels/` |
+| Domain Model | `app/src/main/java/com/example/kairos_mobile/domain/model/` |
+| DB (Room) | `app/src/main/java/com/example/kairos_mobile/data/local/database/` |
+| Mapper | `app/src/main/java/com/example/kairos_mobile/data/mapper/` |
+
+### 클라이언트 주요 DTO 파일
+
+| 파일 | 용도 |
+|------|------|
+| `ClassifyRequest.kt` | 분류 요청 (단일/배치) |
+| `ClassifyResponse.kt` | 분류 응답 (엔티티, 스케줄, 할일 정보) |
+| `AuthDto.kt` | 인증 요청/응답 (OAuth, 토큰 갱신, 사용자 정보) |
+| `CalendarDto.kt` | 캘린더 관련 DTO |
+| `SubscriptionDto.kt` | 구독 검증/정보 DTO |
+| `NoteAiDto.kt` | AI 노트 작업 (그룹화, 재정리, 시맨틱 검색) |
+| `AnalyticsDto.kt` | 분석 이벤트 DTO |
+| `ApiEnvelope.kt` | 공통 API 응답 래퍼 (status, data, error) |
+
+### 클라이언트 네트워크 인터셉터
+
+| 인터셉터 | 역할 |
+|---------|------|
+| `AuthInterceptor.kt` | SharedPreferences에서 JWT 꺼내 Authorization 헤더 첨부 |
+| `DeviceIdInterceptor.kt` | classify, calendar, analytics 엔드포인트에 X-Device-ID 헤더 첨부 |
+| `ErrorInterceptor.kt` | IOException/SocketTimeoutException → ApiException.NetworkError 변환 |
 
 ## 실행 규칙
 
@@ -110,7 +135,7 @@ Content-Type: application/json
 ### API 계약 점검 절차 (/cross-repo api-check)
 
 1. 서버의 `kairos_core/schemas/*.py`에서 Request/Response 모델 읽기
-2. 클라이언트의 `dto/*.kt`에서 대응하는 데이터 클래스 읽기
+2. 클라이언트의 `dto/v2/*.kt`에서 대응하는 데이터 클래스 읽기
 3. 필드명, 타입, nullable 여부, 기본값 대조
 4. 불일치 항목을 테이블로 보고
 
@@ -123,6 +148,22 @@ Content-Type: application/json
 ## 주의사항
 
 - 서버 레포에서 `uv run` 명령 시 `.venv`가 있는 서버 디렉토리에서 실행
-- 서버는 Python, 클라이언트는 Kotlin — 타입 매핑 주의 (e.g. `str` ↔ `String`, `list` ↔ `List`, `dict` ↔ `Map`)
+- 클라이언트 DTO는 Gson `@SerializedName` 어노테이션으로 JSON 키 매핑
+- 클라이언트는 `ApiEnvelope<T>` 래퍼로 모든 응답을 감싸서 처리
+
+### 타입 매핑 참조
+
+| Python (서버) | Kotlin (클라이언트) | 비고 |
+|--------------|-------------------|------|
+| `str` | `String` | |
+| `int` | `Int` / `Long` | |
+| `float` | `Double` | |
+| `bool` | `Boolean` | |
+| `list[T]` | `List<T>` | |
+| `dict[K, V]` | `Map<K, V>` | |
+| `Optional[T]` | `T?` | nullable |
+| `datetime` | `String` (ISO 8601) | 서버에서 직렬화 |
+| `UUID` | `String` | |
+| `Enum` | `String` / `enum class` | `@SerializedName` 사용 |
 - 서버 커밋 시에도 `/commit` 스킬 규칙 동일 적용 (한글 본문, 타입 영문)
 - 양쪽 레포의 CLAUDE.md 설계 원칙("Just Capture")은 동일 — 항상 존중
