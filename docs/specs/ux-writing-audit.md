@@ -1,4 +1,4 @@
-# KAIROS UX 라이팅 감사 보고서
+# Flit. UX 라이팅 감사 보고서
 
 > 작성일: 2026-02-08
 > 대상: Presentation 레이어 전체 (.kt 49개 파일 + 위젯 XML 3개)
@@ -24,7 +24,7 @@
 |------|------|
 | **문체** | 해요체 (친근하면서 정중) — "저장되었습니다" 대신 "저장했어요" 권장 |
 | **숫자** | 한글 표기 ("3분" 대신 "3분" — 아라비아 숫자 사용) |
-| **영문** | 고유명사(Kairos, Google Calendar)만 영문 유지, 나머지 한글화 |
+| **영문** | 고유명사(Flit., Google Calendar)만 영문 유지, 나머지 한글화 |
 | **존칭** | 사용자 지칭 불필요 (주어 생략이 자연스러운 한국어 특성 활용) |
 | **부정** | "~할 수 없습니다" 대신 "~해주세요" (긍정적 안내 우선) |
 | **느낌표** | 최소 사용 (온보딩/성공 시만 허용) |
@@ -55,7 +55,7 @@
 
 | 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
 |------|------------|------|---------|----------|
-| 상단바 제목 | `"Kairos"` | 제목 | CaptureContent.kt:216 | - (브랜드명) |
+| 상단바 제목 | `"Flit."` | 제목 | CaptureContent.kt:216 | - (브랜드명) |
 | 벨 아이콘 | `"AI 분류 현황"` | contentDescription | CaptureContent.kt:245 | - |
 | 히스토리 아이콘 | `"전체 기록"` | contentDescription | CaptureContent.kt:254 | - |
 | 설정 아이콘 | `"설정"` | contentDescription | CaptureContent.kt:263 | - |
@@ -242,7 +242,7 @@
 | 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
 |------|------------|------|---------|----------|
 | 건너뛰기 | `"건너뛰기"` | 링크 | OnboardingScreen.kt:77 | - |
-| 1페이지 브랜드 | `"Kairos"` | 브랜드 | OnboardingScreen.kt:140 | - |
+| 1페이지 브랜드 | `"Flit."` | 브랜드 | OnboardingScreen.kt:140 | - |
 | 1페이지 메인 | `"적으면\n알아서 정리됩니다"` | 제목 | OnboardingScreen.kt:150 | - (좋은 문구) |
 | 1페이지 설명 | `"떠오르는 순간, 바로 던지면 끝.\n정리는 AI가 알아서 합니다."` | 설명 | OnboardingScreen.kt:161 | - (좋은 문구) |
 | 2페이지 칩 | `"할 일"` `"일정"` `"노트"` | 칩 | OnboardingScreen.kt:187-189 | - |
@@ -341,9 +341,9 @@
 
 | 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
 |------|------------|------|---------|----------|
-| 탭 라벨 (Notes) | `"Notes"` | 탭 contentDescription | KairosBottomNav.kt:125 | P0: "노트" (한글 통일) |
-| 탭 라벨 (Home) | `"Home"` | 탭 contentDescription | KairosBottomNav.kt:130 | P0: "홈" (한글 통일) |
-| 탭 라벨 (Calendar) | `"Calendar"` | 탭 contentDescription | KairosBottomNav.kt:135 | P0: "캘린더" (한글 통일) |
+| 탭 라벨 (Notes) | `"Notes"` | 탭 contentDescription | FlitBottomNav.kt:125 | P0: "노트" (한글 통일) |
+| 탭 라벨 (Home) | `"Home"` | 탭 contentDescription | FlitBottomNav.kt:130 | P0: "홈" (한글 통일) |
+| 탭 라벨 (Calendar) | `"Calendar"` | 탭 contentDescription | FlitBottomNav.kt:135 | P0: "캘린더" (한글 통일) |
 | 필터 칩 (전체) | `"전체"` | 칩 | FilterChipRow.kt:33 | - |
 | 필터 칩 (일정) | `"일정"` | 칩 | FilterChipRow.kt:38 | - |
 | 필터 칩 (할일) | `"할일"` | 칩 | FilterChipRow.kt:43 | P0: "할 일" (띄어쓰기 통일) |
@@ -353,7 +353,7 @@
 
 | 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
 |------|------------|------|---------|----------|
-| 캡처 위젯 접근성 | `"KAIROS"` | contentDescription | widget_capture.xml:15 | P1: "캡처 위젯" |
+| 캡처 위젯 접근성 | `"Flit."` | contentDescription | widget_capture.xml:15 | P1: "캡처 위젯" |
 | 캡처 위젯 텍스트 | `"탭하여 캡처하기"` | 텍스트 | widget_capture.xml:23 | - |
 | 할 일 위젯 제목 | `"오늘 할 일"` | 제목 | widget_todo.xml:14 | - |
 | 할 일 위젯 빈 상태 | `"할 일이 없습니다"` | 빈 상태 | widget_todo.xml:36 | P2: "할 일이 없어요" |
@@ -385,9 +385,9 @@
 |---|------|------|------|------|
 | 1 | `"Notes"` (헤더) | `"노트"` | NotesScreen.kt:179 | 앱 내 다른 곳은 "노트"로 한글 사용 |
 | 2 | `"Settings"` (헤더) | `"설정"` | SettingsScreen.kt:60 | 앱 내 다른 곳은 "설정"으로 한글 사용 |
-| 3 | `"Notes"` (탭 라벨) | `"노트"` | KairosBottomNav.kt:125 | 접근성 라벨은 한글이 적절 |
-| 4 | `"Home"` (탭 라벨) | `"홈"` | KairosBottomNav.kt:130 | 접근성 라벨은 한글이 적절 |
-| 5 | `"Calendar"` (탭 라벨) | `"캘린더"` | KairosBottomNav.kt:135 | 접근성 라벨은 한글이 적절 |
+| 3 | `"Notes"` (탭 라벨) | `"노트"` | FlitBottomNav.kt:125 | 접근성 라벨은 한글이 적절 |
+| 4 | `"Home"` (탭 라벨) | `"홈"` | FlitBottomNav.kt:130 | 접근성 라벨은 한글이 적절 |
+| 5 | `"Calendar"` (탭 라벨) | `"캘린더"` | FlitBottomNav.kt:135 | 접근성 라벨은 한글이 적절 |
 | 6 | `"할일"` (필터 칩) | `"할 일"` | FilterChipRow.kt:43 | 다른 모든 곳은 "할 일"로 띄어쓰기 |
 | 7 | `"뒤로"` (contentDescription) | `"뒤로가기"` | TrashScreen.kt:198, HistoryScreen.kt:231 | 다른 화면은 "뒤로가기"로 통일 |
 | 8 | `"할 일"` vs `"할일"` 혼용 | `"할 일"` 통일 | SearchScreen.kt:280, FilterChipRow.kt:43 | 검색 결과 칩에서도 통일 필요 |
@@ -411,7 +411,7 @@
 | 13 | `"사용자가 거부함"` | `"거부됨"` | CaptureDetailScreen.kt:340 | 간결하게 (다른 배지와 동일 형태) |
 | 14 | `"당신은 기록만 하면 됩니다."` | `"기록만 하면 돼요."` | OnboardingScreen.kt:206 | "당신은" 생략, 해요체 |
 | 15 | `"삭제: $trashedDate"` | `"삭제일: $trashedDate"` | TrashScreen.kt:263 | "삭제:"보다 "삭제일:"이 명확 |
-| 16 | `"KAIROS"` (위젯 접근성) | `"캡처 위젯"` | widget_capture.xml:15 | 브랜드명보다 기능 설명 |
+| 16 | `"Flit."` (위젯 접근성) | `"캡처 위젯"` | widget_capture.xml:15 | 브랜드명보다 기능 설명 |
 
 ### P2 (향후 고려) — 감성적 표현 & 세련됨
 

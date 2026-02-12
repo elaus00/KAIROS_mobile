@@ -1,4 +1,4 @@
-# KAIROS Mobile ProGuard 규칙
+# Flit. Mobile ProGuard 규칙
 # 릴리스 빌드 시 코드 난독화 및 최적화 설정
 
 # ============================================================
@@ -78,13 +78,13 @@
 -keep public class * implements java.lang.reflect.Type
 
 # DTO (Data Transfer Object) - API 요청/응답 모델 유지
--keep class com.example.kairos_mobile.data.remote.dto.** { *; }
+-keep class com.flit.app.data.remote.dto.** { *; }
 
 # Entity - Room DB 엔티티 유지
--keep class com.example.kairos_mobile.data.local.database.entities.** { *; }
+-keep class com.flit.app.data.local.database.entities.** { *; }
 
 # Domain Models - 도메인 모델 유지
--keep class com.example.kairos_mobile.domain.model.** { *; }
+-keep class com.flit.app.domain.model.** { *; }
 
 # ============================================================
 # Room Database
@@ -95,10 +95,10 @@
 -dontwarn androidx.room.paging.**
 
 # DAO 인터페이스 유지
--keep interface com.example.kairos_mobile.data.local.database.dao.** { *; }
+-keep interface com.flit.app.data.local.database.dao.** { *; }
 
 # Room 컴파일러 생성 구현체 유지
--keep class com.example.kairos_mobile.data.local.database.KairosDatabase_Impl { *; }
+-keep class com.flit.app.data.local.database.FlitDatabase_Impl { *; }
 
 # ============================================================
 # Hilt / Dagger
@@ -113,7 +113,7 @@
 -keep class * extends dagger.hilt.internal.GeneratedComponent
 
 # Hilt 모듈 유지
--keep class com.example.kairos_mobile.di.** { *; }
+-keep class com.flit.app.di.** { *; }
 
 # Hilt ViewModels
 -keep class * extends androidx.lifecycle.ViewModel {
@@ -145,7 +145,7 @@
 }
 
 # Worker 클래스 유지
--keep class com.example.kairos_mobile.data.worker.** { *; }
+-keep class com.flit.app.data.worker.** { *; }
 
 -keepclassmembers class * extends androidx.work.Worker {
     public <init>(android.content.Context,androidx.work.WorkerParameters);

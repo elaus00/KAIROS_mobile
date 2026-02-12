@@ -14,22 +14,22 @@ plugins {
 }
 
 android {
-    namespace = "com.example.kairos_mobile"
+    namespace = "com.flit.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.kairos_mobile"
+        applicationId = "com.flit.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.example.kairos_mobile.HiltTestRunner"
+        testInstrumentationRunner = "com.flit.app.HiltTestRunner"
     }
 
-    val debugApiBaseUrl = (project.findProperty("KAIROS_API_BASE_URL") as String?)
+    val debugApiBaseUrl = (project.findProperty("FLIT_API_BASE_URL") as String?)
         ?: "https://gifted-michiko-auric.ngrok-free.dev/api/v1"
-    val benchmarkApiBaseUrl = (project.findProperty("KAIROS_BENCHMARK_API_BASE_URL") as String?)
+    val benchmarkApiBaseUrl = (project.findProperty("FLIT_BENCHMARK_API_BASE_URL") as String?)
         ?: debugApiBaseUrl
     val googleAndroidClientId = (project.findProperty("GOOGLE_ANDROID_CLIENT_ID") as String?)
         ?: ""
@@ -55,7 +55,7 @@ android {
     buildTypes {
         debug {
             // 기본값은 Android 에뮬레이터(localhost -> 10.0.2.2)
-            // 필요 시 -PKAIROS_API_BASE_URL=https://... 로 오버라이드 가능
+            // 필요 시 -PFLIT_API_BASE_URL=https://... 로 오버라이드 가능
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
             buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
@@ -79,7 +79,7 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            buildConfigField("String", "API_BASE_URL", "\"https://api.kairos.app/api/v1\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://api.flit.app/api/v1\"")
             buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
@@ -138,12 +138,12 @@ val jacocoExclusions = listOf(
 )
 
 val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
-    include("com/example/kairos_mobile/domain/usecase/**")
+    include("com/flit/app/domain/usecase/**")
     exclude(jacocoExclusions)
 }
 
 val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
-    include("com/example/kairos_mobile/domain/usecase/**")
+    include("com/flit/app/domain/usecase/**")
     exclude(jacocoExclusions)
 }
 

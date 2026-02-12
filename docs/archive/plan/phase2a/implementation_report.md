@@ -148,7 +148,7 @@ Phase 1과 동일하게 Room `fallbackToDestructiveMigration()` 사용. 프로�
 
 | 항목 | 상태 | 비고 |
 |------|------|------|
-| 실제 Google OAuth 연동 | 미구현 | MockKairosApi 기반, 서버 준비 후 교체 |
+| 실제 Google OAuth 연동 | 미구현 | MockFlitApi 기반, 서버 준비 후 교체 |
 | Room Migration 코드 | 미작성 | 현재 destructive migration, 프로덕션 배포 전 작성 필요 |
 | 에뮬레이터 통합 테스트 | 미실행 | UI 시나리오 수동 검증 필요 |
 | Widget 테스트 | 미작성 | Glance 위젯은 UI 테스트로 검증 필요 |
@@ -158,7 +158,7 @@ Phase 1과 동일하게 Room `fallbackToDestructiveMigration()` 사용. 프로�
 
 ## 8. API 전략
 
-현재 모든 외부 API 호출은 `MockKairosApi`를 통해 처리:
+현재 모든 외부 API 호출은 `MockFlitApi`를 통해 처리:
 - `/calendar/events` POST/DELETE/GET — Mock 응답
 - `/analytics/events` POST — Mock 응답 (성공)
 - 실제 Google OAuth/Calendar API 연동은 Phase 3에서 진행

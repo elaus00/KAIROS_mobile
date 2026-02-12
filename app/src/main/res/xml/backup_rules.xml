@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   KAIROS Mobile 백업 규칙
+   Flit. Mobile 백업 규칙
    API 31+ 디바이스에서 전체 백업 정책 정의
    See https://developer.android.com/guide/topics/data/autobackup
 -->

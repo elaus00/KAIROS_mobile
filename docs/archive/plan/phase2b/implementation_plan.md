@@ -37,7 +37,7 @@ Phase 2b는 멀티 인텐트 분할, 노트 편집, 할일 위젯, 히스토리/
 
 | 파일 | 변경 | 내용 |
 |------|------|------|
-| `data/local/database/KairosDatabase.kt` | 수정 | version 12→13 |
+| `data/local/database/FlitDatabase.kt` | 수정 | version 12→13 |
 | `data/local/database/entities/CaptureEntity.kt` | 수정 | `parent_capture_id` (String?) + Index 추가 |
 | `data/local/database/entities/NoteEntity.kt` | 수정 | `body` (String?) 추가 |
 | `domain/model/Capture.kt` | 수정 | `parentCaptureId: String? = null` 추가 |
@@ -61,7 +61,7 @@ Phase 2b는 멀티 인텐트 분할, 노트 편집, 할일 위젯, 히스토리/
 
 | 파일 | 변경 | 내용 |
 |------|------|------|
-| `data/remote/api/MockKairosApi.kt` | 수정 | "~하고", "~그리고" 패턴 감지 → `splitItems` 응답 생성 |
+| `data/remote/api/MockFlitApi.kt` | 수정 | "~하고", "~그리고" 패턴 감지 → `splitItems` 응답 생성 |
 | `data/local/database/dao/CaptureDao.kt` | 수정 | `getByParentCaptureId(parentId)` 쿼리 추가 |
 | `domain/repository/CaptureRepository.kt` | 수정 | `getChildCaptures(parentId)` 추가 |
 | `data/repository/CaptureRepositoryImpl.kt` | 수정 | 위 메서드 구현 |
@@ -283,7 +283,7 @@ ORDER BY c.created_at DESC LIMIT :limit
 | 파일 | 담당 |
 |------|------|
 | `NavGraph.kt` | domain 에이전트 (NOTE_DETAIL route) |
-| `KairosDatabase.kt` | data 에이전트 (version 변경) |
+| `FlitDatabase.kt` | data 에이전트 (version 변경) |
 | `CaptureDao.kt` | data 에이전트 (filter + childCaptures 쿼리) |
 | `CaptureRepository.kt` | data 에이전트 (인터페이스 확장) |
 | `TestFixtures.kt` | qa 에이전트 |

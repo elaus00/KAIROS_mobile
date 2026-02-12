@@ -16,7 +16,7 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
-        android:name=".KairosApplication"
+        android:name=".FlitApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,13 +24,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KAIROS_mobile">
+        android:theme="@style/Theme.Flit">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.KAIROS_mobile"
+            android:theme="@style/Theme.Flit"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,7 +57,7 @@
         <activity
             android:name=".presentation.widget.QuickCaptureActivity"
             android:exported="false"
-            android:theme="@style/Theme.KAIROS.QuickCapture"
+            android:theme="@style/Theme.Flit.QuickCapture"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:launchMode="standard" />
@@ -66,7 +66,7 @@
         <receiver
             android:name=".presentation.widget.CaptureWidgetReceiver"
             android:exported="true"
-            android:label="KAIROS 캡처">
+            android:label="Flit. 캡처">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -79,7 +79,7 @@
         <receiver
             android:name=".presentation.widget.TodoWidgetReceiver"
             android:exported="true"
-            android:label="KAIROS 할 일">
+            android:label="Flit. 할 일">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

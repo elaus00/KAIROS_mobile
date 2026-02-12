@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.kairos_mobile.benchmark"
+    namespace = "com.flit.app.benchmark"
     compileSdk = 36
 
     defaultConfig {

@@ -1,9 +1,9 @@
-# KAIROS 디자인 가이드
+# Flit. 디자인 가이드
 
 > **Version**: 2.0
 > **최종 수정**: 2026-02-12
 >
-> 이 문서는 KAIROS 모바일 앱의 디자인 시스템과 UX 원칙을 정의한다.
+> 이 문서는 Flit. 모바일 앱의 디자인 시스템과 UX 원칙을 정의한다.
 > 새로운 UI 작업 시 반드시 이 가이드를 참조해야 한다.
 >
 > **참조 소스**: `ui/theme/Color.kt`, `ui/theme/Type.kt`, `ui/theme/Theme.kt`
@@ -13,7 +13,7 @@
 
 ## 1. 디자인 철학
 
-### 1.1 KAIROS 핵심 원칙
+### 1.1 Flit. 핵심 원칙
 
 | 원칙 | 설명 | UI 적용 |
 |------|------|---------|
@@ -59,7 +59,7 @@
 
 ```kotlin
 // ✅ 올바른 사용법 — Theme 토큰 사용
-val colors = KairosTheme.colors
+val colors = FlitTheme.colors
 Text(color = colors.text)
 Box(Modifier.background(colors.card))
 
@@ -72,13 +72,13 @@ Text(color = MaterialTheme.colorScheme.onSurface)
 ```
 
 적용 범위:
-- **색상**: `KairosTheme.colors` 토큰만 사용. `Color(0xFF...)` 하드코딩 금지
-- **타이포그래피**: `KairosTypography`에 정의된 스타일만 사용. 인라인 `fontSize`, `fontWeight` 하드코딩 최소화
+- **색상**: `FlitTheme.colors` 토큰만 사용. `Color(0xFF...)` 하드코딩 금지
+- **타이포그래피**: `FlitTypography`에 정의된 스타일만 사용. 인라인 `fontSize`, `fontWeight` 하드코딩 최소화
 - **간격**: 8dp 그리드 시스템 준수. 매직 넘버 대신 일관된 간격 값 사용
 - **모서리 반경**: 카드 12dp, 칩 8dp, 바텀 네비 20dp 등 정의된 값 사용
 
 새로운 색상/스타일이 필요한 경우:
-1. `KairosColors`에 시맨틱 토큰을 추가한다
+1. `FlitColors`에 시맨틱 토큰을 추가한다
 2. Light/Dark 양쪽 값을 정의한다
 3. 이 문서의 색상 시스템 테이블에 기록한다
 
@@ -104,7 +104,7 @@ Icon(
 | 구분 | 우선 사용 | 지양 |
 |------|----------|------|
 | **아이콘** | Material Icons (Extended 포함) | 커스텀 XML drawable |
-| **버튼** | Material3 `Button`, `TextButton`, `IconButton` + KairosTheme 색상 오버라이드 | `Box` + `clickable`로 버튼 직접 구현 |
+| **버튼** | Material3 `Button`, `TextButton`, `IconButton` + FlitTheme 색상 오버라이드 | `Box` + `clickable`로 버튼 직접 구현 |
 | **입력** | Material3 `TextField`, `OutlinedTextField` + 색상 오버라이드 | `BasicTextField` + 직접 데코레이션 |
 | **다이얼로그** | Material3 `AlertDialog` + 색상 오버라이드 | 커스텀 팝업 직접 구현 |
 | **시트** | Material3 `ModalBottomSheet` | 직접 바텀 시트 구현 |
@@ -120,10 +120,10 @@ Icon(
 
 ### 2.3 Material3 컴포넌트 사용 규칙
 
-Material3 컴포넌트를 사용하되, **반드시 KairosTheme 색상을 명시적으로 오버라이드**한다:
+Material3 컴포넌트를 사용하되, **반드시 FlitTheme 색상을 명시적으로 오버라이드**한다:
 
 ```kotlin
-// ✅ Material3 컴포넌트 + KairosTheme 색상 오버라이드
+// ✅ Material3 컴포넌트 + FlitTheme 색상 오버라이드
 AlertDialog(
     onDismissRequest = { /* ... */ },
     containerColor = colors.card,
@@ -150,7 +150,7 @@ OutlinedTextField(
 
 ## 3. 색상 시스템
 
-### 3.1 라이트 테마 (`KairosLight`)
+### 3.1 라이트 테마 (`FlitLight`)
 
 | 토큰 | Hex | 용도 |
 |-------|-----|------|
@@ -173,7 +173,7 @@ OutlinedTextField(
 | `iconMuted` | `#AAAAAA` | 비활성 아이콘 |
 | `divider` | `#F0F0F0` | 구분선 |
 
-### 3.2 다크 테마 (`KairosDark`)
+### 3.2 다크 테마 (`FlitDark`)
 
 | 토큰 | Hex | 용도 |
 |-------|-----|------|
@@ -207,7 +207,7 @@ OutlinedTextField(
 
 ## 4. 타이포그래피
 
-### 4.1 스타일 목록 (`KairosTypography`)
+### 4.1 스타일 목록 (`FlitTypography`)
 
 | 스타일 | 크기 | 굵기 | 자간 | 용도 |
 |--------|------|------|------|------|
@@ -293,9 +293,9 @@ SectionHeader(
 )
 ```
 
-### 6.2 KairosChip
+### 6.2 FlitChip
 
-**파일**: `presentation/components/common/KairosChip.kt`
+**파일**: `presentation/components/common/FlitChip.kt`
 
 **용도**: AI 분류 결과 표시, 필터 태그
 
@@ -310,9 +310,9 @@ SectionHeader(
 - 내부 패딩: horizontal 12dp, vertical 6dp
 - 폰트: 13sp, `FontWeight.Medium`
 
-### 6.3 KairosBottomNav
+### 6.3 FlitBottomNav
 
-**파일**: `presentation/components/common/KairosBottomNav.kt`
+**파일**: `presentation/components/common/FlitBottomNav.kt`
 
 **용도**: 앱 하단 플로팅 네비게이션 바
 
@@ -513,14 +513,14 @@ Compose 애니메이션 API:
 새로운 UI 코드를 작성하거나 리뷰할 때 아래 항목을 확인:
 
 **Theme/색상**
-- [ ] `MaterialTheme.colorScheme.*`를 직접 사용하지 않았는가? (반드시 `KairosTheme.colors` 사용)
+- [ ] `MaterialTheme.colorScheme.*`를 직접 사용하지 않았는가? (반드시 `FlitTheme.colors` 사용)
 - [ ] 하드코딩 `Color(0xFF...)` 값을 사용하지 않았는가? (색상 토큰만 사용)
-- [ ] `AlertDialog`에 `containerColor = colors.card` 등 KairosTheme 색상을 지정했는가?
-- [ ] `OutlinedTextField`에 KairosTheme 색상을 명시적으로 적용했는가?
-- [ ] 새로운 색상이 필요한 경우 `KairosColors`에 토큰으로 추가했는가?
+- [ ] `AlertDialog`에 `containerColor = colors.card` 등 FlitTheme 색상을 지정했는가?
+- [ ] `OutlinedTextField`에 FlitTheme 색상을 명시적으로 적용했는가?
+- [ ] 새로운 색상이 필요한 경우 `FlitColors`에 토큰으로 추가했는가?
 
 **타이포그래피/간격**
-- [ ] 텍스트 스타일은 `KairosTypography`에 정의된 스타일을 사용했는가?
+- [ ] 텍스트 스타일은 `FlitTypography`에 정의된 스타일을 사용했는가?
 - [ ] 인라인 `fontSize`, `fontWeight` 하드코딩을 최소화했는가?
 - [ ] 간격 값은 8dp 그리드 시스템을 따르는가?
 

@@ -1,0 +1,21 @@
+package com.flit.app.domain.usecase.capture
+
+import com.flit.app.domain.repository.CaptureRepository
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/**
+ * 휴지통 비우기 UseCase
+ * 모든 휴지통 항목 완전 삭제
+ */
+@Singleton
+class EmptyTrashUseCase @Inject constructor(
+    private val captureRepository: CaptureRepository,
+    private val hardDeleteCaptureUseCase: HardDeleteCaptureUseCase
+) {
+    suspend operator fun invoke() {
+        // threshold=Long.MAX_VALUE로 모든 휴지통 항목 가져옴
+        val allTrashed = captureRepository.getTrashedOverdue(Long.MAX_VALUE)
+        allTrashed.forEach { hardDeleteCaptureUseCase(it.id) }
+    }
+}

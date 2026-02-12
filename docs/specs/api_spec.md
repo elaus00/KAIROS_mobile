@@ -1,10 +1,10 @@
-# KAIROS — API 명세서
+# Flit. — API 명세서
 
 > **Version**: 2.6
 **작성일**: 2026-02-12
 **기준**: PRD v10.0, 기능명세서 v2.3, 데이터 모델 명세서 v2.0
 **서버 프레임워크**: FastAPI (Python 3.11+)
-**Base URL**: `https://api.kairos.app/api/v1`
+**Base URL**: `https://api.flit.app/api/v1`
 >
 
 ---
@@ -363,7 +363,7 @@ Google OAuth에서 받은 authorization code를 서버가 Google Token API로 �
 {
   "device_id": "uuid-device-123",
   "code": "oauth-auth-code",
-  "redirect_uri": "com.kairos.app:/oauth2redirect"
+  "redirect_uri": "com.flit.app:/oauth2redirect"
 }
 ```
 
@@ -484,14 +484,14 @@ Google OAuth 완료 후 디바이스별 access_token/refresh_token을 서버에 
         "end_time": "2026-02-13T21:00:00+09:00",
         "location": "강남역",
         "is_all_day": false,
-        "source": "kairos"
+        "source": "flit"
       }
     ]
   }
 }
 ```
 
-`source` 필드: "kairos" (Kairos에서 생성) / "google" (Google Calendar에서 직접 생성)
+`source` 필드: "flit" (Flit.에서 생성) / "google" (Google Calendar에서 직접 생성)
 
 ---
 
@@ -667,7 +667,7 @@ Google Play Billing 영수증 검증.
 ```json
 {
   "purchase_token": "google-play-purchase-token-...",
-  "product_id": "kairos_premium_monthly"
+  "product_id": "flit_premium_monthly"
 }
 ```
 
@@ -977,7 +977,7 @@ Inbox에 쌓인 미분류 노트를 AI가 적절한 폴더로 자동 배치한�
 ### 9.1 프로젝트 구조
 
 ```
-kairos-server/
+flit-server/
 ├── app/
 │   ├── main.py                 # FastAPI app 진입점
 │   ├── config.py               # 환경 설정

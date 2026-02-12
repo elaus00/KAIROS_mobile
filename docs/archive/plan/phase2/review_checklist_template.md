@@ -73,7 +73,7 @@
 - [ ] `Flow` 반환 타입 적절 사용 (실시간 관찰 필요 쿼리)
 
 ### 2.5 Database
-- [ ] KairosDatabase 버전 올바른가 (v9 또는 새 시작)
+- [ ] FlitDatabase 버전 올바른가 (v9 또는 새 시작)
 - [ ] 모든 신규 Entity가 `@Database(entities = [...])` 에 등록
 - [ ] 시스템 폴더 시딩 Callback 존재 (system-inbox, system-ideas, system-bookmarks)
 - [ ] FTS 가상 테이블 (CaptureSearchFts) 설정

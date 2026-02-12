@@ -387,7 +387,7 @@ Phase 1 + 2a에서 구현된 모든 기능이 기능명세서(v2.3) 기준으로
 
 ### F-2. deleteCalendarEvent 미연결
 
-- **현상**: `KairosApi`에 `deleteCalendarEvent` 엔드포인트 정의됨
+- **현상**: `FlitApi`에 `deleteCalendarEvent` 엔드포인트 정의됨
 - **문제**: Repository에서 해당 API를 호출하는 메서드가 불명확
 - **권장**: 캘린더 이벤트 삭제 플로우 추적 → 누락 시 연결
 

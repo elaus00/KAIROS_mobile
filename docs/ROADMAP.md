@@ -1,13 +1,13 @@
-# KAIROS Development Roadmap
+# Flit. Development Roadmap
 
-> 이 로드맵은 PRD(Docs/direction/kairos_prd_v10.md)의 Phase 정의를 기반으로 한다.
+> 이 로드맵은 PRD(Docs/direction/flit_prd_v10.md)의 Phase 정의를 기반으로 한다.
 > Phase 범위나 우선순위 변경은 반드시 PRD에 먼저 반영한 후 이 문서를 업데이트한다.
 
 ## 참조 문서
 
 | 문서 | 위치 | 용도 |
 |------|------|------|
-| PRD | `Docs/direction/kairos_prd_v10.md` | 비전, 요구사항, Phase 정의 (최상위) |
+| PRD | `Docs/direction/flit_prd_v10.md` | 비전, 요구사항, Phase 정의 (최상위) |
 | 기능명세서 | `Docs/specs/functional_spec.md` | 기능별 동작 규칙, 상태 전이, 엣지 케이스 |
 | 화면정의서 | *(작성 예정)* | 화면 상태, 인터랙션, UI 스펙 |
 | 데이터모델 명세서 | `Docs/specs/data_model_spec.md` | 스키마, 관계, 상태 머신 |
@@ -78,7 +78,7 @@
 
 ## Phase 3: 서버 연동 (Mock → 실제 API)
 
-**목표**: MockKairosApi 제거, 실제 FastAPI 서버와 연동, 통합 테스트
+**목표**: MockFlitApi 제거, 실제 FastAPI 서버와 연동, 통합 테스트
 
 | 기능 | 범위 | 서브페이즈 |
 |------|------|-----------|
@@ -88,8 +88,8 @@
 | Split 연동 | `/classify` split_items 실서버 검증 | 3-3 |
 | 캘린더 연동 | `/calendar/events` Google OAuth 프록시 | 3-4 |
 | 분석 연동 | `/analytics/events` 배치 전송 | 3-5 |
-| Mock 제거 | MockKairosApi 삭제, 빌드 설정 정리 | 3-6 |
-| 통합 테스트 | E2E 시나리오 검증 + FakeKairosApi 테스트 교체 | 3-7 |
+| Mock 제거 | MockFlitApi 삭제, 빌드 설정 정리 | 3-6 |
+| 통합 테스트 | E2E 시나리오 검증 + FakeFlitApi 테스트 교체 | 3-7 |
 
 **예상 규모**: ~23개 파일 (7 신규, 15 수정, 1 삭제)
 

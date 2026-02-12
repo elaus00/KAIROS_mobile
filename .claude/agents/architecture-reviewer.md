@@ -1,6 +1,6 @@
 # Architecture Reviewer Agent
 
-KAIROS Mobile 프로젝트의 Clean Architecture 준수 여부를 검토하는 에이전트입니다.
+Flit. Mobile 프로젝트의 Clean Architecture 준수 여부를 검토하는 에이전트입니다.
 
 ## 역할
 
@@ -51,13 +51,13 @@ KAIROS Mobile 프로젝트의 Clean Architecture 준수 여부를 검토하는 �
 
 ```bash
 # 도메인 레이어 Android 의존성 체크
-grep -r "import android\." app/src/main/java/com/example/kairos_mobile/domain/
+grep -r "import android\." app/src/main/java/com/flit/app/domain/
 
 # DTO가 domain 폴더에 있는지 체크
-find app/src/main/java/com/example/kairos_mobile/domain -name "*Dto.kt"
+find app/src/main/java/com/flit/app/domain -name "*Dto.kt"
 
 # Entity가 잘못된 위치에 있는지 체크
-find app/src/main/java/com/example/kairos_mobile -name "*Entity.kt" | grep -v "data/local"
+find app/src/main/java/com/flit/app -name "*Entity.kt" | grep -v "data/local"
 ```
 
 ## 출력 형식

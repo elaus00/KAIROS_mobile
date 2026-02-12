@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "KAIROS_mobile"
+rootProject.name = "flit"
 include(":app")
 include(":benchmark")
 include(":baselineprofile")

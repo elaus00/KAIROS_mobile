@@ -1,4 +1,4 @@
-# KAIROS Performance Measurement
+# Flit. Performance Measurement
 
 ## Official Metrics (Fixed)
 
@@ -74,7 +74,7 @@
 - Example:
 ```bash
 python3 scripts/perf/extract_current_metrics.py \
-  --input benchmark/build/outputs/connected_android_test_additional_output/.../com.example.kairos_mobile.benchmark-benchmarkData.json \
+  --input benchmark/build/outputs/connected_android_test_additional_output/.../com.flit.app.benchmark-benchmarkData.json \
   --output docs/performance/current_metrics.json
 
 python3 scripts/perf/perf_gate.py \

@@ -1,4 +1,4 @@
-# KAIROS Mobile
+# Flit. Mobile
 
 멀티모달 캡처 앱. Clean Architecture + MVVM + Jetpack Compose.
 핵심 철학: Just Capture ("떠오른 순간, 바로 던지면 끝")
@@ -44,9 +44,9 @@ UI/UX 관련 작업(화면 추가, 컴포넌트 수정, 디자인 변경 등) �
 3. **`.claude/skills/apple_hig_guide/SKILL.md`** — Apple HIG 기반 디자인 원칙
 
 핵심 구현 규칙:
-- **Theme 우선**: 하드코딩 `Color(0xFF...)` 금지, 반드시 `KairosTheme.colors` 토큰 사용
+- **Theme 우선**: 하드코딩 `Color(0xFF...)` 금지, 반드시 `FlitTheme.colors` 토큰 사용
 - **라이브러리 우선**: 커스텀 XML drawable/Canvas 대신 Material Icons, Material3 컴포넌트 사용
-- **Material3 오버라이드**: Material3 컴포넌트 사용 시 반드시 KairosTheme 색상을 명시적으로 적용
+- **Material3 오버라이드**: Material3 컴포넌트 사용 시 반드시 FlitTheme 색상을 명시적으로 적용
 
 ## 문서 체계 및 컨텍스트 관리
 
@@ -92,7 +92,7 @@ Docs/
 
 - 문서 인덱스: `Docs/INDEX.md`
 - 로드맵: `Docs/ROADMAP.md`
-- PRD: `Docs/direction/kairos_prd_v10.md`
+- PRD: `Docs/direction/flit_prd_v10.md`
 
 ## 코딩 가이드라인
 

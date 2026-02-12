@@ -21,7 +21,7 @@ Phase 1 MVP의 Presentation/Worker 레이어 테스트 커버리지 확보. UseC
 
 ### 테스트 인프라 (이미 존재)
 ```
-app/src/test/java/com/example/kairos_mobile/util/MainDispatcherRule.kt
+app/src/test/java/com/flit/app/util/MainDispatcherRule.kt
 ```
 
 ### 추가 필요 의존성
@@ -38,7 +38,7 @@ testImplementation("androidx.work:work-testing:2.9+")  // Worker 테스트용
 ## 파일 구조
 
 ```
-app/src/test/java/com/example/kairos_mobile/
+app/src/test/java/com/flit/app/
 ├── util/
 │   └── MainDispatcherRule.kt          # 기존
 ├── domain/usecase/                    # 기존 UseCase 테스트들
@@ -276,7 +276,7 @@ app/src/test/java/com/example/kairos_mobile/
 
 ## 9. ClassifyCaptureWorkerTest
 
-**의존성 Mock**: `SyncQueueRepository`, `CaptureRepository`, `KairosApi`, `ClassificationMapper`, `ProcessClassificationResultUseCase`
+**의존성 Mock**: `SyncQueueRepository`, `CaptureRepository`, `FlitApi`, `ClassificationMapper`, `ProcessClassificationResultUseCase`
 
 > Worker 테스트는 `TestListenableWorkerBuilder` (work-testing) 또는 직접 doWork() 호출 방식 사용.
 > `@AssistedInject` 때문에 Worker 인스턴스를 직접 생성하거나 TestWorkerBuilder를 활용한다.
@@ -374,8 +374,8 @@ Step 10: ReclassifyTempWorkerTest (5개)
 
 ```bash
 # 각 Step 완료 후
-./gradlew testDebugUnitTest --tests "com.example.kairos_mobile.presentation.*"
-./gradlew testDebugUnitTest --tests "com.example.kairos_mobile.data.worker.*"
+./gradlew testDebugUnitTest --tests "com.flit.app.presentation.*"
+./gradlew testDebugUnitTest --tests "com.flit.app.data.worker.*"
 
 # 전체
 ./gradlew testDebugUnitTest

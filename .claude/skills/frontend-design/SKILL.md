@@ -66,7 +66,7 @@
 
 **Jetpack Compose 예시:**
 ```kotlin
-val KairosTypography = Typography(
+val FlitTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Serif,  // 독특한 선택
         fontWeight = FontWeight.Bold,
@@ -201,7 +201,7 @@ RoundedCornerShape(
 
 ```kotlin
 @Composable
-fun KAIROS_mobileTheme(
+fun FlitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
@@ -217,7 +217,7 @@ fun KAIROS_mobileTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = KairosTypography,  // 커스텀 타이포그래피
+        typography = FlitTypography,  // 커스텀 타이포그래피
         content = content
     )
 }

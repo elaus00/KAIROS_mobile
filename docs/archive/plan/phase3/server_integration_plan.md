@@ -9,7 +9,7 @@
 
 ## 1. 개요
 
-MockKairosApi는 이미 Phase 2b QA 과정에서 제거됨(3-6 선행 완료). Phase 3에서는 에러 핸들링 레이어를 정비하고, 실제 서버와 연동하여 AI 분류, Calendar 동기화, Analytics 이벤트 전송을 실서버로 전환한다.
+MockFlitApi는 이미 Phase 2b QA 과정에서 제거됨(3-6 선행 완료). Phase 3에서는 에러 핸들링 레이어를 정비하고, 실제 서버와 연동하여 AI 분류, Calendar 동기화, Analytics 이벤트 전송을 실서버로 전환한다.
 
 ### 작업 범위
 
@@ -21,7 +21,7 @@ MockKairosApi는 이미 Phase 2b QA 과정에서 제거됨(3-6 선행 완료). P
 | 3-3 | `/classify` split_items 실서버 연동 | ✅ 클라이언트 준비 완료 (3-2에 포함) |
 | 3-4 | `/calendar/events` 실서버 연동 (Google OAuth) | ✅ 클라이언트 준비 완료 |
 | 3-5 | `/analytics/events` 실서버 연동 | ✅ 클라이언트 준비 완료 |
-| 3-6 | MockKairosApi 제거 + 빌드 설정 정리 | ✅ 완료 (선행) |
+| 3-6 | MockFlitApi 제거 + 빌드 설정 정리 | ✅ 완료 (선행) |
 | 3-7 | 통합 테스트 + 에뮬레이터 검증 | ⬜ 실서버 E2E 대기 |
 
 ---
@@ -160,7 +160,7 @@ OkHttpClient.Builder()
 
 | 파일 | 변경 | 내용 |
 |------|------|------|
-| `data/remote/api/KairosApi.kt` | 확인 | calendar 엔드포인트 시그니처 검증 |
+| `data/remote/api/FlitApi.kt` | 확인 | calendar 엔드포인트 시그니처 검증 |
 | `data/remote/dto/v2/CalendarEventRequest.kt` | 확인 | `captureId` 필드 이미 존재 |
 | `data/repository/CalendarRepositoryImpl.kt` | 완료 | ApiResponseHandler + CalendarApiException 매핑 (3-1에서 완료) |
 
@@ -188,7 +188,7 @@ OkHttpClient.Builder()
 
 | 파일 | 변경 | 내용 |
 |------|------|------|
-| `data/remote/api/KairosApi.kt` | 확인 | analytics 엔드포인트 시그니처 검증 |
+| `data/remote/api/FlitApi.kt` | 확인 | analytics 엔드포인트 시그니처 검증 |
 | `data/remote/dto/v2/AnalyticsEventDto.kt` | 확인 | timestamp 포맷 ISO 8601 확인 |
 | `data/worker/AnalyticsBatchWorker.kt` | 완료 | ApiResponseHandler 기반 에러 핸들링 (3-1에서 완료) |
 
@@ -200,13 +200,13 @@ OkHttpClient.Builder()
 
 ---
 
-### 3-6: MockKairosApi 제거 + 빌드 설정 정리 ✅ 완료 (선행)
+### 3-6: MockFlitApi 제거 + 빌드 설정 정리 ✅ 완료 (선행)
 
 > Phase 2b QA 과정에서 이미 완료됨 (2026-02-08)
 
 | 작업 | 상태 |
 |------|------|
-| `MockKairosApi.kt` 삭제 | ✅ |
+| `MockFlitApi.kt` 삭제 | ✅ |
 | `USE_MOCK_API` BuildConfig 필드 삭제 | ✅ |
 | `NetworkModule.kt` — Retrofit 직접 사용 | ✅ |
 | `MockDataInitializer.kt` 유지 (샘플 데이터) | ✅ |
@@ -230,7 +230,7 @@ OkHttpClient.Builder()
 | Rate Limit | 60회/분 초과 시 429 에러 핸들링 |
 
 **기존 유닛 테스트 호환성**:
-- Mock 이미 제거됨. 기존 테스트에서 MockKairosApi 참조 없음 (MockK mockk() 사용)
+- Mock 이미 제거됨. 기존 테스트에서 MockFlitApi 참조 없음 (MockK mockk() 사용)
 - 137개 유닛 테스트 전체 통과 확인 (2026-02-09)
 
 **검증**: `./gradlew testDebugUnitTest` 전체 통과 + 에뮬레이터 E2E 시나리오 통과

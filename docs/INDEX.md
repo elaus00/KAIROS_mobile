@@ -34,7 +34,7 @@ Docs/
 
 | 파일 | 설명 | 버전 | 최종 수정 |
 |------|------|------|-----------|
-| `kairos_prd_v10.md` | 제품 기획안 (PRD) — 비전, 요구사항, Phase 정의 | v10.0 | 2026-02-06 |
+| `flit_prd_v10.md` | 제품 기획안 (PRD) — 비전, 요구사항, Phase 정의 | v10.0 | 2026-02-06 |
 | `philosophy_principles.md` | 철학 및 원칙 가이드 — Just Capture, 설계 판단 기준, UX 라이팅 원칙 | v2.0 | 2026-02-06 |
 
 ### specs/
@@ -78,9 +78,7 @@ Docs/
 
 ### design/
 
-| 파일 | 설명 | 날짜 |
-|------|------|------|
-| `kairos-redesign-mockup.html` | 인터랙티브 HTML 목업 — 기록/설정 화면 리디자인 | 2026-02-08 |
+*(삭제됨 — 리브랜딩 과정에서 정리)*
 
 ### performance/
 
@@ -137,6 +135,6 @@ Docs/
 | 2026-02-07 | `plan/phase2a/implementation_report.md` | Phase 2a 구현 완료 보고서 작성 |
 | 2026-02-07 | `ROADMAP.md` | Phase 2a 상태를 "구현 완료"로 업데이트 |
 | 2026-02-07 | `functional_spec.md` | v2.1→v2.3: PRD 변경사항 반영 |
-| 2026-02-06 | `kairos_prd_v10.md` | 사용자 업로드 (v9.2→v10.0) |
+| 2026-02-06 | `flit_prd_v10.md` | 사용자 업로드 (v9.2→v10.0) |
 | 2026-02-06 | `INDEX.md` | 초기 생성 |
 | 2026-02-06 | `ROADMAP.md` | 초기 생성 |

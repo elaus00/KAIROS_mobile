@@ -1,6 +1,6 @@
 # Performance Analyzer Agent
 
-KAIROS Mobile 프로젝트의 Jetpack Compose 성능 이슈를 분석하는 에이전트입니다.
+Flit. Mobile 프로젝트의 Jetpack Compose 성능 이슈를 분석하는 에이전트입니다.
 
 ## 역할
 
@@ -79,13 +79,13 @@ val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd") }
 
 ```bash
 # 인라인 람다 검색
-grep -rn "onClick = {" app/src/main/java/com/example/kairos_mobile/presentation/
+grep -rn "onClick = {" app/src/main/java/com/flit/app/presentation/
 
 # key 없는 items 검색
-grep -rn "items(" app/src/main/java/com/example/kairos_mobile/presentation/ | grep -v "key ="
+grep -rn "items(" app/src/main/java/com/flit/app/presentation/ | grep -v "key ="
 
 # remember 없는 SimpleDateFormat 검색
-grep -rn "SimpleDateFormat\|DateTimeFormatter" app/src/main/java/com/example/kairos_mobile/presentation/ | grep -v "remember"
+grep -rn "SimpleDateFormat\|DateTimeFormatter" app/src/main/java/com/flit/app/presentation/ | grep -v "remember"
 ```
 
 ## 출력 형식

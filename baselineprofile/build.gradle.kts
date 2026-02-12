@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.kairos_mobile.baselineprofile"
+    namespace = "com.flit.app.baselineprofile"
     compileSdk = 36
 
     defaultConfig {

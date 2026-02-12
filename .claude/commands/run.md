@@ -5,8 +5,8 @@ Android debug APK를 빌드하고, 연결된 기기/에뮬레이터에 설치 �
 3. 빌드 + 설치 + 실행:
 
 ```bash
-cd /Users/elaus/AndroidStudioProjects/KAIROS_mobile && ./gradlew installDebug
-adb -s <선택된 기기> shell am start -n com.example.kairos_mobile/.MainActivity
+cd /Users/elaus/AndroidStudioProjects/Flit && ./gradlew installDebug
+adb -s <선택된 기기> shell am start -n com.flit.app/.MainActivity
 ```
 
 각 단계 결과를 간결하게 보고한다.

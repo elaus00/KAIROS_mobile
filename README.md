@@ -1,4 +1,4 @@
-# KAIROS Mobile
+# Flit. Mobile
 
 > **"떠오른 순간, 바로 던지면 끝"**
 
@@ -106,7 +106,7 @@ presentation/ → domain/ → data/ (단방향 의존)
 ## 프로젝트 구조
 
 ```
-app/src/main/java/com/example/kairos_mobile/
+app/src/main/java/com/flit/app/
 ├── data/
 │   ├── debug/                   # Debug/Benchmark 샘플 데이터 시드
 │   ├── local/database/          # Room DB v16
@@ -115,7 +115,7 @@ app/src/main/java/com/example/kairos_mobile/
 │   ├── mapper/                  # Entity ↔ Domain 변환
 │   ├── notification/            # CalendarNotifier 구현체
 │   ├── remote/
-│   │   ├── api/                 # KairosApi (실서버 연동)
+│   │   ├── api/                 # FlitApi (실서버 연동)
 │   │   └── dto/v2/             # Request/Response DTO
 │   ├── repository/              # Repository 구현체 (17개)
 │   └── worker/                  # 7 Worker (Classify, ReclassifyTemp, TrashCleanup, AnalyticsBatch, CalendarSync, AutoGroup, InboxClassify)
@@ -186,7 +186,7 @@ app/src/main/java/com/example/kairos_mobile/
 
 | 문서 | 위치 |
 |------|------|
-| PRD (최상위) | `docs/direction/kairos_prd_v10.md` |
+| PRD (최상위) | `docs/direction/flit_prd_v10.md` |
 | 기능명세서 | `docs/specs/functional_spec.md` |
 | 데이터모델 명세서 | `docs/specs/data_model_spec.md` |
 | API 명세서 | `docs/specs/api_spec.md` |

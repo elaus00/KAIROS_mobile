@@ -125,7 +125,7 @@ Claude:
 
 [Phase 3] 작업 실행...
 - SearchBar.kt 생성 (GlassSearchBar.kt 대체)
-- 17개 파일 KairosTheme.colors로 마이그레이션
+- 17개 파일 FlitTheme.colors로 마이그레이션
 - 테스트 파일 import 수정
 
 [Phase 4] 검증...

@@ -149,7 +149,7 @@
 ## 7. 의존성
 
 - 기존 캡처 입력 플로우 (CaptureContent.kt)
-- KairosWritingFontFamily (기존 폰트 스타일)
+- FlitWritingFontFamily (기존 폰트 스타일)
 - UserPreferenceRepository (설정 저장)
 
 ---

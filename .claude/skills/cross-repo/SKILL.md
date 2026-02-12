@@ -1,6 +1,6 @@
 # Cross-Repo Skill
 
-KAIROS 모바일 클라이언트와 서버를 동시에 다루는 크로스 레포 작업 스킬.
+Flit. 모바일 클라이언트와 서버를 동시에 다루는 크로스 레포 작업 스킬.
 두 레포 사이의 API 계약, 스키마, 인증 흐름 등을 일관성 있게 유지합니다.
 
 ## 사용법
@@ -17,7 +17,7 @@ KAIROS 모바일 클라이언트와 서버를 동시에 다루는 크로스 레�
 
 | 레포 | 역할 | 경로 | 언어/프레임워크 | 빌드 |
 |------|------|------|----------------|------|
-| KAIROS_mobile | Android 클라이언트 | `/Users/elaus/AndroidStudioProjects/KAIROS_mobile` | Kotlin / Jetpack Compose | `./gradlew` |
+| Flit | Android 클라이언트 | `/Users/elaus/AndroidStudioProjects/Flit` | Kotlin / Jetpack Compose | `./gradlew` |
 | KAIROS_Server | 백엔드 API + AI | `/Users/elaus/PycharmProjects/KAIROS_Server` | Python 3.12+ / FastAPI | `uv run` |
 
 ## API 계약 포인트 (Source of Truth)
@@ -28,13 +28,13 @@ KAIROS 모바일 클라이언트와 서버를 동시에 다루는 크로스 레�
 
 | 서버 라우터 | 서버 경로 | 클라이언트 대응 |
 |------------|----------|----------------|
-| `capture.py` | `/api/v1/classify`, `/api/v1/classify/batch` | `KairosApi.classify()`, `classifyBatch()` |
-| `calendar.py` | `/api/v1/calendar/*` | `KairosApi.syncCalendar()` 등 |
-| `analytics.py` | `/api/v1/analytics/*` | `KairosApi.getAnalytics()` 등 |
-| `auth.py` | `/api/v1/auth/*` | `KairosApi.exchangeToken()`, `refreshToken()` |
-| `subscription.py` | `/api/v1/subscription/*` | `KairosApi.getSubscription()`, `verifyPurchase()` |
-| `notes.py` | `/api/v1/notes/*` | `KairosApi.groupNotes()`, `reorganizeNotes()` 등 |
-| `ocr.py` | `/api/v1/ocr/*` | `KairosApi.extractText()` |
+| `capture.py` | `/api/v1/classify`, `/api/v1/classify/batch` | `FlitApi.classify()`, `classifyBatch()` |
+| `calendar.py` | `/api/v1/calendar/*` | `FlitApi.syncCalendar()` 등 |
+| `analytics.py` | `/api/v1/analytics/*` | `FlitApi.getAnalytics()` 등 |
+| `auth.py` | `/api/v1/auth/*` | `FlitApi.exchangeToken()`, `refreshToken()` |
+| `subscription.py` | `/api/v1/subscription/*` | `FlitApi.getSubscription()`, `verifyPurchase()` |
+| `notes.py` | `/api/v1/notes/*` | `FlitApi.groupNotes()`, `reorganizeNotes()` 등 |
+| `ocr.py` | `/api/v1/ocr/*` | `FlitApi.extractText()` |
 
 ### 에러 코드 매핑
 
@@ -85,20 +85,20 @@ Content-Type: application/json
 | DB 스키마 | `packages/kairos-core/src/kairos_core/database/postgres/schema.sql` |
 | 테스트 | `tests/unit/mobile_server/` |
 
-### 클라이언트 (KAIROS_mobile)
+### 클라이언트 (Flit)
 
 | 구분 | 경로 |
 |------|------|
-| API 인터페이스 | `app/src/main/java/com/example/kairos_mobile/data/remote/api/KairosApi.kt` |
-| DTO (v2) | `app/src/main/java/com/example/kairos_mobile/data/remote/dto/v2/` |
-| Interceptor | `app/src/main/java/com/example/kairos_mobile/data/remote/interceptor/` |
-| Repository (인터페이스) | `app/src/main/java/com/example/kairos_mobile/domain/repository/` |
-| Repository (구현) | `app/src/main/java/com/example/kairos_mobile/data/repository/` |
-| UseCase | `app/src/main/java/com/example/kairos_mobile/domain/usecase/` |
-| ViewModel | `app/src/main/java/com/example/kairos_mobile/presentation/viewmodels/` |
-| Domain Model | `app/src/main/java/com/example/kairos_mobile/domain/model/` |
-| DB (Room) | `app/src/main/java/com/example/kairos_mobile/data/local/database/` |
-| Mapper | `app/src/main/java/com/example/kairos_mobile/data/mapper/` |
+| API 인터페이스 | `app/src/main/java/com/flit/app/data/remote/api/FlitApi.kt` |
+| DTO (v2) | `app/src/main/java/com/flit/app/data/remote/dto/v2/` |
+| Interceptor | `app/src/main/java/com/flit/app/data/remote/interceptor/` |
+| Repository (인터페이스) | `app/src/main/java/com/flit/app/domain/repository/` |
+| Repository (구현) | `app/src/main/java/com/flit/app/data/repository/` |
+| UseCase | `app/src/main/java/com/flit/app/domain/usecase/` |
+| ViewModel | `app/src/main/java/com/flit/app/presentation/viewmodels/` |
+| Domain Model | `app/src/main/java/com/flit/app/domain/model/` |
+| DB (Room) | `app/src/main/java/com/flit/app/data/local/database/` |
+| Mapper | `app/src/main/java/com/flit/app/data/mapper/` |
 
 ### 클라이언트 주요 DTO 파일
 

@@ -1,7 +1,7 @@
 # Material Design 커스텀 현황 점검 보고서
 
 > 작성일: 2026-02-08
-> 대상: KAIROS Mobile — presentation/ 전체 UI 코드
+> 대상: Flit. Mobile — presentation/ 전체 UI 코드
 > 목적: Material3 기본 컴포넌트의 커스텀 적용 현황 파악 및 브랜딩 일관성 점검
 
 ---
@@ -12,9 +12,9 @@
 
 | 항목 | 상태 | 비고 |
 |------|------|------|
-| KairosColors 전용 색상 클래스 | 완료 | 19개 시맨틱 색상 토큰 (라이트/다크) |
-| Material3 ColorScheme 매핑 | 완료 | KairosLight/Dark → lightColorScheme/darkColorScheme |
-| CompositionLocal 제공 | 완료 | `LocalKairosColors` + `KairosTheme.colors` |
+| FlitColors 전용 색상 클래스 | 완료 | 19개 시맨틱 색상 토큰 (라이트/다크) |
+| Material3 ColorScheme 매핑 | 완료 | FlitLight/Dark → lightColorScheme/darkColorScheme |
+| CompositionLocal 제공 | 완료 | `LocalFlitColors` + `FlitTheme.colors` |
 | 무채색 모노크롬 기조 | 완료 | PRD v4.0 준수 |
 
 ### 1.2 타이포그래피 (부분 커스텀)
@@ -46,7 +46,7 @@
 
 | 파일 | 컴포넌트 | 기본값 사용 내용 | 심각도 | 권장 커스텀 |
 |------|----------|------------------|--------|-------------|
-| `CreateFolderDialog.kt` | AlertDialog | 배경색, 제목/버튼 색상 모두 기본 M3 팔레트 | **High** | containerColor, titleContentColor, textContentColor를 KairosTheme.colors 적용 |
+| `CreateFolderDialog.kt` | AlertDialog | 배경색, 제목/버튼 색상 모두 기본 M3 팔레트 | **High** | containerColor, titleContentColor, textContentColor를 FlitTheme.colors 적용 |
 | `RenameFolderDialog.kt` | AlertDialog | 위와 동일 | **High** | 위와 동일 |
 | `SettingsScreen.kt:528` | AlertDialog (CalendarCodeExchangeDialog) | 배경색, 텍스트 색상 기본값 | **High** | containerColor, titleContentColor 적용 |
 | `SettingsScreen.kt:561` | AlertDialog (CalendarTokenSaveDialog) | 위와 동일 | **High** | 위와 동일 |
@@ -81,7 +81,7 @@
 | `SettingsScreen.kt:599-606` | TextButton (저장/취소) | 위와 동일 | **Medium** | 위와 동일 |
 | `SettingsScreen.kt:288` | TextButton (확인) | 위와 동일 | **Medium** | 위와 동일 |
 
-**상세 설명**: 총 10개 TextButton이 M3 기본 Primary 색상으로 텍스트 표시. Material3 ColorScheme에서 primary를 KairosLight.accent(#111111)로 매핑했으므로, 실제로는 검정색으로 표시될 수 있으나 명시적 커스텀이 없어 테마 변경 시 불안정.
+**상세 설명**: 총 10개 TextButton이 M3 기본 Primary 색상으로 텍스트 표시. Material3 ColorScheme에서 primary를 FlitLight.accent(#111111)로 매핑했으므로, 실제로는 검정색으로 표시될 수 있으나 명시적 커스텀이 없어 테마 변경 시 불안정.
 
 ---
 
@@ -198,9 +198,9 @@
 | `CaptureDetailScreen.kt:327` | CalendarSyncSection | `Color(0xFF4CAF50)`, `Color(0xFFFFA726)`, `Color(0xFFEF5350)` | **Medium** | colors.success, colors.warning, colors.danger 토큰 사용 |
 | `ScheduleTimeline.kt:286` | SyncStatusBadge | `Color(0xFF4CAF50)`, `Color(0xFFFFA726)`, `Color(0xFFEF5350)` | **Medium** | 위와 동일 |
 | `OnboardingScreen.kt:259,264` | OnboardingPageGoogle | `Color(0xFF4CAF50)` | **Medium** | colors.success 사용 |
-| `KairosBottomNav.kt:57` | shadow | `Color.Black.copy(alpha = 0.15f)` | **Low** | 그림자 전용이므로 허용 가능 |
+| `FlitBottomNav.kt:57` | shadow | `Color.Black.copy(alpha = 0.15f)` | **Low** | 그림자 전용이므로 허용 가능 |
 
-**상세 설명**: KairosTheme.colors에 이미 success(#10B981), warning(#F59E0B), danger(#EF4444) 토큰이 정의되어 있으나, 일부 화면에서 다른 색상값(#4CAF50, #FFA726, #EF5350)을 하드코딩. 색상 불일치 발생.
+**상세 설명**: FlitTheme.colors에 이미 success(#10B981), warning(#F59E0B), danger(#EF4444) 토큰이 정의되어 있으나, 일부 화면에서 다른 색상값(#4CAF50, #FFA726, #EF5350)을 하드코딩. 색상 불일치 발생.
 
 ---
 
@@ -246,8 +246,8 @@
 
 ### 3.3 전체 평가
 
-- **커스텀 색상 시스템**: 우수. KairosTheme.colors를 통해 19개 시맨틱 토큰 일관 적용
-- **Material3 ColorScheme 매핑**: 우수. lightColorScheme/darkColorScheme 모두 Kairos 색상으로 매핑
+- **커스텀 색상 시스템**: 우수. FlitTheme.colors를 통해 19개 시맨틱 토큰 일관 적용
+- **Material3 ColorScheme 매핑**: 우수. lightColorScheme/darkColorScheme 모두 Flit 색상으로 매핑
 - **Typography 시스템**: 미흡. bodyLarge만 커스텀, 나머지는 M3 기본값. 실제 사용 시 직접 sp 지정으로 우회
 - **Shape 시스템**: 미흡. MaterialTheme shapes 미설정, 인라인 하드코딩
 - **다이얼로그 계열**: 미흡. AlertDialog, TextButton이 전면적으로 기본 스타일
@@ -292,7 +292,7 @@
    - 공통 패턴 추출: 화면 제목(24sp/SemiBold), 섹션 라벨(12sp/SemiBold), 본문(15sp), 보조(13sp), 힌트(11sp)
 
 8. **Shape 토큰 정의**
-   - Theme.kt에 MaterialTheme shapes 설정 또는 KairosShapes 객체 정의
+   - Theme.kt에 MaterialTheme shapes 설정 또는 FlitShapes 객체 정의
    - small=8.dp, medium=12.dp, large=20.dp 등
 
 9. **Spacing 토큰 정의**
@@ -308,17 +308,17 @@
 | 패턴 | 파일 | 설명 |
 |------|------|------|
 | OutlinedTextField 커스텀 | `NoteDetailScreen.kt:158,213` | focusedBorderColor, unfocusedBorderColor, textColor, cursorColor 모두 지정 |
-| Switch 커스텀 | `SettingsScreen.kt:461` | checked/unchecked 6개 색상 모두 KairosTheme.colors 적용 |
+| Switch 커스텀 | `SettingsScreen.kt:461` | checked/unchecked 6개 색상 모두 FlitTheme.colors 적용 |
 | TopAppBar 커스텀 | `LegalWebViewScreen.kt:53` | containerColor, titleContentColor, navigationIconContentColor 지정 |
 | ModalBottomSheet 커스텀 | `NoteDetailScreen.kt:437` | containerColor = colors.background |
 | Scaffold 커스텀 | 전체 | containerColor = colors.background 일관 적용 |
-| KairosChip 래퍼 | `KairosChip.kt` | Material3 기본 Chip 대신 Box 기반 자체 컴포넌트로 완전 커스텀 |
-| KairosBottomNav 커스텀 | `KairosBottomNav.kt` | BottomAppBar 대신 Box+Row 기반 자체 컴포넌트 |
+| FlitChip 래퍼 | `FlitChip.kt` | Material3 기본 Chip 대신 Box 기반 자체 컴포넌트로 완전 커스텀 |
+| FlitBottomNav 커스텀 | `FlitBottomNav.kt` | BottomAppBar 대신 Box+Row 기반 자체 컴포넌트 |
 
 ---
 
 ## 6. 결론
 
-KAIROS Mobile은 **커스텀 색상 시스템(KairosTheme.colors)이 잘 구축**되어 있으며, Scaffold/TopAppBar/HorizontalDivider 등 주요 레이아웃 컴포넌트는 적절히 커스텀되어 있다. 그러나 **AlertDialog, OutlinedTextField, TextButton 등 입력/인터랙션 컴포넌트**에서 M3 기본 스타일이 그대로 노출되어 모노크롬 디자인 기조와 충돌한다.
+Flit. Mobile은 **커스텀 색상 시스템(FlitTheme.colors)이 잘 구축**되어 있으며, Scaffold/TopAppBar/HorizontalDivider 등 주요 레이아웃 컴포넌트는 적절히 커스텀되어 있다. 그러나 **AlertDialog, OutlinedTextField, TextButton 등 입력/인터랙션 컴포넌트**에서 M3 기본 스타일이 그대로 노출되어 모노크롬 디자인 기조와 충돌한다.
 
 가장 시급한 개선은 **P0의 AlertDialog/OutlinedTextField 10건**이며, 이는 사용자에게 직접 보이는 UI 요소이므로 앱 전체 브랜딩 일관성에 큰 영향을 미친다. NoteDetailScreen과 SettingsScreen(Switch)에 이미 모범 패턴이 존재하므로, 해당 패턴을 나머지 컴포넌트에 확산 적용하면 효율적으로 개선할 수 있다.

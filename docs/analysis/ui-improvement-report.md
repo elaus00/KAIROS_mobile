@@ -1,4 +1,4 @@
-# KAIROS Mobile UI 개선 보고서
+# Flit. Mobile UI 개선 보고서
 
 > 작성일: 2026-02-08
 > 범위: presentation/ 전체 화면 및 컴포넌트 (48개 파일)
@@ -8,7 +8,7 @@
 
 ## 요약
 
-KAIROS Mobile은 미니멀 모노크롬 디자인 시스템(KairosTheme)을 잘 구축하고 있으며, "Just Capture" 철학에 충실한 홈 화면 UX가 돋보인다. 다만 화면 간 일관성, 접근성, 인터랙션 피드백, 빈 상태 처리, 다크모드 세부 조정에서 개선 여지가 있다. 아래에서 화면별/카테고리별로 우선순위와 함께 정리한다.
+Flit. Mobile은 미니멀 모노크롬 디자인 시스템(FlitTheme)을 잘 구축하고 있으며, "Just Capture" 철학에 충실한 홈 화면 UX가 돋보인다. 다만 화면 간 일관성, 접근성, 인터랙션 피드백, 빈 상태 처리, 다크모드 세부 조정에서 개선 여지가 있다. 아래에서 화면별/카테고리별로 우선순위와 함께 정리한다.
 
 ---
 
@@ -18,7 +18,7 @@ KAIROS Mobile은 미니멀 모노크롬 디자인 시스템(KairosTheme)을 잘 
 
 | 화면 | 제목 | fontSize | fontWeight | padding |
 |------|------|----------|------------|---------|
-| CaptureContent (Home) | "Kairos" | 24.sp | SemiBold | h:20, v:16 |
+| CaptureContent (Home) | "Flit." | 24.sp | SemiBold | h:20, v:16 |
 | CalendarContent | "Calendar" | 24.sp | SemiBold | h:20, v:16 |
 | NotesContent | "Notes" | 24.sp | SemiBold | **h:16, v:12** |
 | HistoryScreen | "전체 기록" | **20.sp** | SemiBold | h:16, v:16 |
@@ -37,7 +37,7 @@ KAIROS Mobile은 미니멀 모노크롬 디자인 시스템(KairosTheme)을 잘 
 
 | 사용처 | 코너 반경 |
 |--------|-----------|
-| KairosChip (공통) | 8.dp |
+| FlitChip (공통) | 8.dp |
 | ClassificationDropdown 칩 | **16.dp** |
 | OnboardingScreen ClassificationChip | **16.dp** |
 | CaptureDetailScreen ClassificationChip | 8.dp |
@@ -47,7 +47,7 @@ KAIROS Mobile은 미니멀 모노크롬 디자인 시스템(KairosTheme)을 잘 
 **현재 상태**: 동일 역할의 칩이 3가지 다른 radius(4/8/16dp)를 사용한다. ClassificationDropdown의 16.dp는 pill 형태를 의도한 것으로 보이나 다른 분류 칩(8.dp)과 불일치한다.
 
 **권장 개선안**:
-- 인터랙티브 칩: 8.dp (KairosChip 기준으로 통일)
+- 인터랙티브 칩: 8.dp (FlitChip 기준으로 통일)
 - 비인터랙티브 태그(검색 결과 등): 4.dp는 너무 각져 보이므로 6.dp로 조정
 - ClassificationDropdown도 8.dp로 통일 (또는 의도적 pill이면 별도 디자인 토큰으로 분리)
 
@@ -112,7 +112,7 @@ labelSmall    = 11.sp Medium    (태그, 캡션)
 - TrashTopBar: 뒤로 가기, 비우기 (2곳)
 - HistoryTopBar: 뒤로 가기 (1곳)
 - OnboardingScreen: 건너뛰기, 다음/시작 버튼, Google 연결 버튼 (3곳)
-- KairosBottomNav: 전체 탭 아이템 (1곳)
+- FlitBottomNav: 전체 탭 아이템 (1곳)
 - CalendarCard: 날짜 셀, 토글 버튼 (2곳)
 - AIStatusSheet: 전체 확인, 확인 버튼, 배경 (3곳)
 - CaptureToolBar: 전송 버튼 (1곳)
@@ -187,22 +187,22 @@ labelSmall    = 11.sp Medium    (태그, 캡션)
 
 ### 5-1. 하드코딩된 색상
 
-**현재 상태**: 일부 색상이 KairosTheme을 사용하지 않고 하드코딩되어 있어 다크모드에서 부자연스러울 수 있다.
+**현재 상태**: 일부 색상이 FlitTheme을 사용하지 않고 하드코딩되어 있어 다크모드에서 부자연스러울 수 있다.
 
 | 위치 | 하드코딩 색상 | 문제점 |
 |------|-------------|--------|
-| CaptureDetailScreen CalendarSyncSection | `Color(0xFF4CAF50)`, `Color(0xFFFFA726)`, `Color(0xFFEF5350)` | KairosTheme.success/warning/danger와 불일치 |
+| CaptureDetailScreen CalendarSyncSection | `Color(0xFF4CAF50)`, `Color(0xFFFFA726)`, `Color(0xFFEF5350)` | FlitTheme.success/warning/danger와 불일치 |
 | ScheduleTimeline SyncStatusBadge | `Color(0xFF4CAF50)`, `Color(0xFFFFA726)`, `Color(0xFFEF5350)` | 동일 |
 | OnboardingPageGoogle "연결됨" | `Color(0xFF4CAF50)` | 동일 |
 
 **권장 개선안**:
-- `KairosColors`에 이미 `success`, `warning`, `danger` 토큰이 정의되어 있으므로 이를 사용
-- `Color(0xFF4CAF50)` -> `colors.success` (단, KairosLight.success = 0xFF10B981로 값이 다르므로, 의도적으로 다른 녹색이면 `calendarSynced` 같은 별도 토큰 추가)
+- `FlitColors`에 이미 `success`, `warning`, `danger` 토큰이 정의되어 있으므로 이를 사용
+- `Color(0xFF4CAF50)` -> `colors.success` (단, FlitLight.success = 0xFF10B981로 값이 다르므로, 의도적으로 다른 녹색이면 `calendarSynced` 같은 별도 토큰 추가)
 - `Color(0xFFFFA726)` -> `colors.warning` (값은 같은 계열이지만 정확한 코드가 다름: 0xFFF59E0B)
 
 ### 5-2. 다크모드에서 elevation/shadow
 
-**현재 상태**: `KairosBottomNav`에 `shadow(elevation = 16.dp)` 적용. 다크모드에서 shadow는 거의 보이지 않으며, 대신 border나 surface tint로 깊이감을 표현해야 한다.
+**현재 상태**: `FlitBottomNav`에 `shadow(elevation = 16.dp)` 적용. 다크모드에서 shadow는 거의 보이지 않으며, 대신 border나 surface tint로 깊이감을 표현해야 한다.
 
 **권장 개선안**: 다크모드에서는 border(1.dp, borderLight) 추가 또는 surface elevation 컬러로 분리
 
@@ -286,7 +286,7 @@ labelSmall    = 11.sp Medium    (태그, 캡션)
 
 | 위치 | 요소 | contentDescription |
 |------|------|-------------------|
-| NotesContent FolderFilterChips 폴더칩 | KairosChip | 없음 (텍스트로 유추 가능하나 명시 권장) |
+| NotesContent FolderFilterChips 폴더칩 | FlitChip | 없음 (텍스트로 유추 가능하나 명시 권장) |
 | CalendarCard 날짜 셀 | Box + Text | 없음 |
 | OnboardingBottomBar 인디케이터 | Box | 없음 |
 | TaskCheckbox | Box | 없음 (semantics 필요) |
@@ -448,7 +448,7 @@ labelSmall    = 11.sp Medium    (태그, 캡션)
 5. Typography 시스템 정의 (Type.kt 확장)
 6. 리플 효과 복원 (핵심 액션 버튼)
 7. 빈 상태 뷰 통일 (공통 EmptyStateView 컴포넌트)
-8. 하드코딩 색상 -> KairosTheme 토큰 사용
+8. 하드코딩 색상 -> FlitTheme 토큰 사용
 9. SettingsScreen 개발자 항목 숨김 처리
 10. 에러 상태에 "다시 시도" 액션 추가
 11. 접근성: contentDescription, semantics 보완
@@ -471,8 +471,8 @@ labelSmall    = 11.sp Medium    (태그, 캡션)
 
 ## 부록: 잘 구현된 점
 
-- **디자인 시스템**: KairosColors + CompositionLocal 기반 커스텀 색상 시스템이 체계적
-- **다크모드**: 라이트/다크 팔레트가 완전히 분리되어 있고, 대부분의 UI가 KairosTheme.colors 사용
+- **디자인 시스템**: FlitColors + CompositionLocal 기반 커스텀 색상 시스템이 체계적
+- **다크모드**: 라이트/다크 팔레트가 완전히 분리되어 있고, 대부분의 UI가 FlitTheme.colors 사용
 - **"Just Capture" 철학**: 홈 화면이 전체 화면 입력 영역으로, 캡처까지의 단계가 최소
 - **스와이프 삭제**: SwipeToDismissBox + Snackbar 실행 취소 패턴이 일관되게 적용
 - **CalendarCard**: 주간/월간 전환, 스와이프 제스처, 날짜 선택 애니메이션이 잘 구현됨

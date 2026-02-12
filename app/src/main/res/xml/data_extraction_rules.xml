@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   KAIROS Mobile 데이터 추출 규칙
+   Flit. Mobile 데이터 추출 규칙
    API 31+ 디바이스에서 클라우드 백업 및 기기 간 전송 정책 정의
    See https://developer.android.com/about/versions/12/backup-restore#xml-changes
 -->

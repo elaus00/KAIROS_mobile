@@ -75,14 +75,14 @@
 - 제품 정책에 맞춘 사용자 안내/수동 선택 UX 보완 권장
 
 ## 5) 주요 변경 파일(대표)
-- `app/src/main/java/com/example/kairos_mobile/domain/repository/CalendarRepository.kt`
-- `app/src/main/java/com/example/kairos_mobile/data/repository/CalendarRepositoryImpl.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/settings/SettingsViewModel.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/settings/SettingsScreen.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/onboarding/OnboardingViewModel.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/onboarding/OnboardingScreen.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/auth/LoginScreen.kt`
-- `app/src/main/java/com/example/kairos_mobile/presentation/auth/LoginViewModel.kt`
-- `app/src/main/java/com/example/kairos_mobile/data/repository/SyncRepositoryImpl.kt`
-- `app/src/main/java/com/example/kairos_mobile/domain/usecase/sync/InitialSyncUseCase.kt`
+- `app/src/main/java/com/flit/app/domain/repository/CalendarRepository.kt`
+- `app/src/main/java/com/flit/app/data/repository/CalendarRepositoryImpl.kt`
+- `app/src/main/java/com/flit/app/presentation/settings/SettingsViewModel.kt`
+- `app/src/main/java/com/flit/app/presentation/settings/SettingsScreen.kt`
+- `app/src/main/java/com/flit/app/presentation/onboarding/OnboardingViewModel.kt`
+- `app/src/main/java/com/flit/app/presentation/onboarding/OnboardingScreen.kt`
+- `app/src/main/java/com/flit/app/presentation/auth/LoginScreen.kt`
+- `app/src/main/java/com/flit/app/presentation/auth/LoginViewModel.kt`
+- `app/src/main/java/com/flit/app/data/repository/SyncRepositoryImpl.kt`
+- `app/src/main/java/com/flit/app/domain/usecase/sync/InitialSyncUseCase.kt`
 

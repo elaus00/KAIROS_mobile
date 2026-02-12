@@ -1,4 +1,4 @@
-# KAIROS — 데이터 모델 명세서
+# Flit. — 데이터 모델 명세서
 
 > **Version**: 2.3
 **작성일**: 2026-02-12
@@ -647,7 +647,7 @@ Room DB는 Destructive Migration 전략을 사용한다. 스키마 변경 시 �
 
 ```kotlin
 // DatabaseModule.kt
-Room.databaseBuilder(context, KairosDatabase::class.java, DATABASE_NAME)
+Room.databaseBuilder(context, FlitDatabase::class.java, DATABASE_NAME)
     .fallbackToDestructiveMigration()
     .build()
 ```
