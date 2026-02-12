@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -20,12 +23,13 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.example.kairos_mobile.R
 import com.example.kairos_mobile.data.local.database.dao.CaptureDao
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -83,7 +87,7 @@ private fun CaptureContent(todayCount: Int) {
             .fillMaxSize()
             .background(GlanceTheme.colors.background)
             .cornerRadius(16.dp)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
         // 입력 필드 스타일 영역 (탭하면 QuickCaptureActivity)
@@ -92,23 +96,21 @@ private fun CaptureContent(todayCount: Int) {
                 .fillMaxWidth()
                 .background(GlanceTheme.colors.surfaceVariant)
                 .cornerRadius(12.dp)
-                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .clickable(onClick = actionStartActivity<QuickCaptureActivity>()),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "✎",
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    color = GlanceTheme.colors.primary,
-                    fontWeight = FontWeight.Bold
-                )
+            Image(
+                provider = ImageProvider(R.drawable.ic_widget_edit),
+                contentDescription = "캡처 입력",
+                modifier = GlanceModifier.size(20.dp),
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.primary)
             )
-            Spacer(modifier = GlanceModifier.width(10.dp))
+            Spacer(modifier = GlanceModifier.width(8.dp))
             Text(
                 text = "무엇이든 캡처하세요",
                 style = TextStyle(
-                    fontSize = 15.sp,
+                    fontSize = 16.sp,
                     color = GlanceTheme.colors.onSurfaceVariant
                 ),
                 modifier = GlanceModifier.defaultWeight()
@@ -117,7 +119,7 @@ private fun CaptureContent(todayCount: Int) {
                 Text(
                     text = "$todayCount",
                     style = TextStyle(
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = GlanceTheme.colors.primary
                     )
