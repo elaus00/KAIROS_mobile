@@ -75,7 +75,8 @@ fun PremiumGateSheet(
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colors.accent
+                    containerColor = colors.accent,
+                    contentColor = colors.background
                 )
             ) {
                 Text(

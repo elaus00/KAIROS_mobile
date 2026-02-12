@@ -94,6 +94,7 @@ fun AiClassificationSettingsScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .heightIn(min = 48.dp)
                             .clickable {
                                 if (isPremium) {
                                     showPresetDropdown = true
