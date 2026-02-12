@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.flit.app.domain.model.Folder
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -60,6 +61,7 @@ fun NoteDetailScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: NoteDetailViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val context = LocalContext.current
@@ -96,7 +98,7 @@ fun NoteDetailScreen(
             val result = snackbarHostState.showSnackbar(
                 message = "삭제됨",
                 actionLabel = "실행 취소",
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Short
             )
             if (result == SnackbarResult.ActionPerformed) {
                 viewModel.onUndoDelete()
@@ -363,6 +365,7 @@ fun NoteDetailScreen(
             },
             onDismiss = { showFolderSheet = false }
         )
+    }
     }
 }
 

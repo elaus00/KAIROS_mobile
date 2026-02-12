@@ -189,17 +189,20 @@ class NoteDetailViewModel @Inject constructor(
 
     /**
      * 노트 삭제 — §4.4 Snackbar 실행 취소 패턴
-     * softDelete 후 5초 대기, 실행 취소 없으면 moveToTrash
+     * softDelete 후 3초 대기, 실행 취소 없으면 moveToTrash
      */
     fun onDelete() {
         val captureId = _uiState.value.noteDetail?.captureId ?: return
+
+        trashJob?.cancel()
+        trashJob = null
 
         viewModelScope.launch {
             captureRepository.softDelete(captureId)
             _uiState.update { it.copy(isDeleted = true) }
         }
 
-        // 5초 후 휴지통 이동 예약
+        // 3초 후 휴지통 이동 예약
         trashJob = viewModelScope.launch {
             delay(SNACKBAR_DURATION_MS)
             captureRepository.moveToTrash(captureId)
@@ -218,8 +221,13 @@ class NoteDetailViewModel @Inject constructor(
         trashJob = null
 
         viewModelScope.launch {
-            captureRepository.undoSoftDelete(captureId)
-            _uiState.update { it.copy(isDeleted = false) }
+            val capture = captureRepository.getCaptureById(captureId)
+            if (capture?.isTrashed == true) {
+                captureRepository.restoreFromTrash(captureId)
+            } else {
+                captureRepository.undoSoftDelete(captureId)
+            }
+            _uiState.update { it.copy(isDeleted = false, shouldNavigateBack = false) }
         }
     }
 
@@ -287,6 +295,6 @@ class NoteDetailViewModel @Inject constructor(
     }
 
     companion object {
-        private const val SNACKBAR_DURATION_MS = 5000L
+        private const val SNACKBAR_DURATION_MS = 3000L
     }
 }

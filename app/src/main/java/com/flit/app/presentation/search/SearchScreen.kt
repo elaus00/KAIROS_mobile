@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flit.app.domain.model.Capture
 import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.domain.model.SemanticSearchResult
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FilterChipRow
 import com.flit.app.presentation.components.common.FlitChip
 import com.flit.app.ui.theme.FlitTheme
@@ -46,6 +47,7 @@ fun SearchScreen(
     onNavigate: (String) -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = FlitTheme.colors
     val focusRequester = remember { FocusRequester() }
@@ -132,13 +134,13 @@ fun SearchScreen(
                         if (uiState.searchText.isNotEmpty()) {
                             IconButton(
                                 onClick = { viewModel.onSearchTextChanged("") },
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(48.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "지우기",
                                     tint = colors.textMuted,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
                         }
@@ -326,6 +328,7 @@ fun SearchScreen(
                 }
             }
         }
+    }
     }
 }
 

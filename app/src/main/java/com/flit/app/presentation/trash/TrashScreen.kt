@@ -4,20 +4,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.domain.model.Capture
+import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.ui.theme.FlitTheme
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
 
 /**
  * 휴지통 화면
@@ -29,6 +34,7 @@ fun TrashScreen(
     modifier: Modifier = Modifier,
     viewModel: TrashViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
@@ -183,6 +189,7 @@ fun TrashScreen(
             )
         }
     }
+    }
 }
 
 /**
@@ -245,6 +252,21 @@ private fun TrashItem(
     val trashedDate = remember(capture.trashedAt) {
         capture.trashedAt?.let { dateFormat.format(Date(it)) } ?: ""
     }
+    val remainingDays = remember(capture.trashedAt) {
+        val trashedAt = capture.trashedAt ?: return@remember 0
+        val elapsedDays = ((System.currentTimeMillis() - trashedAt) / (24L * 60L * 60L * 1000L)).toInt()
+        max(0, 30 - elapsedDays)
+    }
+    val typeLabel = remember(capture.classifiedType, capture.noteSubType) {
+        when (capture.classifiedType) {
+            ClassifiedType.SCHEDULE -> "일정"
+            ClassifiedType.TODO -> "할 일"
+            ClassifiedType.NOTES -> {
+                if (capture.noteSubType == com.flit.app.domain.model.NoteSubType.IDEA) "아이디어" else "노트"
+            }
+            ClassifiedType.TEMP -> "미분류"
+        }
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -271,6 +293,26 @@ private fun TrashItem(
             if (trashedDate.isNotEmpty()) {
                 Text(
                     text = "삭제: $trashedDate",
+                    color = colors.textMuted,
+                    fontSize = 12.sp
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = typeLabel,
+                    color = colors.chipText,
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(colors.chipBg)
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+                Text(
+                    text = "남은 ${remainingDays}일",
                     color = colors.textMuted,
                     fontSize = 12.sp
                 )

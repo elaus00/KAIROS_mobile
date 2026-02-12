@@ -2,11 +2,11 @@ package com.flit.app.presentation.calendar.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
@@ -27,16 +27,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,7 +47,10 @@ import com.flit.app.ui.theme.FlitTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * CalendarCard 컴포넌트
@@ -66,11 +71,14 @@ fun CalendarCard(
     val colors = FlitTheme.colors
     val today = LocalDate.now()
     val currentMonth = YearMonth.from(selectedDate)
+    val scope = rememberCoroutineScope()
 
     // 스와이프 제스처 감지용 누적값
     var dragAmountX by remember { mutableFloatStateOf(0f) }
     var dragAmountY by remember { mutableFloatStateOf(0f) }
-    var weekSlideDirection by remember { mutableIntStateOf(0) } // 1: 다음 주, -1: 이전 주
+    var weekDragOffsetX by remember { mutableFloatStateOf(0f) }
+    var weekContainerWidthPx by remember { mutableFloatStateOf(0f) }
+    var settleJob by remember { mutableStateOf<Job?>(null) }
 
     Column(
         modifier = modifier
@@ -81,6 +89,8 @@ fun CalendarCard(
             .pointerInput(isExpanded, currentMonth) {
                 detectDragGestures(
                     onDragStart = {
+                        settleJob?.cancel()
+                        settleJob = null
                         dragAmountX = 0f
                         dragAmountY = 0f
                     },
@@ -88,9 +98,14 @@ fun CalendarCard(
                         change.consume()
                         dragAmountX += dragAmount.x
                         dragAmountY += dragAmount.y
+                        if (!isExpanded && abs(dragAmountX) > abs(dragAmountY)) {
+                            val width = weekContainerWidthPx.takeIf { it > 0f } ?: 1f
+                            weekDragOffsetX = (weekDragOffsetX + dragAmount.x)
+                                .coerceIn(-width, width)
+                        }
                     },
                     onDragEnd = {
-                        val threshold = 50f
+                        val threshold = 24f
                         if (abs(dragAmountY) > abs(dragAmountX)) {
                             // 수직 스와이프 우선
                             if (dragAmountY > threshold && !isExpanded) {
@@ -111,14 +126,50 @@ fun CalendarCard(
                                     onMonthChange(currentMonth.minusMonths(1))
                                 }
                             } else {
-                                // 주간 뷰에서 좌우 스와이프 → 주 이동
-                                if (dragAmountX < -threshold) {
-                                    weekSlideDirection = 1
-                                    onDateSelected(selectedDate.plusWeeks(1))
-                                } else if (dragAmountX > threshold) {
-                                    weekSlideDirection = -1
-                                    onDateSelected(selectedDate.minusWeeks(1))
+                                // 주간 뷰에서 좌우 스와이프 → 인터랙티브 주 이동
+                                val width = weekContainerWidthPx.takeIf { it > 0f } ?: 1f
+                                val commitThreshold = 18f
+                                val deltaWeek = when {
+                                    weekDragOffsetX <= -commitThreshold -> 1L
+                                    weekDragOffsetX >= commitThreshold -> -1L
+                                    else -> 0L
                                 }
+
+                                settleJob = scope.launch {
+                                    if (deltaWeek != 0L) {
+                                        val target = if (deltaWeek > 0) -width else width
+                                        animate(
+                                            initialValue = weekDragOffsetX,
+                                            targetValue = target,
+                                            animationSpec = tween(
+                                                durationMillis = 300,
+                                                easing = FastOutSlowInEasing
+                                            )
+                                        ) { value, _ -> weekDragOffsetX = value }
+                                        weekDragOffsetX = 0f
+                                        onDateSelected(selectedDate.plusWeeks(deltaWeek))
+                                    } else {
+                                        animate(
+                                            initialValue = weekDragOffsetX,
+                                            targetValue = 0f,
+                                            animationSpec = tween(
+                                                durationMillis = 320,
+                                                easing = FastOutSlowInEasing
+                                            )
+                                        ) { value, _ -> weekDragOffsetX = value }
+                                    }
+                                }
+                            }
+                        } else if (!isExpanded) {
+                            settleJob = scope.launch {
+                                animate(
+                                    initialValue = weekDragOffsetX,
+                                    targetValue = 0f,
+                                    animationSpec = tween(
+                                        durationMillis = 320,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ) { value, _ -> weekDragOffsetX = value }
                             }
                         }
                     }
@@ -211,43 +262,56 @@ fun CalendarCard(
                 }
             } else {
                 // 주간 뷰 (기본 상태)
-                AnimatedContent(
-                    targetState = selectedDate.minusDays(selectedDate.dayOfWeek.value.toLong() % 7),
-                    transitionSpec = {
-                        if (weekSlideDirection > 0) {
-                            slideInHorizontally(
-                                animationSpec = tween(220),
-                                initialOffsetX = { fullWidth -> fullWidth / 2 }
-                            ) + fadeIn(animationSpec = tween(220)) togetherWith
-                                slideOutHorizontally(
-                                    animationSpec = tween(220),
-                                    targetOffsetX = { fullWidth -> -fullWidth / 2 }
-                                ) + fadeOut(animationSpec = tween(220))
-                        } else if (weekSlideDirection < 0) {
-                            slideInHorizontally(
-                                animationSpec = tween(220),
-                                initialOffsetX = { fullWidth -> -fullWidth / 2 }
-                            ) + fadeIn(animationSpec = tween(220)) togetherWith
-                                slideOutHorizontally(
-                                    animationSpec = tween(220),
-                                    targetOffsetX = { fullWidth -> fullWidth / 2 }
-                                ) + fadeOut(animationSpec = tween(220))
-                        } else {
-                            fadeIn(animationSpec = tween(180)) togetherWith
-                                fadeOut(animationSpec = tween(180))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .onSizeChanged { size ->
+                            weekContainerWidthPx = size.width.toFloat()
                         }
-                    },
-                    label = "weekTransition"
                 ) {
-                    CalendarWeekRow(
-                        selectedDate = selectedDate,
-                        today = today,
-                        datesWithSchedules = datesWithSchedules,
-                        onDateSelected = { date ->
-                            weekSlideDirection = 0
-                            onDateSelected(date)
-                        }
-                    )
+                    val widthPx = weekContainerWidthPx.takeIf { it > 0f } ?: 0f
+                    val roundedOffset = weekDragOffsetX.roundToInt()
+                    val prevSelectedDate = selectedDate.minusWeeks(1)
+                    val nextSelectedDate = selectedDate.plusWeeks(1)
+
+                    if (widthPx <= 0f) {
+                        // 폭 측정 전에는 단일 주차만 렌더링해 오버레이로 인한 마크 오표시를 방지한다.
+                        CalendarWeekRow(
+                            selectedDate = selectedDate,
+                            today = today,
+                            datesWithSchedules = datesWithSchedules,
+                            onDateSelected = onDateSelected
+                        )
+                    } else {
+                        CalendarWeekRow(
+                            selectedDate = prevSelectedDate,
+                            today = today,
+                            datesWithSchedules = datesWithSchedules,
+                            onDateSelected = onDateSelected,
+                            modifier = Modifier.offset {
+                                IntOffset((-widthPx).roundToInt() + roundedOffset, 0)
+                            }
+                        )
+
+                        CalendarWeekRow(
+                            selectedDate = selectedDate,
+                            today = today,
+                            datesWithSchedules = datesWithSchedules,
+                            onDateSelected = onDateSelected,
+                            modifier = Modifier.offset { IntOffset(roundedOffset, 0) }
+                        )
+
+                        CalendarWeekRow(
+                            selectedDate = nextSelectedDate,
+                            today = today,
+                            datesWithSchedules = datesWithSchedules,
+                            onDateSelected = onDateSelected,
+                            modifier = Modifier.offset {
+                                IntOffset(widthPx.roundToInt() + roundedOffset, 0)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -315,6 +379,7 @@ private fun CalendarDayCell(
 
     val textColor = when {
         isSelected -> if (colors.isDark) colors.background else Color.White
+        isToday -> colors.accent
         else -> colors.text
     }
 
@@ -345,7 +410,12 @@ private fun CalendarDayCell(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(backgroundColor),
+                .background(backgroundColor)
+                .border(
+                    width = if (isToday && !isSelected) 1.dp else 0.dp,
+                    color = if (isToday && !isSelected) colors.accent else Color.Transparent,
+                    shape = CircleShape
+                ),
             contentAlignment = Alignment.Center
         ) {
             Text(

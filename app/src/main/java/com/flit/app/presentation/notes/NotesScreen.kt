@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.StickyNote2
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.domain.model.FolderType
 import com.flit.app.domain.model.NoteSubType
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FlitChip
 import com.flit.app.ui.theme.FlitTheme
 import java.text.SimpleDateFormat
@@ -61,6 +63,7 @@ fun NotesContent(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
 
     NotesContentInternal(
@@ -72,6 +75,7 @@ fun NotesContent(
         onReorganizeClick = onReorganizeClick,
         modifier = modifier
     )
+    }
 }
 
 /**
@@ -89,6 +93,14 @@ private fun NotesContentInternal(
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            onEvent(NotesEvent.DismissError)
+        }
+    }
 
     // 다이얼로그
     if (uiState.showCreateFolderDialog) {
@@ -106,62 +118,75 @@ private fun NotesContentInternal(
         )
     }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
     ) {
-        // 상단 헤더
-        NotesHeader(
-            onTrashClick = onTrashClick,
-            onSearchClick = onSearchClick,
-            onReorganizeClick = onReorganizeClick,
-            showReorganize = uiState.isPremium
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.background)
+        ) {
+            // 상단 헤더
+            NotesHeader(
+                onTrashClick = onTrashClick,
+                onSearchClick = onSearchClick,
+                onReorganizeClick = onReorganizeClick,
+                showReorganize = uiState.isPremium
+            )
 
-        // 폴더 필터 칩
-        FolderFilterChips(
-            folders = uiState.folders,
-            selectedFolderId = uiState.selectedFilterFolderId,
-            onFilterSelect = { onEvent(NotesEvent.SelectFilter(it)) },
-            onCreateFolder = { onEvent(NotesEvent.ShowCreateFolderDialog) },
-            onRenameFolder = { onEvent(NotesEvent.ShowRenameFolderDialog(it)) },
-            onDeleteFolder = { onEvent(NotesEvent.DeleteFolder(it)) }
-        )
+            // 폴더 필터 칩
+            FolderFilterChips(
+                folders = uiState.folders,
+                selectedFolderId = uiState.selectedFilterFolderId,
+                onFilterSelect = { onEvent(NotesEvent.SelectFilter(it)) },
+                onCreateFolder = { onEvent(NotesEvent.ShowCreateFolderDialog) },
+                onRenameFolder = { onEvent(NotesEvent.ShowRenameFolderDialog(it)) },
+                onDeleteFolder = { onEvent(NotesEvent.DeleteFolder(it)) }
+            )
 
-        // 노트 리스트
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = colors.accent,
-                        modifier = Modifier.size(32.dp)
+            // 노트 리스트
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = colors.accent,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+
+                uiState.notes.isEmpty() -> {
+                    EmptyNotesView(
+                        hasFilter = uiState.selectedFilterFolderId != null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                }
+
+                else -> {
+                    NotesList(
+                        notes = uiState.notes,
+                        onNoteClick = onNoteClick,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
-
-            uiState.notes.isEmpty() -> {
-                EmptyNotesView(
-                    hasFilter = uiState.selectedFilterFolderId != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
-
-            else -> {
-                NotesList(
-                    notes = uiState.notes,
-                    onNoteClick = onNoteClick,
-                    modifier = Modifier.weight(1f)
-                )
-            }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        )
     }
 }
 
@@ -326,7 +351,7 @@ private fun FolderFilterChips(
             // 새 폴더 추가 버튼
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(48.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(colors.chipBg)
                     .clickable { onCreateFolder() },
