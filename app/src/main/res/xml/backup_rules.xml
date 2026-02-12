@@ -22,5 +22,5 @@
     <exclude domain="file" path="."/>
 
     <!-- 캐시 제외 -->
-    <exclude domain="cache" path="."/>
+    <exclude domain="root" path="cache/"/>
 </full-backup-content>

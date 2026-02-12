@@ -223,3 +223,11 @@
 
 # 이미 개별 라이브러리별로 dontwarn 규칙을 적용했으므로
 # 전역 dontwarn은 사용하지 않음 (R8 경고로 실제 문제 감지 가능)
+
+# ============================================================
+# Tracing (Perfetto / Android Studio Profiler)
+# ============================================================
+-keep class androidx.tracing.** { *; }
+-dontwarn androidx.tracing.**
+-keep class androidx.compose.runtime.tracing.** { *; }
+-dontwarn androidx.compose.runtime.tracing.**

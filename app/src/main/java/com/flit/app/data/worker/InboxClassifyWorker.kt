@@ -21,6 +21,7 @@ import com.flit.app.domain.repository.FolderRepository
 import com.flit.app.domain.repository.NoteAiRepository
 import com.flit.app.domain.repository.NoteRepository
 import com.flit.app.domain.repository.SubscriptionRepository
+import com.flit.app.tracing.AppTrace
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -43,6 +44,7 @@ class InboxClassifyWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "InboxClassifyWorker"
+        private const val TRACE_INBOX_CLASSIFY_EXECUTION = "inbox_classify_execution"
         private const val WORK_NAME = "inbox_classify"
 
         fun enqueuePeriodicWork(workManager: WorkManager) {
@@ -67,60 +69,62 @@ class InboxClassifyWorker @AssistedInject constructor(
             return Result.success()
         }
 
-        return try {
-            val tempCaptures = captureRepository.getTempCaptures()
-            if (tempCaptures.isEmpty()) {
-                Log.d(TAG, "분류 대상 TEMP 캡처 없음")
-                return Result.success()
-            }
-
-            // 노트 입력 데이터 구축
-            val noteInputs = tempCaptures.map { capture ->
-                NoteAiInput(
-                    captureId = capture.id,
-                    aiTitle = capture.aiTitle ?: "",
-                    tags = emptyList(),
-                    noteSubType = capture.noteSubType?.name,
-                    folderId = null
-                )
-            }
-            val folderList = folderRepository.getAllFolders().first()
-
-            val result = noteAiRepository.inboxClassify(noteInputs, folderList)
-
-            // 새 폴더 생성
-            for (newFolder in result.newFolders) {
-                val folderType = try {
-                    FolderType.valueOf(newFolder.type.uppercase())
-                } catch (_: Exception) {
-                    FolderType.USER
+        return AppTrace.suspendSection(TRACE_INBOX_CLASSIFY_EXECUTION) {
+            try {
+                val tempCaptures = captureRepository.getTempCaptures()
+                if (tempCaptures.isEmpty()) {
+                    Log.d(TAG, "분류 대상 TEMP 캡처 없음")
+                    return@suspendSection Result.success()
                 }
-                folderRepository.getOrCreateFolder(newFolder.name, folderType)
-            }
 
-            // 분류 결과 적용
-            for (assignment in result.assignments) {
-                try {
-                    val noteSubType = assignment.newNoteSubType.takeIf { it.isNotBlank() }?.let {
-                        try { NoteSubType.valueOf(it.uppercase()) } catch (_: Exception) { null }
-                    }
-                    captureRepository.updateClassification(
-                        captureId = assignment.captureId,
-                        classifiedType = ClassifiedType.NOTES,
-                        noteSubType = noteSubType,
-                        aiTitle = "",
-                        confidence = ConfidenceLevel.HIGH
+                // 노트 입력 데이터 구축
+                val noteInputs = tempCaptures.map { capture ->
+                    NoteAiInput(
+                        captureId = capture.id,
+                        aiTitle = capture.aiTitle ?: "",
+                        tags = emptyList(),
+                        noteSubType = capture.noteSubType?.name,
+                        folderId = null
                     )
-                } catch (e: Exception) {
-                    Log.w(TAG, "캡처 ${assignment.captureId} 분류 적용 실패", e)
                 }
-            }
+                val folderList = folderRepository.getAllFolders().first()
 
-            Log.d(TAG, "${result.assignments.size}개 캡처 Inbox 분류 완료")
-            Result.success()
-        } catch (e: Exception) {
-            Log.e(TAG, "Inbox 분류 실패", e)
-            Result.retry()
+                val result = noteAiRepository.inboxClassify(noteInputs, folderList)
+
+                // 새 폴더 생성
+                for (newFolder in result.newFolders) {
+                    val folderType = try {
+                        FolderType.valueOf(newFolder.type.uppercase())
+                    } catch (_: Exception) {
+                        FolderType.USER
+                    }
+                    folderRepository.getOrCreateFolder(newFolder.name, folderType)
+                }
+
+                // 분류 결과 적용
+                for (assignment in result.assignments) {
+                    try {
+                        val noteSubType = assignment.newNoteSubType.takeIf { it.isNotBlank() }?.let {
+                            try { NoteSubType.valueOf(it.uppercase()) } catch (_: Exception) { null }
+                        }
+                        captureRepository.updateClassification(
+                            captureId = assignment.captureId,
+                            classifiedType = ClassifiedType.NOTES,
+                            noteSubType = noteSubType,
+                            aiTitle = "",
+                            confidence = ConfidenceLevel.HIGH
+                        )
+                    } catch (e: Exception) {
+                        Log.w(TAG, "캡처 ${assignment.captureId} 분류 적용 실패", e)
+                    }
+                }
+
+                Log.d(TAG, "${result.assignments.size}개 캡처 Inbox 분류 완료")
+                Result.success()
+            } catch (e: Exception) {
+                Log.e(TAG, "Inbox 분류 실패", e)
+                Result.retry()
+            }
         }
     }
 }

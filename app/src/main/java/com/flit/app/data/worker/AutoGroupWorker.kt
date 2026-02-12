@@ -17,6 +17,7 @@ import com.flit.app.domain.repository.FolderRepository
 import com.flit.app.domain.repository.NoteAiRepository
 import com.flit.app.domain.repository.NoteRepository
 import com.flit.app.domain.repository.SubscriptionRepository
+import com.flit.app.tracing.AppTrace
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -38,6 +39,7 @@ class AutoGroupWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "AutoGroupWorker"
+        private const val TRACE_AUTO_GROUP_EXECUTION = "auto_group_execution"
         private const val WORK_NAME = "auto_group"
 
         fun enqueuePeriodicWork(workManager: WorkManager) {
@@ -62,47 +64,49 @@ class AutoGroupWorker @AssistedInject constructor(
             return Result.success()
         }
 
-        return try {
-            val ungroupedNoteIds = noteRepository.getUngroupedNoteIds()
-            if (ungroupedNoteIds.isEmpty()) {
-                Log.d(TAG, "그룹화 대상 노트 없음")
-                return Result.success()
-            }
-
-            // 노트 입력 데이터 + captureId→noteId 매핑 구축
-            val captureToNoteMap = mutableMapOf<String, String>()
-            val noteInputs = ungroupedNoteIds.mapNotNull { noteId ->
-                val detail = noteRepository.getNoteDetail(noteId).first() ?: return@mapNotNull null
-                captureToNoteMap[detail.captureId] = noteId
-                NoteAiInput(
-                    captureId = detail.captureId,
-                    aiTitle = detail.aiTitle ?: "",
-                    tags = emptyList(),
-                    noteSubType = detail.noteSubType?.name,
-                    folderId = detail.folderId
-                )
-            }
-
-            val folderList = folderRepository.getAllFolders().first()
-            val groups = noteAiRepository.groupNotes(noteInputs, folderList)
-
-            for (group in groups) {
-                val folderType = try {
-                    FolderType.valueOf(group.folderType.uppercase())
-                } catch (_: Exception) {
-                    FolderType.AI_GROUP
+        return AppTrace.suspendSection(TRACE_AUTO_GROUP_EXECUTION) {
+            try {
+                val ungroupedNoteIds = noteRepository.getUngroupedNoteIds()
+                if (ungroupedNoteIds.isEmpty()) {
+                    Log.d(TAG, "그룹화 대상 노트 없음")
+                    return@suspendSection Result.success()
                 }
-                val folder = folderRepository.getOrCreateFolder(group.folderName, folderType)
-                for (captureId in group.captureIds) {
-                    val noteId = captureToNoteMap[captureId] ?: continue
-                    noteRepository.moveToFolder(noteId, folder.id)
+
+                // 노트 입력 데이터 + captureId→noteId 매핑 구축
+                val captureToNoteMap = mutableMapOf<String, String>()
+                val noteInputs = ungroupedNoteIds.mapNotNull { noteId ->
+                    val detail = noteRepository.getNoteDetail(noteId).first() ?: return@mapNotNull null
+                    captureToNoteMap[detail.captureId] = noteId
+                    NoteAiInput(
+                        captureId = detail.captureId,
+                        aiTitle = detail.aiTitle ?: "",
+                        tags = emptyList(),
+                        noteSubType = detail.noteSubType?.name,
+                        folderId = detail.folderId
+                    )
                 }
+
+                val folderList = folderRepository.getAllFolders().first()
+                val groups = noteAiRepository.groupNotes(noteInputs, folderList)
+
+                for (group in groups) {
+                    val folderType = try {
+                        FolderType.valueOf(group.folderType.uppercase())
+                    } catch (_: Exception) {
+                        FolderType.AI_GROUP
+                    }
+                    val folder = folderRepository.getOrCreateFolder(group.folderName, folderType)
+                    for (captureId in group.captureIds) {
+                        val noteId = captureToNoteMap[captureId] ?: continue
+                        noteRepository.moveToFolder(noteId, folder.id)
+                    }
+                }
+                Log.d(TAG, "${groups.size}개 그룹 생성 완료")
+                Result.success()
+            } catch (e: Exception) {
+                Log.e(TAG, "그룹화 실패", e)
+                Result.retry()
             }
-            Log.d(TAG, "${groups.size}개 그룹 생성 완료")
-            Result.success()
-        } catch (e: Exception) {
-            Log.e(TAG, "그룹화 실패", e)
-            Result.retry()
         }
     }
 }

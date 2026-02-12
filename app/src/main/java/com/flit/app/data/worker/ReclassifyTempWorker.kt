@@ -18,6 +18,7 @@ import com.flit.app.data.remote.dto.v2.ClassifyBatchRequest
 import com.flit.app.data.remote.dto.v2.ClassifyResponse
 import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.usecase.classification.ProcessClassificationResultUseCase
+import com.flit.app.tracing.AppTrace
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
@@ -38,68 +39,71 @@ class ReclassifyTempWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        Log.d(TAG, "ReclassifyTempWorker 시작")
+        return AppTrace.suspendSection(TRACE_RECLASSIFY_BATCH_EXECUTION) {
+            Log.d(TAG, "ReclassifyTempWorker 시작")
 
-        val tempCaptures = captureRepository.getTempCaptures()
-        if (tempCaptures.isEmpty()) {
-            Log.d(TAG, "재분류 대상 TEMP 캡처 없음")
-            return Result.success()
-        }
-
-        Log.d(TAG, "TEMP 캡처 ${tempCaptures.size}개 배치 재분류 시작")
-
-        var successCount = 0
-        for (chunk in tempCaptures.chunked(BATCH_SIZE)) {
-            val request = ClassifyBatchRequest(
-                items = chunk.map { capture ->
-                    ClassifyBatchItemDto(
-                        captureId = capture.id,
-                        text = capture.originalText
-                    )
-                },
-                deviceId = deviceIdProvider.getOrCreateDeviceId()
-            )
-            val response = api.classifyBatch(request)
-            val body = response.body()
-
-            if (!response.isSuccessful || body?.status != "ok" || body.data == null) {
-                Log.w(TAG, "배치 재분류 실패: http=${response.code()}, code=${body?.error?.code}")
-                continue
+            val tempCaptures = captureRepository.getTempCaptures()
+            if (tempCaptures.isEmpty()) {
+                Log.d(TAG, "재분류 대상 TEMP 캡처 없음")
+                return@suspendSection Result.success()
             }
 
-            body.data.results.forEach { result ->
-                runCatching {
-                    val classification = classificationMapper.toDomain(
-                        ClassifyResponse(
-                            classifiedType = result.classifiedType,
-                            noteSubType = result.noteSubType,
-                            confidence = result.confidence,
-                            aiTitle = result.aiTitle,
-                            tags = result.tags,
-                            entities = result.entities,
-                            scheduleInfo = result.scheduleInfo,
-                            todoInfo = result.todoInfo,
-                            splitItems = result.splitItems
+            Log.d(TAG, "TEMP 캡처 ${tempCaptures.size}개 배치 재분류 시작")
+
+            var successCount = 0
+            for (chunk in tempCaptures.chunked(BATCH_SIZE)) {
+                val request = ClassifyBatchRequest(
+                    items = chunk.map { capture ->
+                        ClassifyBatchItemDto(
+                            captureId = capture.id,
+                            text = capture.originalText
                         )
-                    )
-                    processClassificationResultUseCase(result.captureId, classification)
-                    successCount++
-                }.onFailure { throwable ->
-                    Log.e(TAG, "배치 분류 결과 적용 실패: ${result.captureId}", throwable)
+                    },
+                    deviceId = deviceIdProvider.getOrCreateDeviceId()
+                )
+                val response = api.classifyBatch(request)
+                val body = response.body()
+
+                if (!response.isSuccessful || body?.status != "ok" || body.data == null) {
+                    Log.w(TAG, "배치 재분류 실패: http=${response.code()}, code=${body?.error?.code}")
+                    continue
+                }
+
+                body.data.results.forEach { result ->
+                    runCatching {
+                        val classification = classificationMapper.toDomain(
+                            ClassifyResponse(
+                                classifiedType = result.classifiedType,
+                                noteSubType = result.noteSubType,
+                                confidence = result.confidence,
+                                aiTitle = result.aiTitle,
+                                tags = result.tags,
+                                entities = result.entities,
+                                scheduleInfo = result.scheduleInfo,
+                                todoInfo = result.todoInfo,
+                                splitItems = result.splitItems
+                            )
+                        )
+                        processClassificationResultUseCase(result.captureId, classification)
+                        successCount++
+                    }.onFailure { throwable ->
+                        Log.e(TAG, "배치 분류 결과 적용 실패: ${result.captureId}", throwable)
+                    }
+                }
+
+                body.data.failed.forEach { failed ->
+                    Log.w(TAG, "배치 분류 실패 항목: ${failed.captureId}, error=${failed.error}")
                 }
             }
 
-            body.data.failed.forEach { failed ->
-                Log.w(TAG, "배치 분류 실패 항목: ${failed.captureId}, error=${failed.error}")
-            }
+            Log.d(TAG, "ReclassifyTempWorker 완료: $successCount 건 처리")
+            Result.success()
         }
-
-        Log.d(TAG, "ReclassifyTempWorker 완료: $successCount 건 처리")
-        return Result.success()
     }
 
     companion object {
         private const val TAG = "ReclassifyTempWorker"
+        private const val TRACE_RECLASSIFY_BATCH_EXECUTION = "reclassify_batch_execution"
         private const val WORK_NAME = "reclassify_temp"
         private const val BATCH_SIZE = 20
 

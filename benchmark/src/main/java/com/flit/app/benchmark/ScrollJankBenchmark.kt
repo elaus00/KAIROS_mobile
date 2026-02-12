@@ -2,6 +2,7 @@ package com.flit.app.benchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingGfxInfoMetric
+import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -23,6 +24,7 @@ class ScrollJankBenchmark {
             packageName = TARGET_PACKAGE,
             metrics = listOf(FrameTimingGfxInfoMetric()),
             iterations = 10,
+            compilationMode = CompilationMode.None(),
             startupMode = StartupMode.WARM,
             setupBlock = {
                 pressHome()
@@ -33,7 +35,7 @@ class ScrollJankBenchmark {
             waitForHomeReady()
             tapNotesTab()
             openIdeasFolder()
-            scrollDownRepeatedly(times = 8)
+            scrollDownRepeatedly(times = 15)
         }
     }
 
@@ -43,6 +45,7 @@ class ScrollJankBenchmark {
             packageName = TARGET_PACKAGE,
             metrics = listOf(FrameTimingGfxInfoMetric()),
             iterations = 10,
+            compilationMode = CompilationMode.None(),
             startupMode = StartupMode.WARM,
             setupBlock = {
                 pressHome()
@@ -54,7 +57,7 @@ class ScrollJankBenchmark {
             tapNotesTab()
             openSearchScreenFromNotes()
             enterSearchKeyword("벤치")
-            scrollDownRepeatedly(times = 8)
+            scrollDownRepeatedly(times = 15)
         }
     }
 }

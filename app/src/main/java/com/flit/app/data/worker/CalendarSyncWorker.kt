@@ -12,6 +12,7 @@ import com.flit.app.data.local.database.dao.ScheduleDao
 import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.CaptureRepository
+import com.flit.app.tracing.AppTrace
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
@@ -30,45 +31,48 @@ class CalendarSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        Log.d(TAG, "CalendarSyncWorker 시작")
+        return AppTrace.suspendSection(TRACE_CALENDAR_SYNC_EXECUTION) {
+            Log.d(TAG, "CalendarSyncWorker 시작")
 
-        // SYNC_FAILED 상태인 일정 조회
-        val failedSchedules = scheduleDao.getByCalendarSyncStatus(CalendarSyncStatus.SYNC_FAILED.name)
+            // SYNC_FAILED 상태인 일정 조회
+            val failedSchedules = scheduleDao.getByCalendarSyncStatus(CalendarSyncStatus.SYNC_FAILED.name)
 
-        if (failedSchedules.isEmpty()) {
-            Log.d(TAG, "재시도 대상 없음")
-            return Result.success()
-        }
-
-        Log.d(TAG, "SYNC_FAILED 일정 ${failedSchedules.size}개 재시도")
-
-        var retryCount = 0
-        for (entity in failedSchedules) {
-            try {
-                val capture = captureRepository.getCaptureById(entity.captureId) ?: continue
-                val title = capture.aiTitle ?: capture.originalText.take(30)
-                val startTime = entity.startTime ?: continue
-
-                calendarRepository.syncToCalendar(
-                    scheduleId = entity.id,
-                    title = title,
-                    startTime = startTime,
-                    endTime = entity.endTime,
-                    location = entity.location,
-                    isAllDay = entity.isAllDay
-                )
-                retryCount++
-            } catch (e: Exception) {
-                Log.e(TAG, "캘린더 동기화 재시도 실패: ${entity.id}", e)
+            if (failedSchedules.isEmpty()) {
+                Log.d(TAG, "재시도 대상 없음")
+                return@suspendSection Result.success()
             }
-        }
 
-        Log.d(TAG, "재시도 완료: $retryCount 건 성공")
-        return Result.success()
+            Log.d(TAG, "SYNC_FAILED 일정 ${failedSchedules.size}개 재시도")
+
+            var retryCount = 0
+            for (entity in failedSchedules) {
+                try {
+                    val capture = captureRepository.getCaptureById(entity.captureId) ?: continue
+                    val title = capture.aiTitle ?: capture.originalText.take(30)
+                    val startTime = entity.startTime ?: continue
+
+                    calendarRepository.syncToCalendar(
+                        scheduleId = entity.id,
+                        title = title,
+                        startTime = startTime,
+                        endTime = entity.endTime,
+                        location = entity.location,
+                        isAllDay = entity.isAllDay
+                    )
+                    retryCount++
+                } catch (e: Exception) {
+                    Log.e(TAG, "캘린더 동기화 재시도 실패: ${entity.id}", e)
+                }
+            }
+
+            Log.d(TAG, "재시도 완료: $retryCount 건 성공")
+            Result.success()
+        }
     }
 
     companion object {
         private const val TAG = "CalendarSyncWorker"
+        private const val TRACE_CALENDAR_SYNC_EXECUTION = "calendar_sync_execution"
         private const val WORK_NAME = "calendar_sync_retry"
 
         /**

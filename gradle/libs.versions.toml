@@ -34,6 +34,8 @@ uiautomator = "2.3.0"
 baselineProfilePlugin = "1.3.4"
 profileinstaller = "1.4.1"
 desugarJdkLibs = "2.1.4"
+tracing = "1.3.0"
+composeRuntimeTracing = "1.7.6"
 
 [libraries]
 # Core library desugaring (java.time 등 API 24-25 지원)
@@ -127,6 +129,8 @@ googleid = { group = "com.google.android.libraries.identity.googleid", name = "g
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacro" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
+androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", version.ref = "tracing" }
+compose-runtime-tracing = { group = "androidx.compose.runtime", name = "runtime-tracing", version.ref = "composeRuntimeTracing" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

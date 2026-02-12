@@ -1,6 +1,7 @@
 package com.flit.app.benchmark
 
 import android.os.SystemClock
+import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.TraceSectionMetric
@@ -23,6 +24,7 @@ class CaptureFlowBenchmark {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(TraceSectionMetric("capture_save_completion")),
+            compilationMode = CompilationMode.None(),
             iterations = 10,
             startupMode = StartupMode.WARM,
             setupBlock = {
@@ -42,6 +44,7 @@ class CaptureFlowBenchmark {
         benchmarkRule.measureRepeated(
             packageName = TARGET_PACKAGE,
             metrics = listOf(TraceSectionMetric("ai_classification_completion")),
+            compilationMode = CompilationMode.None(),
             iterations = 10,
             startupMode = StartupMode.WARM,
             setupBlock = {

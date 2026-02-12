@@ -9,6 +9,7 @@ import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.usecase.analytics.TrackEventUseCase
 import com.flit.app.domain.usecase.search.SearchCapturesUseCase
 import com.flit.app.domain.usecase.search.SemanticSearchUseCase
+import com.flit.app.tracing.AppTrace
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,6 +32,10 @@ class SearchViewModel @Inject constructor(
     private val semanticSearchUseCase: SemanticSearchUseCase,
     private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
+    companion object {
+        private const val TRACE_LOCAL_SEARCH_EXECUTION = "local_search_execution"
+        private const val TRACE_SEMANTIC_SEARCH_EXECUTION = "semantic_search_execution"
+    }
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
@@ -102,22 +107,24 @@ class SearchViewModel @Inject constructor(
 
         try {
             if (hasFilters) {
-                // 필터 포함 검색 (suspend)
-                val results = searchCapturesUseCase.searchFiltered(
-                    query = query,
-                    type = state.selectedType,
-                    startDate = null,
-                    endDate = null
-                )
-                _uiState.update {
-                    it.copy(searchResults = results, hasSearched = true)
-                }
+                AppTrace.suspendSection(TRACE_LOCAL_SEARCH_EXECUTION) {
+                    // 필터 포함 검색 (suspend)
+                    val results = searchCapturesUseCase.searchFiltered(
+                        query = query,
+                        type = state.selectedType,
+                        startDate = null,
+                        endDate = null
+                    )
+                    _uiState.update {
+                        it.copy(searchResults = results, hasSearched = true)
+                    }
 
-                // 검색 수행 분석 이벤트
-                trackEventUseCase(
-                    eventType = "search_performed",
-                    eventData = """{"result_count":${results.size},"result_clicked":false,"filtered":true}"""
-                )
+                    // 검색 수행 분석 이벤트
+                    trackEventUseCase(
+                        eventType = "search_performed",
+                        eventData = """{"result_count":${results.size},"result_clicked":false,"filtered":true}"""
+                    )
+                }
             } else {
                 // 기본 검색 (Flow 수집)
                 searchCapturesUseCase(query)
@@ -167,29 +174,31 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             _uiState.update { it.copy(isSemanticLoading = true) }
-            try {
-                val results = semanticSearchUseCase(query)
-                _uiState.update {
-                    it.copy(
-                        semanticResults = results,
-                        isSemanticLoading = false,
-                        hasSearched = true
-                    )
-                }
-            } catch (e: ApiException.SubscriptionRequired) {
-                _uiState.update {
-                    it.copy(
-                        isSemanticMode = false,
-                        isSemanticLoading = false,
-                        errorMessage = "Premium 구독이 필요합니다"
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isSemanticLoading = false,
-                        errorMessage = e.message ?: "시맨틱 검색 실패"
-                    )
+            AppTrace.suspendSection(TRACE_SEMANTIC_SEARCH_EXECUTION) {
+                try {
+                    val results = semanticSearchUseCase(query)
+                    _uiState.update {
+                        it.copy(
+                            semanticResults = results,
+                            isSemanticLoading = false,
+                            hasSearched = true
+                        )
+                    }
+                } catch (e: ApiException.SubscriptionRequired) {
+                    _uiState.update {
+                        it.copy(
+                            isSemanticMode = false,
+                            isSemanticLoading = false,
+                            errorMessage = "Premium 구독이 필요합니다"
+                        )
+                    }
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(
+                            isSemanticLoading = false,
+                            errorMessage = e.message ?: "시맨틱 검색 실패"
+                        )
+                    }
                 }
             }
         }

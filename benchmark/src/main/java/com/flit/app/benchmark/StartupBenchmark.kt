@@ -1,6 +1,7 @@
 package com.flit.app.benchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.TraceSectionMetric
@@ -24,6 +25,7 @@ class StartupBenchmark {
             packageName = TARGET_PACKAGE,
             metrics = listOf(StartupTimingMetric()),
             iterations = 10,
+            compilationMode = CompilationMode.None(),
             startupMode = StartupMode.COLD,
             setupBlock = {
                 pressHome()
@@ -41,6 +43,7 @@ class StartupBenchmark {
             packageName = TARGET_PACKAGE,
             metrics = listOf(TraceSectionMetric("first_input_latency")),
             iterations = 10,
+            compilationMode = CompilationMode.None(),
             startupMode = StartupMode.COLD,
             setupBlock = {
                 pressHome()
@@ -49,6 +52,7 @@ class StartupBenchmark {
             startActivityAndWait()
             dismissOnboardingIfVisible()
             waitForHomeReady()
+            tapHomeTab()
             enterFirstCharacter()
         }
     }

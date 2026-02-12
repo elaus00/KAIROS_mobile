@@ -45,9 +45,8 @@
 ## Build/Manifest Policy
 
 - Added `benchmark` buildType in `:app` (release-like for measurement)
-- Added `profileable` in:
-  - `app/src/release/AndroidManifest.xml`
-  - `app/src/benchmark/AndroidManifest.xml`
+- Set `profileableByShell` in:
+  - `app/src/benchmark/AndroidManifest.xml` only
 
 ## Baseline Profile Pipeline
 
@@ -95,3 +94,9 @@ Rules:
 - Verdict
 
 Template: `Docs/performance/pr_report_template.md`
+
+## Additional Docs
+
+- Workflow notes (conversation summary): `docs/performance/2026-02-12_benchmark_apm_workflow_notes.md`
+- Performance log template: `docs/performance/performance_log_template.md`
+- Performance log (actual measured values): `docs/performance/performance_log.md`

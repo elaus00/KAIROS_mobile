@@ -279,6 +279,8 @@ dependencies {
     implementation(libs.googleid)
 
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.androidx.tracing.ktx)
+    implementation(libs.compose.runtime.tracing)
 
     // Google Play Billing
     implementation("com.android.billingclient:billing-ktx:7.0.0")
