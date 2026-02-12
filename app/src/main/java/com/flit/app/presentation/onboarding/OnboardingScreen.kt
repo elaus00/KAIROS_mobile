@@ -3,13 +3,10 @@ package com.flit.app.presentation.onboarding
 import android.Manifest
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -19,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -83,15 +79,17 @@ fun OnboardingScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
-            Text(
-                text = "건너뛰기",
-                color = colors.textMuted,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable { viewModel.skip() }
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
+            TextButton(
+                onClick = { viewModel.skip() },
+                modifier = Modifier.heightIn(min = 48.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = "건너뛰기",
+                    color = colors.textMuted,
+                    fontSize = 14.sp
+                )
+            }
         }
 
         // 페이저
@@ -303,12 +301,13 @@ private fun OnboardingPageCalendar(
                     .clip(RoundedCornerShape(24.dp))
                     .background(colors.accent)
                     .clickable { onConnect() }
+                    .heightIn(min = 48.dp)
                     .padding(horizontal = 24.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = if (errorMessage != null) "다시 시도" else "캘린더 권한 허용",
-                    color = if (colors.isDark) colors.background else Color.White,
+                    color = colors.background,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -426,33 +425,27 @@ private fun OnboardingPage3(
             )
 
             // 전송 버튼
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (inputText.isNotBlank()) colors.accent
-                        else colors.accentBg
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = LocalIndication.current,
-                        enabled = !isSubmitting && inputText.isNotBlank()
-                    ) { onSubmit() },
-                contentAlignment = Alignment.Center
+            FilledIconButton(
+                onClick = onSubmit,
+                enabled = !isSubmitting && inputText.isNotBlank(),
+                modifier = Modifier.size(48.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = colors.accent,
+                    disabledContainerColor = colors.accentBg
+                )
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = if (colors.isDark) colors.background else Color.White
+                        color = colors.background
                     )
                 } else {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "전송",
                         tint = if (inputText.isNotBlank()) {
-                            if (colors.isDark) colors.background else Color.White
+                            colors.background
                         } else colors.textMuted,
                         modifier = Modifier.size(22.dp)
                     )
@@ -496,17 +489,16 @@ private fun OnboardingBottomBar(
 
         // 다음/시작 버튼
         val buttonText = if (currentPage == totalPages - 1) "시작하기" else "다음"
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
-                .background(colors.accent)
-                .clickable { onNext() }
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-            contentAlignment = Alignment.Center
+        Button(
+            onClick = onNext,
+            modifier = Modifier.heightIn(min = 48.dp),
+            shape = RoundedCornerShape(24.dp),
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = colors.accent)
         ) {
             Text(
                 text = buttonText,
-                color = if (colors.isDark) colors.background else Color.White,
+                color = colors.background,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )

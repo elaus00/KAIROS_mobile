@@ -60,7 +60,6 @@ fun SettingsScreen(
     AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
-    val fontScale = 1f
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
@@ -138,7 +137,6 @@ fun SettingsScreen(
                     title = "시스템 설정",
                     description = "기기 설정에 따름",
                     isSelected = uiState.themePreference == ThemePreference.SYSTEM,
-                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.SYSTEM) }
                 )
 
@@ -147,7 +145,6 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "라이트 모드",
                     isSelected = uiState.themePreference == ThemePreference.LIGHT,
-                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.LIGHT) }
                 )
 
@@ -156,7 +153,6 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "다크 모드",
                     isSelected = uiState.themePreference == ThemePreference.DARK,
-                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.DARK) }
                 )
 
@@ -181,7 +177,6 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "작게",
                     isSelected = uiState.captureFontSize == FontSizePreference.SMALL.name,
-                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.SMALL.name) }
                 )
 
@@ -190,7 +185,6 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "보통",
                     isSelected = uiState.captureFontSize == FontSizePreference.MEDIUM.name,
-                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.MEDIUM.name) }
                 )
 
@@ -199,7 +193,6 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "크게",
                     isSelected = uiState.captureFontSize == FontSizePreference.LARGE.name,
-                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.LARGE.name) }
                 )
             }
@@ -218,7 +211,6 @@ fun SettingsScreen(
                     description = if (!uiState.isCalendarPermissionGranted) "활성화하면 캘린더 권한을 요청합니다"
                         else "일정을 기기 캘린더에 동기화",
                     isChecked = uiState.isCalendarEnabled,
-                    fontScale = fontScale,
                     onToggle = { enabled ->
                         if (enabled && !uiState.isCalendarPermissionGranted) {
                             calendarPermissionLauncher.launch(
@@ -239,7 +231,6 @@ fun SettingsScreen(
 
                     NavigationSettingItem(
                         title = "캘린더 설정",
-                        fontScale = fontScale,
                         onClick = onNavigateToCalendarSettings
                     )
                 }
@@ -256,7 +247,6 @@ fun SettingsScreen(
             SettingsCard {
                 NavigationSettingItem(
                     title = "AI 분류 설정",
-                    fontScale = fontScale,
                     onClick = {
                         if (isPremiumSubscriber) {
                             onNavigateToAiSettings()
@@ -282,34 +272,29 @@ fun SettingsScreen(
                     NavigationSettingItem(
                         title = uiState.user!!.email,
                         showArrow = false,
-                        fontScale = fontScale,
                         onClick = { }
                     )
                     SettingsDivider()
                     NavigationSettingItem(
                         title = "로그아웃",
-                        fontScale = fontScale,
                         onClick = { showLogoutDialog = true }
                     )
                 } else {
                     // 미로그인 상태
                     NavigationSettingItem(
                         title = "로그인",
-                        fontScale = fontScale,
                         onClick = onNavigateToLogin
                     )
                 }
                 SettingsDivider()
                 NavigationSettingItem(
                     title = "구독 관리",
-                    fontScale = fontScale,
                     onClick = onNavigateToSubscription
                 )
                 SettingsDivider()
                 NavigationSettingItem(
                     title = "사용 분석",
                     description = "캡처 통계 및 분류 현황",
-                    fontScale = fontScale,
                     onClick = {
                         if (isPremiumSubscriber) {
                             onNavigateToAnalytics()
@@ -332,7 +317,6 @@ fun SettingsScreen(
             SettingsCard {
                 NavigationSettingItem(
                     title = "개인정보 처리방침",
-                    fontScale = fontScale,
                     onClick = onNavigateToPrivacyPolicy
                 )
 
@@ -340,7 +324,6 @@ fun SettingsScreen(
 
                 NavigationSettingItem(
                     title = "이용약관",
-                    fontScale = fontScale,
                     onClick = onNavigateToTermsOfService
                 )
 
@@ -350,7 +333,6 @@ fun SettingsScreen(
                     title = "앱 버전",
                     description = BuildConfig.VERSION_NAME,
                     showArrow = false,
-                    fontScale = fontScale,
                     onClick = { }
                 )
             }
@@ -368,7 +350,6 @@ fun SettingsScreen(
                     DebugImageUploadItem(
                         isSubmitting = uiState.debugSubmitting,
                         result = uiState.debugResult,
-                        fontScale = fontScale,
                         onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
                         onDismissResult = { viewModel.dismissDebugResult() }
                     )
@@ -425,7 +406,6 @@ private fun ThemeOptionItem(
     title: String,
     description: String? = null,
     isSelected: Boolean,
-    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -434,6 +414,7 @@ private fun ThemeOptionItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -475,7 +456,6 @@ private fun ThemeOptionItem(
 private fun DebugImageUploadItem(
     isSubmitting: Boolean,
     result: String?,
-    fontScale: Float = 1f,
     onImageSelected: (Uri) -> Unit,
     onDismissResult: () -> Unit,
     modifier: Modifier = Modifier
@@ -491,6 +471,7 @@ private fun DebugImageUploadItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable(enabled = !isSubmitting) {
                 photoPickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)

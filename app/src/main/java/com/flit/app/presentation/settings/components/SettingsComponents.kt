@@ -67,7 +67,6 @@ internal fun NavigationSettingItem(
     title: String,
     description: String? = null,
     showArrow: Boolean = true,
-    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -76,6 +75,7 @@ internal fun NavigationSettingItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -84,7 +84,7 @@ internal fun NavigationSettingItem(
         Text(
             text = title,
             color = colors.text,
-            fontSize = (15f * fontScale).sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
 
@@ -93,7 +93,7 @@ internal fun NavigationSettingItem(
                 Text(
                     text = it,
                     color = colors.textMuted,
-                    fontSize = (14f * fontScale).sp
+                    fontSize = 14.sp
                 )
             }
 
@@ -118,7 +118,6 @@ internal fun ToggleSettingItem(
     title: String,
     description: String? = null,
     isChecked: Boolean,
-    fontScale: Float = 1f,
     onToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -127,6 +126,7 @@ internal fun ToggleSettingItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -135,7 +135,7 @@ internal fun ToggleSettingItem(
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = (15f * fontScale).sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
             if (description != null) {
@@ -143,7 +143,7 @@ internal fun ToggleSettingItem(
                 Text(
                     text = description,
                     color = colors.textMuted,
-                    fontSize = (13f * fontScale).sp
+                    fontSize = 13.sp
                 )
             }
         }

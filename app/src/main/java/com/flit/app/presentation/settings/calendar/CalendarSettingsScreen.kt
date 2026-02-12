@@ -47,7 +47,6 @@ fun CalendarSettingsScreen(
     AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
-    val fontScale = 1f
     var showCalendarSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -110,7 +109,6 @@ fun CalendarSettingsScreen(
                     description = uiState.availableCalendars
                         .firstOrNull { it.id == uiState.selectedCalendarId }
                         ?.displayName ?: "선택 필요",
-                    fontScale = fontScale,
                     onClick = { showCalendarSheet = true }
                 )
 
@@ -119,7 +117,6 @@ fun CalendarSettingsScreen(
                     ActionItem(
                         title = "캘린더 목록 새로고침",
                         description = "기기 캘린더 목록을 다시 불러옵니다",
-                        fontScale = fontScale,
                         onClick = { viewModel.reloadAvailableCalendars() }
                     )
                 }
@@ -139,7 +136,6 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "신뢰도 높은 일정을 자동으로 캘린더에 추가"
                         else "일정 추가 전 사용자 승인을 요청합니다",
                     isChecked = uiState.isAutoAddEnabled,
-                    fontScale = fontScale,
                     onToggle = { viewModel.toggleAutoAdd(it) }
                 )
 
@@ -150,7 +146,6 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "자동 추가된 일정을 알림으로 확인"
                         else "승인 대기 중인 일정이 있을 때 알림",
                     isChecked = uiState.isNotificationEnabled,
-                    fontScale = fontScale,
                     onToggle = { viewModel.toggleNotification(it) }
                 )
             }
@@ -169,7 +164,6 @@ fun CalendarSettingsScreen(
             CalendarSelectionSheet(
                 calendars = uiState.availableCalendars,
                 selectedId = uiState.selectedCalendarId,
-                fontScale = fontScale,
                 onSelect = { calendarId ->
                     viewModel.setTargetCalendar(calendarId)
                     showCalendarSheet = false
@@ -186,7 +180,6 @@ fun CalendarSettingsScreen(
 private fun ActionItem(
     title: String,
     description: String,
-    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -194,6 +187,7 @@ private fun ActionItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -217,7 +211,6 @@ private fun ActionItem(
 private fun CalendarSelectionSheet(
     calendars: List<LocalCalendar>,
     selectedId: Long?,
-    fontScale: Float = 1f,
     onSelect: (Long) -> Unit
 ) {
     val colors = FlitTheme.colors
@@ -249,15 +242,17 @@ private fun CalendarSelectionSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .heightIn(min = 48.dp)
                         .clickable { onSelect(calendar.id) }
                         .padding(horizontal = 16.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val calendarDotColor = runCatching { Color(calendar.color) }.getOrElse { colors.iconMuted }
                     Box(
                         modifier = Modifier
                             .size(12.dp)
                             .clip(CircleShape)
-                            .background(Color(calendar.color))
+                            .background(calendarDotColor)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
