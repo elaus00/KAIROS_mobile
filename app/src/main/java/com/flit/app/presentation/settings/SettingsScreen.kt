@@ -58,6 +58,8 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
+    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
+    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
@@ -94,7 +96,7 @@ fun SettingsScreen(
                     Text(
                         text = "설정",
                         color = colors.text,
-                        fontSize = 20.sp,
+                        fontSize = (20f * fontScale).sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -124,7 +126,10 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // 화면 섹션 (테마 + 글씨 크기 통합)
-            SectionHeader(title = "화면")
+            SectionHeader(
+                title = "화면",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 // 다크모드 3옵션
@@ -132,6 +137,7 @@ fun SettingsScreen(
                     title = "시스템 설정",
                     description = "기기 설정에 따름",
                     isSelected = uiState.themePreference == ThemePreference.SYSTEM,
+                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.SYSTEM) }
                 )
 
@@ -140,6 +146,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "라이트 모드",
                     isSelected = uiState.themePreference == ThemePreference.LIGHT,
+                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.LIGHT) }
                 )
 
@@ -148,6 +155,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "다크 모드",
                     isSelected = uiState.themePreference == ThemePreference.DARK,
+                    fontScale = fontScale,
                     onClick = { viewModel.setTheme(ThemePreference.DARK) }
                 )
 
@@ -164,7 +172,7 @@ fun SettingsScreen(
                 Text(
                     text = "글씨 크기",
                     color = colors.textMuted,
-                    fontSize = 12.sp,
+                    fontSize = (12f * fontScale).sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
@@ -172,6 +180,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "작게",
                     isSelected = uiState.captureFontSize == FontSizePreference.SMALL.name,
+                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.SMALL.name) }
                 )
 
@@ -180,6 +189,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "보통",
                     isSelected = uiState.captureFontSize == FontSizePreference.MEDIUM.name,
+                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.MEDIUM.name) }
                 )
 
@@ -188,6 +198,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "크게",
                     isSelected = uiState.captureFontSize == FontSizePreference.LARGE.name,
+                    fontScale = fontScale,
                     onClick = { viewModel.setCaptureFontSize(FontSizePreference.LARGE.name) }
                 )
             }
@@ -195,7 +206,10 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 캘린더 섹션 — 토글만 남기고 세부 설정은 세부 화면으로 분리
-            SectionHeader(title = "캘린더 연동")
+            SectionHeader(
+                title = "캘린더 연동",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 ToggleSettingItem(
@@ -203,6 +217,7 @@ fun SettingsScreen(
                     description = if (!uiState.isCalendarPermissionGranted) "활성화하면 캘린더 권한을 요청합니다"
                         else "일정을 기기 캘린더에 동기화",
                     isChecked = uiState.isCalendarEnabled,
+                    fontScale = fontScale,
                     onToggle = { enabled ->
                         if (enabled && !uiState.isCalendarPermissionGranted) {
                             calendarPermissionLauncher.launch(
@@ -223,6 +238,7 @@ fun SettingsScreen(
 
                     NavigationSettingItem(
                         title = "캘린더 설정",
+                        fontScale = fontScale,
                         onClick = onNavigateToCalendarSettings
                     )
                 }
@@ -231,11 +247,15 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // AI 분류 섹션 — 세부 화면으로 진입하는 단일 항목
-            SectionHeader(title = "AI 분류")
+            SectionHeader(
+                title = "AI 분류",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 NavigationSettingItem(
                     title = "AI 분류 설정",
+                    fontScale = fontScale,
                     onClick = {
                         if (isPremiumSubscriber) {
                             onNavigateToAiSettings()
@@ -250,7 +270,10 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 계정 섹션
-            SectionHeader(title = "계정")
+            SectionHeader(
+                title = "계정",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 if (uiState.user != null) {
@@ -258,29 +281,34 @@ fun SettingsScreen(
                     NavigationSettingItem(
                         title = uiState.user!!.email,
                         showArrow = false,
+                        fontScale = fontScale,
                         onClick = { }
                     )
                     SettingsDivider()
                     NavigationSettingItem(
                         title = "로그아웃",
+                        fontScale = fontScale,
                         onClick = { showLogoutDialog = true }
                     )
                 } else {
                     // 미로그인 상태
                     NavigationSettingItem(
                         title = "로그인",
+                        fontScale = fontScale,
                         onClick = onNavigateToLogin
                     )
                 }
                 SettingsDivider()
                 NavigationSettingItem(
                     title = "구독 관리",
+                    fontScale = fontScale,
                     onClick = onNavigateToSubscription
                 )
                 SettingsDivider()
                 NavigationSettingItem(
                     title = "사용 분석",
                     description = "캡처 통계 및 분류 현황",
+                    fontScale = fontScale,
                     onClick = {
                         if (isPremiumSubscriber) {
                             onNavigateToAnalytics()
@@ -295,11 +323,15 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 정보 섹션
-            SectionHeader(title = "정보")
+            SectionHeader(
+                title = "정보",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 NavigationSettingItem(
                     title = "개인정보 처리방침",
+                    fontScale = fontScale,
                     onClick = onNavigateToPrivacyPolicy
                 )
 
@@ -307,6 +339,7 @@ fun SettingsScreen(
 
                 NavigationSettingItem(
                     title = "이용약관",
+                    fontScale = fontScale,
                     onClick = onNavigateToTermsOfService
                 )
 
@@ -316,6 +349,7 @@ fun SettingsScreen(
                     title = "앱 버전",
                     description = BuildConfig.VERSION_NAME,
                     showArrow = false,
+                    fontScale = fontScale,
                     onClick = { }
                 )
             }
@@ -324,12 +358,16 @@ fun SettingsScreen(
             if (BuildConfig.DEBUG) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                SectionHeader(title = "개발자 도구")
+                SectionHeader(
+                    title = "개발자 도구",
+                    fontSize = (12f * fontScale).sp
+                )
 
                 SettingsCard {
                     DebugImageUploadItem(
                         isSubmitting = uiState.debugSubmitting,
                         result = uiState.debugResult,
+                        fontScale = fontScale,
                         onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
                         onDismissResult = { viewModel.dismissDebugResult() }
                     )
@@ -385,6 +423,7 @@ private fun ThemeOptionItem(
     title: String,
     description: String? = null,
     isSelected: Boolean,
+    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -402,7 +441,7 @@ private fun ThemeOptionItem(
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = 15.sp,
+                fontSize = (15f * fontScale).sp,
                 fontWeight = FontWeight.Medium
             )
             if (description != null) {
@@ -410,7 +449,7 @@ private fun ThemeOptionItem(
                 Text(
                     text = description,
                     color = colors.textMuted,
-                    fontSize = 13.sp
+                    fontSize = (13f * fontScale).sp
                 )
             }
         }
@@ -434,6 +473,7 @@ private fun ThemeOptionItem(
 private fun DebugImageUploadItem(
     isSubmitting: Boolean,
     result: String?,
+    fontScale: Float = 1f,
     onImageSelected: (Uri) -> Unit,
     onDismissResult: () -> Unit,
     modifier: Modifier = Modifier
@@ -465,14 +505,14 @@ private fun DebugImageUploadItem(
                 Text(
                     text = "이미지 캡처 테스트",
                     color = colors.text,
-                    fontSize = 15.sp,
+                    fontSize = (15f * fontScale).sp,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "갤러리에서 이미지를 선택하여 캡처로 제출",
                     color = colors.textMuted,
-                    fontSize = 13.sp
+                    fontSize = (13f * fontScale).sp
                 )
             }
 
@@ -491,7 +531,7 @@ private fun DebugImageUploadItem(
             Text(
                 text = result,
                 color = if (result.startsWith("실패")) colors.danger else colors.success,
-                fontSize = 12.sp
+                fontSize = (12f * fontScale).sp
             )
         }
     }

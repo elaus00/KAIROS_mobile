@@ -11,7 +11,7 @@ import com.flit.app.domain.model.User
  */
 data class SettingsUiState(
     // 테마 설정 (LIGHT / DARK / SYSTEM)
-    val themePreference: ThemePreference = ThemePreference.DARK,
+    val themePreference: ThemePreference = ThemePreference.SYSTEM,
 
     // 캘린더 연동 여부
     val isCalendarEnabled: Boolean = false,

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.navigation.FlitNavGraph
 import com.flit.app.navigation.NavRoutes
+import com.flit.app.tracing.AppTrace
 import com.flit.app.ui.theme.FlitTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -28,6 +30,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    companion object {
+        private const val TRACE_ACTIVITY_CREATE = "activity_create"
+    }
 
     @Inject
     lateinit var submitCaptureUseCase: SubmitCaptureUseCase
@@ -44,36 +49,43 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 위젯 딥링크 처리
-        autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
-        pendingCaptureId.value = intent?.getStringExtra("navigate_to_capture_id")
+        AppTrace.section(TRACE_ACTIVITY_CREATE) {
+            // 위젯 딥링크 처리
+            autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
+            pendingCaptureId.value = intent?.getStringExtra("navigate_to_capture_id")
 
-        // 공유 인텐트 처리 (텍스트 캡처 저장 + 토스트)
-        handleShareIntent(intent)
+            // 공유 인텐트 처리 (텍스트 캡처 저장 + 토스트)
+            handleShareIntent(intent)
 
-        enableEdgeToEdge()
-        setContent {
-            val themePreference by userPreferenceRepository.getThemePreference().collectAsState(initial = ThemePreference.DARK)
-            val isDarkTheme = themePreference == ThemePreference.DARK
-
-            // 온보딩 완료 여부에 따라 시작 화면 결정
-            val startDestination by produceState<String?>(initialValue = null) {
-                value = if (userPreferenceRepository.isOnboardingCompleted()) {
-                    NavRoutes.HOME
-                } else {
-                    NavRoutes.ONBOARDING
+            enableEdgeToEdge()
+            setContent {
+                val themePreference by userPreferenceRepository.getThemePreference().collectAsState(initial = ThemePreference.SYSTEM)
+                val systemIsDark = isSystemInDarkTheme()
+                val isDarkTheme = when (themePreference) {
+                    ThemePreference.SYSTEM -> systemIsDark
+                    ThemePreference.LIGHT -> false
+                    ThemePreference.DARK -> true
                 }
-            }
 
-            FlitTheme(darkTheme = isDarkTheme) {
-                startDestination?.let { destination ->
-                    FlitNavGraph(
-                        navController = rememberNavController(),
-                        startDestination = destination,
-                        autoFocusCapture = autoFocusCapture.value,
-                        pendingCaptureId = pendingCaptureId.value,
-                        onPendingCaptureHandled = { pendingCaptureId.value = null }
-                    )
+                // 온보딩 완료 여부에 따라 시작 화면 결정
+                val startDestination by produceState<String?>(initialValue = null) {
+                    value = if (userPreferenceRepository.isOnboardingCompleted()) {
+                        NavRoutes.HOME
+                    } else {
+                        NavRoutes.ONBOARDING
+                    }
+                }
+
+                FlitTheme(darkTheme = isDarkTheme) {
+                    startDestination?.let { destination ->
+                        FlitNavGraph(
+                            navController = rememberNavController(),
+                            startDestination = destination,
+                            autoFocusCapture = autoFocusCapture.value,
+                            pendingCaptureId = pendingCaptureId.value,
+                            onPendingCaptureHandled = { pendingCaptureId.value = null }
+                        )
+                    }
                 }
             }
         }

@@ -67,6 +67,7 @@ internal fun NavigationSettingItem(
     title: String,
     description: String? = null,
     showArrow: Boolean = true,
+    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -83,7 +84,7 @@ internal fun NavigationSettingItem(
         Text(
             text = title,
             color = colors.text,
-            fontSize = 15.sp,
+            fontSize = (15f * fontScale).sp,
             fontWeight = FontWeight.Medium
         )
 
@@ -92,7 +93,7 @@ internal fun NavigationSettingItem(
                 Text(
                     text = it,
                     color = colors.textMuted,
-                    fontSize = 14.sp
+                    fontSize = (14f * fontScale).sp
                 )
             }
 
@@ -117,6 +118,7 @@ internal fun ToggleSettingItem(
     title: String,
     description: String? = null,
     isChecked: Boolean,
+    fontScale: Float = 1f,
     onToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -133,7 +135,7 @@ internal fun ToggleSettingItem(
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = 15.sp,
+                fontSize = (15f * fontScale).sp,
                 fontWeight = FontWeight.Medium
             )
             if (description != null) {
@@ -141,7 +143,7 @@ internal fun ToggleSettingItem(
                 Text(
                     text = description,
                     color = colors.textMuted,
-                    fontSize = 13.sp
+                    fontSize = (13f * fontScale).sp
                 )
             }
         }
