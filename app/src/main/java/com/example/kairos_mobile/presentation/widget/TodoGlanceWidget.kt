@@ -125,17 +125,17 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
             .fillMaxSize()
             .background(GlanceTheme.colors.background)
             .cornerRadius(16.dp)
-            .padding(12.dp)
+            .padding(16.dp)
     ) {
         // 헤더
         Row(
-            modifier = GlanceModifier.fillMaxWidth().padding(bottom = 6.dp),
+            modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "오늘 할 일",
                 style = TextStyle(
-                    fontSize = 15.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = GlanceTheme.colors.onBackground
                 ),
@@ -146,7 +146,7 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
                 Text(
                     text = "+${overflow}개 더",
                     style = TextStyle(
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = GlanceTheme.colors.onSurfaceVariant
                     )
                 )
@@ -162,7 +162,7 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
                 Text(
                     text = "할 일을 모두 완료했어요!",
                     style = TextStyle(
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         color = GlanceTheme.colors.onSurfaceVariant
                     )
                 )
@@ -178,13 +178,13 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
 
         // 앱 열기
         Box(
-            modifier = GlanceModifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = GlanceModifier.fillMaxWidth().padding(top = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "앱 열기",
                 style = TextStyle(
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     color = GlanceTheme.colors.onSurfaceVariant
                 ),
                 modifier = GlanceModifier.clickable(
@@ -198,18 +198,19 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
 @Composable
 private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) {
     val title = item.aiTitle?.takeIf { it.isNotBlank() } ?: item.originalText
+    val isOverdue = !item.isCompleted && item.deadline != null && item.deadline < System.currentTimeMillis()
     val textColor = if (item.isCompleted) GlanceTheme.colors.outline else GlanceTheme.colors.onSurface
     val textDecoration = if (item.isCompleted) TextDecoration.LineThrough else TextDecoration.None
 
     Row(
-        modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = GlanceModifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 체크 인디케이터 (○/●)
         Text(
             text = if (item.isCompleted) "●" else "○",
             style = TextStyle(
-                fontSize = 16.sp,
+                fontSize = 20.sp,
                 color = if (item.isCompleted) GlanceTheme.colors.outline else GlanceTheme.colors.onSurfaceVariant
             ),
             modifier = GlanceModifier.clickable(
@@ -218,28 +219,38 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
                 )
             )
         )
-        Spacer(modifier = GlanceModifier.width(10.dp))
+        Spacer(modifier = GlanceModifier.width(8.dp))
 
-        // 제목
+        // 제목 (탭 → 앱에서 상세보기)
         Text(
             text = title,
             style = TextStyle(
-                fontSize = 13.sp,
+                fontSize = 16.sp,
                 color = textColor,
                 textDecoration = textDecoration
             ),
             maxLines = 1,
-            modifier = GlanceModifier.defaultWeight()
+            modifier = GlanceModifier.defaultWeight().clickable(
+                onClick = actionStartActivity<MainActivity>(
+                    parameters = actionParametersOf(
+                        ActionParameters.Key<String>("navigate_to_capture_id") to item.captureId
+                    )
+                )
+            )
         )
 
         // 마감 시간
         if (item.deadline != null) {
-            Spacer(modifier = GlanceModifier.width(4.dp))
+            Spacer(modifier = GlanceModifier.width(6.dp))
             Text(
                 text = timeFormat.format(Date(item.deadline)),
                 style = TextStyle(
-                    fontSize = 11.sp,
-                    color = if (item.isCompleted) GlanceTheme.colors.outline else GlanceTheme.colors.onSurfaceVariant
+                    fontSize = 14.sp,
+                    color = when {
+                        item.isCompleted -> GlanceTheme.colors.outline
+                        isOverdue -> GlanceTheme.colors.error
+                        else -> GlanceTheme.colors.onSurfaceVariant
+                    }
                 )
             )
         }

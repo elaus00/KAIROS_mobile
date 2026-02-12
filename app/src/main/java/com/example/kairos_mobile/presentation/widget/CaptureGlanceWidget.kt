@@ -15,11 +15,12 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Column
+import androidx.glance.layout.Box
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
@@ -77,50 +78,52 @@ class CaptureGlanceWidget : GlanceAppWidget() {
 
 @Composable
 private fun CaptureContent(todayCount: Int) {
-    val countText = if (todayCount > 0) "오늘 ${todayCount}개 캡처" else "오늘 첫 캡처를 시작하세요"
-
-    Column(
+    Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(GlanceTheme.colors.background)
             .cornerRadius(16.dp)
-            .padding(12.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // 입력 영역 (탭하면 QuickCaptureActivity)
+        // 입력 필드 스타일 영역 (탭하면 QuickCaptureActivity)
         Row(
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .defaultWeight()
+                .background(GlanceTheme.colors.surfaceVariant)
+                .cornerRadius(12.dp)
+                .padding(horizontal = 14.dp, vertical = 10.dp)
                 .clickable(onClick = actionStartActivity<QuickCaptureActivity>()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "+",
+                text = "✎",
                 style = TextStyle(
-                    fontSize = 18.sp,
-                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 16.sp,
+                    color = GlanceTheme.colors.primary,
                     fontWeight = FontWeight.Bold
                 )
             )
-            Spacer(modifier = GlanceModifier.width(8.dp))
+            Spacer(modifier = GlanceModifier.width(10.dp))
             Text(
-                text = "무엇이든 캡처하세요...",
+                text = "무엇이든 캡처하세요",
                 style = TextStyle(
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = GlanceTheme.colors.onSurfaceVariant
-                )
+                ),
+                modifier = GlanceModifier.defaultWeight()
             )
+            if (todayCount > 0) {
+                Text(
+                    text = "$todayCount",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = GlanceTheme.colors.primary
+                    )
+                )
+            }
         }
-
-        // 오늘 캡처 수
-        Text(
-            text = countText,
-            style = TextStyle(
-                fontSize = 11.sp,
-                color = GlanceTheme.colors.onSurfaceVariant
-            ),
-            modifier = GlanceModifier.padding(top = 4.dp)
-        )
     }
 }
 

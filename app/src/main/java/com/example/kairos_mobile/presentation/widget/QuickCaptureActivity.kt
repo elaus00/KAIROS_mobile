@@ -13,6 +13,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +41,9 @@ class QuickCaptureActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val isDark = isDarkMode()
+
+        // 투명 Activity에서 키보드 인셋을 직접 처리
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // 루트 컨테이너 (배경 탭하면 닫기)
         val root = FrameLayout(this).apply {
@@ -69,7 +75,13 @@ class QuickCaptureActivity : ComponentActivity() {
             maxLines = 15
             gravity = Gravity.TOP or Gravity.START
             setPadding(dp(20), dp(20), dp(20), dp(12))
-            imeOptions = EditorInfo.IME_ACTION_NONE
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    submitCapture()
+                    true
+                } else false
+            }
         }
         val editParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
@@ -129,16 +141,30 @@ class QuickCaptureActivity : ComponentActivity() {
         )
         card.addView(toolbar, toolbarParams)
 
-        // 카드 위치: 상단에서 시작, 키보드 위까지 채움 (adjustResize)
+        // 카드 위치: 상단 고정, 내용에 따라 높이 조절
         val cardParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.WRAP_CONTENT
         ).apply {
+            gravity = Gravity.TOP
             setMargins(dp(16), dp(80), dp(16), dp(0))
         }
+        card.minimumHeight = dp(200)
         root.addView(card, cardParams)
 
         setContentView(root)
+
+        // 키보드와 최소 16dp 여백 보장 — EditText 최대 높이 동적 제한
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val navBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            val bottomInset = maxOf(imeBottom, navBottom)
+            if (view.height > 0) {
+                val maxCardHeight = view.height - dp(80) - bottomInset - dp(16)
+                editText.maxHeight = (maxCardHeight - dp(50)).coerceAtLeast(dp(100))
+            }
+            insets
+        }
 
         // 키보드 자동 표시
         editText.requestFocus()
