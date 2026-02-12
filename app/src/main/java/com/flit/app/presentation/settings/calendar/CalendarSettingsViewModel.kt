@@ -3,10 +3,13 @@ package com.flit.app.presentation.settings.calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.CalendarException
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.LocalCalendar
 import com.flit.app.domain.repository.CalendarRepository
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.settings.CalendarSettingsKeys
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
+import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,8 @@ import javax.inject.Inject
 class CalendarSettingsViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
-    private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase
+    private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase,
+    private val userPreferenceRepository: UserPreferenceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalendarSettingsUiState())
@@ -32,6 +36,7 @@ class CalendarSettingsViewModel @Inject constructor(
     init {
         loadCalendarSettings()
         loadAvailableCalendars()
+        loadCaptureFontSize()
     }
 
     /** 캘린더 설정 로드 */
@@ -109,6 +114,16 @@ class CalendarSettingsViewModel @Inject constructor(
 
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    private fun loadCaptureFontSize() {
+        viewModelScope.launch {
+            val size = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_CAPTURE_FONT_SIZE,
+                FontSizePreference.MEDIUM.name
+            )
+            _uiState.update { it.copy(captureFontSize = size) }
+        }
     }
 
     private suspend fun normalizeSelectedCalendar(calendars: List<LocalCalendar>): Long? {

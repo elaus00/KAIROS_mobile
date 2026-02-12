@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flit.app.domain.model.AnalyticsDashboard
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.ui.theme.FlitTheme
 
 /** 분석 대시보드 화면 */
@@ -29,6 +30,8 @@ fun AnalyticsDashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val colors = FlitTheme.colors
+    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
+    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
 
     Scaffold(
         topBar = {
@@ -37,7 +40,7 @@ fun AnalyticsDashboardScreen(
                     Text(
                         text = "분석",
                         color = colors.text,
-                        fontSize = 20.sp,
+                        fontSize = (20f * fontScale).sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -70,10 +73,10 @@ fun AnalyticsDashboardScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(uiState.errorMessage ?: "", color = colors.textMuted, fontSize = 14.sp)
+                        Text(uiState.errorMessage ?: "", color = colors.textMuted, fontSize = (14f * fontScale).sp)
                         Spacer(modifier = Modifier.height(16.dp))
                         TextButton(onClick = { viewModel.loadDashboard() }) {
-                            Text("다시 시도", color = colors.accent)
+                            Text("다시 시도", color = colors.accent, fontSize = (14f * fontScale).sp)
                         }
                     }
                 }
@@ -81,6 +84,7 @@ fun AnalyticsDashboardScreen(
             uiState.dashboard != null -> {
                 DashboardContent(
                     dashboard = uiState.dashboard!!,
+                    fontScale = fontScale,
                     modifier = Modifier.padding(paddingValues)
                 )
             }
@@ -92,6 +96,7 @@ fun AnalyticsDashboardScreen(
 @Composable
 private fun DashboardContent(
     dashboard: AnalyticsDashboard,
+    fontScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -107,6 +112,7 @@ private fun DashboardContent(
         StatCard(
             title = "총 캡처",
             value = dashboard.totalCaptures.toString(),
+            fontScale = fontScale,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -114,7 +120,7 @@ private fun DashboardContent(
         Text(
             text = "유형별 분포",
             color = colors.text,
-            fontSize = 16.sp,
+            fontSize = (16f * fontScale).sp,
             fontWeight = FontWeight.SemiBold
         )
 
@@ -134,15 +140,16 @@ private fun DashboardContent(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(label, color = colors.text, fontSize = 14.sp)
-                Text("${count}건", color = colors.textMuted, fontSize = 14.sp)
+                Text(label, color = colors.text, fontSize = (14f * fontScale).sp)
+                Text("${count}건", color = colors.textMuted, fontSize = (14f * fontScale).sp)
             }
         }
 
         // 평균 분류 시간
         StatCard(
             title = "평균 분류 시간",
-            value = "${dashboard.avgClassificationTimeMs}ms"
+            value = "${dashboard.avgClassificationTimeMs}ms",
+            fontScale = fontScale
         )
 
         // 인기 태그
@@ -150,7 +157,7 @@ private fun DashboardContent(
             Text(
                 text = "인기 태그",
                 color = colors.text,
-                fontSize = 16.sp,
+                fontSize = (16f * fontScale).sp,
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -163,8 +170,8 @@ private fun DashboardContent(
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("#$tag", color = colors.accent, fontSize = 14.sp)
-                    Text("${count}회", color = colors.textMuted, fontSize = 13.sp)
+                    Text("#$tag", color = colors.accent, fontSize = (14f * fontScale).sp)
+                    Text("${count}회", color = colors.textMuted, fontSize = (13f * fontScale).sp)
                 }
             }
         }
@@ -178,6 +185,7 @@ private fun DashboardContent(
 private fun StatCard(
     title: String,
     value: String,
+    fontScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -189,8 +197,8 @@ private fun StatCard(
             .background(colors.card)
             .padding(16.dp)
     ) {
-        Text(title, color = colors.textMuted, fontSize = 13.sp)
+        Text(title, color = colors.textMuted, fontSize = (13f * fontScale).sp)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(value, color = colors.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(value, color = colors.text, fontSize = (24f * fontScale).sp, fontWeight = FontWeight.Bold)
     }
 }

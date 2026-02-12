@@ -2,6 +2,7 @@ package com.flit.app.presentation.settings.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.classification.GetPresetsUseCase
@@ -34,6 +35,7 @@ class AiClassificationSettingsViewModel @Inject constructor(
     init {
         loadPresets()
         loadSubscription()
+        loadCaptureFontSize()
     }
 
     /** 분류 프리셋 및 커스텀 인스트럭션 로드 */
@@ -75,6 +77,16 @@ class AiClassificationSettingsViewModel @Inject constructor(
     fun saveCustomInstruction() {
         viewModelScope.launch {
             setCustomInstructionUseCase(_uiState.value.customInstruction)
+        }
+    }
+
+    private fun loadCaptureFontSize() {
+        viewModelScope.launch {
+            val size = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_CAPTURE_FONT_SIZE,
+                FontSizePreference.MEDIUM.name
+            )
+            _uiState.update { it.copy(captureFontSize = size) }
         }
     }
 }

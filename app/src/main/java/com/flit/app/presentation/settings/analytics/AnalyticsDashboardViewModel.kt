@@ -3,7 +3,10 @@ package com.flit.app.presentation.settings.analytics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.AnalyticsDashboard
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.repository.NoteAiRepository
+import com.flit.app.domain.repository.UserPreferenceRepository
+import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.domain.usecase.subscription.CheckFeatureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +20,16 @@ import javax.inject.Inject
 data class AnalyticsDashboardUiState(
     val dashboard: AnalyticsDashboard? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val captureFontSize: String = FontSizePreference.MEDIUM.name
 )
 
 /** 분석 대시보드 ViewModel */
 @HiltViewModel
 class AnalyticsDashboardViewModel @Inject constructor(
     private val noteAiRepository: NoteAiRepository,
-    private val checkFeatureUseCase: CheckFeatureUseCase
+    private val checkFeatureUseCase: CheckFeatureUseCase,
+    private val userPreferenceRepository: UserPreferenceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyticsDashboardUiState())
@@ -32,6 +37,7 @@ class AnalyticsDashboardViewModel @Inject constructor(
 
     init {
         loadDashboard()
+        loadCaptureFontSize()
     }
 
     /** 대시보드 데이터 로드 */
@@ -59,5 +65,15 @@ class AnalyticsDashboardViewModel @Inject constructor(
     /** 에러 메시지 닫기 */
     fun onErrorDismissed() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    private fun loadCaptureFontSize() {
+        viewModelScope.launch {
+            val size = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_CAPTURE_FONT_SIZE,
+                FontSizePreference.MEDIUM.name
+            )
+            _uiState.update { it.copy(captureFontSize = size) }
+        }
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.LocalCalendar
 import com.flit.app.presentation.components.common.SectionHeader
 import com.flit.app.presentation.settings.components.NavigationSettingItem
@@ -45,6 +46,8 @@ fun CalendarSettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
+    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
+    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
     var showCalendarSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -66,7 +69,7 @@ fun CalendarSettingsScreen(
                     Text(
                         text = "캘린더 설정",
                         color = colors.text,
-                        fontSize = 20.sp,
+                        fontSize = (20f * fontScale).sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -96,7 +99,10 @@ fun CalendarSettingsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // 연동 캘린더 섹션
-            SectionHeader(title = "연동 캘린더")
+            SectionHeader(
+                title = "연동 캘린더",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 NavigationSettingItem(
@@ -104,6 +110,7 @@ fun CalendarSettingsScreen(
                     description = uiState.availableCalendars
                         .firstOrNull { it.id == uiState.selectedCalendarId }
                         ?.displayName ?: "선택 필요",
+                    fontScale = fontScale,
                     onClick = { showCalendarSheet = true }
                 )
 
@@ -112,6 +119,7 @@ fun CalendarSettingsScreen(
                     ActionItem(
                         title = "캘린더 목록 새로고침",
                         description = "기기 캘린더 목록을 다시 불러옵니다",
+                        fontScale = fontScale,
                         onClick = { viewModel.reloadAvailableCalendars() }
                     )
                 }
@@ -120,7 +128,10 @@ fun CalendarSettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 일정 추가 설정 섹션
-            SectionHeader(title = "일정 추가")
+            SectionHeader(
+                title = "일정 추가",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 ToggleSettingItem(
@@ -128,6 +139,7 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "신뢰도 높은 일정을 자동으로 캘린더에 추가"
                         else "일정 추가 전 사용자 승인을 요청합니다",
                     isChecked = uiState.isAutoAddEnabled,
+                    fontScale = fontScale,
                     onToggle = { viewModel.toggleAutoAdd(it) }
                 )
 
@@ -138,6 +150,7 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "자동 추가된 일정을 알림으로 확인"
                         else "승인 대기 중인 일정이 있을 때 알림",
                     isChecked = uiState.isNotificationEnabled,
+                    fontScale = fontScale,
                     onToggle = { viewModel.toggleNotification(it) }
                 )
             }
@@ -156,6 +169,7 @@ fun CalendarSettingsScreen(
             CalendarSelectionSheet(
                 calendars = uiState.availableCalendars,
                 selectedId = uiState.selectedCalendarId,
+                fontScale = fontScale,
                 onSelect = { calendarId ->
                     viewModel.setTargetCalendar(calendarId)
                     showCalendarSheet = false
@@ -171,6 +185,7 @@ fun CalendarSettingsScreen(
 private fun ActionItem(
     title: String,
     description: String,
+    fontScale: Float = 1f,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -184,9 +199,9 @@ private fun ActionItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = colors.text, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            Text(text = title, color = colors.text, fontSize = (15f * fontScale).sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = description, color = colors.textMuted, fontSize = 13.sp)
+            Text(text = description, color = colors.textMuted, fontSize = (13f * fontScale).sp)
         }
         Icon(
             imageVector = Icons.Default.ChevronRight,
@@ -201,6 +216,7 @@ private fun ActionItem(
 private fun CalendarSelectionSheet(
     calendars: List<LocalCalendar>,
     selectedId: Long?,
+    fontScale: Float = 1f,
     onSelect: (Long) -> Unit
 ) {
     val colors = FlitTheme.colors
@@ -213,7 +229,7 @@ private fun CalendarSelectionSheet(
         Text(
             text = "연동 캘린더 선택",
             color = colors.text,
-            fontSize = 17.sp,
+            fontSize = (17f * fontScale).sp,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -225,7 +241,7 @@ private fun CalendarSelectionSheet(
                     .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "사용 가능한 캘린더가 없습니다", color = colors.textMuted, fontSize = 14.sp)
+                Text(text = "사용 가능한 캘린더가 없습니다", color = colors.textMuted, fontSize = (14f * fontScale).sp)
             }
         } else {
             calendars.forEachIndexed { index, calendar ->
@@ -244,8 +260,8 @@ private fun CalendarSelectionSheet(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = calendar.displayName, color = colors.text, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                        Text(text = calendar.accountName, color = colors.textMuted, fontSize = 13.sp)
+                        Text(text = calendar.displayName, color = colors.text, fontSize = (15f * fontScale).sp, fontWeight = FontWeight.Medium)
+                        Text(text = calendar.accountName, color = colors.textMuted, fontSize = (13f * fontScale).sp)
                     }
                     if (calendar.id == selectedId) {
                         Icon(

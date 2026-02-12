@@ -17,11 +17,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.flit.app.domain.model.CaptureSource
+import com.flit.app.domain.model.FontSizePreference
+import com.flit.app.domain.model.ThemePreference
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
+import com.flit.app.domain.usecase.settings.PreferenceKeys
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -34,6 +40,9 @@ class QuickCaptureActivity : ComponentActivity() {
     @Inject
     lateinit var submitCaptureUseCase: SubmitCaptureUseCase
 
+    @Inject
+    lateinit var userPreferenceRepository: UserPreferenceRepository
+
     private lateinit var editText: EditText
     private lateinit var doneButton: TextView
     private var isSubmitting = false
@@ -41,8 +50,12 @@ class QuickCaptureActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 테마 기반 색상 로드
-        val colors = resolveThemeColors()
+        val themePreference = loadThemePreference()
+        val fontPreference = loadCaptureFontPreference()
+        val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
+
+        // 사용자 설정(테마/글씨 크기) 기반 UI 스타일 로드
+        val colors = resolveThemeColors(isDarkMode(themePreference))
 
         // 투명 Activity에서 키보드 인셋을 직접 처리
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -70,7 +83,7 @@ class QuickCaptureActivity : ComponentActivity() {
             hint = "무엇이든 캡처하세요..."
             setHintTextColor(colors.hint)
             setTextColor(colors.text)
-            textSize = 16f
+            textSize = fontPreference.captureFontSize.toFloat()
             background = null
             isSingleLine = false
             minLines = 5
@@ -109,7 +122,7 @@ class QuickCaptureActivity : ComponentActivity() {
         // 좌측: "Flit." 텍스트
         val brandText = TextView(this).apply {
             text = "Flit."
-            textSize = 12f
+            textSize = 12f * fontScale
             setTextColor(colors.brandText)
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             letterSpacing = 0.1f
@@ -120,7 +133,7 @@ class QuickCaptureActivity : ComponentActivity() {
         // 우측: "완료" 버튼 (44dp 터치 타겟 확보)
         doneButton = TextView(this).apply {
             text = "완료"
-            textSize = 14f
+            textSize = 14f * fontScale
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(colors.buttonText)
             gravity = Gravity.CENTER
@@ -244,8 +257,7 @@ class QuickCaptureActivity : ComponentActivity() {
      * 테마 기반 색상 세트 로드
      * DeviceDefault 테마에서 적응형 색상을 가져오고, 대비 기준을 보장
      */
-    private fun resolveThemeColors(): ThemeColors {
-        val isDark = isDarkMode()
+    private fun resolveThemeColors(isDark: Boolean): ThemeColors {
         return if (isDark) {
             ThemeColors(
                 cardBackground = 0xFF1E1E1E.toInt(),   // 순수 검정 회피 (HIG 2.8)
@@ -269,8 +281,26 @@ class QuickCaptureActivity : ComponentActivity() {
         }
     }
 
-    /** 다크 모드 여부 */
-    private fun isDarkMode(): Boolean {
+    private fun loadThemePreference(): ThemePreference = runBlocking {
+        runCatching { userPreferenceRepository.getThemePreference().first() }
+            .getOrDefault(ThemePreference.SYSTEM)
+    }
+
+    private fun loadCaptureFontPreference(): FontSizePreference = runBlocking {
+        runCatching {
+            val size = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_CAPTURE_FONT_SIZE,
+                FontSizePreference.MEDIUM.name
+            )
+            FontSizePreference.fromString(size)
+        }.getOrDefault(FontSizePreference.MEDIUM)
+    }
+
+    /** 사용자 설정 + 시스템 상태를 반영한 다크 모드 여부 */
+    private fun isDarkMode(themePreference: ThemePreference): Boolean {
+        if (themePreference == ThemePreference.LIGHT) return false
+        if (themePreference == ThemePreference.DARK) return true
+
         val nightMode = resources.configuration.uiMode and
                 android.content.res.Configuration.UI_MODE_NIGHT_MASK
         return nightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES

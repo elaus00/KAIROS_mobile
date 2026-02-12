@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.presentation.components.common.PremiumBadge
 import com.flit.app.presentation.components.common.SectionHeader
@@ -41,6 +42,8 @@ fun AiClassificationSettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
+    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
+    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
     val isPremium = uiState.subscriptionTier == SubscriptionTier.PREMIUM
     var showPresetDropdown by remember { mutableStateOf(false) }
     var showPremiumGateSheet by remember { mutableStateOf(false) }
@@ -52,7 +55,7 @@ fun AiClassificationSettingsScreen(
                     Text(
                         text = "AI 분류 설정",
                         color = colors.text,
-                        fontSize = 20.sp,
+                        fontSize = (20f * fontScale).sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -81,7 +84,10 @@ fun AiClassificationSettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            SectionHeader(title = "분류 프리셋")
+            SectionHeader(
+                title = "분류 프리셋",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 // 프리셋 드롭다운
@@ -105,7 +111,7 @@ fun AiClassificationSettingsScreen(
                                 Text(
                                     text = "분류 프리셋",
                                     color = colors.text,
-                                    fontSize = 15.sp,
+                                    fontSize = (15f * fontScale).sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 if (!isPremium) {
@@ -117,7 +123,7 @@ fun AiClassificationSettingsScreen(
                             Text(
                                 text = uiState.presets.find { it.id == uiState.selectedPresetId }?.name ?: "기본",
                                 color = colors.textMuted,
-                                fontSize = 13.sp
+                                fontSize = (13f * fontScale).sp
                             )
                         }
                         Icon(
@@ -142,7 +148,7 @@ fun AiClassificationSettingsScreen(
                                         )
                                         Text(
                                             text = preset.description,
-                                            fontSize = 12.sp,
+                                            fontSize = (12f * fontScale).sp,
                                             color = colors.textMuted
                                         )
                                     }
@@ -159,7 +165,10 @@ fun AiClassificationSettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SectionHeader(title = "분류 규칙")
+            SectionHeader(
+                title = "분류 규칙",
+                fontSize = (12f * fontScale).sp
+            )
 
             SettingsCard {
                 Box {
@@ -172,7 +181,7 @@ fun AiClassificationSettingsScreen(
                             Text(
                                 text = "분류 규칙",
                                 color = colors.text,
-                                fontSize = 15.sp,
+                                fontSize = (15f * fontScale).sp,
                                 fontWeight = FontWeight.Medium
                             )
                             if (!isPremium) {
@@ -184,7 +193,13 @@ fun AiClassificationSettingsScreen(
                         OutlinedTextField(
                             value = uiState.customInstruction,
                             onValueChange = { viewModel.setCustomInstruction(it) },
-                            placeholder = { Text("예: 업무 관련 내용은 일정으로 분류", color = colors.placeholder) },
+                            placeholder = {
+                                Text(
+                                    "예: 업무 관련 내용은 일정으로 분류",
+                                    color = colors.placeholder,
+                                    fontSize = (14f * fontScale).sp
+                                )
+                            },
                             enabled = isPremium,
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
@@ -205,7 +220,7 @@ fun AiClassificationSettingsScreen(
                                 onClick = { viewModel.saveCustomInstruction() },
                                 modifier = Modifier.align(Alignment.End)
                             ) {
-                                Text("저장", color = colors.accent, fontSize = 14.sp)
+                                Text("저장", color = colors.accent, fontSize = (14f * fontScale).sp)
                             }
                         }
                     }
@@ -235,4 +250,3 @@ fun AiClassificationSettingsScreen(
         )
     }
 }
-

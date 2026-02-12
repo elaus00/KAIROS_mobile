@@ -1,6 +1,7 @@
 package com.flit.app.presentation.settings.calendar
 
 import com.flit.app.domain.repository.CalendarRepository
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.flit.app.util.MainDispatcherRule
@@ -30,14 +31,17 @@ class CalendarSettingsViewModelTest {
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
+    private lateinit var userPreferenceRepository: UserPreferenceRepository
 
     @Before
     fun setUp() {
         calendarRepository = mockk(relaxed = true)
         getCalendarSettingsUseCase = mockk(relaxed = true)
         setCalendarSettingsUseCase = mockk(relaxed = true)
+        userPreferenceRepository = mockk(relaxed = true)
         coEvery { calendarRepository.getAvailableCalendars() } returns emptyList()
         coEvery { calendarRepository.getTargetCalendarId() } returns null
+        coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
     }
 
     @After
@@ -49,7 +53,8 @@ class CalendarSettingsViewModelTest {
         return CalendarSettingsViewModel(
             calendarRepository,
             getCalendarSettingsUseCase,
-            setCalendarSettingsUseCase
+            setCalendarSettingsUseCase,
+            userPreferenceRepository
         )
     }
 
