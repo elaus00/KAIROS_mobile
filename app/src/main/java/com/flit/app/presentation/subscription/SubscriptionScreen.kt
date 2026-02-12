@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.presentation.components.common.AppFontScaleProvider
@@ -43,8 +42,7 @@ fun SubscriptionScreen(
                     Text(
                         text = "구독 관리",
                         color = colors.text,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 navigationIcon = {
@@ -81,8 +79,7 @@ fun SubscriptionScreen(
             Text(
                 text = "Premium 기능",
                 color = colors.text,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -144,8 +141,7 @@ fun SubscriptionScreen(
                     } else {
                         Text(
                             text = "Premium으로 업그레이드",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
                         )
                     }
                 }
@@ -156,7 +152,7 @@ fun SubscriptionScreen(
                 Text(
                     text = uiState.error!!,
                     color = colors.danger,
-                    fontSize = 14.sp
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -192,8 +188,7 @@ private fun CurrentPlanCard(
         Column {
             Text(
                 text = if (isPremium) "Premium" else "Free",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                 color = if (isPremium) {
                     if (colors.isDark) colors.background else colors.card
                 } else {
@@ -203,7 +198,7 @@ private fun CurrentPlanCard(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = if (isPremium) "모든 기능을 사용할 수 있습니다" else "기본 기능만 사용 가능합니다",
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 color = if (isPremium) {
                     if (colors.isDark) colors.background.copy(alpha = 0.7f) else colors.card.copy(alpha = 0.7f)
                 } else {
@@ -235,7 +230,7 @@ private fun FeatureItem(
         Text(
             text = name,
             color = if (enabled) colors.text else colors.textMuted,
-            fontSize = 15.sp
+            style = MaterialTheme.typography.titleMedium
         )
         if (enabled) {
             Icon(

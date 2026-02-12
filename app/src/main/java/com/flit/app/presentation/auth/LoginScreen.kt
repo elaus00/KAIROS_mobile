@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
@@ -76,8 +75,7 @@ fun LoginScreen(
                     Text(
                         text = "로그인",
                         color = colors.text,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 navigationIcon = {
@@ -100,22 +98,21 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "Flit.",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = colors.accent
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                color = colors.accent,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "AI 캡처의 모든 것",
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyLarge,
                 color = colors.textMuted
             )
 
@@ -144,8 +141,7 @@ fun LoginScreen(
                 } else {
                     Text(
                         text = "Google로 로그인",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                     )
                 }
             }
@@ -155,7 +151,7 @@ fun LoginScreen(
                 Text(
                     text = uiState.error!!,
                     color = colors.danger,
-                    fontSize = 14.sp
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -163,7 +159,7 @@ fun LoginScreen(
 
             Text(
                 text = "로그인 없이도 기본 기능을 사용할 수 있습니다",
-                fontSize = 13.sp,
+                style = MaterialTheme.typography.bodySmall,
                 color = colors.textMuted
             )
 
@@ -171,7 +167,7 @@ fun LoginScreen(
 
             Text(
                 text = "다른 Google 계정으로 로그인하면 기존 로컬 데이터는 초기화됩니다",
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.labelMedium,
                 color = colors.textMuted
             )
         }

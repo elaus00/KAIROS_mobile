@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.flit.app.ui.theme.FlitTheme
 
 /**
@@ -51,8 +50,7 @@ fun PremiumGateSheet(
 
             Text(
                 text = "Premium 기능",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 color = colors.text
             )
 
@@ -60,10 +58,9 @@ fun PremiumGateSheet(
 
             Text(
                 text = "$featureName 기능은\nPremium 구독이 필요합니다.",
-                fontSize = 15.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 color = colors.textMuted,
-                textAlign = TextAlign.Center,
-                lineHeight = 22.sp
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -81,8 +78,7 @@ fun PremiumGateSheet(
             ) {
                 Text(
                     text = "Premium으로 업그레이드",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
                 )
             }
 
@@ -92,7 +88,7 @@ fun PremiumGateSheet(
                 Text(
                     text = "나중에",
                     color = colors.textMuted,
-                    fontSize = 14.sp
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

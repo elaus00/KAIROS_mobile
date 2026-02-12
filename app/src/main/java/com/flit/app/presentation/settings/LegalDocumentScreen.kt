@@ -1,6 +1,7 @@
 package com.flit.app.presentation.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,9 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
@@ -48,8 +48,7 @@ fun LegalDocumentScreen(
                 title = {
                     Text(
                         text = title,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 },
                 navigationIcon = {
@@ -79,26 +78,25 @@ fun LegalDocumentScreen(
         ) {
             Surface(
                 color = colors.card,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(12.dp),
                 tonalElevation = 0.dp,
                 shadowElevation = 0.dp
             ) {
-                Column(modifier = Modifier.padding(14.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "초안 문서",
                         color = colors.text,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = "버전 $draftVersion · 최종 수정 $updatedAt",
                         color = colors.textMuted,
-                        fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium
                     )
                     Text(
                         text = "본 문서는 Flit 앱 현재 구현 기준의 운영 초안이며, 법률 자문을 대체하지 않습니다.",
                         color = colors.textSecondary,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 6.dp)
                     )
                 }
@@ -108,8 +106,7 @@ fun LegalDocumentScreen(
                 Text(
                     text = "${index + 1}. ${section.title}",
                     color = colors.text,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
                 )
 
@@ -117,8 +114,7 @@ fun LegalDocumentScreen(
                     Text(
                         text = "• $item",
                         color = colors.textSecondary,
-                        fontSize = 14.sp,
-                        lineHeight = 22.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
@@ -132,8 +128,7 @@ fun LegalDocumentScreen(
             Text(
                 text = "문서 기준: PRD v10.1, 기능명세 v2.4, 데이터모델 v2.3, 앱 구현(설정/인증/동기화/분석/캘린더) 기준",
                 color = colors.textMuted,
-                fontSize = 12.sp,
-                lineHeight = 18.sp
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
