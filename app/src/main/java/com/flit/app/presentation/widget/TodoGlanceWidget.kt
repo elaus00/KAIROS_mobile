@@ -2,12 +2,12 @@ package com.flit.app.presentation.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
@@ -33,6 +33,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.unit.ColorProvider
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDecoration
@@ -41,6 +42,7 @@ import com.flit.app.MainActivity
 import com.flit.app.R
 import com.flit.app.data.local.database.dao.TodoDao
 import com.flit.app.data.local.database.dao.TodoWithCaptureRow
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -56,7 +58,7 @@ import java.util.Locale
  * - 오늘 마감 할 일 표시 (완료 포함, 미완료 우선)
  * - 헤더에 오늘 날짜 + 바로가기 버튼
  * - 체크 토글: 완료 아이콘 + 취소선, 미완료 빈 원
- * - GlanceTheme 자동 다크/라이트 대응
+ * - 앱 테마 설정(SYSTEM/LIGHT/DARK) 반영
  */
 class TodoGlanceWidget : GlanceAppWidget() {
 
@@ -65,6 +67,7 @@ class TodoGlanceWidget : GlanceAppWidget() {
     interface TodoWidgetEntryPoint {
         fun todoDao(): TodoDao
         fun toggleTodoCompletionUseCase(): ToggleTodoCompletionUseCase
+        fun userPreferenceRepository(): UserPreferenceRepository
     }
 
     companion object {
@@ -73,23 +76,27 @@ class TodoGlanceWidget : GlanceAppWidget() {
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val (items, totalCount) = loadData(context)
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            TodoWidgetEntryPoint::class.java
+        )
+        val (items, totalCount) = loadData(entryPoint)
+        val isDark = resolveWidgetDarkTheme(context, entryPoint.userPreferenceRepository())
         val todayLabel = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
             .format(Date())
 
         provideContent {
-            GlanceTheme {
-                TodoContent(items, totalCount, todayLabel)
-            }
+            TodoContent(
+                items = items,
+                totalCount = totalCount,
+                todayLabel = todayLabel,
+                isDark = isDark
+            )
         }
     }
 
-    private suspend fun loadData(context: Context): Pair<List<TodoWithCaptureRow>, Int> {
+    private suspend fun loadData(entryPoint: TodoWidgetEntryPoint): Pair<List<TodoWithCaptureRow>, Int> {
         return try {
-            val entryPoint = EntryPointAccessors.fromApplication(
-                context.applicationContext,
-                TodoWidgetEntryPoint::class.java
-            )
             val todoDao = entryPoint.todoDao()
             val todayEnd = Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, 23)
@@ -129,12 +136,15 @@ class ToggleTodoAction : ActionCallback {
 private fun TodoContent(
     items: List<TodoWithCaptureRow>,
     totalCount: Int,
-    todayLabel: String
+    todayLabel: String,
+    isDark: Boolean
 ) {
+    val colors = widgetColors(isDark)
+
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.background)
+            .background(colors.background)
             .cornerRadius(16.dp)
             .padding(16.dp)
     ) {
@@ -148,7 +158,7 @@ private fun TodoContent(
                 style = TextStyle(
                     fontSize = 20.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = GlanceTheme.colors.onBackground
+                    color = colors.onBackground
                 )
             )
             Spacer(modifier = GlanceModifier.width(8.dp))
@@ -157,7 +167,7 @@ private fun TodoContent(
                 style = TextStyle(
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.Normal,
-                    color = GlanceTheme.colors.onSurfaceVariant
+                    color = colors.onSurfaceVariant
                 )
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
@@ -166,7 +176,7 @@ private fun TodoContent(
                 text = "바로가기",
                 style = TextStyle(
                     fontSize = 12.5.sp,
-                    color = GlanceTheme.colors.primary
+                    color = colors.primary
                 ),
                 modifier = GlanceModifier
                     .padding(vertical = 4.dp)
@@ -181,18 +191,22 @@ private fun TodoContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "할 일을 모두 완료했어요!",
-                    style = TextStyle(
-                        fontSize = 16.5.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant
+                        text = "할 일을 모두 완료했어요!",
+                        style = TextStyle(
+                            fontSize = 16.5.sp,
+                            color = colors.onSurfaceVariant
+                        )
                     )
-                )
-            }
-        } else {
+                }
+            } else {
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             LazyColumn(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
                 items(items, itemId = { it.todoId.hashCode().toLong() }) { item ->
-                    TodoItemRow(item, timeFormat)
+                    TodoItemRow(
+                        item = item,
+                        timeFormat = timeFormat,
+                        colors = colors
+                    )
                 }
                 // 오버플로우 표시
                 if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
@@ -206,7 +220,7 @@ private fun TodoContent(
                                 text = "+${overflow}개 더 있음",
                                 style = TextStyle(
                                     fontSize = 12.5.sp,
-                                    color = GlanceTheme.colors.onSurfaceVariant
+                                    color = colors.onSurfaceVariant
                                 )
                             )
                         }
@@ -218,10 +232,14 @@ private fun TodoContent(
 }
 
 @Composable
-private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) {
+private fun TodoItemRow(
+    item: TodoWithCaptureRow,
+    timeFormat: SimpleDateFormat,
+    colors: TodoWidgetColors
+) {
     val title = item.aiTitle?.takeIf { it.isNotBlank() } ?: item.originalText
     val isOverdue = !item.isCompleted && item.deadline != null && item.deadline < System.currentTimeMillis()
-    val textColor = if (item.isCompleted) GlanceTheme.colors.outline else GlanceTheme.colors.onSurface
+    val textColor = if (item.isCompleted) colors.outline else colors.onSurface
     val textDecoration = if (item.isCompleted) TextDecoration.LineThrough else TextDecoration.None
 
     Row(
@@ -247,8 +265,8 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
                 contentDescription = if (item.isCompleted) "완료됨" else "미완료",
                 modifier = GlanceModifier.size(24.dp),
                 colorFilter = ColorFilter.tint(
-                    if (item.isCompleted) GlanceTheme.colors.outline
-                    else GlanceTheme.colors.onSurfaceVariant
+                    if (item.isCompleted) colors.outline
+                    else colors.onSurfaceVariant
                 )
             )
         }
@@ -285,15 +303,52 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
                     fontSize = 12.5.sp,
                     fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal,
                     color = when {
-                        item.isCompleted -> GlanceTheme.colors.outline
-                        isOverdue -> GlanceTheme.colors.error
-                        else -> GlanceTheme.colors.onSurfaceVariant
+                        item.isCompleted -> colors.outline
+                        isOverdue -> colors.error
+                        else -> colors.onSurfaceVariant
                     }
                 )
             )
         }
     }
 }
+
+private data class TodoWidgetColors(
+    val background: ColorProvider,
+    val primary: ColorProvider,
+    val onBackground: ColorProvider,
+    val onSurface: ColorProvider,
+    val onSurfaceVariant: ColorProvider,
+    val outline: ColorProvider,
+    val error: ColorProvider
+)
+
+private fun widgetColors(isDark: Boolean): TodoWidgetColors {
+    return if (isDark) {
+        TodoWidgetColors(
+            background = fixedColor(Color(0xFF111111)),
+            primary = fixedColor(Color(0xFFF0F0F0)),
+            onBackground = fixedColor(Color(0xFFECECEC)),
+            onSurface = fixedColor(Color(0xFFF5F5F5)),
+            onSurfaceVariant = fixedColor(Color(0xFFBDBDBD)),
+            outline = fixedColor(Color(0xFF8A8A8A)),
+            error = fixedColor(Color(0xFFFF8A80))
+        )
+    } else {
+        TodoWidgetColors(
+            background = fixedColor(Color(0xFFFFFFFF)),
+            primary = fixedColor(Color(0xFF1A1A1A)),
+            onBackground = fixedColor(Color(0xFF111111)),
+            onSurface = fixedColor(Color(0xFF212121)),
+            onSurfaceVariant = fixedColor(Color(0xFF616161)),
+            outline = fixedColor(Color(0xFF9E9E9E)),
+            error = fixedColor(Color(0xFFC62828))
+        )
+    }
+}
+
+private fun fixedColor(color: Color): ColorProvider =
+    ColorProvider(color)
 
 /**
  * 할 일 위젯 리시버 (Manifest에 등록)

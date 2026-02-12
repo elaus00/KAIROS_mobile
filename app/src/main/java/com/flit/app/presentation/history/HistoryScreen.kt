@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.presentation.components.common.FlitChip
 import com.flit.app.presentation.components.common.SwipeableCard
@@ -41,6 +42,7 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
@@ -216,6 +218,7 @@ fun HistoryScreen(
                 }
             }
         }
+    }
     }
 }
 

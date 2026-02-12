@@ -1,5 +1,6 @@
 package com.flit.app.presentation.settings
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +15,9 @@ import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
+import com.flit.app.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +32,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val userPreferenceRepository: UserPreferenceRepository,
     private val calendarRepository: CalendarRepository,
     private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
@@ -163,6 +167,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferenceRepository.setThemePreference(theme)
             _uiState.update { it.copy(themePreference = theme) }
+            WidgetUpdateHelper.updateAllWidgets(appContext)
         }
     }
 

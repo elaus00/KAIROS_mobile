@@ -54,6 +54,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.classification.AIStatusSheet
 import com.flit.app.ui.theme.FlitTheme
 import com.flit.app.ui.theme.FlitWritingFontFamily
@@ -76,6 +77,7 @@ fun CaptureContent(
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -265,6 +267,7 @@ fun CaptureContent(
                 }
             )
         }
+    }
     }
 }
 

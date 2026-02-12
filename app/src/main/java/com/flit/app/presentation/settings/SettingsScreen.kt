@@ -31,6 +31,7 @@ import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.presentation.components.common.SectionHeader
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.settings.components.NavigationSettingItem
 import com.flit.app.presentation.settings.components.SettingsCard
 import com.flit.app.presentation.settings.components.SettingsDivider
@@ -56,10 +57,10 @@ fun SettingsScreen(
     onNavigateToCalendarSettings: () -> Unit = {},
     onNavigateToAiSettings: () -> Unit = {}
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
-    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
-    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
+    val fontScale = 1f
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
@@ -96,7 +97,7 @@ fun SettingsScreen(
                     Text(
                         text = "설정",
                         color = colors.text,
-                        fontSize = (20f * fontScale).sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -128,7 +129,7 @@ fun SettingsScreen(
             // 화면 섹션 (테마 + 글씨 크기 통합)
             SectionHeader(
                 title = "화면",
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
 
             SettingsCard {
@@ -172,7 +173,7 @@ fun SettingsScreen(
                 Text(
                     text = "글씨 크기",
                     color = colors.textMuted,
-                    fontSize = (12f * fontScale).sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
@@ -208,7 +209,7 @@ fun SettingsScreen(
             // 캘린더 섹션 — 토글만 남기고 세부 설정은 세부 화면으로 분리
             SectionHeader(
                 title = "캘린더 연동",
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
 
             SettingsCard {
@@ -249,7 +250,7 @@ fun SettingsScreen(
             // AI 분류 섹션 — 세부 화면으로 진입하는 단일 항목
             SectionHeader(
                 title = "AI 분류",
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
 
             SettingsCard {
@@ -272,7 +273,7 @@ fun SettingsScreen(
             // 계정 섹션
             SectionHeader(
                 title = "계정",
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
 
             SettingsCard {
@@ -325,7 +326,7 @@ fun SettingsScreen(
             // 정보 섹션
             SectionHeader(
                 title = "정보",
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
 
             SettingsCard {
@@ -360,7 +361,7 @@ fun SettingsScreen(
 
                 SectionHeader(
                     title = "개발자 도구",
-                    fontSize = (12f * fontScale).sp
+                    fontSize = 12.sp
                 )
 
                 SettingsCard {
@@ -413,6 +414,7 @@ fun SettingsScreen(
             }
         )
     }
+    }
 }
 
 /**
@@ -441,7 +443,7 @@ private fun ThemeOptionItem(
             Text(
                 text = title,
                 color = colors.text,
-                fontSize = (15f * fontScale).sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
             if (description != null) {
@@ -449,7 +451,7 @@ private fun ThemeOptionItem(
                 Text(
                     text = description,
                     color = colors.textMuted,
-                    fontSize = (13f * fontScale).sp
+                    fontSize = 13.sp
                 )
             }
         }
@@ -505,14 +507,14 @@ private fun DebugImageUploadItem(
                 Text(
                     text = "이미지 캡처 테스트",
                     color = colors.text,
-                    fontSize = (15f * fontScale).sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "갤러리에서 이미지를 선택하여 캡처로 제출",
                     color = colors.textMuted,
-                    fontSize = (13f * fontScale).sp
+                    fontSize = 13.sp
                 )
             }
 
@@ -531,7 +533,7 @@ private fun DebugImageUploadItem(
             Text(
                 text = result,
                 color = if (result.startsWith("실패")) colors.danger else colors.success,
-                fontSize = (12f * fontScale).sp
+                fontSize = 12.sp
             )
         }
     }

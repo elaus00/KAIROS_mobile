@@ -17,6 +17,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.BuildConfig
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -34,6 +35,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val context = LocalContext.current
@@ -170,6 +172,7 @@ fun LoginScreen(
                 color = colors.textMuted
             )
         }
+    }
     }
 }
 

@@ -37,6 +37,7 @@ import coil.request.ImageRequest
 import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.domain.model.NoteSubType
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -53,6 +54,7 @@ fun CaptureDetailScreen(
     onNavigateToSettings: () -> Unit = {},
     viewModel: CaptureDetailViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
     val context = LocalContext.current
@@ -278,6 +280,7 @@ fun CaptureDetailScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
+    }
     }
 }
 

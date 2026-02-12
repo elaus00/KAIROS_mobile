@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
 /**
@@ -31,6 +32,7 @@ fun ReorganizeScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: ReorganizeViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
 
@@ -187,6 +189,7 @@ fun ReorganizeScreen(
                 }
             }
         }
+    }
     }
 }
 

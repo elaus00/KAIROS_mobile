@@ -1,5 +1,6 @@
 package com.flit.app.presentation.settings
 
+import android.content.Context
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.CalendarRepository
@@ -37,6 +38,7 @@ class SettingsViewModelTest {
     val dispatcherRule = MainDispatcherRule()
 
     private lateinit var userPreferenceRepository: UserPreferenceRepository
+    private lateinit var appContext: Context
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
@@ -48,6 +50,7 @@ class SettingsViewModelTest {
     @Before
     fun setUp() {
         userPreferenceRepository = mockk()
+        appContext = mockk(relaxed = true)
         calendarRepository = mockk(relaxed = true)
         getCalendarSettingsUseCase = mockk(relaxed = true)
         setCalendarSettingsUseCase = mockk(relaxed = true)
@@ -66,6 +69,7 @@ class SettingsViewModelTest {
 
     private fun createViewModel(): SettingsViewModel {
         return SettingsViewModel(
+            appContext,
             userPreferenceRepository,
             calendarRepository,
             getCalendarSettingsUseCase,

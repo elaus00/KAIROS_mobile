@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.domain.model.SubscriptionTier
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
 /**
@@ -31,6 +32,7 @@ fun SubscriptionScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: SubscriptionViewModel = hiltViewModel()
 ) {
+    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
 
@@ -157,6 +159,7 @@ fun SubscriptionScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
     }
 }
 

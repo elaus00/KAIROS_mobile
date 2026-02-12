@@ -16,14 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.flit.app.domain.model.FontSizePreference
+import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -32,13 +29,10 @@ import com.flit.app.ui.theme.FlitTheme
 fun LegalWebViewScreen(
     title: String,
     url: String,
-    viewModel: LegalWebViewViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {}
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
-    val fontPreference = FontSizePreference.fromString(uiState.captureFontSize)
-    val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
 
     Scaffold(
         topBar = {
@@ -46,7 +40,7 @@ fun LegalWebViewScreen(
                 title = {
                     Text(
                         text = title,
-                        fontSize = (18f * fontScale).sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -86,5 +80,6 @@ fun LegalWebViewScreen(
                 .padding(paddingValues)
                 .background(colors.background)
         )
+    }
     }
 }
