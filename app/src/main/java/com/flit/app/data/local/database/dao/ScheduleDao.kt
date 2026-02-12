@@ -87,6 +87,9 @@ interface ScheduleDao {
     @Query("DELETE FROM schedules WHERE capture_id = :captureId")
     suspend fun deleteByCaptureId(captureId: String)
 
+    @Query("DELETE FROM schedules WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     /**
      * 캘린더 동기화 상태로 일정 조회
      */

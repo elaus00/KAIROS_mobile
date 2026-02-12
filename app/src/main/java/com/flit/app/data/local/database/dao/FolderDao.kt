@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.flit.app.data.local.database.entities.FolderEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -31,6 +32,9 @@ interface FolderDao {
     @Query("SELECT * FROM folders WHERE id = :id")
     suspend fun getById(id: String): FolderEntity?
 
+    @Update
+    suspend fun update(folder: FolderEntity)
+
     /**
      * 이름으로 폴더 조회 (중복 체크용)
      */
@@ -48,6 +52,9 @@ interface FolderDao {
      */
     @Query("DELETE FROM folders WHERE id = :id AND type = 'USER'")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM folders WHERE id = :id")
+    suspend fun deleteByIdForSync(id: String)
 
     /**
      * 이름 + 유형으로 폴더 조회 (AI 그룹 폴더 재사용)

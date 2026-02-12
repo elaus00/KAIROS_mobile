@@ -15,6 +15,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
@@ -55,6 +56,8 @@ class AuthRepositoryImplTest {
         every { editor.apply() } just Runs
         every { deviceIdProvider.getOrCreateDeviceId() } returns "test-device-id"
         every { database.clearAllTables() } just Runs
+        every { prefs.getString("auth_user_id", null) } returns null
+        every { prefs.getString("sync_last_sync_user_id", null) } returns null
 
         repository = AuthRepositoryImpl(api, deviceIdProvider, prefs, database)
     }
@@ -102,9 +105,7 @@ class AuthRepositoryImplTest {
         repository.loginWithGoogle("token")
 
         // Then — 디바이스 ID가 "test-device-id"인 요청이 전송되었는지 검증
-        coEvery { api.authGoogle(match { it.deviceId == "test-device-id" }) } returns Response.success(
-            ApiEnvelope(status = "ok", data = authResponse)
-        )
+        coVerify { api.authGoogle(match { it.deviceId == "test-device-id" }) }
     }
 
     @Test(expected = ApiException.Unauthorized::class)

@@ -59,12 +59,16 @@ class LoginViewModel @Inject constructor(
 
                 // 로그인 성공 직후 초기 동기화 수행
                 val syncResult = initialSyncUseCase()
-                if (!syncResult.success && !syncResult.skipped) {
+                if (!syncResult.success) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = syncResult.message ?: "초기 동기화에 실패했습니다.",
-                            isLoggedIn = true
+                            error = syncResult.message ?: if (syncResult.skipped) {
+                                "초기 동기화가 보류되었습니다."
+                            } else {
+                                "초기 동기화에 실패했습니다."
+                            },
+                            isLoggedIn = false
                         )
                     }
                     return@launch

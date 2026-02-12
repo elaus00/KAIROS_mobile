@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.flit.app.data.local.database.entities.TagEntity
 
 /**
@@ -35,6 +36,12 @@ interface TagDao {
      */
     @Query("SELECT * FROM tags WHERE name = :name LIMIT 1")
     suspend fun getByName(name: String): TagEntity?
+
+    @Update
+    suspend fun update(tag: TagEntity)
+
+    @Query("DELETE FROM tags WHERE id = :id")
+    suspend fun deleteById(id: String)
 
     /** 동기화용 전체 태그 조회 */
     @Query("SELECT * FROM tags")

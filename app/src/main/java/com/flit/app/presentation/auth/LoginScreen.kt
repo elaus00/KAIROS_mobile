@@ -161,6 +161,14 @@ fun LoginScreen(
                 fontSize = 13.sp,
                 color = colors.textMuted
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "다른 Google 계정으로 로그인하면 기존 로컬 데이터는 초기화됩니다",
+                fontSize = 12.sp,
+                color = colors.textMuted
+            )
         }
     }
 }

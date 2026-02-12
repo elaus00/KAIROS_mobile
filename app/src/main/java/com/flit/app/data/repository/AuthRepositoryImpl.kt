@@ -34,9 +34,15 @@ class AuthRepositoryImpl @Inject constructor(
         private const val KEY_USER_EMAIL = "auth_user_email"
         private const val KEY_SUBSCRIPTION_TIER = "auth_subscription_tier"
         private const val KEY_GOOGLE_CALENDAR_CONNECTED = "auth_google_calendar_connected"
+        private const val KEY_LAST_SYNC_AT = "sync_last_sync_at"
+        private const val KEY_LAST_SYNC_CURSOR = "sync_last_sync_cursor"
+        private const val KEY_LAST_SYNC_USER_ID = "sync_last_sync_user_id"
+        private const val KEY_TARGET_CALENDAR_ID = "target_calendar_id"
     }
 
     override suspend fun loginWithGoogle(idToken: String): User {
+        val previousUserId = prefs.getString(KEY_USER_ID, null)
+        val lastSyncUserId = prefs.getString(KEY_LAST_SYNC_USER_ID, null)
         val request = AuthGoogleRequest(
             idToken = idToken,
             deviceId = deviceIdProvider.getOrCreateDeviceId()
@@ -51,6 +57,18 @@ class AuthRepositoryImpl @Inject constructor(
             subscriptionTier = userDto.subscriptionTier,
             googleCalendarConnected = userDto.googleCalendarConnected
         )
+        val switchedFromPrevious = !previousUserId.isNullOrBlank() && previousUserId != user.id
+        val switchedFromLastSync = !lastSyncUserId.isNullOrBlank() && lastSyncUserId != user.id
+        if (switchedFromPrevious || switchedFromLastSync) {
+            // 다른 계정으로 전환되면 기존 로컬 데이터를 초기화해 계정 간 오염을 방지한다.
+            database.clearAllTables()
+            prefs.edit()
+                .remove(KEY_LAST_SYNC_AT)
+                .remove(KEY_LAST_SYNC_CURSOR)
+                .remove(KEY_LAST_SYNC_USER_ID)
+                .remove(KEY_TARGET_CALENDAR_ID)
+                .apply()
+        }
         saveUser(user)
         return user
     }

@@ -1,14 +1,23 @@
 package com.flit.app.data.repository
 
+import androidx.room.withTransaction
+import com.flit.app.data.local.database.FlitDatabase
 import com.flit.app.data.local.database.dao.CaptureDao
 import com.flit.app.data.local.database.dao.FolderDao
 import com.flit.app.data.local.database.dao.NoteDao
 import com.flit.app.data.local.database.dao.ScheduleDao
 import com.flit.app.data.local.database.dao.TagDao
 import com.flit.app.data.local.database.dao.TodoDao
+import com.flit.app.data.local.database.entities.CaptureEntity
+import com.flit.app.data.local.database.entities.FolderEntity
+import com.flit.app.data.local.database.entities.NoteEntity
+import com.flit.app.data.local.database.entities.ScheduleEntity
+import com.flit.app.data.local.database.entities.TagEntity
+import com.flit.app.data.local.database.entities.TodoEntity
 import com.flit.app.data.remote.ApiResponseHandler
 import com.flit.app.data.remote.DeviceIdProvider
 import com.flit.app.data.remote.api.FlitApi
+import com.flit.app.data.remote.dto.v2.SyncPullItem
 import com.flit.app.data.remote.dto.v2.SyncPullRequest
 import com.flit.app.data.remote.dto.v2.SyncPushItem
 import com.flit.app.data.remote.dto.v2.SyncPushRequest
@@ -24,6 +33,7 @@ class SyncRepositoryImpl @Inject constructor(
     private val api: FlitApi,
     private val deviceIdProvider: DeviceIdProvider,
     private val userPreferenceRepository: UserPreferenceRepository,
+    private val database: FlitDatabase,
     private val captureDao: CaptureDao,
     private val todoDao: TodoDao,
     private val scheduleDao: ScheduleDao,
@@ -220,17 +230,38 @@ class SyncRepositoryImpl @Inject constructor(
             )
         }
 
+        if (response.changes.isEmpty()) {
+            val nextCursor = response.nextCursor ?: Instant.now().toString()
+            storeSyncState(currentUserId = currentUserId, lastSyncAt = nextCursor, cursor = nextCursor)
+            return SyncResult(
+                success = true,
+                pulledCount = 0,
+                message = "서버에서 가져올 변경 사항이 없습니다."
+            )
+        }
+
+        val applyResult = runCatching { applyServerChanges(response.changes) }
+        if (applyResult.isFailure) {
+            return SyncResult(
+                success = false,
+                skipped = true,
+                pulledCount = response.changes.size,
+                message = applyResult.exceptionOrNull()?.message
+                    ?: "서버 변경 사항 반영에 실패했습니다."
+            )
+        }
+        val applyStats = applyResult.getOrThrow()
+
         val nextCursor = response.nextCursor ?: Instant.now().toString()
         storeSyncState(currentUserId = currentUserId, lastSyncAt = nextCursor, cursor = nextCursor)
 
-        // TODO: 서버 변경 사항의 로컬 반영은 서버 스키마 확정 후 적용
         return SyncResult(
             success = true,
-            pulledCount = response.changes.size,
-            message = if (response.changes.isEmpty()) {
-                "서버에서 가져올 변경 사항이 없습니다."
+            pulledCount = applyStats.appliedCount,
+            message = if (applyStats.skippedCount > 0) {
+                "서버 변경 ${applyStats.totalCount}건 중 ${applyStats.appliedCount}건 반영, ${applyStats.skippedCount}건 스킵"
             } else {
-                "서버 변경 사항 ${response.changes.size}건을 확인했습니다."
+                "서버 변경 사항 ${applyStats.appliedCount}건을 반영했습니다."
             }
         )
     }
@@ -252,5 +283,289 @@ class SyncRepositoryImpl @Inject constructor(
 
     private fun epochMsToIso(epochMs: Long): String {
         return Instant.ofEpochMilli(epochMs).toString()
+    }
+
+    private data class ApplyStats(
+        val totalCount: Int,
+        val appliedCount: Int,
+        val skippedCount: Int
+    )
+
+    private suspend fun applyServerChanges(changes: List<SyncPullItem>): ApplyStats {
+        var appliedCount = 0
+        var skippedCount = 0
+        database.withTransaction {
+            val deletions = changes.filter { it.operation.equals("delete", ignoreCase = true) }
+            val upserts = changes.filterNot { it.operation.equals("delete", ignoreCase = true) }
+
+            // Delete는 FK 제약을 고려해 자식부터 처리.
+            deletions.forEach { item ->
+                val id = item.resolveId()
+                if (id == null) {
+                    skippedCount++
+                    return@forEach
+                }
+                when (item.normalizedEntityType()) {
+                    "tasks" -> {
+                        todoDao.deleteById(id)
+                        appliedCount++
+                    }
+                    "events" -> {
+                        scheduleDao.deleteById(id)
+                        appliedCount++
+                    }
+                    "notes" -> {
+                        noteDao.deleteById(id)
+                        appliedCount++
+                    }
+                    "captures" -> {
+                        captureDao.hardDelete(id)
+                        appliedCount++
+                    }
+                    "tags" -> {
+                        tagDao.deleteById(id)
+                        appliedCount++
+                    }
+                    "folders" -> {
+                        folderDao.deleteByIdForSync(id)
+                        appliedCount++
+                    }
+                    else -> skippedCount++
+                }
+            }
+
+            // Upsert는 부모 엔티티를 먼저 반영.
+            upserts.filterEntity("folders").forEach {
+                if (upsertFolder(it)) appliedCount++ else skippedCount++
+            }
+            upserts.filterEntity("tags").forEach {
+                if (upsertTag(it)) appliedCount++ else skippedCount++
+            }
+            upserts.filterEntity("captures").forEach {
+                if (upsertCapture(it)) appliedCount++ else skippedCount++
+            }
+            upserts.filterEntity("tasks").forEach {
+                if (upsertTodo(it)) appliedCount++ else skippedCount++
+            }
+            upserts.filterEntity("events").forEach {
+                if (upsertSchedule(it)) appliedCount++ else skippedCount++
+            }
+            upserts.filterEntity("notes").forEach {
+                if (upsertNote(it)) appliedCount++ else skippedCount++
+            }
+
+            val knownEntities = setOf("folders", "tags", "captures", "tasks", "events", "notes")
+            skippedCount += upserts.count { it.normalizedEntityType() !in knownEntities }
+        }
+        return ApplyStats(
+            totalCount = changes.size,
+            appliedCount = appliedCount,
+            skippedCount = skippedCount
+        )
+    }
+
+    private suspend fun upsertCapture(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val createdAt = data.long("created_at") ?: now
+        val entity = CaptureEntity(
+            id = id,
+            originalText = data.string("original_text") ?: "",
+            aiTitle = data.string("ai_title"),
+            classifiedType = data.string("classified_type") ?: "TEMP",
+            noteSubType = data.string("note_sub_type"),
+            confidence = data.string("confidence"),
+            source = data.string("source") ?: "APP",
+            isConfirmed = data.bool("is_confirmed") ?: false,
+            confirmedAt = data.long("confirmed_at"),
+            isDeleted = data.bool("is_deleted") ?: false,
+            deletedAt = data.long("deleted_at"),
+            createdAt = createdAt,
+            updatedAt = data.long("updated_at") ?: createdAt,
+            classificationCompletedAt = data.long("classification_completed_at"),
+            isTrashed = data.bool("is_trashed") ?: false,
+            trashedAt = data.long("trashed_at"),
+            imageUri = data.string("image_uri"),
+            parentCaptureId = data.string("parent_capture_id")
+        )
+        if (captureDao.getById(id) == null) {
+            captureDao.insert(entity)
+        } else {
+            captureDao.update(entity)
+        }
+        return true
+    }
+
+    private suspend fun upsertTodo(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val captureId = data.string("capture_id") ?: return false
+        val createdAt = data.long("created_at") ?: now
+        val entity = TodoEntity(
+            id = id,
+            captureId = captureId,
+            deadline = data.long("deadline"),
+            isCompleted = data.bool("is_completed") ?: false,
+            completedAt = data.long("completed_at"),
+            sortOrder = data.int("sort_order") ?: 0,
+            createdAt = createdAt,
+            deadlineSource = data.string("deadline_source"),
+            sortSource = data.string("sort_source") ?: "DEFAULT",
+            updatedAt = data.long("updated_at") ?: createdAt
+        )
+        if (todoDao.getById(id) == null) {
+            todoDao.insert(entity)
+        } else {
+            todoDao.update(entity)
+        }
+        return true
+    }
+
+    private suspend fun upsertSchedule(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val captureId = data.string("capture_id") ?: return false
+        val createdAt = data.long("created_at") ?: now
+        val entity = ScheduleEntity(
+            id = id,
+            captureId = captureId,
+            startTime = data.long("start_time"),
+            endTime = data.long("end_time"),
+            location = data.string("location"),
+            isAllDay = data.bool("is_all_day") ?: false,
+            confidence = data.string("confidence") ?: "MEDIUM",
+            calendarSyncStatus = data.string("calendar_sync_status") ?: "NOT_LINKED",
+            calendarEventId = data.string("calendar_event_id"),
+            createdAt = createdAt,
+            updatedAt = data.long("updated_at") ?: createdAt
+        )
+        if (scheduleDao.getById(id) == null) {
+            scheduleDao.insert(entity)
+        } else {
+            scheduleDao.update(entity)
+        }
+        return true
+    }
+
+    private suspend fun upsertNote(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val captureId = data.string("capture_id") ?: return false
+        val createdAt = data.long("created_at") ?: now
+        val entity = NoteEntity(
+            id = id,
+            captureId = captureId,
+            folderId = data.string("folder_id"),
+            createdAt = createdAt,
+            updatedAt = data.long("updated_at") ?: createdAt,
+            body = data.string("body")
+        )
+        if (noteDao.getById(id) == null) {
+            noteDao.insert(entity)
+        } else {
+            noteDao.update(entity)
+        }
+        return true
+    }
+
+    private suspend fun upsertTag(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val name = data.string("name") ?: id
+        val entity = TagEntity(
+            id = id,
+            name = name,
+            createdAt = data.long("created_at") ?: now
+        )
+        if (tagDao.getById(id) == null) {
+            val existingByName = tagDao.getByName(name)
+            if (existingByName != null && existingByName.id != id) {
+                return false
+            }
+            tagDao.insert(entity)
+            return tagDao.getById(id) != null
+        } else {
+            tagDao.update(entity)
+        }
+        return true
+    }
+
+    private suspend fun upsertFolder(item: SyncPullItem): Boolean {
+        val data = item.data
+        val now = System.currentTimeMillis()
+        val id = item.resolveId() ?: return false
+        val entity = FolderEntity(
+            id = id,
+            name = data.string("name") ?: "Untitled",
+            type = data.string("type") ?: "USER",
+            sortOrder = data.int("sort_order") ?: 0,
+            createdAt = data.long("created_at") ?: now
+        )
+        if (folderDao.getById(id) == null) {
+            folderDao.insert(entity)
+        } else {
+            folderDao.update(entity)
+        }
+        return true
+    }
+
+    private fun SyncPullItem.resolveId(): String? {
+        return data.string("id")
+            ?: serverId?.takeIf { it.isNotBlank() }
+    }
+
+    private fun SyncPullItem.normalizedEntityType(): String {
+        return entityType.trim().lowercase()
+    }
+
+    private fun List<SyncPullItem>.filterEntity(type: String): List<SyncPullItem> {
+        return filter { it.normalizedEntityType() == type }
+    }
+
+    private fun Map<String, Any?>.string(key: String): String? {
+        val value = this[key] ?: return null
+        return when (value) {
+            is String -> value.takeIf { it.isNotBlank() }
+            else -> value.toString().takeIf { it.isNotBlank() && it != "null" }
+        }
+    }
+
+    private fun Map<String, Any?>.long(key: String): Long? {
+        val value = this[key] ?: return null
+        return when (value) {
+            is Number -> value.toLong()
+            is String -> value.toLongOrNull() ?: value.toDoubleOrNull()?.toLong()
+            else -> null
+        }
+    }
+
+    private fun Map<String, Any?>.int(key: String): Int? {
+        val value = this[key] ?: return null
+        return when (value) {
+            is Number -> value.toInt()
+            is String -> value.toIntOrNull() ?: value.toDoubleOrNull()?.toInt()
+            else -> null
+        }
+    }
+
+    private fun Map<String, Any?>.bool(key: String): Boolean? {
+        val value = this[key] ?: return null
+        return when (value) {
+            is Boolean -> value
+            is Number -> value.toInt() != 0
+            is String -> {
+                when (value.lowercase()) {
+                    "true", "1", "yes" -> true
+                    "false", "0", "no" -> false
+                    else -> null
+                }
+            }
+            else -> null
+        }
     }
 }

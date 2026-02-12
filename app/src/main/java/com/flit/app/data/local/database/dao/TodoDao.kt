@@ -100,6 +100,9 @@ interface TodoDao {
     @Query("DELETE FROM todos WHERE capture_id = :captureId")
     suspend fun deleteByCaptureId(captureId: String)
 
+    @Query("DELETE FROM todos WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     /**
      * 정렬 순서 업데이트
      */

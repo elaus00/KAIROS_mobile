@@ -85,6 +85,9 @@ interface NoteDao {
     @Query("DELETE FROM notes WHERE capture_id = :captureId")
     suspend fun deleteByCaptureId(captureId: String)
 
+    @Query("DELETE FROM notes WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     /**
      * 폴더별 노트 + 활성 캡처 정보 조회
      */
