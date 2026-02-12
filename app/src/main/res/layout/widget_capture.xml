@@ -2,26 +2,49 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
+    android:orientation="vertical"
     android:padding="12dp"
     android:background="@drawable/widget_background">
 
-    <ImageView
-        android:id="@+id/widget_icon"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:src="@drawable/ic_launcher_foreground"
-        android:contentDescription="KAIROS" />
-
-    <TextView
-        android:id="@+id/widget_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+    <!-- 입력 영역 (탭하면 QuickCaptureActivity 실행) -->
+    <LinearLayout
+        android:id="@+id/widget_capture_input"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginStart="8dp"
-        android:text="탭하여 캡처하기"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp">
+
+        <!-- 입력 힌트 아이콘 -->
+        <ImageView
+            android:id="@+id/widget_capture_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@android:drawable/ic_input_add"
+            android:contentDescription="캡처"
+            android:alpha="0.5" />
+
+        <!-- 입력 힌트 텍스트 -->
+        <TextView
+            android:id="@+id/widget_capture_hint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="무엇이든 캡처하세요..."
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- 오늘 캡처 수 -->
+    <TextView
+        android:id="@+id/widget_capture_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="오늘 첫 캡처를 시작하세요"
+        android:textSize="11sp"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="4dp" />
 
 </LinearLayout>

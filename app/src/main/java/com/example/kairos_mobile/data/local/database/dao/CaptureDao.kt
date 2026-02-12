@@ -179,6 +179,16 @@ interface CaptureDao {
     fun getActiveCount(): Flow<Int>
 
     /**
+     * 오늘 생성된 캡처 수 조회 (위젯용)
+     */
+    @Query("""
+        SELECT COUNT(*) FROM captures
+        WHERE is_deleted = 0 AND is_trashed = 0
+        AND created_at >= :todayStartMs
+    """)
+    suspend fun getTodayCaptureCount(todayStartMs: Long): Int
+
+    /**
      * 특정 폴더에 속한 노트들의 캡처 note_sub_type 일괄 변경
      * 폴더 삭제 시 소속 캡처의 note_sub_type을 INBOX로 변경하기 위해 사용
      */

@@ -69,6 +69,15 @@
 
         </activity>
 
+        <!-- 위젯 퀵 캡처 Activity (투명 다이얼로그) -->
+        <activity
+            android:name=".presentation.widget.QuickCaptureActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KAIROS.QuickCapture"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="standard" />
+
         <!-- 캡처 위젯 리시버 -->
         <receiver
             android:name=".presentation.widget.CaptureWidgetProvider"

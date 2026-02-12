@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
@@ -24,7 +25,9 @@ import java.util.Locale
 
 /**
  * 할 일 위젯 (4x2)
- * 오늘 마감 미완료 할 일 표시 + 체크박스 완료 토글
+ * - 오늘 마감 미완료 할 일 표시 + 체크박스 완료 토글
+ * - 라이트/다크 테마 대응
+ * - "+N개 더" 오버플로우 표시
  */
 class TodoWidgetProvider : AppWidgetProvider() {
 
@@ -37,6 +40,7 @@ class TodoWidgetProvider : AppWidgetProvider() {
     companion object {
         const val ACTION_TOGGLE_TODO = "com.example.kairos_mobile.ACTION_TOGGLE_TODO"
         const val EXTRA_TODO_ID = "extra_todo_id"
+        private const val DISPLAY_LIMIT = 5
     }
 
     override fun onUpdate(
@@ -82,6 +86,7 @@ class TodoWidgetProvider : AppWidgetProvider() {
         appWidgetId: Int
     ) {
         val views = RemoteViews(context.packageName, R.layout.widget_todo)
+        val isDark = isDarkMode(context)
 
         // 리스트 어댑터 설정
         val serviceIntent = Intent(context, TodoWidgetService::class.java).apply {
@@ -110,7 +115,57 @@ class TodoWidgetProvider : AppWidgetProvider() {
         )
         views.setOnClickPendingIntent(R.id.widget_todo_open_app, openAppPendingIntent)
 
+        // "+N개 더" 오버플로우 표시
+        val totalCount = getTotalTodoCount(context)
+        if (totalCount > DISPLAY_LIMIT) {
+            val overflow = totalCount - DISPLAY_LIMIT
+            views.setTextViewText(R.id.widget_todo_overflow, "+${overflow}개 더")
+            views.setViewVisibility(R.id.widget_todo_overflow, View.VISIBLE)
+        } else {
+            views.setViewVisibility(R.id.widget_todo_overflow, View.GONE)
+        }
+
+        // 테마별 텍스트 색상 적용
+        val titleColor = if (isDark) 0xCCFFFFFF.toInt() else 0xFF111111.toInt()
+        val mutedColor = if (isDark) 0xFF888888.toInt() else 0xFF737373.toInt()
+        val linkColor = if (isDark) 0xFF888888.toInt() else 0xFF888888.toInt()
+
+        views.setTextColor(R.id.widget_todo_title, titleColor)
+        views.setTextColor(R.id.widget_todo_overflow, mutedColor)
+        views.setTextColor(R.id.widget_todo_empty, mutedColor)
+        views.setTextColor(R.id.widget_todo_open_app, linkColor)
+
         appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    /**
+     * 오늘 마감 미완료 할 일 전체 수 조회 (오버플로우 표시용)
+     */
+    private fun getTotalTodoCount(context: Context): Int {
+        return try {
+            val entryPoint = EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                TodoWidgetEntryPoint::class.java
+            )
+            val todoDao = entryPoint.todoDao()
+            val todayEnd = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
+            }.timeInMillis
+            runBlocking {
+                todoDao.getTodayIncompleteTodoCount(todayEnd)
+            }
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    private fun isDarkMode(context: Context): Boolean {
+        val nightMode = context.resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK
+        return nightMode == Configuration.UI_MODE_NIGHT_YES
     }
 }
 
@@ -165,10 +220,17 @@ private class TodoWidgetViewsFactory(
     override fun getViewAt(position: Int): RemoteViews {
         val item = items[position]
         val views = RemoteViews(context.packageName, R.layout.widget_todo_item)
+        val isDark = isDarkMode()
 
         // 제목 설정 (aiTitle 우선, 없으면 originalText)
         val title = item.aiTitle?.takeIf { it.isNotBlank() } ?: item.originalText
         views.setTextViewText(R.id.widget_todo_item_title, title)
+
+        // 테마별 텍스트 색상
+        val textColor = if (isDark) 0xFFDDDDDD.toInt() else 0xFF333333.toInt()
+        val deadlineColor = if (isDark) 0xFF888888.toInt() else 0xFF737373.toInt()
+        views.setTextColor(R.id.widget_todo_item_title, textColor)
+        views.setTextColor(R.id.widget_todo_item_deadline, deadlineColor)
 
         // 마감 시간 표시
         if (item.deadline != null) {
@@ -190,11 +252,19 @@ private class TodoWidgetViewsFactory(
         return views
     }
 
-    override fun getLoadingView(): RemoteViews? = null
+    override fun getLoadingView(): RemoteViews {
+        return RemoteViews(context.packageName, R.layout.widget_todo_item)
+    }
 
     override fun getViewTypeCount(): Int = 1
 
     override fun getItemId(position: Int): Long = items[position].todoId.hashCode().toLong()
 
     override fun hasStableIds(): Boolean = true
+
+    private fun isDarkMode(): Boolean {
+        val nightMode = context.resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK
+        return nightMode == Configuration.UI_MODE_NIGHT_YES
+    }
 }

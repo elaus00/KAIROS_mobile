@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.capture
 
+import android.app.Application
 import android.os.Trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CaptureViewModel @Inject constructor(
+    private val application: Application,
     private val submitCaptureUseCase: SubmitCaptureUseCase,
     private val userPreferenceRepository: UserPreferenceRepository,
     private val captureRepository: CaptureRepository,
@@ -142,6 +145,8 @@ class CaptureViewModel @Inject constructor(
                     )
                 }
                 _events.emit(CaptureEvent.SubmitSuccess)
+                // 위젯 갱신
+                WidgetUpdateHelper.updateCaptureWidget(application)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

@@ -475,13 +475,12 @@ private fun NoteListItem(
 
 /**
  * NoteSubType → 표시 라벨 변환
- * INBOX/USER_FOLDER는 별도 칩 불필요 (폴더 이름으로 표시)
+ * INBOX/USER_FOLDER는 폴더 이름으로 이미 표시되므로 칩 생략
  */
 private fun noteSubTypeLabel(subType: String?): String? {
     return when (subType) {
         NoteSubType.IDEA.name -> "Idea"
         NoteSubType.BOOKMARK.name -> "Bookmark"
-        NoteSubType.INBOX.name -> "Inbox"
         else -> null
     }
 }

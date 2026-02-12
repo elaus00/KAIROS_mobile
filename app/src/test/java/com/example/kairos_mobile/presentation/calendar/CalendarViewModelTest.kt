@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.calendar
 
+import android.app.Application
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
@@ -41,6 +42,7 @@ class CalendarViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
+    private lateinit var application: Application
     private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var todoRepository: TodoRepository
     private lateinit var captureRepository: CaptureRepository
@@ -51,6 +53,7 @@ class CalendarViewModelTest {
 
     @Before
     fun setUp() {
+        application = mockk(relaxed = true)
         scheduleRepository = mockk()
         todoRepository = mockk()
         captureRepository = mockk()
@@ -77,6 +80,7 @@ class CalendarViewModelTest {
         every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
 
         return CalendarViewModel(
+            application,
             scheduleRepository,
             todoRepository,
             captureRepository,
@@ -106,7 +110,7 @@ class CalendarViewModelTest {
 
         // When
         val viewModel = CalendarViewModel(
-            scheduleRepository, todoRepository, captureRepository,
+            application, scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
             reorderTodo, approveSuggestion
         )
@@ -134,7 +138,7 @@ class CalendarViewModelTest {
 
         // When
         val viewModel = CalendarViewModel(
-            scheduleRepository, todoRepository, captureRepository,
+            application, scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
             reorderTodo, approveSuggestion
         )
@@ -159,7 +163,7 @@ class CalendarViewModelTest {
 
         // When
         val viewModel = CalendarViewModel(
-            scheduleRepository, todoRepository, captureRepository,
+            application, scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
             reorderTodo, approveSuggestion
         )
@@ -243,7 +247,7 @@ class CalendarViewModelTest {
 
         // When
         val viewModel = CalendarViewModel(
-            scheduleRepository, todoRepository, captureRepository,
+            application, scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
             reorderTodo, approveSuggestion
         )
@@ -269,7 +273,7 @@ class CalendarViewModelTest {
 
         // When
         val viewModel = CalendarViewModel(
-            scheduleRepository, todoRepository, captureRepository,
+            application, scheduleRepository, todoRepository, captureRepository,
             calendarRepository, toggleTodoCompletion,
             reorderTodo, approveSuggestion
         )

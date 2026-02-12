@@ -26,6 +26,7 @@ import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.classification.BuildModificationHistoryUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ProcessClassificationResultUseCase
 import com.example.kairos_mobile.domain.usecase.subscription.CheckFeatureUseCase
+import com.example.kairos_mobile.presentation.widget.WidgetUpdateHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import com.example.kairos_mobile.data.remote.dto.v2.OcrRequest
@@ -189,6 +190,11 @@ class ClassifyCaptureWorker @AssistedInject constructor(
 
         // 완료된 항목 정리
         syncQueueRepository.deleteCompleted()
+
+        // 분류 완료 후 위젯 갱신 (새 TODO 생성 가능)
+        if (successCount > 0) {
+            WidgetUpdateHelper.updateAllWidgets(applicationContext)
+        }
 
         return Result.success()
     }

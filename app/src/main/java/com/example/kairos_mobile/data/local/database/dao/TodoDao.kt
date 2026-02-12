@@ -123,6 +123,18 @@ interface TodoDao {
     fun getActiveCount(): Flow<Int>
 
     /**
+     * 오늘 마감 미완료 할 일 수 조회 (위젯 오버플로우 표시용)
+     */
+    @Query("""
+        SELECT COUNT(*)
+        FROM todos t
+        INNER JOIN captures c ON t.capture_id = c.id
+        WHERE t.is_completed = 0 AND c.is_deleted = 0 AND c.is_trashed = 0
+        AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
+    """)
+    suspend fun getTodayIncompleteTodoCount(todayEndMs: Long?): Int
+
+    /**
      * 오늘 마감 미완료 할 일 조회 (위젯용, 최대 5개)
      */
     @Query("""

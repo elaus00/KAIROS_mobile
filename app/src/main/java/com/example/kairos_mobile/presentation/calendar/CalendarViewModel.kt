@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.calendar
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
@@ -10,6 +11,7 @@ import com.example.kairos_mobile.domain.repository.TodoRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ReorderTodoUseCase
 import com.example.kairos_mobile.domain.usecase.todo.ToggleTodoCompletionUseCase
+import com.example.kairos_mobile.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,6 +37,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
+    private val application: Application,
     private val scheduleRepository: ScheduleRepository,
     private val todoRepository: TodoRepository,
     private val captureRepository: CaptureRepository,
@@ -267,6 +270,8 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             delay(300) // 체크 애니메이션 표시
             toggleTodoCompletion(taskId)
+            // 위젯 갱신
+            WidgetUpdateHelper.updateTodoWidget(application)
             // Flow(getAllTodos)가 자동으로 UI 업데이트 — 제자리 유지
         }
     }

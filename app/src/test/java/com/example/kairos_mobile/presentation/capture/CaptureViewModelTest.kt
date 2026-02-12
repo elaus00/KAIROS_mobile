@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.capture
 
+import android.app.Application
 import android.os.Trace
 import app.cash.turbine.test
 import com.example.kairos_mobile.domain.model.Capture
@@ -43,6 +44,7 @@ class CaptureViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
+    private lateinit var application: Application
     private lateinit var submitCaptureUseCase: SubmitCaptureUseCase
     private lateinit var userPreferenceRepository: UserPreferenceRepository
     private lateinit var captureRepository: CaptureRepository
@@ -55,6 +57,7 @@ class CaptureViewModelTest {
         every { Trace.beginSection(any()) } just runs
         every { Trace.endSection() } just runs
 
+        application = mockk(relaxed = true)
         submitCaptureUseCase = mockk()
         userPreferenceRepository = mockk()
         captureRepository = mockk()
@@ -78,6 +81,7 @@ class CaptureViewModelTest {
         coEvery { userPreferenceRepository.getString("capture_font_size", "MEDIUM") } returns "MEDIUM"
         every { captureRepository.getUnconfirmedCount() } returns flowOf(unconfirmedCount)
         return CaptureViewModel(
+            application,
             submitCaptureUseCase,
             userPreferenceRepository,
             captureRepository,
