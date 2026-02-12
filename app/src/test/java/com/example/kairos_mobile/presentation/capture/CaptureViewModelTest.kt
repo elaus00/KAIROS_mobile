@@ -8,6 +8,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import com.example.kairos_mobile.util.MainDispatcherRule
 import com.example.kairos_mobile.util.TestFixtures
 import io.mockk.coEvery
@@ -78,7 +79,7 @@ class CaptureViewModelTest {
         unconfirmedCount: Int = 0
     ): CaptureViewModel {
         coEvery { userPreferenceRepository.getString("draft_capture", "") } returns draftText
-        coEvery { userPreferenceRepository.getString("capture_font_size", "MEDIUM") } returns "MEDIUM"
+        coEvery { userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, "MEDIUM") } returns "MEDIUM"
         every { captureRepository.getUnconfirmedCount() } returns flowOf(unconfirmedCount)
         return CaptureViewModel(
             application,

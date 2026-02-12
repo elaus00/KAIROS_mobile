@@ -3,6 +3,7 @@ package com.example.kairos_mobile.presentation.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.model.FontSizePreference
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.domain.repository.AuthRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
@@ -11,6 +12,7 @@ import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,10 +41,6 @@ class SettingsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
-
-    companion object {
-        private const val KEY_CAPTURE_FONT_SIZE = "capture_font_size"
-    }
 
     init {
         loadPreferences()
@@ -86,7 +84,7 @@ class SettingsViewModel @Inject constructor(
     /** 캡처 글씨 크기 로드 */
     private fun loadCaptureFontSize() {
         viewModelScope.launch {
-            val size = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
+            val size = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
             _uiState.update { it.copy(captureFontSize = size) }
         }
     }
@@ -141,7 +139,7 @@ class SettingsViewModel @Inject constructor(
     /** 캡처 글씨 크기 변경 */
     fun setCaptureFontSize(size: String) {
         viewModelScope.launch {
-            userPreferenceRepository.setString(KEY_CAPTURE_FONT_SIZE, size)
+            userPreferenceRepository.setString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, size)
             _uiState.update { it.copy(captureFontSize = size) }
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.CalendarException
 import com.example.kairos_mobile.domain.model.LocalCalendar
 import com.example.kairos_mobile.domain.repository.CalendarRepository
+import com.example.kairos_mobile.domain.usecase.settings.CalendarSettingsKeys
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +41,7 @@ class CalendarSettingsViewModel @Inject constructor(
             val notificationEnabled = getCalendarSettingsUseCase.isNotificationEnabled()
             _uiState.update {
                 it.copy(
-                    isAutoAddEnabled = mode == "auto",
+                    isAutoAddEnabled = mode == CalendarSettingsKeys.MODE_AUTO,
                     isNotificationEnabled = notificationEnabled
                 )
             }
@@ -86,7 +87,7 @@ class CalendarSettingsViewModel @Inject constructor(
 
     /** 자동 추가 토글 (on=auto, off=suggest) */
     fun toggleAutoAdd(enabled: Boolean) {
-        val mode = if (enabled) "auto" else "suggest"
+        val mode = if (enabled) CalendarSettingsKeys.MODE_AUTO else CalendarSettingsKeys.MODE_SUGGEST
         viewModelScope.launch {
             setCalendarSettingsUseCase.setCalendarMode(mode)
             _uiState.update { it.copy(isAutoAddEnabled = enabled) }

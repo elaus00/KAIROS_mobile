@@ -10,6 +10,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import com.example.kairos_mobile.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,7 +38,6 @@ class CaptureViewModel @Inject constructor(
     companion object {
         private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
         private const val KEY_DRAFT_TEXT = "draft_capture"
-        private const val KEY_CAPTURE_FONT_SIZE = "capture_font_size"
     }
 
 
@@ -83,7 +83,7 @@ class CaptureViewModel @Inject constructor(
      */
     fun loadFontSize() {
         viewModelScope.launch {
-            val sizeKey = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
+            val sizeKey = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
             val pref = FontSizePreference.fromString(sizeKey)
             _uiState.update {
                 it.copy(fontSize = pref.captureFontSize, lineHeight = pref.captureLineHeight)

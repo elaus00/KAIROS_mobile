@@ -7,6 +7,7 @@ import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.classification.GetPresetsUseCase
 import com.example.kairos_mobile.domain.usecase.classification.SetCustomInstructionUseCase
 import com.example.kairos_mobile.domain.usecase.classification.SetPresetUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,8 +40,8 @@ class AiClassificationSettingsViewModel @Inject constructor(
     private fun loadPresets() {
         val presets = getPresetsUseCase()
         viewModelScope.launch {
-            val currentPresetId = userPreferenceRepository.getString("classification_preset_id", "default")
-            val currentInstruction = userPreferenceRepository.getString("classification_custom_instruction", "")
+            val currentPresetId = userPreferenceRepository.getString(PreferenceKeys.KEY_CLASSIFICATION_PRESET_ID, "default")
+            val currentInstruction = userPreferenceRepository.getString(PreferenceKeys.KEY_CLASSIFICATION_CUSTOM_INSTRUCTION, "")
             _uiState.update {
                 it.copy(
                     presets = presets,

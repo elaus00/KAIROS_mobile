@@ -25,6 +25,7 @@ import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.classification.BuildModificationHistoryUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ProcessClassificationResultUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import com.example.kairos_mobile.domain.usecase.subscription.CheckFeatureUseCase
 import com.example.kairos_mobile.presentation.widget.WidgetUpdateHelper
 import dagger.assisted.Assisted
@@ -142,8 +143,8 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                         else -> "APP"
                     }
                     // 사용자 분류 프리셋/커스텀 지시 주입
-                    val presetId = userPreferenceRepository.getString("classification_preset_id", "default")
-                    val customInstruction = userPreferenceRepository.getString("classification_custom_instruction", "")
+                    val presetId = userPreferenceRepository.getString(PreferenceKeys.KEY_CLASSIFICATION_PRESET_ID, "default")
+                    val customInstruction = userPreferenceRepository.getString(PreferenceKeys.KEY_CLASSIFICATION_CUSTOM_INSTRUCTION, "")
                     val modificationHistory = buildModificationHistoryUseCase()
                     val userContext = UserContextDto(
                         modificationHistory = modificationHistory.takeIf { it.isNotEmpty() },

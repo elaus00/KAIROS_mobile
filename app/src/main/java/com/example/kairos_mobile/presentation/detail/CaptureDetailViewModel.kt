@@ -16,6 +16,7 @@ import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggesti
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
 import com.example.kairos_mobile.domain.usecase.classification.ChangeClassificationUseCase
+import com.example.kairos_mobile.domain.usecase.settings.PreferenceKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,7 +56,7 @@ class CaptureDetailViewModel @Inject constructor(
     /** 본문 글씨 크기 로드 */
     private fun loadFontSize() {
         viewModelScope.launch {
-            val sizeKey = userPreferenceRepository.getString("capture_font_size", "MEDIUM")
+            val sizeKey = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
             val pref = FontSizePreference.fromString(sizeKey)
             _uiState.update {
                 it.copy(bodyFontSize = pref.bodyFontSize, bodyLineHeight = pref.bodyLineHeight)

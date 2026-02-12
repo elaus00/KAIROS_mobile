@@ -25,6 +25,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.domain.model.LocalCalendar
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
+import com.example.kairos_mobile.presentation.settings.components.NavigationSettingItem
+import com.example.kairos_mobile.presentation.settings.components.SettingsCard
+import com.example.kairos_mobile.presentation.settings.components.SettingsDivider
+import com.example.kairos_mobile.presentation.settings.components.ToggleSettingItem
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
@@ -164,60 +168,6 @@ fun CalendarSettingsScreen(
 // ---- 하위 Composable 컴포넌트 ----
 
 @Composable
-private fun SettingsCard(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val colors = KairosTheme.colors
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(colors.card)
-            .border(0.5.dp, colors.borderLight, RoundedCornerShape(12.dp)),
-        content = content
-    )
-}
-
-@Composable
-private fun NavigationSettingItem(
-    title: String,
-    description: String? = null,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            color = colors.text,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            description?.let {
-                Text(text = it, color = colors.textMuted, fontSize = 14.sp)
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = colors.textMuted,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
-
-@Composable
 private fun ActionItem(
     title: String,
     description: String,
@@ -245,55 +195,6 @@ private fun ActionItem(
             modifier = Modifier.size(20.dp)
         )
     }
-}
-
-@Composable
-private fun ToggleSettingItem(
-    title: String,
-    description: String? = null,
-    isChecked: Boolean,
-    onToggle: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = KairosTheme.colors
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = colors.text, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            if (description != null) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(text = description, color = colors.textMuted, fontSize = 13.sp)
-            }
-        }
-        Switch(
-            checked = isChecked,
-            onCheckedChange = onToggle,
-            modifier = Modifier.scale(0.9f),
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = colors.accent,
-                checkedTrackColor = colors.accent.copy(alpha = 0.3f),
-                checkedBorderColor = colors.accent.copy(alpha = 0.3f),
-                uncheckedThumbColor = colors.textMuted,
-                uncheckedTrackColor = colors.borderLight,
-                uncheckedBorderColor = colors.border
-            )
-        )
-    }
-}
-
-@Composable
-private fun SettingsDivider(modifier: Modifier = Modifier) {
-    val colors = KairosTheme.colors
-    HorizontalDivider(
-        modifier = modifier.padding(horizontal = 16.dp),
-        thickness = 0.5.dp,
-        color = colors.borderLight
-    )
 }
 
 @Composable

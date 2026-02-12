@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.presentation.components.common.PremiumBadge
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
+import com.example.kairos_mobile.presentation.settings.components.SettingsCard
 import com.example.kairos_mobile.presentation.subscription.PremiumGateSheet
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
@@ -235,19 +236,3 @@ fun AiClassificationSettingsScreen(
     }
 }
 
-@Composable
-private fun SettingsCard(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val colors = KairosTheme.colors
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(colors.card)
-            .border(0.5.dp, colors.borderLight, RoundedCornerShape(12.dp)),
-        content = content
-    )
-}

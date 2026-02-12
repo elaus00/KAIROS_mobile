@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.settings
 
+import com.example.kairos_mobile.domain.model.FontSizePreference
 import com.example.kairos_mobile.domain.model.SubscriptionFeatures
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.model.ThemePreference
@@ -31,5 +32,5 @@ data class SettingsUiState(
     val features: SubscriptionFeatures = SubscriptionFeatures(),
 
     // 캡처 글씨 크기 (SMALL / MEDIUM / LARGE)
-    val captureFontSize: String = "MEDIUM"
+    val captureFontSize: String = FontSizePreference.MEDIUM.name
 )
