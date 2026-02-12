@@ -22,7 +22,7 @@ data class Schedule(
     val isAllDay: Boolean = false,
     /** 일정 신뢰도 */
     val confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM,
-    /** Google Calendar 동기화 상태 */
+    /** 기기 캘린더 동기화 상태 */
     val calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED,
     /** 캘린더 이벤트 ID (DB column: google_event_id) */
     val calendarEventId: String? = null,

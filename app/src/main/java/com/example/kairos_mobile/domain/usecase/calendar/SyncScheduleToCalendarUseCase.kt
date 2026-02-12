@@ -19,7 +19,7 @@ interface CalendarNotifier {
 }
 
 /**
- * 일정을 Google Calendar에 동기화하는 UseCase
+ * 일정을 기기 캘린더에 동기화하는 UseCase
  * confidence 기반 AUTO/SUGGEST 분기 + 알림 발행
  */
 @Singleton

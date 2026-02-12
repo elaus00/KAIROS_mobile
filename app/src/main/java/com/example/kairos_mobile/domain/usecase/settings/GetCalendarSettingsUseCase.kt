@@ -12,7 +12,7 @@ class GetCalendarSettingsUseCase @Inject constructor(
     private val userPreferenceRepository: UserPreferenceRepository
 ) {
     /**
-     * Google Calendar 연동 여부
+     * 기기 캘린더 연동 여부
      */
     suspend fun isCalendarEnabled(): Boolean {
         return userPreferenceRepository.getString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "false") == "true"

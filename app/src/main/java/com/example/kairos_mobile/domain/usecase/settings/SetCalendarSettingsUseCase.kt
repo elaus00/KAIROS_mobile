@@ -12,7 +12,7 @@ class SetCalendarSettingsUseCase @Inject constructor(
     private val userPreferenceRepository: UserPreferenceRepository
 ) {
     /**
-     * Google Calendar 연동 설정
+     * 기기 캘린더 연동 설정
      */
     suspend fun setCalendarEnabled(enabled: Boolean) {
         userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, enabled.toString())

@@ -11,6 +11,6 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.5</item>
-        <item name="android:windowSoftInputMode">stateVisible|adjustResize</item>
+        <item name="android:windowSoftInputMode">stateVisible|adjustNothing</item>
     </style>
 </resources>

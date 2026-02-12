@@ -35,6 +35,9 @@ data class CalendarUiState(
     // 로딩 상태
     val isLoading: Boolean = false,
 
+    // 연동 캘린더 이름 (배지/Snackbar 표시용)
+    val targetCalendarName: String? = null,
+
     // 에러 메시지
     val errorMessage: String? = null
 )
@@ -55,7 +58,7 @@ data class ScheduleDisplayItem(
     val location: String?,
     /** 종일 이벤트 여부 */
     val isAllDay: Boolean,
-    /** Google Calendar 동기화 상태 */
+    /** 기기 캘린더 동기화 상태 */
     val calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED
 )
 
@@ -102,7 +105,7 @@ sealed class CalendarUiEvent {
     data class DeleteSuccess(val captureId: String) : CalendarUiEvent()
     data object UndoSuccess : CalendarUiEvent()
     /** 캘린더 동기화 승인 완료 */
-    data object SyncApproved : CalendarUiEvent()
+    data class SyncApproved(val calendarName: String? = null) : CalendarUiEvent()
     /** 캘린더 동기화 거부 완료 */
     data object SyncRejected : CalendarUiEvent()
 }

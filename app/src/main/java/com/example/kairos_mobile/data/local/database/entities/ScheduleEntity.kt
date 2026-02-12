@@ -52,7 +52,7 @@ data class ScheduleEntity(
     // AI 분류 신뢰도: HIGH, MEDIUM, LOW
     val confidence: String,
 
-    // Google Calendar 동기화 상태
+    // 기기 캘린더 동기화 상태
     @ColumnInfo(name = "calendar_sync_status", defaultValue = "NOT_LINKED")
     val calendarSyncStatus: String = "NOT_LINKED",
 

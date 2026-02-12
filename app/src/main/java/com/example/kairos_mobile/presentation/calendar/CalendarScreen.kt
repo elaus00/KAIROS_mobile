@@ -66,8 +66,13 @@ fun CalendarContent(
                     }
                 }
                 CalendarUiEvent.UndoSuccess -> Unit
-                CalendarUiEvent.SyncApproved -> {
-                    snackbarHostState.showSnackbar("캘린더에 추가되었습니다")
+                is CalendarUiEvent.SyncApproved -> {
+                    val message = if (event.calendarName != null) {
+                        "'${event.calendarName}' 캘린더에 추가되었습니다"
+                    } else {
+                        "기기 캘린더에 추가되었습니다"
+                    }
+                    snackbarHostState.showSnackbar(message)
                 }
                 CalendarUiEvent.SyncRejected -> Unit
             }
@@ -131,6 +136,7 @@ fun CalendarContent(
 
                 ScheduleTimeline(
                     schedules = uiState.schedules,
+                    targetCalendarName = uiState.targetCalendarName,
                     onScheduleClick = { /* 상세 네비게이션은 Phase 1-10 */ },
                     onScheduleDelete = { captureId ->
                         viewModel.onEvent(CalendarEvent.DeleteSchedule(captureId))

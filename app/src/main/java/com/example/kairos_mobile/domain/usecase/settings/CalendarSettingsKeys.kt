@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.domain.usecase.settings
 
 /**
- * Google Calendar 설정 키
+ * 기기 캘린더 설정 키
  */
 object CalendarSettingsKeys {
     const val KEY_CALENDAR_ENABLED = "calendar_enabled"

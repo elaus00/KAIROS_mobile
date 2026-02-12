@@ -38,11 +38,15 @@ class MainActivity : ComponentActivity() {
     /** 위젯에서 진입 시 캡처 입력 자동 포커스 (Compose 재합성 트리거) */
     private val autoFocusCapture = mutableStateOf(false)
 
+    /** 위젯에서 할 일 탭 시 상세 화면으로 이동할 captureId */
+    private val pendingCaptureId = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // 위젯 딥링크 처리
         autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
+        pendingCaptureId.value = intent?.getStringExtra("navigate_to_capture_id")
 
         // 공유 인텐트 처리 (텍스트 캡처 저장 + 토스트)
         handleShareIntent(intent)
@@ -66,7 +70,9 @@ class MainActivity : ComponentActivity() {
                     KairosNavGraph(
                         navController = rememberNavController(),
                         startDestination = destination,
-                        autoFocusCapture = autoFocusCapture.value
+                        autoFocusCapture = autoFocusCapture.value,
+                        pendingCaptureId = pendingCaptureId.value,
+                        onPendingCaptureHandled = { pendingCaptureId.value = null }
                     )
                 }
             }
@@ -77,6 +83,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
+        pendingCaptureId.value = intent.getStringExtra("navigate_to_capture_id")
         handleShareIntent(intent)
     }
 

@@ -60,6 +60,7 @@ class CalendarViewModel @Inject constructor(
         loadSchedulesForSelectedDate()
         loadTodos()
         loadDatesWithSchedules()
+        loadTargetCalendarName()
     }
 
     /**
@@ -303,13 +304,31 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
+     * 연동 캘린더 이름 로드
+     */
+    private fun loadTargetCalendarName() {
+        viewModelScope.launch {
+            try {
+                val targetId = calendarRepository.getTargetCalendarId()
+                if (targetId != null) {
+                    val calendars = calendarRepository.getAvailableCalendars()
+                    val name = calendars.firstOrNull { it.id == targetId }?.displayName
+                    _uiState.update { it.copy(targetCalendarName = name) }
+                }
+            } catch (_: Exception) {
+                // 캘린더 이름 로드 실패 시 무시
+            }
+        }
+    }
+
+    /**
      * 캘린더 제안 승인
      */
     private fun approveCalendarSuggestion(scheduleId: String) {
         viewModelScope.launch {
             try {
                 approveSuggestion(scheduleId)
-                _events.emit(CalendarUiEvent.SyncApproved)
+                _events.emit(CalendarUiEvent.SyncApproved(_uiState.value.targetCalendarName))
                 loadSchedulesForSelectedDate()
             } catch (e: Exception) {
                 _uiState.update {

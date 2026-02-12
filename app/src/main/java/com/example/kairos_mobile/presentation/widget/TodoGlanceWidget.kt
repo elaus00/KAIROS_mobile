@@ -195,7 +195,7 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
                     fontSize = 12.sp,
                     color = GlanceTheme.colors.onSurfaceVariant
                 ),
-                modifier = GlanceModifier.padding(vertical = 8.dp)
+                modifier = GlanceModifier.padding(vertical = 12.dp)
             )
         }
     }
@@ -215,7 +215,7 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
         // 체크 아이콘 (44dp 터치 타겟 확보)
         Box(
             modifier = GlanceModifier
-                .size(40.dp)
+                .size(44.dp)
                 .clickable(
                     onClick = actionRunCallback<ToggleTodoAction>(
                         actionParametersOf(TodoGlanceWidget.TodoIdKey to item.todoId)
