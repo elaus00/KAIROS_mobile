@@ -96,7 +96,8 @@ interface NoteDao {
             c.original_text AS original_text,
             c.created_at AS created_at,
             n.body AS body,
-            n.folder_id AS folder_id
+            n.folder_id AS folder_id,
+            c.note_sub_type AS note_sub_type
         FROM notes n
         INNER JOIN captures c ON c.id = n.capture_id
         WHERE n.folder_id = :folderId
@@ -117,7 +118,8 @@ interface NoteDao {
             c.original_text AS original_text,
             c.created_at AS created_at,
             n.body AS body,
-            n.folder_id AS folder_id
+            n.folder_id AS folder_id,
+            c.note_sub_type AS note_sub_type
         FROM notes n
         INNER JOIN captures c ON c.id = n.capture_id
         WHERE c.is_deleted = 0
@@ -188,7 +190,9 @@ data class NoteWithCaptureRow(
     @ColumnInfo(name = "body")
     val body: String? = null,
     @ColumnInfo(name = "folder_id")
-    val folderId: String? = null
+    val folderId: String? = null,
+    @ColumnInfo(name = "note_sub_type")
+    val noteSubType: String? = null
 )
 
 /**

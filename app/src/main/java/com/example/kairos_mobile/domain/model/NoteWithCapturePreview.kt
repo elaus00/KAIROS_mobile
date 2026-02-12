@@ -10,5 +10,6 @@ data class NoteWithCapturePreview(
     val originalText: String,
     val createdAt: Long,
     val body: String? = null,
-    val folderId: String? = null
+    val folderId: String? = null,
+    val noteSubType: String? = null
 )

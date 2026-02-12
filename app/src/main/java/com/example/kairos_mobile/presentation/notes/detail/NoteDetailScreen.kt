@@ -1,7 +1,11 @@
 package com.example.kairos_mobile.presentation.notes.detail
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.core.net.toUri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,8 +16,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,6 +47,12 @@ import java.time.format.DateTimeFormatter
 /**
  * 노트 상세/편집 화면 (Apple Notes 스타일)
  * 콘텐츠 중심 — 제목/본문이 자연스럽게 이어지는 에디터
+ *
+ * 개선사항:
+ * - §4.1 자동 저장: 뒤로가기 시 변경사항 자동 저장
+ * - §4.4 삭제: Snackbar 실행 취소 패턴
+ * - §3.1 폴더 칩 직접 노출: 수정 마찰 3→1탭
+ * - §3.4 원본 텍스트 토글: 원문 확인 가능
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +63,20 @@ fun NoteDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 자동 저장 후 뒤로가기 (§4.1 입력 보호)
+    BackHandler {
+        viewModel.autoSaveAndExit()
+    }
+
+    // navigate back 이벤트 관찰
+    LaunchedEffect(uiState.shouldNavigateBack) {
+        if (uiState.shouldNavigateBack) {
+            viewModel.onNavigateBackHandled()
+            onNavigateBack()
+        }
+    }
 
     // 공유 텍스트가 설정되면 ShareSheet 실행
     LaunchedEffect(uiState.shareText) {
@@ -62,6 +90,20 @@ fun NoteDetailScreen(
         }
     }
 
+    // 삭제 시 Snackbar 표시 (§4.4 실행 취소)
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) {
+            val result = snackbarHostState.showSnackbar(
+                message = "삭제됨",
+                actionLabel = "실행 취소",
+                duration = SnackbarDuration.Long
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.onUndoDelete()
+            }
+        }
+    }
+
     // 폴더 선택 바텀시트 상태
     var showFolderSheet by remember { mutableStateOf(false) }
     // 더보기 메뉴 상태
@@ -72,7 +114,7 @@ fun NoteDetailScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = { viewModel.autoSaveAndExit() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "뒤로가기",
@@ -81,28 +123,7 @@ fun NoteDetailScreen(
                     }
                 },
                 actions = {
-                    // 저장 버튼 (변경사항이 있을 때만)
-                    if (uiState.hasChanges) {
-                        IconButton(
-                            onClick = { viewModel.onSave() },
-                            enabled = !uiState.isSaving
-                        ) {
-                            if (uiState.isSaving) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(18.dp),
-                                    color = colors.accent,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = "저장",
-                                    tint = colors.accent
-                                )
-                            }
-                        }
-                    }
-                    // 더보기 메뉴 (공유, 폴더 이동, 정보)
+                    // 더보기 메뉴 (공유, 폴더 이동, 삭제, 정보)
                     Box {
                         IconButton(onClick = { showMoreMenu = true }) {
                             Icon(
@@ -122,6 +143,10 @@ fun NoteDetailScreen(
                                 showMoreMenu = false
                                 showFolderSheet = true
                             },
+                            onDelete = {
+                                showMoreMenu = false
+                                viewModel.onDelete()
+                            },
                             noteDetail = uiState.noteDetail,
                             folders = uiState.folders,
                             selectedFolderId = uiState.selectedFolderId
@@ -132,6 +157,16 @@ fun NoteDetailScreen(
                     containerColor = colors.background
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = colors.card,
+                    contentColor = colors.text,
+                    actionColor = colors.accent
+                )
+            }
         },
         containerColor = colors.background
     ) { paddingValues ->
@@ -220,11 +255,35 @@ fun NoteDetailScreen(
                         }
                     )
 
-                    // 태그 칩 (있을 때만 표시)
+                    // 태그 + 폴더 칩 (§3.1 직접 노출 — 수정 마찰 1탭)
                     val tags = uiState.noteDetail?.tags ?: emptyList()
-                    if (tags.isNotEmpty()) {
+                    val folderName = uiState.folders.find {
+                        it.id == uiState.selectedFolderId
+                    }?.name
+
+                    if (tags.isNotEmpty() || folderName != null) {
                         Spacer(modifier = Modifier.height(10.dp))
-                        TagRow(tags = tags)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // 폴더 칩 (탭하면 바텀시트 — 1탭으로 수정 가능)
+                            if (folderName != null) {
+                                FolderChip(
+                                    name = folderName,
+                                    onClick = { showFolderSheet = true }
+                                )
+                            }
+                            // 태그
+                            tags.forEach { tag ->
+                                Text(
+                                    text = "#$tag",
+                                    color = colors.textMuted,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -255,6 +314,21 @@ fun NoteDetailScreen(
                             }
                         }
                     )
+
+                    // 원본 텍스트 토글 (§3.4 원본 보존 원칙)
+                    uiState.noteDetail?.let { detail ->
+                        val currentBody = uiState.editedBody
+                        val originalText = detail.originalText
+                        // 현재 편집 중인 본문과 원본이 다를 때만 표시
+                        if (originalText.isNotBlank() && originalText != currentBody) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OriginalTextSection(
+                                originalText = originalText,
+                                expanded = uiState.showOriginalText,
+                                onToggle = { viewModel.onToggleOriginalText() }
+                            )
+                        }
+                    }
 
                     // 첨부 이미지 (라벨 없이, 라운드 카드)
                     uiState.noteDetail?.imageUri?.let { imageUri ->
@@ -293,31 +367,97 @@ fun NoteDetailScreen(
 }
 
 /**
- * 태그 가로 나열 (# 접두사, 작은 칩)
+ * 폴더 칩 (탭하면 바텀시트 열림 — 수정 마찰 1탭)
  */
 @Composable
-private fun TagRow(
-    tags: List<String>,
+private fun FolderChip(
+    name: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = KairosTheme.colors
 
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(colors.chipBg)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        tags.forEach { tag ->
+        Icon(
+            imageVector = Icons.Outlined.Folder,
+            contentDescription = null,
+            tint = colors.textMuted,
+            modifier = Modifier.size(14.dp)
+        )
+        Text(
+            text = name,
+            color = colors.textMuted,
+            fontSize = 13.sp
+        )
+    }
+}
+
+/**
+ * 원본 텍스트 접기/펼치기 섹션 (§3.4 원본 보존 원칙)
+ */
+@Composable
+private fun OriginalTextSection(
+    originalText: String,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = KairosTheme.colors
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        // 토글 버튼
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onToggle)
+                .padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp
+                else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = colors.textMuted,
+                modifier = Modifier.size(16.dp)
+            )
             Text(
-                text = "#$tag",
+                text = if (expanded) "원문 접기" else "원문 보기",
                 color = colors.textMuted,
                 fontSize = 13.sp
+            )
+        }
+
+        // 원문 내용
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Text(
+                text = originalText,
+                color = colors.textSecondary,
+                fontSize = 14.sp,
+                lineHeight = 22.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(colors.chipBg)
+                    .padding(12.dp)
             )
         }
     }
 }
 
 /**
- * 더보기 드롭다운 메뉴 (공유, 폴더 이동, 노트 정보)
+ * 더보기 드롭다운 메뉴 (공유, 폴더 이동, 삭제, 노트 정보)
  */
 @Composable
 private fun NoteMoreMenu(
@@ -325,6 +465,7 @@ private fun NoteMoreMenu(
     onDismiss: () -> Unit,
     onShare: () -> Unit,
     onMoveFolder: () -> Unit,
+    onDelete: () -> Unit,
     noteDetail: com.example.kairos_mobile.domain.model.NoteDetail?,
     folders: List<Folder>,
     selectedFolderId: String?
@@ -387,6 +528,25 @@ private fun NoteMoreMenu(
                 )
             },
             onClick = onMoveFolder
+        )
+        // 삭제 (§4.4 Snackbar 실행 취소)
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = "삭제",
+                    color = colors.danger,
+                    fontSize = 15.sp
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = colors.danger,
+                    modifier = Modifier.size(18.dp)
+                )
+            },
+            onClick = onDelete
         )
         // 노트 정보 (날짜)
         noteDetail?.let { detail ->

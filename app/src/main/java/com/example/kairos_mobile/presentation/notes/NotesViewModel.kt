@@ -93,7 +93,7 @@ class NotesViewModel @Inject constructor(
                 // 폴더 ID → 이름 매핑
                 val folderNameMap = folders.associate { it.id to it.name }
 
-                // 노트 목록 (폴더 이름 포함)
+                // 노트 목록 (폴더 이름 + 서브타입 포함)
                 val notesWithFolder = allNotes.map { preview ->
                     NoteWithCapture(
                         noteId = preview.noteId,
@@ -103,7 +103,8 @@ class NotesViewModel @Inject constructor(
                         createdAt = preview.createdAt,
                         body = preview.body,
                         folderId = preview.folderId,
-                        folderName = preview.folderId?.let { folderNameMap[it] }
+                        folderName = preview.folderId?.let { folderNameMap[it] },
+                        noteSubType = preview.noteSubType
                     )
                 }
 

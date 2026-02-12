@@ -3,11 +3,14 @@ package com.example.kairos_mobile.presentation.notes.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.note.UpdateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +21,7 @@ import javax.inject.Inject
 
 /**
  * 노트 상세 화면 ViewModel
- * 노트 조회, 편집, 저장 처리
+ * 노트 조회, 편집, 자동 저장, 삭제 처리
  */
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
@@ -26,6 +29,7 @@ class NoteDetailViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val folderRepository: FolderRepository,
+    private val captureRepository: CaptureRepository,
     private val trackEventUseCase: TrackEventUseCase
 ) : ViewModel() {
 
@@ -33,6 +37,9 @@ class NoteDetailViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(NoteDetailUiState())
     val uiState: StateFlow<NoteDetailUiState> = _uiState.asStateFlow()
+
+    /** 삭제 후 휴지통 이동 예약 Job (실행 취소 시 취소) */
+    private var trashJob: Job? = null
 
     init {
         loadNoteDetail()
@@ -131,39 +138,96 @@ class NoteDetailViewModel @Inject constructor(
     }
 
     /**
-     * 변경사항 저장
+     * 자동 저장 후 뒤로가기 — §4.1 입력 보호 원칙
+     * 변경사항이 있으면 저장 후 navigate back 이벤트 발생
      */
-    fun onSave() {
+    fun autoSaveAndExit() {
+        val state = _uiState.value
+        if (!state.hasChanges || state.isDeleted) {
+            _uiState.update { it.copy(shouldNavigateBack = true) }
+            return
+        }
+
+        viewModelScope.launch {
+            saveChangesInternal()
+            _uiState.update { it.copy(shouldNavigateBack = true) }
+        }
+    }
+
+    /**
+     * 저장 로직 (내부용)
+     */
+    private suspend fun saveChangesInternal() {
         val state = _uiState.value
         val noteDetail = state.noteDetail ?: return
 
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
-            try {
-                // 제목 변경 확인
-                val titleChanged = state.editedTitle != (noteDetail.aiTitle ?: "")
-                if (titleChanged && state.editedTitle.isNotBlank()) {
-                    updateNoteUseCase.updateTitle(noteDetail.captureId, state.editedTitle)
-                }
-
-                // 본문 변경 확인
-                val bodyChanged = state.editedBody != (noteDetail.body ?: "")
-                if (bodyChanged) {
-                    val newBody = state.editedBody.ifBlank { null }
-                    updateNoteUseCase.updateBody(noteDetail.noteId, newBody)
-                }
-
-                // 폴더 변경 확인
-                val folderChanged = state.selectedFolderId != noteDetail.folderId
-                if (folderChanged && state.selectedFolderId != null) {
-                    updateNoteUseCase.moveToFolder(noteDetail.noteId, state.selectedFolderId)
-                }
-
-                _uiState.update { it.copy(isSaving = false, hasChanges = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isSaving = false, error = e.message) }
+        try {
+            // 제목 변경 확인
+            val titleChanged = state.editedTitle != (noteDetail.aiTitle ?: "")
+            if (titleChanged && state.editedTitle.isNotBlank()) {
+                updateNoteUseCase.updateTitle(noteDetail.captureId, state.editedTitle)
             }
+
+            // 본문 변경 확인 (checkChanges와 동일 기준)
+            val bodyChanged = state.editedBody != (noteDetail.body ?: noteDetail.originalText)
+            if (bodyChanged) {
+                val newBody = state.editedBody.ifBlank { null }
+                updateNoteUseCase.updateBody(noteDetail.noteId, newBody)
+            }
+
+            // 폴더 변경 확인
+            val folderChanged = state.selectedFolderId != noteDetail.folderId
+            if (folderChanged && state.selectedFolderId != null) {
+                updateNoteUseCase.moveToFolder(noteDetail.noteId, state.selectedFolderId)
+            }
+
+            _uiState.update { it.copy(hasChanges = false) }
+        } catch (e: Exception) {
+            _uiState.update { it.copy(error = e.message) }
         }
+    }
+
+    /**
+     * 노트 삭제 — §4.4 Snackbar 실행 취소 패턴
+     * softDelete 후 5초 대기, 실행 취소 없으면 moveToTrash
+     */
+    fun onDelete() {
+        val captureId = _uiState.value.noteDetail?.captureId ?: return
+
+        viewModelScope.launch {
+            captureRepository.softDelete(captureId)
+            _uiState.update { it.copy(isDeleted = true) }
+        }
+
+        // 5초 후 휴지통 이동 예약
+        trashJob = viewModelScope.launch {
+            delay(SNACKBAR_DURATION_MS)
+            captureRepository.moveToTrash(captureId)
+            _uiState.update { it.copy(shouldNavigateBack = true) }
+        }
+    }
+
+    /**
+     * 삭제 실행 취소
+     */
+    fun onUndoDelete() {
+        val captureId = _uiState.value.noteDetail?.captureId ?: return
+
+        // 휴지통 이동 예약 취소
+        trashJob?.cancel()
+        trashJob = null
+
+        viewModelScope.launch {
+            captureRepository.undoSoftDelete(captureId)
+            _uiState.update { it.copy(isDeleted = false) }
+        }
+    }
+
+    /**
+     * navigate back 이벤트 소비
+     */
+    fun onNavigateBackHandled() {
+        _uiState.update { it.copy(shouldNavigateBack = false) }
     }
 
     /**
@@ -220,5 +284,9 @@ class NoteDetailViewModel @Inject constructor(
         return title != (noteDetail.aiTitle ?: "") ||
                 body != (noteDetail.body ?: noteDetail.originalText) ||
                 folderId != noteDetail.folderId
+    }
+
+    companion object {
+        private const val SNACKBAR_DURATION_MS = 5000L
     }
 }

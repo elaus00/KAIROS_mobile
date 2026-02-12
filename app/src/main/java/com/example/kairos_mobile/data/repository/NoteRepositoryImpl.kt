@@ -100,7 +100,8 @@ class NoteRepositoryImpl @Inject constructor(
             originalText = originalText,
             createdAt = createdAt,
             body = body,
-            folderId = folderId
+            folderId = folderId,
+            noteSubType = noteSubType
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -44,7 +44,9 @@ data class NoteWithCapture(
     val createdAt: Long,
     val body: String? = null,
     val folderId: String? = null,
-    val folderName: String? = null
+    val folderName: String? = null,
+    /** 노트 서브 분류 (INBOX, IDEA, BOOKMARK, USER_FOLDER) */
+    val noteSubType: String? = null
 )
 
 /**

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.kairos_mobile.domain.model.ClassifiedType
 import com.example.kairos_mobile.domain.model.NoteDetail
 import com.example.kairos_mobile.domain.model.NoteSubType
+import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
@@ -18,6 +19,7 @@ import io.mockk.runs
 import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -34,7 +36,8 @@ import org.junit.Test
  * NoteDetailViewModel 단위 테스트
  * - 노트 상세 로드
  * - 편집 상태 추적 (제목/본문/폴더)
- * - 저장 위임
+ * - 자동 저장 (autoSaveAndExit)
+ * - 삭제 + 실행 취소
  * - capture_revisited 분석 이벤트
  * - 에러 처리
  */
@@ -47,6 +50,7 @@ class NoteDetailViewModelTest {
     private lateinit var noteRepository: NoteRepository
     private lateinit var updateNoteUseCase: UpdateNoteUseCase
     private lateinit var folderRepository: FolderRepository
+    private lateinit var captureRepository: CaptureRepository
     private lateinit var trackEventUseCase: TrackEventUseCase
 
     @Before
@@ -54,6 +58,7 @@ class NoteDetailViewModelTest {
         noteRepository = mockk()
         updateNoteUseCase = mockk()
         folderRepository = mockk()
+        captureRepository = mockk(relaxed = true)
         trackEventUseCase = mockk(relaxed = true)
     }
 
@@ -97,6 +102,7 @@ class NoteDetailViewModelTest {
             noteRepository,
             updateNoteUseCase,
             folderRepository,
+            captureRepository,
             trackEventUseCase
         )
     }
@@ -201,10 +207,10 @@ class NoteDetailViewModelTest {
         assertEquals("folder-ideas", viewModel.uiState.value.selectedFolderId)
     }
 
-    // ── 6. 저장 → UseCase 위임 ──
+    // ── 6. 자동 저장 → UseCase 위임 ──
 
     @Test
-    fun `save_delegates_title_body_folder_to_usecase`() = runTest {
+    fun `autoSaveAndExit_delegates_changes_to_usecase`() = runTest {
         // given
         val noteDetail = createNoteDetail(aiTitle = "원래", body = "원본", folderId = "f1")
         every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
@@ -216,11 +222,11 @@ class NoteDetailViewModelTest {
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        // when: 제목, 본문, 폴더 모두 변경 후 저장
+        // when: 제목, 본문, 폴더 모두 변경 후 자동 저장
         viewModel.onTitleChanged("새 제목")
         viewModel.onBodyChanged("새 본문")
         viewModel.onFolderChanged("f2")
-        viewModel.onSave()
+        viewModel.autoSaveAndExit()
         advanceUntilIdle()
 
         // then
@@ -228,10 +234,99 @@ class NoteDetailViewModelTest {
         coVerify { updateNoteUseCase.updateBody("note-1", "새 본문") }
         coVerify { updateNoteUseCase.moveToFolder("note-1", "f2") }
         assertFalse(viewModel.uiState.value.hasChanges)
-        assertFalse(viewModel.uiState.value.isSaving)
+        assertTrue(viewModel.uiState.value.shouldNavigateBack)
     }
 
-    // ── 7. capture_revisited 이벤트 ──
+    // ── 7. 변경 없이 autoSaveAndExit → 즉시 네비게이션 ──
+
+    @Test
+    fun `autoSaveAndExit_without_changes_navigates_immediately`() = runTest {
+        // given
+        val noteDetail = createNoteDetail()
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+        assertFalse(viewModel.uiState.value.hasChanges)
+
+        // when
+        viewModel.autoSaveAndExit()
+
+        // then
+        assertTrue(viewModel.uiState.value.shouldNavigateBack)
+    }
+
+    // ── 8. 삭제 → softDelete 호출 ──
+
+    @Test
+    fun `delete_calls_softDelete_and_sets_isDeleted`() = runTest {
+        // given
+        val noteDetail = createNoteDetail()
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // when
+        viewModel.onDelete()
+        advanceUntilIdle()
+
+        // then
+        coVerify { captureRepository.softDelete("cap-1") }
+        assertTrue(viewModel.uiState.value.isDeleted)
+    }
+
+    // ── 9. 삭제 실행 취소 → undoSoftDelete ──
+
+    @Test
+    fun `undo_delete_calls_undoSoftDelete_and_resets_state`() = runTest {
+        // given
+        val noteDetail = createNoteDetail()
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onDelete()
+        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isDeleted)
+
+        // when
+        viewModel.onUndoDelete()
+        advanceUntilIdle()
+
+        // then
+        coVerify { captureRepository.undoSoftDelete("cap-1") }
+        assertFalse(viewModel.uiState.value.isDeleted)
+    }
+
+    // ── 10. 삭제 후 5초 경과 → moveToTrash ──
+
+    @Test
+    fun `delete_moves_to_trash_after_timeout`() = runTest {
+        // given
+        val noteDetail = createNoteDetail()
+        every { noteRepository.getNoteDetail("note-1") } returns flowOf(noteDetail)
+        every { folderRepository.getAllFolders() } returns flowOf(emptyList())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // when
+        viewModel.onDelete()
+        advanceUntilIdle()
+        advanceTimeBy(6000L)
+        advanceUntilIdle()
+
+        // then
+        coVerify { captureRepository.moveToTrash("cap-1") }
+        assertTrue(viewModel.uiState.value.shouldNavigateBack)
+    }
+
+    // ── 11. capture_revisited 이벤트 ──
 
     @Test
     fun `capture_revisited_event_tracked_on_first_load`() = runTest {
@@ -253,7 +348,7 @@ class NoteDetailViewModelTest {
         }
     }
 
-    // ── 8. 원본 텍스트 토글 ──
+    // ── 12. 원본 텍스트 토글 ──
 
     @Test
     fun `toggle_original_text_flips_flag`() = runTest {
@@ -275,7 +370,7 @@ class NoteDetailViewModelTest {
         assertFalse(viewModel.uiState.value.showOriginalText)
     }
 
-    // ── 9. 에러 닫기 ──
+    // ── 13. 에러 닫기 ──
 
     @Test
     fun `error_dismissed_clears_error`() = runTest {
@@ -289,7 +384,7 @@ class NoteDetailViewModelTest {
         advanceUntilIdle()
 
         viewModel.onTitleChanged("에러 유발")
-        viewModel.onSave()
+        viewModel.autoSaveAndExit()
         advanceUntilIdle()
         assertNotNull(viewModel.uiState.value.error)
 
