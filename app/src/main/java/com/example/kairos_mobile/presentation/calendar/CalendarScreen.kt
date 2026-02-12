@@ -84,13 +84,23 @@ fun CalendarContent(
             .fillMaxSize()
             .background(colors.background)
     ) {
-        // 월간/주간 모두 캘린더 카드가 콘텐츠와 함께 스크롤
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(24.dp))
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 고정 헤더
+            Text(
+                text = "일정 및 할 일",
+                color = colors.text,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+            )
+
+            // 스크롤 콘텐츠
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
 
             CalendarCard(
                 selectedDate = uiState.selectedDate,
@@ -171,6 +181,7 @@ fun CalendarContent(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+            }
             }
         }
 

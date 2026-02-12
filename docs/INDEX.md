@@ -44,7 +44,7 @@ Docs/
 | `functional_spec.md` | 기능명세서 — 동작 규칙, 상태 전이, 엣지 케이스 | v2.3 | PRD v10.0, 데이터모델 v2.0 | 2026-02-07 |
 | `data_model_spec.md` | 데이터모델 명세서 — 스키마, 관계, 상태 머신 | v2.2 | PRD v10.0, 기능명세서 v2.3 | 2026-02-12 |
 | `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.5 | PRD v10.0, 기능명세서 v2.3, 데이터모델 v2.0 | 2026-02-10 |
-| `design-guide.md` | 디자인 가이드 — 색상/타이포/간격/컴포넌트/금지사항 | v1.1 | PRD v10.0 | 2026-02-12 |
+| `design-guide.md` | 디자인 가이드 — 철학/구현원칙/색상/타이포/간격/컴포넌트/UX패턴/라이팅/접근성 | v2.0 | PRD v10.0, philosophy_principles v2.0, Apple HIG | 2026-02-12 |
 | `ux-writing-audit.md` | UX 라이팅 감사 — P0 8건 반영 완료, P1 16건, P2 17건 | v1.1 | PRD v10.0, design-guide v1.1 | 2026-02-12 |
 
 ### plan/
@@ -120,6 +120,8 @@ Docs/
 |------|------|-----------|
 | 2026-02-12 | `INDEX.md` | 문서 정리: 아카이브 9건, 삭제 3건, 누락 6건 등록, 디렉토리 구조 갱신 |
 | 2026-02-12 | `ROADMAP.md` | screen-spec 경로 수정, Phase 2b 테스트 완료 반영, 아카이브 경로 갱신 |
+| 2026-02-12 | `design-guide.md` | v1.1→v2.0: philosophy_principles+Apple HIG 통합, 구현원칙(Theme우선/라이브러리우선) 추가, UX패턴/라이팅/접근성 섹션 신설 |
+| 2026-02-12 | `CLAUDE.md` | UI 작업 필수 참조 3개 문서 + 핵심 구현 규칙 섹션 추가 |
 | 2026-02-12 | `design-guide.md` | v1.0→v1.1: textMuted/placeholder WCAG AA 색상값 갱신 (Light #737373, Dark #7A7A7A) |
 | 2026-02-12 | `ux-writing-audit.md` | v1.0→v1.1: P0 8건 전체 반영 완료 마킹 |
 | 2026-02-12 | `philosophy_principles.md` | Snackbar 5초→3초 수정 (PRD v10.0 반영) |

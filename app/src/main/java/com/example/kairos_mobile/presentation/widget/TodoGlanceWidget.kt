@@ -54,9 +54,9 @@ import java.util.Locale
 /**
  * 할 일 홈 화면 위젯 (Glance)
  * - 오늘 마감 할 일 표시 (완료 포함, 미완료 우선)
+ * - 헤더에 오늘 날짜 + 바로가기 버튼
  * - 체크 토글: 완료 아이콘 + 취소선, 미완료 빈 원
  * - GlanceTheme 자동 다크/라이트 대응
- * - "+N개 더" 오버플로우 표시
  */
 class TodoGlanceWidget : GlanceAppWidget() {
 
@@ -74,10 +74,12 @@ class TodoGlanceWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val (items, totalCount) = loadData(context)
+        val todayLabel = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
+            .format(Date())
 
         provideContent {
             GlanceTheme {
-                TodoContent(items, totalCount)
+                TodoContent(items, totalCount, todayLabel)
             }
         }
     }
@@ -124,7 +126,11 @@ class ToggleTodoAction : ActionCallback {
 }
 
 @Composable
-private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
+private fun TodoContent(
+    items: List<TodoWithCaptureRow>,
+    totalCount: Int,
+    todayLabel: String
+) {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
@@ -132,7 +138,7 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
             .cornerRadius(16.dp)
             .padding(16.dp)
     ) {
-        // 헤더
+        // 헤더: 제목 + 날짜 + 바로가기
         Row(
             modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -140,22 +146,32 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
             Text(
                 text = "오늘 할 일",
                 style = TextStyle(
-                    fontSize = 20.sp,
+                    fontSize = 20.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = GlanceTheme.colors.onBackground
-                ),
-                modifier = GlanceModifier.defaultWeight()
-            )
-            if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
-                val overflow = totalCount - TodoGlanceWidget.DISPLAY_LIMIT
-                Text(
-                    text = "+${overflow}개 더",
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant
-                    )
                 )
-            }
+            )
+            Spacer(modifier = GlanceModifier.width(8.dp))
+            Text(
+                text = todayLabel,
+                style = TextStyle(
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = GlanceTheme.colors.onSurfaceVariant
+                )
+            )
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            // 바로가기 버튼 (우측 상단)
+            Text(
+                text = "바로가기",
+                style = TextStyle(
+                    fontSize = 12.5.sp,
+                    color = GlanceTheme.colors.primary
+                ),
+                modifier = GlanceModifier
+                    .padding(vertical = 4.dp)
+                    .clickable(onClick = actionStartActivity<MainActivity>())
+            )
         }
 
         // 할 일 리스트 또는 빈 상태
@@ -167,7 +183,7 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
                 Text(
                     text = "할 일을 모두 완료했어요!",
                     style = TextStyle(
-                        fontSize = 16.sp,
+                        fontSize = 16.5.sp,
                         color = GlanceTheme.colors.onSurfaceVariant
                     )
                 )
@@ -178,25 +194,25 @@ private fun TodoContent(items: List<TodoWithCaptureRow>, totalCount: Int) {
                 items(items, itemId = { it.todoId.hashCode().toLong() }) { item ->
                     TodoItemRow(item, timeFormat)
                 }
+                // 오버플로우 표시
+                if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
+                    val overflow = totalCount - TodoGlanceWidget.DISPLAY_LIMIT
+                    item(itemId = -1L) {
+                        Box(
+                            modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "+${overflow}개 더 있음",
+                                style = TextStyle(
+                                    fontSize = 12.5.sp,
+                                    color = GlanceTheme.colors.onSurfaceVariant
+                                )
+                            )
+                        }
+                    }
+                }
             }
-        }
-
-        // 앱 열기 (44dp 터치 타겟 확보)
-        Box(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .padding(top = 4.dp)
-                .clickable(onClick = actionStartActivity<MainActivity>()),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "앱 열기",
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = GlanceTheme.colors.onSurfaceVariant
-                ),
-                modifier = GlanceModifier.padding(vertical = 12.dp)
-            )
         }
     }
 }
@@ -242,7 +258,7 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
         Text(
             text = title,
             style = TextStyle(
-                fontSize = 16.sp,
+                fontSize = 16.5.sp,
                 color = textColor,
                 textDecoration = textDecoration
             ),
@@ -266,7 +282,7 @@ private fun TodoItemRow(item: TodoWithCaptureRow, timeFormat: SimpleDateFormat) 
                     timeFormat.format(Date(item.deadline))
                 },
                 style = TextStyle(
-                    fontSize = 12.sp,
+                    fontSize = 12.5.sp,
                     fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal,
                     color = when {
                         item.isCompleted -> GlanceTheme.colors.outline

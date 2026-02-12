@@ -41,6 +41,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -52,6 +54,7 @@ import com.example.kairos_mobile.ui.theme.KairosTheme
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 /**
  * TaskList 컴포넌트
@@ -108,18 +111,20 @@ private fun DraggableTaskList(
 ) {
     val colors = KairosTheme.colors
     val haptic = LocalHapticFeedback.current
+    val density = LocalDensity.current
 
     // 드래그 상태 관리
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
     var draggingIndex by remember { mutableIntStateOf(-1) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
-    val itemHeight = 62f // 대략적인 아이템 높이 (dp 기준)
+    var measuredItemHeight by remember { mutableFloatStateOf(0f) }
+    val spacingPx = with(density) { 6.dp.toPx() }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         currentList.forEachIndexed { index, task ->
             key(task.todoId) {
@@ -128,10 +133,17 @@ private fun DraggableTaskList(
                 Box(
                     modifier = Modifier
                         .zIndex(if (isDragging) 1f else 0f)
+                        .onSizeChanged { size ->
+                            if (measuredItemHeight == 0f) {
+                                measuredItemHeight = size.height.toFloat()
+                            }
+                        }
                         .graphicsLayer {
                             if (isDragging) {
                                 translationY = dragOffsetY
-                                shadowElevation = 8f
+                                shadowElevation = 2f
+                                scaleX = 1.01f
+                                scaleY = 1.01f
                             }
                         }
                 ) {
@@ -147,7 +159,8 @@ private fun DraggableTaskList(
                         },
                         onDrag = { deltaY ->
                             dragOffsetY += deltaY
-                            val targetIndex = (index + (dragOffsetY / itemHeight).toInt())
+                            val slotHeight = if (measuredItemHeight > 0f) measuredItemHeight + spacingPx else 60f
+                            val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
                                 .coerceIn(0, currentList.size - 1)
                             if (targetIndex != index && targetIndex != draggingIndex) {
                                 currentList.add(targetIndex, currentList.removeAt(draggingIndex))
@@ -168,7 +181,7 @@ private fun DraggableTaskList(
 }
 
 /**
- * 드래그 핸들이 포함된 할 일 아이템
+ * 할 일 아이템 (아이템 전체에서 long press → 드래그 순서 변경)
  */
 @Composable
 private fun TaskItemWithDragHandle(
@@ -187,19 +200,23 @@ private fun TaskItemWithDragHandle(
     // 확장 가능 여부 판단
     val hasExpandableContent = task.deadline != null || task.title.length > 25
 
-    // 드래그 중 배경색 변경
-    val cardBackground by animateColorAsState(
-        targetValue = if (isDragging) colors.accentBg else colors.card,
-        animationSpec = tween(durationMillis = 150),
-        label = "dragBg"
-    )
-
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(cardBackground)
-            .border(1.dp, if (isDragging) colors.accent.copy(alpha = 0.3f) else colors.border, RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { onDragStart() },
+                    onDrag = { change, offset ->
+                        change.consume()
+                        onDrag(offset.y)
+                    },
+                    onDragEnd = { onDragEnd() },
+                    onDragCancel = { onDragEnd() }
+                )
+            }
             .clickable {
                 if (isExpanded) {
                     onTaskAction()
@@ -209,34 +226,13 @@ private fun TaskItemWithDragHandle(
                     onTaskAction()
                 }
             }
-            .padding(start = 4.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 드래그 핸들
-                Icon(
-                    imageVector = Icons.Default.DragHandle,
-                    contentDescription = "순서 변경",
-                    tint = colors.textMuted.copy(alpha = 0.3f),
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(12.dp)
-                        .pointerInput(Unit) {
-                            detectDragGesturesAfterLongPress(
-                                onDragStart = { onDragStart() },
-                                onDrag = { change, offset ->
-                                    change.consume()
-                                    onDrag(offset.y)
-                                },
-                                onDragEnd = { onDragEnd() },
-                                onDragCancel = { onDragEnd() }
-                            )
-                        }
-                )
-
                 // 내용
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -284,7 +280,7 @@ private fun TaskItemWithDragHandle(
             }
 
             AnimatedVisibility(visible = isExpanded && hasExpandableContent) {
-                Column(modifier = Modifier.padding(top = 8.dp, start = 48.dp)) {
+                Column(modifier = Modifier.padding(top = 8.dp)) {
                     // 확장 시 제목 전문 표시 (긴 제목일 때)
                     if (task.title.length > 25) {
                         Text(

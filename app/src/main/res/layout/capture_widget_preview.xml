@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 캡처 위젯 피커 미리보기 (API 31+) -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 캡처 위젯 피커 미리보기 (API 31+, 대형 노트패드 스타일) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/widget_preview_bg"
-    android:padding="12dp">
+    android:padding="16dp">
 
+    <!-- 노트패드 스타일 입력 영역 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:gravity="top|start"
         android:background="@drawable/widget_input_preview_bg"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp">
+        android:padding="16dp">
 
         <ImageView
             android:layout_width="20dp"
@@ -24,20 +25,22 @@
             android:tint="#6750A4" />
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="무엇이든 캡처하세요"
             android:textSize="16sp"
             android:textColor="#999999" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#6750A4" />
     </LinearLayout>
-</FrameLayout>
+
+    <!-- 하단: 오늘 캡처 수 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:paddingTop="8dp"
+        android:text="오늘 3개"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#6750A4" />
+</LinearLayout>

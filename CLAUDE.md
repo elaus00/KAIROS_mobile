@@ -35,6 +35,19 @@ presentation/ → domain/ → data/ (단방향 의존)
 - Room: 스키마 변경 시 Migration + 버전 증가 필수
 - 보안: API 키 하드코딩 금지, EncryptedSharedPreferences 사용
 
+## UI 작업 필수 참조
+
+UI/UX 관련 작업(화면 추가, 컴포넌트 수정, 디자인 변경 등) 시 반드시 아래 3개 문서를 참조해야 한다:
+
+1. **`docs/direction/philosophy_principles.md`** — 철학 및 설계 판단 기준 (최상위)
+2. **`docs/specs/design-guide.md`** — 디자인 시스템 (색상/타이포/간격/컴포넌트/UX 패턴/구현 원칙)
+3. **`.claude/skills/apple_hig_guide/SKILL.md`** — Apple HIG 기반 디자인 원칙
+
+핵심 구현 규칙:
+- **Theme 우선**: 하드코딩 `Color(0xFF...)` 금지, 반드시 `KairosTheme.colors` 토큰 사용
+- **라이브러리 우선**: 커스텀 XML drawable/Canvas 대신 Material Icons, Material3 컴포넌트 사용
+- **Material3 오버라이드**: Material3 컴포넌트 사용 시 반드시 KairosTheme 색상을 명시적으로 적용
+
 ## 문서 체계 및 컨텍스트 관리
 
 ### Docs 디렉토리 구조
