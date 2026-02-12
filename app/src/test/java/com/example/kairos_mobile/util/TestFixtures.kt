@@ -92,7 +92,7 @@ object TestFixtures {
         location: String? = null,
         isAllDay: Boolean = false,
         calendarSyncStatus: CalendarSyncStatus = CalendarSyncStatus.NOT_LINKED,
-        googleEventId: String? = null
+        calendarEventId: String? = null
     ) = Schedule(
         id = id,
         captureId = captureId,
@@ -101,7 +101,7 @@ object TestFixtures {
         location = location,
         isAllDay = isAllDay,
         calendarSyncStatus = calendarSyncStatus,
-        googleEventId = googleEventId
+        calendarEventId = calendarEventId
     )
 
     fun classificationLog(

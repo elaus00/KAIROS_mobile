@@ -14,6 +14,7 @@ import com.example.kairos_mobile.data.repository.FolderRepositoryImpl
 import com.example.kairos_mobile.data.repository.NoteRepositoryImpl
 import com.example.kairos_mobile.data.repository.ScheduleRepositoryImpl
 import com.example.kairos_mobile.data.repository.SyncQueueRepositoryImpl
+import com.example.kairos_mobile.data.repository.SyncRepositoryImpl
 import com.example.kairos_mobile.data.repository.TagRepositoryImpl
 import com.example.kairos_mobile.data.repository.TodoRepositoryImpl
 import com.example.kairos_mobile.data.repository.UserPreferenceRepositoryImpl
@@ -30,6 +31,7 @@ import com.example.kairos_mobile.domain.repository.ExtractedEntityRepository
 import com.example.kairos_mobile.domain.repository.FolderRepository
 import com.example.kairos_mobile.domain.repository.NoteRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
+import com.example.kairos_mobile.domain.repository.SyncRepository
 import com.example.kairos_mobile.domain.repository.SyncQueueRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
 import com.example.kairos_mobile.domain.repository.TodoRepository
@@ -94,6 +96,12 @@ abstract class RepositoryModule {
     abstract fun bindSyncQueueRepository(
         impl: SyncQueueRepositoryImpl
     ): SyncQueueRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncRepository(
+        impl: SyncRepositoryImpl
+    ): SyncRepository
 
     @Binds
     @Singleton

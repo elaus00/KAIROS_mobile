@@ -8,11 +8,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.ui.theme.KairosTheme
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.launch
 
 /**
  * 로그인 화면
@@ -27,9 +36,35 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
+    val context = LocalContext.current
+    val credentialManager = remember { CredentialManager.create(context) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) onLoginSuccess()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                LoginEvent.LaunchGoogleLogin -> {
+                    scope.launch {
+                        val idToken = requestGoogleIdToken(context = context, credentialManager = credentialManager)
+                        if (idToken != null) {
+                            viewModel.onGoogleIdTokenReceived(idToken)
+                        } else {
+                            viewModel.onGoogleLoginError(
+                                if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isBlank()) {
+                                    "GOOGLE_WEB_CLIENT_ID를 설정해주세요."
+                                } else {
+                                    "Google 로그인에 실패했습니다. 다시 시도해주세요."
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -127,5 +162,39 @@ fun LoginScreen(
                 color = colors.textMuted
             )
         }
+    }
+}
+
+private suspend fun requestGoogleIdToken(
+    context: android.content.Context,
+    credentialManager: CredentialManager
+): String? {
+    if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isBlank()) {
+        return null
+    }
+
+    val googleIdOption = GetGoogleIdOption.Builder()
+        .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+        .setFilterByAuthorizedAccounts(false)
+        .setAutoSelectEnabled(false)
+        .build()
+
+    val request = GetCredentialRequest.Builder()
+        .addCredentialOption(googleIdOption)
+        .build()
+
+    return try {
+        val result = credentialManager.getCredential(context, request)
+        val credential = result.credential
+        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            googleIdTokenCredential.idToken
+        } else {
+            null
+        }
+    } catch (_: GetCredentialException) {
+        null
+    } catch (_: GoogleIdTokenParsingException) {
+        null
     }
 }

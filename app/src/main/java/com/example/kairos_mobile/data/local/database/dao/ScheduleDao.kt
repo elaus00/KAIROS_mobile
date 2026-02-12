@@ -98,8 +98,12 @@ interface ScheduleDao {
      */
     @Query("""
         UPDATE schedules
-        SET calendar_sync_status = :status, google_event_id = :googleEventId, updated_at = :updatedAt
+        SET calendar_sync_status = :status, google_event_id = :calendarEventId, updated_at = :updatedAt
         WHERE id = :id
     """)
-    suspend fun updateCalendarSync(id: String, status: String, googleEventId: String?, updatedAt: Long = System.currentTimeMillis())
+    suspend fun updateCalendarSync(id: String, status: String, calendarEventId: String?, updatedAt: Long = System.currentTimeMillis())
+
+    /** 동기화용 전체 일정 조회 */
+    @Query("SELECT * FROM schedules")
+    suspend fun getAllForSync(): List<ScheduleEntity>
 }

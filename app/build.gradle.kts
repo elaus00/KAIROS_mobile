@@ -31,6 +31,10 @@ android {
         ?: "https://gifted-michiko-auric.ngrok-free.dev/api/v1"
     val benchmarkApiBaseUrl = (project.findProperty("KAIROS_BENCHMARK_API_BASE_URL") as String?)
         ?: debugApiBaseUrl
+    val googleAndroidClientId = (project.findProperty("GOOGLE_ANDROID_CLIENT_ID") as String?)
+        ?: ""
+    val googleWebClientId = (project.findProperty("GOOGLE_WEB_CLIENT_ID") as String?)
+        ?: ""
 
     // Keystore 설정 로드 (릴리스 서명용)
     val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -53,7 +57,8 @@ android {
             // 기본값은 Android 에뮬레이터(localhost -> 10.0.2.2)
             // 필요 시 -PKAIROS_API_BASE_URL=https://... 로 오버라이드 가능
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
-            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
+            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         create("benchmark") {
@@ -62,7 +67,8 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
             buildConfigField("String", "API_BASE_URL", "\"$benchmarkApiBaseUrl\"")
-            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
+            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
@@ -74,7 +80,8 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "API_BASE_URL", "\"https://api.kairos.app/api/v1\"")
-            buildConfigField("String", "GOOGLE_OAUTH_CLIENT_ID", "\"\"")
+            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
         }
     }
@@ -267,9 +274,10 @@ dependencies {
 
     // Security (EncryptedSharedPreferences)
     implementation(libs.security.crypto)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play)
+    implementation(libs.googleid)
 
-    // Browser (Chrome Custom Tabs for OAuth)
-    implementation(libs.browser)
     implementation(libs.androidx.profileinstaller)
 
     // Google Play Billing

@@ -55,4 +55,8 @@ interface FolderDao {
     @Query("SELECT * FROM folders WHERE name = :name AND type = :type LIMIT 1")
     suspend fun getByNameAndType(name: String, type: String): FolderEntity?
 
+    /** 동기화용 전체 폴더 조회 */
+    @Query("SELECT * FROM folders")
+    suspend fun getAllForSync(): List<FolderEntity>
+
 }

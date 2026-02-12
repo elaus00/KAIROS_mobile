@@ -260,4 +260,8 @@ interface CaptureDao {
         offset: Int
     ): List<CaptureEntity>
 
+    /** 동기화용 전체 캡처 조회 */
+    @Query("SELECT * FROM captures")
+    suspend fun getAllForSync(): List<CaptureEntity>
+
 }

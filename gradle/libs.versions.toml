@@ -27,7 +27,8 @@ coil-compose = "2.5.0"
 datastore = "1.0.0"
 glance = "1.1.1"
 securityCrypto = "1.0.0"
-browser = "1.7.0"
+credentials = "1.3.0"
+googleid = "1.1.1"
 benchmarkMacro = "1.3.4"
 uiautomator = "2.3.0"
 baselineProfilePlugin = "1.3.4"
@@ -119,9 +120,10 @@ glance-material3 = { group = "androidx.glance", name = "glance-material3", versi
 
 # Security
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+credentials-play = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
-# Browser (Chrome Custom Tabs)
-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacro" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }

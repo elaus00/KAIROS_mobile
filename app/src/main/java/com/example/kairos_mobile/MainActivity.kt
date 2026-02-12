@@ -1,7 +1,6 @@
 package com.example.kairos_mobile
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -15,11 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.kairos_mobile.domain.model.CaptureSource
 import com.example.kairos_mobile.domain.model.ThemePreference
-import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.settings.CalendarSettingsKeys
-import com.example.kairos_mobile.data.remote.oauth.GoogleOAuthUrlBuilder
 import com.example.kairos_mobile.navigation.KairosNavGraph
 import com.example.kairos_mobile.navigation.NavRoutes
 import com.example.kairos_mobile.ui.theme.KAIROS_mobileTheme
@@ -39,9 +35,6 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userPreferenceRepository: UserPreferenceRepository
 
-    @Inject
-    lateinit var calendarRepository: CalendarRepository
-
     /** 위젯에서 진입 시 캡처 입력 자동 포커스 (Compose 재합성 트리거) */
     private val autoFocusCapture = mutableStateOf(false)
 
@@ -50,9 +43,6 @@ class MainActivity : ComponentActivity() {
 
         // 위젯 딥링크 처리
         autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
-
-        // OAuth 딥링크 콜백 처리 (자동 코드 교환)
-        handleOAuthCallback(intent)
 
         // 공유 인텐트 처리 (텍스트 캡처 저장 + 토스트)
         handleShareIntent(intent)
@@ -87,7 +77,6 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
-        handleOAuthCallback(intent)
         handleShareIntent(intent)
     }
 
@@ -119,48 +108,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun handleOAuthCallback(intent: Intent?) {
-        if (intent?.action != Intent.ACTION_VIEW) return
-
-        val uri = intent.data ?: return
-        if (!isOAuthRedirect(uri)) return
-
-        val error = uri.getQueryParameter("error")
-        if (!error.isNullOrBlank()) {
-            Toast.makeText(this, "Google 연결 실패: $error", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val code = uri.getQueryParameter("code")
-        if (code.isNullOrBlank()) return
-
-        lifecycleScope.launch {
-            runCatching {
-                calendarRepository.exchangeCalendarToken(
-                    code = code,
-                    redirectUri = GoogleOAuthUrlBuilder.REDIRECT_URI
-                )
-            }.onSuccess { connected ->
-                if (connected) {
-                    userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
-                    Toast.makeText(this@MainActivity, "Google Calendar 연결 완료", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@MainActivity, "Google Calendar 연결 실패", Toast.LENGTH_SHORT).show()
-                }
-            }.onFailure { throwable ->
-                Toast.makeText(
-                    this@MainActivity,
-                    throwable.message ?: "Google Calendar 연결 실패",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun isOAuthRedirect(uri: Uri): Boolean {
-        if (uri.scheme != GoogleOAuthUrlBuilder.REDIRECT_SCHEME) return false
-        val pathMatched = uri.path == GoogleOAuthUrlBuilder.REDIRECT_PATH
-        val hostMatched = uri.host == GoogleOAuthUrlBuilder.REDIRECT_HOST
-        return pathMatched || hostMatched
-    }
 }

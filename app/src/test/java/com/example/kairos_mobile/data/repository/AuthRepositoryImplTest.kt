@@ -210,7 +210,7 @@ class AuthRepositoryImplTest {
         repository.logout()
 
         // Then
-        verify { database.clearAllTables() }
+        verify(exactly = 0) { database.clearAllTables() }
         verify { editor.remove("auth_access_token") }
         verify { editor.remove("auth_refresh_token") }
         verify { editor.remove("auth_token_expires_at") }

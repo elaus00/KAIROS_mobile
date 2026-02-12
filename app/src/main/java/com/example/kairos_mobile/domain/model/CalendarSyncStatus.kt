@@ -1,7 +1,7 @@
 package com.example.kairos_mobile.domain.model
 
 /**
- * Google Calendar 동기화 상태
+ * 캘린더 동기화 상태
  */
 enum class CalendarSyncStatus {
     /** 연결되지 않음 */

@@ -1,5 +1,6 @@
 package com.example.kairos_mobile.presentation.onboarding
 
+import android.Manifest
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.LocalIndication
@@ -26,6 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.kairos_mobile.ui.theme.KairosTheme
 import kotlinx.coroutines.launch
 
@@ -45,6 +48,13 @@ fun OnboardingScreen(
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
     val scope = rememberCoroutineScope()
+    val calendarPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        val readGranted = result[Manifest.permission.READ_CALENDAR] == true
+        val writeGranted = result[Manifest.permission.WRITE_CALENDAR] == true
+        viewModel.onCalendarPermissionResult(readGranted && writeGranted)
+    }
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -92,11 +102,18 @@ fun OnboardingScreen(
             when (page) {
                 0 -> OnboardingPage1(colors = colors)
                 1 -> OnboardingPage2(colors = colors)
-                2 -> OnboardingPageGoogle(
+                2 -> OnboardingPageCalendar(
                     colors = colors,
-                    isConnected = uiState.isGoogleConnected,
-                    errorMessage = uiState.googleConnectionError,
-                    onConnect = viewModel::connectGoogle
+                    isConnected = uiState.isCalendarPermissionGranted,
+                    errorMessage = uiState.calendarConnectionError,
+                    onConnect = {
+                        calendarPermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.READ_CALENDAR,
+                                Manifest.permission.WRITE_CALENDAR
+                            )
+                        )
+                    }
                 )
                 3 -> OnboardingPage3(
                     colors = colors,
@@ -216,10 +233,10 @@ private fun OnboardingPage2(colors: com.example.kairos_mobile.ui.theme.KairosCol
 }
 
 /**
- * 온보딩 Google Calendar 연결 페이지
+ * 온보딩 캘린더 권한 연결 페이지
  */
 @Composable
-private fun OnboardingPageGoogle(
+private fun OnboardingPageCalendar(
     colors: com.example.kairos_mobile.ui.theme.KairosColors,
     isConnected: Boolean,
     errorMessage: String?,
@@ -233,7 +250,7 @@ private fun OnboardingPageGoogle(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Google Calendar\n연동",
+            text = "캘린더 연동",
             color = colors.text,
             fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold,
@@ -290,7 +307,7 @@ private fun OnboardingPageGoogle(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (errorMessage != null) "다시 시도" else "Google Calendar 연결",
+                    text = if (errorMessage != null) "다시 시도" else "캘린더 권한 허용",
                     color = if (colors.isDark) colors.background else Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold

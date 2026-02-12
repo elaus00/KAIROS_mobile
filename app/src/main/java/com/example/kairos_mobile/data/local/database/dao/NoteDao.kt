@@ -167,6 +167,10 @@ interface NoteDao {
         WHERE n.id = :noteId
     """)
     fun getNoteWithCapture(noteId: String): Flow<NoteDetailRow?>
+
+    /** 동기화용 전체 노트 조회 */
+    @Query("SELECT * FROM notes")
+    suspend fun getAllForSync(): List<NoteEntity>
 }
 
 data class FolderNoteCountRow(

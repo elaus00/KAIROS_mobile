@@ -3,7 +3,8 @@ package com.example.kairos_mobile.presentation.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.CalendarApiException
+import com.example.kairos_mobile.domain.model.CalendarException
+import com.example.kairos_mobile.domain.model.LocalCalendar
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.domain.repository.AuthRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
@@ -53,14 +54,13 @@ class SettingsViewModel @Inject constructor(
     init {
         loadPreferences()
         loadCalendarSettings()
+        refreshCalendarPermissionState()
         loadAccountInfo()
         loadPresets()
         loadCaptureFontSize()
     }
 
-    /**
-     * 설정 값 로드
-     */
+    /** 설정 값 로드 */
     private fun loadPreferences() {
         viewModelScope.launch {
             userPreferenceRepository.getThemePreference().collect { theme ->
@@ -69,9 +69,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 캘린더 설정 로드
-     */
+    /** 캘린더 설정 로드 */
     private fun loadCalendarSettings() {
         viewModelScope.launch {
             val calendarEnabled = getCalendarSettingsUseCase.isCalendarEnabled()
@@ -87,9 +85,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 계정 정보 로드
-     */
+    /** 계정 정보 로드 */
     private fun loadAccountInfo() {
         viewModelScope.launch {
             val user = authRepository.getCurrentUser()
@@ -101,9 +97,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 분류 프리셋 로드
-     */
+    /** 분류 프리셋 로드 */
     private fun loadPresets() {
         val presets = getPresetsUseCase()
         viewModelScope.launch {
@@ -119,9 +113,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 캡처 글씨 크기 로드
-     */
+    /** 캡처 글씨 크기 로드 */
     private fun loadCaptureFontSize() {
         viewModelScope.launch {
             val size = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
@@ -129,9 +121,82 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 캡처 글씨 크기 변경
-     */
+    /** 캘린더 권한 상태 새로고침 */
+    fun refreshCalendarPermissionState() {
+        viewModelScope.launch {
+            val granted = calendarRepository.isCalendarPermissionGranted()
+            if (!granted) {
+                if (_uiState.value.isCalendarEnabled) {
+                    setCalendarSettingsUseCase.setCalendarEnabled(false)
+                }
+                _uiState.update {
+                    it.copy(
+                        isCalendarPermissionGranted = false,
+                        isCalendarEnabled = false,
+                        availableCalendars = emptyList(),
+                        selectedCalendarId = null
+                    )
+                }
+                return@launch
+            }
+
+            _uiState.update { it.copy(isCalendarPermissionGranted = true) }
+            loadAvailableCalendarsInternal()
+        }
+    }
+
+    /** 권한 요청 결과 처리 */
+    fun onCalendarPermissionResult(granted: Boolean) {
+        viewModelScope.launch {
+            if (!granted) {
+                setCalendarSettingsUseCase.setCalendarEnabled(false)
+                _uiState.update {
+                    it.copy(
+                        isCalendarPermissionGranted = false,
+                        isCalendarEnabled = false,
+                        availableCalendars = emptyList(),
+                        selectedCalendarId = null,
+                        calendarAuthMessage = "캘린더 권한이 거부되었습니다."
+                    )
+                }
+                return@launch
+            }
+
+            setCalendarSettingsUseCase.setCalendarEnabled(true)
+            _uiState.update {
+                it.copy(
+                    isCalendarPermissionGranted = true,
+                    isCalendarEnabled = true,
+                    calendarAuthMessage = "캘린더 권한이 허용되었습니다."
+                )
+            }
+            loadAvailableCalendarsInternal()
+        }
+    }
+
+    /** 캘린더 목록 재조회 */
+    fun reloadAvailableCalendars() {
+        viewModelScope.launch {
+            loadAvailableCalendarsInternal()
+        }
+    }
+
+    /** 대상 캘린더 선택 */
+    fun setTargetCalendar(calendarId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                calendarRepository.setTargetCalendarId(calendarId)
+            }.onSuccess {
+                _uiState.update { it.copy(selectedCalendarId = calendarId) }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(calendarAuthMessage = mapCalendarErrorMessage(throwable))
+                }
+            }
+        }
+    }
+
+    /** 캡처 글씨 크기 변경 */
     fun setCaptureFontSize(size: String) {
         viewModelScope.launch {
             userPreferenceRepository.setString(KEY_CAPTURE_FONT_SIZE, size)
@@ -139,9 +204,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 분류 프리셋 변경
-     */
+    /** 분류 프리셋 변경 */
     fun setPreset(presetId: String) {
         viewModelScope.launch {
             setPresetUseCase(presetId)
@@ -149,25 +212,19 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 분류 커스텀 인스트럭션 변경
-     */
+    /** 분류 커스텀 인스트럭션 변경 */
     fun setCustomInstruction(instruction: String) {
         _uiState.update { it.copy(customInstruction = instruction) }
     }
 
-    /**
-     * 분류 커스텀 인스트럭션 저장
-     */
+    /** 분류 커스텀 인스트럭션 저장 */
     fun saveCustomInstruction() {
         viewModelScope.launch {
             setCustomInstructionUseCase(_uiState.value.customInstruction)
         }
     }
 
-    /**
-     * 로그아웃
-     */
+    /** 로그아웃 */
     fun logout() {
         viewModelScope.launch {
             try {
@@ -181,9 +238,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 테마 변경 (LIGHT / DARK / SYSTEM)
-     */
+    /** 테마 변경 (LIGHT / DARK / SYSTEM) */
     fun setTheme(theme: ThemePreference) {
         viewModelScope.launch {
             userPreferenceRepository.setThemePreference(theme)
@@ -191,19 +246,34 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Google Calendar 연동 토글
-     */
+    /** 캘린더 연동 토글 */
     fun toggleCalendar(enabled: Boolean) {
         viewModelScope.launch {
+            if (enabled && !calendarRepository.isCalendarPermissionGranted()) {
+                _uiState.update {
+                    it.copy(
+                        isCalendarEnabled = false,
+                        calendarAuthMessage = "캘린더 권한이 필요합니다."
+                    )
+                }
+                return@launch
+            }
+
             setCalendarSettingsUseCase.setCalendarEnabled(enabled)
-            _uiState.update { it.copy(isCalendarEnabled = enabled) }
+            _uiState.update {
+                it.copy(
+                    isCalendarEnabled = enabled,
+                    isCalendarPermissionGranted = calendarRepository.isCalendarPermissionGranted()
+                )
+            }
+
+            if (enabled) {
+                loadAvailableCalendarsInternal()
+            }
         }
     }
 
-    /**
-     * 일정 추가 모드 변경
-     */
+    /** 일정 추가 모드 변경 */
     fun setCalendarMode(mode: String) {
         viewModelScope.launch {
             setCalendarSettingsUseCase.setCalendarMode(mode)
@@ -211,9 +281,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 알림 설정 토글
-     */
+    /** 알림 설정 토글 */
     fun toggleNotification(enabled: Boolean) {
         viewModelScope.launch {
             setCalendarSettingsUseCase.setNotificationEnabled(enabled)
@@ -221,9 +289,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 에러 메시지 닫기
-     */
+    /** 에러 메시지 닫기 */
     fun onErrorDismissed() {
         _uiState.update { it.copy(errorMessage = null) }
     }
@@ -236,106 +302,7 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(calendarAuthMessage = message) }
     }
 
-    fun exchangeCalendarCode(code: String, redirectUri: String) {
-        if (code.isBlank() || redirectUri.isBlank()) {
-            _uiState.update { it.copy(calendarAuthMessage = "code/redirect_uri를 입력해주세요.") }
-            return
-        }
-        viewModelScope.launch {
-            _uiState.update { it.copy(calendarAuthLoading = true, calendarAuthMessage = null) }
-            runCatching {
-                calendarRepository.exchangeCalendarToken(code.trim(), redirectUri.trim())
-            }.onSuccess { connected ->
-                if (connected) {
-                    setCalendarSettingsUseCase.setCalendarEnabled(true)
-                }
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        isCalendarEnabled = connected || it.isCalendarEnabled,
-                        calendarAuthMessage = if (connected) "Google Calendar 연결 성공" else "연결 실패"
-                    )
-                }
-            }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        calendarAuthMessage = mapCalendarErrorMessage(throwable)
-                    )
-                }
-            }
-        }
-    }
-
-    fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresIn: String?) {
-        if (accessToken.isBlank()) {
-            _uiState.update { it.copy(calendarAuthMessage = "access_token을 입력해주세요.") }
-            return
-        }
-        // expires_in(초)를 expires_at(ISO 8601)로 변환
-        val expiresAt = expiresIn?.trim()?.takeIf { it.isNotEmpty() }?.toLongOrNull()?.let {
-            java.time.Instant.now().plusSeconds(it).toString()
-        }
-        viewModelScope.launch {
-            _uiState.update { it.copy(calendarAuthLoading = true, calendarAuthMessage = null) }
-            runCatching {
-                calendarRepository.saveCalendarToken(
-                    accessToken = accessToken.trim(),
-                    refreshToken = refreshToken?.trim()?.ifEmpty { null },
-                    expiresAt = expiresAt
-                )
-            }.onSuccess { connected ->
-                if (connected) {
-                    setCalendarSettingsUseCase.setCalendarEnabled(true)
-                }
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        isCalendarEnabled = connected || it.isCalendarEnabled,
-                        calendarAuthMessage = if (connected) "토큰 저장 성공" else "토큰 저장 실패"
-                    )
-                }
-            }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        calendarAuthMessage = mapCalendarErrorMessage(throwable)
-                    )
-                }
-            }
-        }
-    }
-
-    fun fetchCalendarEventsPreview() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(calendarAuthLoading = true, calendarAuthMessage = null) }
-            val today = java.time.LocalDate.now()
-            runCatching {
-                calendarRepository.getCalendarEvents(
-                    startDate = today.minusDays(7),
-                    endDate = today.plusDays(30)
-                )
-            }.onSuccess { events ->
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        calendarAuthMessage = "캘린더 이벤트 ${events.size}건 조회됨"
-                    )
-                }
-            }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        calendarAuthLoading = false,
-                        calendarAuthMessage = mapCalendarErrorMessage(throwable)
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * 디버그: 이미지 URI로 캡처 제출
-     */
+    /** 디버그: 이미지 URI로 캡처 제출 */
     fun debugSubmitImage(uri: Uri) {
         viewModelScope.launch {
             _uiState.update { it.copy(debugSubmitting = true, debugResult = null) }
@@ -362,19 +329,56 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 디버그 결과 메시지 닫기
-     */
+    /** 디버그 결과 메시지 닫기 */
     fun dismissDebugResult() {
         _uiState.update { it.copy(debugResult = null) }
     }
 
+    private suspend fun loadAvailableCalendarsInternal() {
+        runCatching {
+            val calendars = calendarRepository.getAvailableCalendars()
+            val selected = normalizeSelectedCalendar(calendars)
+            calendars to selected
+        }.onSuccess { (calendars, selectedCalendarId) ->
+            _uiState.update {
+                it.copy(
+                    availableCalendars = calendars,
+                    selectedCalendarId = selectedCalendarId,
+                    isCalendarPermissionGranted = true
+                )
+            }
+        }.onFailure { throwable ->
+            _uiState.update {
+                it.copy(
+                    availableCalendars = emptyList(),
+                    selectedCalendarId = null,
+                    calendarAuthMessage = mapCalendarErrorMessage(throwable)
+                )
+            }
+        }
+    }
+
+    private suspend fun normalizeSelectedCalendar(calendars: List<LocalCalendar>): Long? {
+        if (calendars.isEmpty()) {
+            return null
+        }
+
+        val selected = calendarRepository.getTargetCalendarId()
+        if (selected != null && calendars.any { it.id == selected }) {
+            return selected
+        }
+
+        val fallback = calendars.firstOrNull { it.isPrimary } ?: calendars.first()
+        calendarRepository.setTargetCalendarId(fallback.id)
+        return fallback.id
+    }
+
     private fun mapCalendarErrorMessage(throwable: Throwable): String {
         return when (throwable) {
-            is CalendarApiException.GoogleAuthRequired -> "Google 계정 연결이 필요합니다."
-            is CalendarApiException.GoogleTokenExpired -> "Google 토큰이 만료되었습니다. 다시 연결해주세요."
-            is CalendarApiException.GoogleApiError -> "Google Calendar API 오류가 발생했습니다."
-            is CalendarApiException.Unknown -> throwable.message ?: "캘린더 요청 실패"
+            is CalendarException.PermissionDenied -> "캘린더 권한이 필요합니다."
+            is CalendarException.NoCalendarSelected -> "연동할 캘린더를 선택해주세요."
+            is CalendarException.InsertFailed -> throwable.message ?: "캘린더 일정 추가에 실패했습니다."
+            is CalendarException.Unknown -> throwable.message ?: "캘린더 요청 실패"
             else -> throwable.message ?: "요청 실패"
         }
     }

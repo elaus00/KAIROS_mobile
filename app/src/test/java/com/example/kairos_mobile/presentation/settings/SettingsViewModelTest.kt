@@ -64,6 +64,9 @@ class SettingsViewModelTest {
         getPresetsUseCase = mockk(relaxed = true)
         setPresetUseCase = mockk(relaxed = true)
         setCustomInstructionUseCase = mockk(relaxed = true)
+        every { calendarRepository.isCalendarPermissionGranted() } returns true
+        coEvery { calendarRepository.getAvailableCalendars() } returns emptyList()
+        coEvery { calendarRepository.getTargetCalendarId() } returns null
         // loadPresets()에서 호출되는 getString mock 설정
         coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
     }

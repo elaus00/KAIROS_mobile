@@ -1,6 +1,6 @@
 # KAIROS — 데이터 모델 명세서
 
-> **Version**: 2.2
+> **Version**: 2.3
 **작성일**: 2026-02-12
 **기준**: PRD v10.0, 기능명세서 v2.3
 >
@@ -15,17 +15,26 @@
 | 2.0 | 2026-02-06 | PRD v10.0 + 기능명세서 v2.0 반영 (불일치 시 PRD 우선). (1) 분류 체계 전면 변경 — classified_type을 SCHEDULE/TODO/NOTES/TEMP 4개로 재편, note_sub_type 필드 추가, (2) 삭제 모델 변경 — Phase 1: Soft Delete(3초) → Hard Delete, Phase 2a: 휴지통(30일) 도입으로 3단계화, is_trashed/trashed_at 필드 추가(Phase 2a), (3) AI 분류 확인 추적 — is_confirmed/confirmed_at 필드 추가 (AI 분류 현황 시트 뱃지 지원), (4) 멀티 인텐트 분할(Phase 2b) — parent_capture_id 필드 추가, source enum에 SPLIT 추가, (5) Folder에 BOOKMARKS 타입 및 system-bookmarks 시스템 폴더 추가, (6) AnalyticsEvent 이벤트 유형 업데이트 — classification_confirmed/trash_restored/split_capture_created 추가, inbox_item_resolved → temp_item_resolved 변경 |
 | 2.1 | 2026-02-07 | 서버 PostgreSQL 스키마 정렬. (1) analytics_events 저장 테이블을 서버 섹션에 명시, (2) Phase 2a 디바이스별 Google OAuth 토큰 저장용 google_device_tokens 테이블 추가 |
 | 2.2 | 2026-02-12 | 구현 기준 정합성 보정. (1) CaptureEntity에서 draft_text 필드 제거 (EncryptedSharedPreferences 전용), (2) UserPreference/GoogleAuth를 Room Entity에서 제거 — 실제로 EncryptedSharedPreferences로 구현, (3) 마이그레이션 전략을 v16 Destructive Migration으로 갱신, (4) Entity 수 12개 + FTS 1개로 명시 |
+| 2.3 | 2026-02-12 | CalendarProvider 전환 반영. (1) Android 캘린더 연동은 로컬 CalendarProvider 기준, (2) Schedule 앱 코드 필드명 `googleEventId` -> `calendarEventId`로 변경(컬럼명 `google_event_id` 유지), (3) Android 클라이언트의 Google OAuth 토큰 저장 테이블 사용 중단(서버/iOS 레거시) |
+
+## 0.A 2026-02-12 Addendum (우선 적용)
+
+아래 항목은 본문의 기존 Google OAuth/서버 캘린더 프록시 서술보다 우선 적용한다.
+
+1. Android 캘린더 연동은 `CalendarProvider` 기반 로컬 쓰기 모델이다.  
+2. `schedules.google_event_id` 컬럼은 호환성 때문에 유지하되, 앱 코드에서는 `calendarEventId` 필드명을 사용한다.  
+3. `google_device_tokens` 테이블은 Android 클라이언트 기준 비활성(서버/iOS 레거시)이다.
 
 ## 1. 아키텍처 개요
 
 ### 1.1 로컬 우선 원칙
 
-모든 콘텐츠 데이터는 Android Room DB에 로컬 우선 저장한다. 서버는 AI 처리, 캘린더 동기화, 인증·과금, 분석 데이터 수집만 담당한다.
+모든 콘텐츠 데이터는 Android Room DB에 로컬 우선 저장한다. 서버는 AI 처리, 인증·과금, 분석 데이터 수집, 그리고 `/sync/*` 동기화를 담당한다.
 
 ```
 [Android Room DB]          [서버 (FastAPI)]
 ├── captures               ├── AI 분류 API
-├── todos                  ├── 캘린더 동기화 API
+├── todos                  ├── 동기화 API (/sync/*)
 ├── schedules              ├── 분석 이벤트 수집 API
 ├── notes                  ├── 인증 API (Phase 3a)
 ├── folders                └── 구독 API (Phase 3a)
@@ -184,7 +193,7 @@ Capture가 SCHEDULE로 분류될 때 생성되는 파생 엔티티.
 | location | String? | | 장소 | 1 |
 | is_all_day | Boolean | ✓ | 종일 이벤트 여부. 기본값 false | 1 |
 | calendar_sync_status | Enum | ✓ | 캘린더 동기화 상태 | 2a |
-| google_event_id | String? | | Google Calendar 이벤트 ID | 2a |
+| google_event_id | String? | | 캘린더 이벤트 ID 컬럼(호환성 유지). 앱 코드 필드명은 `calendarEventId` | 2a |
 | confidence | Enum | ✓ | HIGH, MEDIUM, LOW | 1 |
 | created_at | Long | ✓ | 생성 시각 | 1 |
 | updated_at | Long | ✓ | 최종 수정 시각 | 1 |
@@ -669,4 +678,4 @@ Room.databaseBuilder(context, KairosDatabase::class.java, DATABASE_NAME)
 
 ---
 
-*Document Version: 2.2 | Last Updated: 2026-02-12*
+*Document Version: 2.3 | Last Updated: 2026-02-12*

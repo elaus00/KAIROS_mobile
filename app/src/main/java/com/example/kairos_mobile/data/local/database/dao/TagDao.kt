@@ -36,4 +36,8 @@ interface TagDao {
     @Query("SELECT * FROM tags WHERE name = :name LIMIT 1")
     suspend fun getByName(name: String): TagEntity?
 
+    /** 동기화용 전체 태그 조회 */
+    @Query("SELECT * FROM tags")
+    suspend fun getAllForSync(): List<TagEntity>
+
 }

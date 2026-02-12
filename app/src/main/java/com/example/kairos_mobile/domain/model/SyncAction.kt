@@ -10,10 +10,10 @@ enum class SyncAction {
     /** TEMP 재분류 */
     RECLASSIFY,
 
-    /** Google Calendar 이벤트 생성 (Phase 2a) */
+    /** 캘린더 이벤트 생성 (Phase 2a) */
     CALENDAR_CREATE,
 
-    /** Google Calendar 이벤트 삭제 (Phase 2a) */
+    /** 캘린더 이벤트 삭제 (Phase 2a) */
     CALENDAR_DELETE,
 
     /** 분석 이벤트 배치 전송 (Phase 2a) */

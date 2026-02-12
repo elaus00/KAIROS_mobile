@@ -177,6 +177,10 @@ interface TodoDao {
         AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
     """)
     suspend fun getTodayTodoCountForWidget(todayEndMs: Long?): Int
+
+    /** 동기화용 전체 할 일 조회 */
+    @Query("SELECT * FROM todos")
+    suspend fun getAllForSync(): List<TodoEntity>
 }
 
 /**

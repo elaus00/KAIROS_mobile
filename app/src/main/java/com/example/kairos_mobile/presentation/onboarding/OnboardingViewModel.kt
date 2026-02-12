@@ -2,6 +2,7 @@ package com.example.kairos_mobile.presentation.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
 import com.example.kairos_mobile.domain.usecase.settings.CalendarSettingsKeys
@@ -22,10 +23,10 @@ import javax.inject.Inject
 data class OnboardingUiState(
     val inputText: String = "",
     val isSubmitting: Boolean = false,
-    /** Google Calendar 연결 상태 (Mock) */
-    val isGoogleConnected: Boolean = false,
-    /** Google Calendar 연결 실패 에러 메시지 */
-    val googleConnectionError: String? = null
+    /** 캘린더 권한 허용 상태 */
+    val isCalendarPermissionGranted: Boolean = false,
+    /** 캘린더 연동 에러 메시지 */
+    val calendarConnectionError: String? = null
 )
 
 /**
@@ -43,7 +44,8 @@ sealed class OnboardingEvent {
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val userPreferenceRepository: UserPreferenceRepository,
-    private val submitCaptureUseCase: SubmitCaptureUseCase
+    private val submitCaptureUseCase: SubmitCaptureUseCase,
+    private val calendarRepository: CalendarRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState())
@@ -53,24 +55,62 @@ class OnboardingViewModel @Inject constructor(
     val events: SharedFlow<OnboardingEvent> = _events.asSharedFlow()
 
     init {
-        loadGoogleConnectionState()
+        loadCalendarPermissionState()
     }
 
-    private fun loadGoogleConnectionState() {
+    private fun loadCalendarPermissionState() {
         viewModelScope.launch {
-            val connected = userPreferenceRepository.getString(
-                CalendarSettingsKeys.KEY_CALENDAR_ENABLED,
-                "false"
-            ) == "true"
-            _uiState.update { it.copy(isGoogleConnected = connected) }
+            val granted = calendarRepository.isCalendarPermissionGranted()
+            _uiState.update { it.copy(isCalendarPermissionGranted = granted) }
+            if (!granted) {
+                userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "false")
+            }
         }
     }
 
-    /**
-     * 입력 텍스트 업데이트 (3번째 화면 입력창)
-     */
+    /** 입력 텍스트 업데이트 (3번째 화면 입력창) */
     fun updateInput(text: String) {
         _uiState.update { it.copy(inputText = text) }
+    }
+
+    /**
+     * 권한 요청 결과 처리
+     * 허용 시 캘린더 연동 활성화 + 기본 캘린더 선택
+     */
+    fun onCalendarPermissionResult(granted: Boolean) {
+        viewModelScope.launch {
+            if (!granted) {
+                userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "false")
+                _uiState.update {
+                    it.copy(
+                        isCalendarPermissionGranted = false,
+                        calendarConnectionError = "권한이 없어도 계속 사용할 수 있습니다. 나중에 설정에서 켜세요."
+                    )
+                }
+                return@launch
+            }
+
+            runCatching {
+                val calendars = calendarRepository.getAvailableCalendars()
+                val target = calendars.firstOrNull { it.isPrimary } ?: calendars.firstOrNull()
+                target?.let { calendarRepository.setTargetCalendarId(it.id) }
+                userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        isCalendarPermissionGranted = true,
+                        calendarConnectionError = null
+                    )
+                }
+            }.onFailure {
+                _uiState.update {
+                    it.copy(
+                        isCalendarPermissionGranted = false,
+                        calendarConnectionError = "캘린더 연동에 실패했습니다. 설정에서 다시 시도해주세요."
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -94,33 +134,13 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 스킵 (텍스트 입력 없이 완료)
-     */
+    /** 스킵 (텍스트 입력 없이 완료) */
     fun skip() {
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
             userPreferenceRepository.setOnboardingCompleted()
             _events.emit(OnboardingEvent.NavigateToHome)
             _uiState.update { it.copy(isSubmitting = false) }
-        }
-    }
-
-    /**
-     * Google Calendar 연결 (Mock — 즉시 연결됨 상태로 전환)
-     */
-    fun connectGoogle() {
-        viewModelScope.launch {
-            try {
-                // 에러 상태 초기화
-                _uiState.update { it.copy(googleConnectionError = null) }
-
-                userPreferenceRepository.setString(CalendarSettingsKeys.KEY_CALENDAR_ENABLED, "true")
-                _uiState.update { it.copy(isGoogleConnected = true) }
-            } catch (e: Exception) {
-                // 실패 시 에러 메시지 설정 (현재는 발생하지 않음)
-                _uiState.update { it.copy(googleConnectionError = "연결에 실패했습니다. 다시 시도해주세요.") }
-            }
         }
     }
 }

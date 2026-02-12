@@ -1,7 +1,7 @@
 # KAIROS — API 명세서
 
-> **Version**: 2.5
-**작성일**: 2026-02-10
+> **Version**: 2.6
+**작성일**: 2026-02-12
 **기준**: PRD v10.0, 기능명세서 v2.3, 데이터 모델 명세서 v2.0
 **서버 프레임워크**: FastAPI (Python 3.11+)
 **Base URL**: `https://api.kairos.app/api/v1`
@@ -20,8 +20,21 @@
 | 2.3 | 2026-02-07 | PRD v10.0 우선 정렬. (1) user_context.modification_history를 Phase 2b로 조정, (2) 수정 이력 기반 학습(modification_learning) Phase를 3b→2b로 조정 |
 | 2.4 | 2026-02-07 | PRD 충돌 정렬. (1) 수정 이력 기반 학습을 2b(초안)/3b(고도화)로 분리, (2) 분류 프리셋/사용자 지시를 3a로 조정, (3) AI 자동 그룹화 명칭을 AI 통합 그룹화로 통일 |
 | 2.5 | 2026-02-10 | API 계약 정렬. (1) 구독 features에 `analytics_dashboard`/`ocr` 추가, (2) OCR 엔드포인트 추가 (`POST /ocr/extract`, JSON+Base64), (3) Auth refresh 응답 `user` nullable 명시, (4) Auth/me에 `google_calendar_connected` 필드 명시, (5) 시맨틱 검색/대시보드 엔드포인트 추가, (6) 요약 테이블 갱신 |
+| 2.6 | 2026-02-12 | Android 클라이언트 기준 정렬. (1) 캘린더 연동이 CalendarProvider(로컬)로 전환되어 `/calendar/*`를 Android에서는 사용 중단, (2) 초기 동기화용 `/sync/push`, `/sync/pull` 엔드포인트를 Android 연동 대상으로 명시, (3) Google 로그인 표현을 OAuth 일반 표현에서 Google Sign-In(ID Token) + 서버 JWT로 정정 |
 
 ---
+
+## 0.A 2026-02-12 Addendum (우선 적용)
+
+본 문서의 기존 `Google Calendar API 프록시(/calendar/*)` 섹션은 서버 호환성(iOS 포함) 관점의 레거시 계약이다.  
+Android 클라이언트 기준으로는 아래가 우선 적용된다.
+
+- 캘린더 생성/조회/삭제: Android `CalendarProvider` 직접 사용
+- `/calendar/token`, `/calendar/token/exchange`, `/calendar/events*`: Android에서 호출하지 않음
+- 로그인: Google Sign-In(ID Token) -> `/auth/google` -> 서버 JWT 발급
+- 초기 동기화: `/sync/push`, `/sync/pull` 사용
+
+즉, Android 앱 동작 기준 계약은 본 Addendum + `/sync/*`, `/auth/*`, `/classify*`, `/analytics/events`를 기준으로 본다.
 
 ## 1. 아키텍처 개요
 
@@ -32,11 +45,11 @@
 | 역할 | 설명 | Phase |
 | --- | --- | --- |
 | AI 분류 | 텍스트 분석 → 유형(classified_type + note_sub_type)·제목·태그·엔티티 반환 | 1 |
-| 캘린더 동기화 | Google Calendar API 프록시 | 2a |
+| 캘린더 동기화 | Android: CalendarProvider 로컬 연동 / 서버: `/calendar/*` 레거시 유지(iOS 호환) | 2a |
 | 분석 이벤트 수집 | 클라이언트 이벤트 배치 수신 | 2a |
 | 노트 그룹화 | AI 기반 노트 그룹화·재정리 | 3a |
 | Inbox AI 분류 | Inbox 노트 자동 폴더 배치 | 3a |
-| 인증 | Google OAuth 처리 | 3a |
+| 인증 | Google Sign-In(ID Token) 검증 + JWT 발급 | 3a |
 | 구독 관리 | 구독 상태 확인·변경 | 3a |
 
 ### 1.2 인증
@@ -558,7 +571,7 @@ Google OAuth 완료 후 디바이스별 access_token/refresh_token을 서버에 
 
 ## 5. 인증 API (Phase 3a)
 
-### 5.1 POST /auth/google — Google OAuth 로그인
+### 5.1 POST /auth/google — Google Sign-In(ID Token) 로그인
 
 **Request:**
 
@@ -1016,8 +1029,9 @@ classify 요청 수신
 | POST /classify | 60회/분 | device_id |
 | POST /classify/batch | 10회/분 | device_id |
 | POST /analytics/events | 30회/분 | device_id |
-| POST /calendar/* | 30회/분 | device_id |
+| POST /calendar/* | 30회/분 | device_id (Android 미사용, 레거시) |
 | POST /notes/* | 10회/분 | device_id |
+| POST /sync/* | 30회/분 | device_id |
 
 ---
 
@@ -1027,19 +1041,21 @@ classify 요청 수신
 | --- | --- | --- | --- |
 | /classify | POST | 1 | 단건 AI 분류 |
 | /classify/batch | POST | 1 | 배치 AI 분류 (Temp 재분류) |
-| /calendar/token/exchange | POST | 2a | OAuth 코드 교환 + 디바이스 토큰 저장 |
-| /calendar/token | POST | 2a | 디바이스별 Google OAuth 토큰 저장 |
-| /calendar/events | POST | 2a | 캘린더 이벤트 생성 |
-| /calendar/events/{id} | DELETE | 2a | 캘린더 이벤트 삭제 |
-| /calendar/events | GET | 2a | 캘린더 이벤트 조회 |
+| /calendar/token/exchange | POST | 2a | OAuth 코드 교환 + 디바이스 토큰 저장 (Android 미사용, 레거시) |
+| /calendar/token | POST | 2a | 디바이스별 Google OAuth 토큰 저장 (Android 미사용, 레거시) |
+| /calendar/events | POST | 2a | 캘린더 이벤트 생성 (Android 미사용, 레거시) |
+| /calendar/events/{id} | DELETE | 2a | 캘린더 이벤트 삭제 (Android 미사용, 레거시) |
+| /calendar/events | GET | 2a | 캘린더 이벤트 조회 (Android 미사용, 레거시) |
 | /analytics/events | POST | 2a | 분석 이벤트 배치 전송 |
+| /sync/push | POST | 3a | 로컬 변경분 서버 업로드 |
+| /sync/pull | POST | 3a | 서버 변경분 조회 |
 | /notes/group | POST | 3a | AI 통합 그룹화 (구독) |
 | /notes/reorganize | POST | 3a | 전체 재정리 (구독) |
 | /notes/inbox-classify | POST | 3a | Inbox AI 자동 분류 (구독) |
 | /notes/search-semantic | POST | 3a | 시맨틱 검색 (구독) |
 | /analytics/dashboard | GET | 3b | 분석 대시보드 (구독) |
 | /ocr/extract | POST | 3b | 이미지 OCR 텍스트 추출 (구독) |
-| /auth/google | POST | 3a | Google OAuth 로그인 |
+| /auth/google | POST | 3a | Google Sign-In(ID Token) 로그인 |
 | /auth/refresh | POST | 3a | 토큰 갱신 |
 | /auth/me | GET | 3a | 현재 사용자 정보 |
 | /subscription | GET | 3a | 구독 상태 조회 |
@@ -1047,4 +1063,4 @@ classify 요청 수신
 
 ---
 
-*Document Version: 2.5 | Last Updated: 2026-02-10*
+*Document Version: 2.6 | Last Updated: 2026-02-12*

@@ -16,7 +16,7 @@ class DeviceIdInterceptor @Inject constructor(
 
         val requiresDeviceId = path.endsWith("/classify") ||
             path.endsWith("/classify/batch") ||
-            path.contains("/calendar/") ||
+            path.contains("/sync/") ||
             path.endsWith("/analytics/events")
 
         if (!requiresDeviceId) {

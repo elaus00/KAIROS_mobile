@@ -1,35 +1,40 @@
 package com.example.kairos_mobile.data.repository
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.Context
+import android.provider.CalendarContract
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import com.example.kairos_mobile.data.local.database.dao.ScheduleDao
-import com.example.kairos_mobile.data.remote.ApiResponseHandler
-import com.example.kairos_mobile.data.remote.DeviceIdProvider
-import com.example.kairos_mobile.data.remote.api.KairosApi
-import com.example.kairos_mobile.data.remote.dto.v2.CalendarEventRequest
-import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenExchangeRequest
-import com.example.kairos_mobile.data.remote.dto.v2.CalendarTokenRequest
-import com.example.kairos_mobile.domain.model.ApiException
-import com.example.kairos_mobile.domain.model.CalendarApiException
+import com.example.kairos_mobile.domain.model.CalendarException
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
-import com.example.kairos_mobile.domain.model.RemoteCalendarEvent
+import com.example.kairos_mobile.domain.model.LocalCalendar
 import com.example.kairos_mobile.domain.repository.CalendarRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
-import java.time.LocalDate
-import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * CalendarRepository 구현체
- * Mock API를 통한 Google Calendar 동기화
+ * Android CalendarProvider 기반 로컬 캘린더 연동
  */
 @Singleton
 class CalendarRepositoryImpl @Inject constructor(
-    private val api: KairosApi,
+    @ApplicationContext private val context: Context,
     private val scheduleDao: ScheduleDao,
-    private val deviceIdProvider: DeviceIdProvider
+    private val userPreferenceRepository: UserPreferenceRepository
 ) : CalendarRepository {
+
+    companion object {
+        private const val KEY_TARGET_CALENDAR_ID = "target_calendar_id"
+    }
 
     override suspend fun syncToCalendar(
         scheduleId: String,
@@ -39,116 +44,144 @@ class CalendarRepositoryImpl @Inject constructor(
         location: String?,
         isAllDay: Boolean
     ): String {
-        val schedule = scheduleDao.getById(scheduleId)
-            ?: throw IllegalStateException("일정을 찾을 수 없습니다: $scheduleId")
-        val request = CalendarEventRequest(
-            captureId = schedule.captureId,
-            title = title,
-            startTime = toIsoOffsetDateTime(startTime),
-            endTime = endTime?.let { toIsoOffsetDateTime(it) },
-            location = location,
-            isAllDay = isAllDay
-        )
-        try {
-            val data = ApiResponseHandler.safeCall { api.createCalendarEvent(request) }
-            val eventId = data.googleEventId
+        return try {
+            val targetCalendarId = resolveTargetCalendarId()
+                ?: throw CalendarException.NoCalendarSelected()
+
+            val values = ContentValues().apply {
+                put(CalendarContract.Events.CALENDAR_ID, targetCalendarId)
+                put(CalendarContract.Events.TITLE, title)
+                put(CalendarContract.Events.EVENT_LOCATION, location)
+
+                if (isAllDay) {
+                    val zoneId = ZoneId.systemDefault()
+                    val startDate = Instant.ofEpochMilli(startTime).atZone(zoneId).toLocalDate()
+                    val startOfDayMs = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli()
+                    val endDate = endTime?.let {
+                        Instant.ofEpochMilli(it).atZone(zoneId).toLocalDate().plusDays(1)
+                    } ?: startDate.plusDays(1)
+                    val endOfDayMs = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli()
+
+                    put(CalendarContract.Events.DTSTART, startOfDayMs)
+                    put(CalendarContract.Events.DTEND, endOfDayMs)
+                    put(CalendarContract.Events.ALL_DAY, 1)
+                    put(CalendarContract.Events.EVENT_TIMEZONE, "UTC")
+                } else {
+                    put(CalendarContract.Events.DTSTART, startTime)
+                    put(CalendarContract.Events.DTEND, endTime ?: (startTime + 60 * 60 * 1000L))
+                    put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().id)
+                }
+            }
+
+            val eventId = withContext(Dispatchers.IO) {
+                ensureCalendarPermission()
+                val uri = context.contentResolver.insert(CalendarContract.Events.CONTENT_URI, values)
+                    ?: throw CalendarException.InsertFailed()
+                uri.lastPathSegment ?: throw CalendarException.InsertFailed()
+            }
+
             scheduleDao.updateCalendarSync(scheduleId, CalendarSyncStatus.SYNCED.name, eventId)
-            return eventId
+            eventId
         } catch (e: Exception) {
             scheduleDao.updateCalendarSync(scheduleId, CalendarSyncStatus.SYNC_FAILED.name, null)
-            throw toCalendarException(e)
+            throw when (e) {
+                is CalendarException -> e
+                is SecurityException -> CalendarException.PermissionDenied()
+                else -> CalendarException.Unknown(e.message ?: "캘린더 요청 실패")
+            }
         }
     }
 
-    override suspend fun updateSyncStatus(scheduleId: String, status: CalendarSyncStatus, googleEventId: String?) {
-        scheduleDao.updateCalendarSync(scheduleId, status.name, googleEventId)
+    override suspend fun updateSyncStatus(
+        scheduleId: String,
+        status: CalendarSyncStatus,
+        calendarEventId: String?
+    ) {
+        scheduleDao.updateCalendarSync(scheduleId, status.name, calendarEventId)
     }
 
-    override suspend fun exchangeCalendarToken(code: String, redirectUri: String): Boolean {
-        try {
-            val data = ApiResponseHandler.safeCall {
-                api.exchangeCalendarToken(
-                    CalendarTokenExchangeRequest(
-                        deviceId = deviceIdProvider.getOrCreateDeviceId(),
-                        code = code,
-                        redirectUri = redirectUri
-                    )
+    override fun isCalendarPermissionGranted(): Boolean {
+        val readGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_CALENDAR
+        ) == PermissionChecker.PERMISSION_GRANTED
+        val writeGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_CALENDAR
+        ) == PermissionChecker.PERMISSION_GRANTED
+        return readGranted && writeGranted
+    }
+
+    override suspend fun getAvailableCalendars(): List<LocalCalendar> = withContext(Dispatchers.IO) {
+        ensureCalendarPermission()
+
+        val projection = arrayOf(
+            CalendarContract.Calendars._ID,
+            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+            CalendarContract.Calendars.ACCOUNT_NAME,
+            CalendarContract.Calendars.CALENDAR_COLOR,
+            CalendarContract.Calendars.IS_PRIMARY
+        )
+
+        val selection = "${CalendarContract.Calendars.VISIBLE} = 1 AND ${CalendarContract.Calendars.SYNC_EVENTS} = 1"
+        val sortOrder = "${CalendarContract.Calendars.IS_PRIMARY} DESC, ${CalendarContract.Calendars.CALENDAR_DISPLAY_NAME} COLLATE NOCASE ASC"
+
+        val calendars = mutableListOf<LocalCalendar>()
+        context.contentResolver.query(
+            CalendarContract.Calendars.CONTENT_URI,
+            projection,
+            selection,
+            null,
+            sortOrder
+        )?.use { cursor ->
+            val idIndex = cursor.getColumnIndexOrThrow(CalendarContract.Calendars._ID)
+            val nameIndex = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
+            val accountIndex = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.ACCOUNT_NAME)
+            val colorIndex = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.CALENDAR_COLOR)
+            val primaryIndex = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.IS_PRIMARY)
+
+            while (cursor.moveToNext()) {
+                calendars += LocalCalendar(
+                    id = cursor.getLong(idIndex),
+                    displayName = cursor.getString(nameIndex) ?: "Unnamed",
+                    accountName = cursor.getString(accountIndex) ?: "",
+                    color = cursor.getInt(colorIndex),
+                    isPrimary = cursor.getInt(primaryIndex) == 1
                 )
             }
-            return data.connected
-        } catch (e: Exception) {
-            throw toCalendarException(e)
         }
+
+        calendars
     }
 
-    override suspend fun saveCalendarToken(accessToken: String, refreshToken: String?, expiresAt: String?): Boolean {
-        try {
-            val data = ApiResponseHandler.safeCall {
-                api.saveCalendarToken(
-                    CalendarTokenRequest(
-                        deviceId = deviceIdProvider.getOrCreateDeviceId(),
-                        accessToken = accessToken,
-                        refreshToken = refreshToken,
-                        expiresAt = expiresAt
-                    )
-                )
-            }
-            return data.connected
-        } catch (e: Exception) {
-            throw toCalendarException(e)
-        }
+    override suspend fun setTargetCalendarId(calendarId: Long) {
+        userPreferenceRepository.setString(KEY_TARGET_CALENDAR_ID, calendarId.toString())
     }
 
-    override suspend fun getCalendarEvents(startDate: LocalDate, endDate: LocalDate): List<RemoteCalendarEvent> {
-        try {
-            val data = ApiResponseHandler.safeCall {
-                api.getCalendarEvents(startDate.toString(), endDate.toString())
-            }
-            return data.events.map { event ->
-                RemoteCalendarEvent(
-                    googleEventId = event.googleEventId,
-                    title = event.title,
-                    startTime = parseIsoDateTimeToEpochMs(event.startTime) ?: 0L,
-                    endTime = parseIsoDateTimeToEpochMs(event.endTime),
-                    location = event.location,
-                    isAllDay = event.isAllDay,
-                    source = event.source
-                )
-            }
-        } catch (e: Exception) {
-            throw toCalendarException(e)
-        }
+    override suspend fun getTargetCalendarId(): Long? {
+        val raw = userPreferenceRepository.getString(KEY_TARGET_CALENDAR_ID, "")
+        return raw.toLongOrNull()
     }
 
-    private fun toIsoOffsetDateTime(epochMs: Long): String {
-        return Instant.ofEpochMilli(epochMs)
-            .atZone(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-    }
-
-    private fun parseIsoDateTimeToEpochMs(value: String?): Long? {
-        if (value.isNullOrBlank()) {
+    private suspend fun resolveTargetCalendarId(): Long? {
+        val calendars = getAvailableCalendars()
+        if (calendars.isEmpty()) {
             return null
         }
-        return runCatching { OffsetDateTime.parse(value).toInstant().toEpochMilli() }
-            .recoverCatching { Instant.parse(value).toEpochMilli() }
-            .getOrNull()
+
+        val selected = getTargetCalendarId()
+        if (selected != null && calendars.any { it.id == selected }) {
+            return selected
+        }
+
+        val fallback = calendars.firstOrNull { it.isPrimary } ?: calendars.first()
+        setTargetCalendarId(fallback.id)
+        return fallback.id
     }
 
-    /**
-     * ApiException → CalendarApiException 변환
-     * 캘린더 전용 에러 코드는 CalendarApiException으로 매핑하고,
-     * 이미 CalendarApiException이면 그대로 전달
-     */
-    private fun toCalendarException(e: Exception): Throwable {
-        if (e is CalendarApiException) return e
-        val code = (e as? ApiException)?.errorCode
-        val msg = e.message ?: "캘린더 요청 실패"
-        return when (code) {
-            "GOOGLE_AUTH_REQUIRED" -> CalendarApiException.GoogleAuthRequired(msg)
-            "GOOGLE_TOKEN_EXPIRED" -> CalendarApiException.GoogleTokenExpired(msg)
-            "GOOGLE_API_ERROR" -> CalendarApiException.GoogleApiError(msg)
-            else -> CalendarApiException.Unknown(msg)
+    private fun ensureCalendarPermission() {
+        if (!isCalendarPermissionGranted()) {
+            throw CalendarException.PermissionDenied()
         }
     }
 }

@@ -1,11 +1,35 @@
 # KAIROS — 기능명세서
 
-> **Version**: 2.3
-**작성일**: 2026-02-06
+> **Version**: 2.4
+**작성일**: 2026-02-12
 **기준**: PRD v10.0, 데이터 모델 명세서 v2.0
 > 
 
 ---
+
+## 0.A 2026-02-12 Addendum (우선 적용)
+
+본 문서의 기존 서술 중 아래 항목은 2026-02-12 구현 기준으로 대체 적용한다.
+
+1. 캘린더 연동 방식
+- 기존: Google OAuth + 서버 프록시 기반 Google Calendar API 호출
+- 현재: Android CalendarProvider 기반 로컬 캘린더 연동 (`READ_CALENDAR`/`WRITE_CALENDAR`)
+
+2. 온보딩/설정 캘린더 UX
+- 기존: Google 연결 버튼(OAuth)
+- 현재: 캘린더 권한 요청 + 연동 캘린더 선택
+
+3. 캘린더 동기화 범위
+- 기존: 양방향 동기화 및 원격 읽기 캐시
+- 현재(Android): 로컬 캘린더 쓰기 중심. 원격 pull/merge는 미적용
+
+4. 로그아웃 정책
+- 기존: 계정 로그아웃 시 로컬 DB 정리 가능 전제
+- 현재: 인증 토큰만 제거, 로컬 데이터 유지
+
+5. 본문의 `Google Calendar`, `Google OAuth`, `calendar/token*`, `calendar/events` 관련 서술은
+- iOS/서버 레거시 문맥으로 간주한다.
+- Android 클라이언트 동작 기준은 본 Addendum을 우선한다.
 
 ## 0. 상태 모델 및 공통 정책
 
@@ -1311,7 +1335,7 @@ UI: 토글 스위치. Android 시스템 알림 설정과 연동 안내.
 
 ### Phase 2a: 코어 루프 완성
 
-이미지 첨부(카메라 포함), 휴지통(30일 보존), Google Calendar 동기화, 일정 상세/월간 뷰, 완료 항목 보기, AI 마감일 제안, 입력 위젯, 푸시 알림, 분류 수정 로깅, 품질 관측 수집
+이미지 첨부(카메라 포함), 휴지통(30일 보존), 로컬 캘린더(CalendarProvider) 연동, 일정 상세/월간 뷰, 완료 항목 보기, AI 마감일 제안, 입력 위젯, 푸시 알림, 분류 수정 로깅, 품질 관측 수집
 
 ### Phase 2b: 사용성 확장 (최소 출시 기준)
 
@@ -1319,7 +1343,7 @@ UI: 토글 스위치. Android 시스템 알림 설정과 연동 안내.
 
 ### Phase 3a: 구독 기능
 
-Inbox AI 자동 분류, AI 통합 그룹화 및 재정리, 분류 프리셋, 사용자 지시, 인증(Google OAuth), 구독 모델, 구독 현황/로그아웃
+Inbox AI 자동 분류, AI 통합 그룹화 및 재정리, 분류 프리셋, 사용자 지시, 인증(Google Sign-In + 서버 JWT), 구독 모델, 구독 현황/로그아웃
 
 ### Phase 3b: 고급 AI 및 외부 확장 (구독)
 
@@ -1327,4 +1351,4 @@ Inbox AI 자동 분류, AI 통합 그룹화 및 재정리, 분류 프리셋, 사
 
 ---
 
-*Document Version: 2.3 | Last Updated: 2026-02-07*
+*Document Version: 2.4 | Last Updated: 2026-02-12*

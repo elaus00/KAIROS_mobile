@@ -23,7 +23,7 @@ class ScheduleMapper @Inject constructor() {
             isAllDay = entity.isAllDay,
             confidence = parseConfidenceLevel(entity.confidence),
             calendarSyncStatus = parseCalendarSyncStatus(entity.calendarSyncStatus),
-            googleEventId = entity.googleEventId,
+            calendarEventId = entity.calendarEventId,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -55,7 +55,7 @@ class ScheduleMapper @Inject constructor() {
             isAllDay = schedule.isAllDay,
             confidence = schedule.confidence.name,
             calendarSyncStatus = schedule.calendarSyncStatus.name,
-            googleEventId = schedule.googleEventId,
+            calendarEventId = schedule.calendarEventId,
             createdAt = schedule.createdAt,
             updatedAt = schedule.updatedAt
         )

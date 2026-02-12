@@ -56,9 +56,9 @@ data class ScheduleEntity(
     @ColumnInfo(name = "calendar_sync_status", defaultValue = "NOT_LINKED")
     val calendarSyncStatus: String = "NOT_LINKED",
 
-    // Google Calendar 이벤트 ID
+    // 캘린더 이벤트 ID (DB 컬럼은 기존 google_event_id 유지)
     @ColumnInfo(name = "google_event_id")
-    val googleEventId: String? = null,
+    val calendarEventId: String? = null,
 
     // 생성 시각 (epoch ms)
     @ColumnInfo(name = "created_at")

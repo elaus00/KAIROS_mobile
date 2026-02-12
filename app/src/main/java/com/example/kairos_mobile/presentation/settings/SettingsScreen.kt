@@ -1,10 +1,10 @@
 package com.example.kairos_mobile.presentation.settings
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,13 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.BuildConfig
-import com.example.kairos_mobile.data.remote.oauth.GoogleOAuthUrlBuilder
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.presentation.components.common.PremiumBadge
@@ -53,15 +51,20 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var showExchangeDialog by remember { mutableStateOf(false) }
-    var showTokenDialog by remember { mutableStateOf(false) }
     var showPresetDropdown by remember { mutableStateOf(false) }
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
     val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
     val snackbarHostState = remember { SnackbarHostState() }
+    var showCalendarDropdown by remember { mutableStateOf(false) }
+    val calendarPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        val readGranted = result[Manifest.permission.READ_CALENDAR] == true
+        val writeGranted = result[Manifest.permission.WRITE_CALENDAR] == true
+        viewModel.onCalendarPermissionResult(readGranted && writeGranted)
+    }
 
     // 캘린더 인증 메시지 Snackbar 표시
     LaunchedEffect(uiState.calendarAuthMessage) {
@@ -72,6 +75,10 @@ fun SettingsScreen(
             )
             viewModel.dismissCalendarAuthMessage()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshCalendarPermissionState()
     }
 
     Scaffold(
@@ -174,36 +181,95 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // 캘린더 섹션
-            SectionHeader(title = "Google Calendar")
+            SectionHeader(title = "캘린더 연동")
 
             SettingsCard {
                 ToggleSettingItem(
-                    title = "Google Calendar 연동",
-                    description = "일정을 Google Calendar에 동기화",
+                    title = "캘린더 연동",
+                    description = "일정을 기기 캘린더에 동기화",
                     isChecked = uiState.isCalendarEnabled,
-                    onToggle = { viewModel.toggleCalendar(it) }
-                )
-
-                SettingsDivider()
-
-                CalendarActionItem(
-                    title = "Google OAuth 시작 (자동)",
-                    description = "브라우저 인증 후 앱으로 자동 복귀",
-                    enabled = !uiState.calendarAuthLoading,
-                    onClick = {
-                        val oauthUrl = GoogleOAuthUrlBuilder.buildAuthorizationUrl(
-                            clientId = BuildConfig.GOOGLE_OAUTH_CLIENT_ID
-                        )
-                        if (oauthUrl.isNullOrBlank()) {
-                            viewModel.showCalendarAuthMessage("GOOGLE_OAUTH_CLIENT_ID를 설정해야 합니다.")
+                    onToggle = { enabled ->
+                        if (enabled && !uiState.isCalendarPermissionGranted) {
+                            calendarPermissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_CALENDAR,
+                                    Manifest.permission.WRITE_CALENDAR
+                                )
+                            )
                         } else {
-                            CustomTabsIntent.Builder().build()
-                                .launchUrl(context, Uri.parse(oauthUrl))
+                            viewModel.toggleCalendar(enabled)
                         }
                     }
                 )
 
-                if (uiState.isCalendarEnabled) {
+                if (!uiState.isCalendarPermissionGranted) {
+                    SettingsDivider()
+                    CalendarActionItem(
+                        title = "권한 요청",
+                        description = "캘린더 연동을 위해 권한을 허용해주세요",
+                        enabled = true,
+                        onClick = {
+                            calendarPermissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_CALENDAR,
+                                    Manifest.permission.WRITE_CALENDAR
+                                )
+                            )
+                        }
+                    )
+                } else if (uiState.isCalendarEnabled) {
+                    SettingsDivider()
+
+                    Box {
+                        NavigationSettingItem(
+                            title = "연동 캘린더",
+                            description = uiState.availableCalendars
+                                .firstOrNull { it.id == uiState.selectedCalendarId }
+                                ?.displayName ?: "선택 필요",
+                            onClick = { showCalendarDropdown = true }
+                        )
+
+                        DropdownMenu(
+                            expanded = showCalendarDropdown,
+                            onDismissRequest = { showCalendarDropdown = false }
+                        ) {
+                            if (uiState.availableCalendars.isEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("사용 가능한 캘린더가 없습니다.") },
+                                    onClick = { showCalendarDropdown = false }
+                                )
+                            } else {
+                                uiState.availableCalendars.forEach { calendar ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = if (calendar.isPrimary) {
+                                                    "${calendar.displayName} (기본)"
+                                                } else {
+                                                    calendar.displayName
+                                                }
+                                            )
+                                        },
+                                        onClick = {
+                                            viewModel.setTargetCalendar(calendar.id)
+                                            showCalendarDropdown = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (uiState.availableCalendars.isEmpty()) {
+                        SettingsDivider()
+                        CalendarActionItem(
+                            title = "캘린더 목록 새로고침",
+                            description = "기기 캘린더 목록을 다시 불러옵니다",
+                            enabled = true,
+                            onClick = { viewModel.reloadAvailableCalendars() }
+                        )
+                    }
+
                     SettingsDivider()
 
                     ThemeOptionItem(
@@ -222,7 +288,6 @@ fun SettingsScreen(
                         onClick = { viewModel.setCalendarMode("suggest") }
                     )
 
-                    // 알림 (캘린더 활성화 시에만 의미 있음)
                     SettingsDivider()
 
                     ToggleSettingItem(
@@ -231,36 +296,6 @@ fun SettingsScreen(
                         isChecked = uiState.isNotificationEnabled,
                         onToggle = { viewModel.toggleNotification(it) }
                     )
-
-                    // 디버그 전용 항목
-                    if (BuildConfig.DEBUG) {
-                        SettingsDivider()
-
-                        CalendarActionItem(
-                            title = "OAuth code 교환",
-                            description = "calendar/token/exchange 호출",
-                            enabled = !uiState.calendarAuthLoading,
-                            onClick = { showExchangeDialog = true }
-                        )
-
-                        SettingsDivider()
-
-                        CalendarActionItem(
-                            title = "토큰 직접 저장",
-                            description = "calendar/token 호출",
-                            enabled = !uiState.calendarAuthLoading,
-                            onClick = { showTokenDialog = true }
-                        )
-
-                        SettingsDivider()
-
-                        CalendarActionItem(
-                            title = "이벤트 조회 테스트",
-                            description = "calendar/events 조회",
-                            enabled = !uiState.calendarAuthLoading,
-                            onClick = { viewModel.fetchCalendarEventsPreview() }
-                        )
-                    }
                 }
             }
 
@@ -501,28 +536,6 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
-    }
-
-    if (showExchangeDialog) {
-        CalendarCodeExchangeDialog(
-            loading = uiState.calendarAuthLoading,
-            onDismiss = { showExchangeDialog = false },
-            onSubmit = { code, redirectUri ->
-                viewModel.exchangeCalendarCode(code, redirectUri)
-                showExchangeDialog = false
-            }
-        )
-    }
-
-    if (showTokenDialog) {
-        CalendarTokenSaveDialog(
-            loading = uiState.calendarAuthLoading,
-            onDismiss = { showTokenDialog = false },
-            onSubmit = { accessToken, refreshToken, expiresIn ->
-                viewModel.saveCalendarToken(accessToken, refreshToken, expiresIn)
-                showTokenDialog = false
-            }
-        )
     }
 
     // Premium 게이트 시트
@@ -785,135 +798,6 @@ private fun CalendarActionItem(
             )
         }
     }
-}
-
-@Composable
-private fun CalendarCodeExchangeDialog(
-    loading: Boolean,
-    onDismiss: () -> Unit,
-    onSubmit: (code: String, redirectUri: String) -> Unit
-) {
-    val colors = KairosTheme.colors
-    var code by remember { mutableStateOf("") }
-    var redirectUri by remember { mutableStateOf("com.kairos.app:/oauth2redirect") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.card,
-        titleContentColor = colors.text,
-        textContentColor = colors.text,
-        title = { Text("OAuth Code 교환", color = colors.text) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = code,
-                    onValueChange = { code = it },
-                    label = { Text("authorization code") },
-                    singleLine = true,
-                    enabled = !loading,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colors.accent,
-                        unfocusedBorderColor = colors.border,
-                        focusedTextColor = colors.text,
-                        unfocusedTextColor = colors.text,
-                        focusedLabelColor = colors.accent,
-                        unfocusedLabelColor = colors.textSecondary,
-                        cursorColor = colors.accent
-                    )
-                )
-                OutlinedTextField(
-                    value = redirectUri,
-                    onValueChange = { redirectUri = it },
-                    label = { Text("redirect_uri") },
-                    singleLine = true,
-                    enabled = !loading,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colors.accent,
-                        unfocusedBorderColor = colors.border,
-                        focusedTextColor = colors.text,
-                        unfocusedTextColor = colors.text,
-                        focusedLabelColor = colors.accent,
-                        unfocusedLabelColor = colors.textSecondary,
-                        cursorColor = colors.accent
-                    )
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = !loading,
-                onClick = { onSubmit(code, redirectUri) }
-            ) { Text("요청", color = colors.accent) }
-        },
-        dismissButton = {
-            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소", color = colors.textSecondary) }
-        }
-    )
-}
-
-@Composable
-private fun CalendarTokenSaveDialog(
-    loading: Boolean,
-    onDismiss: () -> Unit,
-    onSubmit: (accessToken: String, refreshToken: String, expiresIn: String) -> Unit
-) {
-    val colors = KairosTheme.colors
-    var accessToken by remember { mutableStateOf("") }
-    var refreshToken by remember { mutableStateOf("") }
-    var expiresIn by remember { mutableStateOf("") }
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = colors.accent,
-        unfocusedBorderColor = colors.border,
-        focusedTextColor = colors.text,
-        unfocusedTextColor = colors.text,
-        focusedLabelColor = colors.accent,
-        unfocusedLabelColor = colors.textSecondary,
-        cursorColor = colors.accent
-    )
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.card,
-        titleContentColor = colors.text,
-        textContentColor = colors.text,
-        title = { Text("토큰 직접 저장", color = colors.text) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = accessToken,
-                    onValueChange = { accessToken = it },
-                    label = { Text("access_token") },
-                    singleLine = true,
-                    enabled = !loading,
-                    colors = textFieldColors
-                )
-                OutlinedTextField(
-                    value = refreshToken,
-                    onValueChange = { refreshToken = it },
-                    label = { Text("refresh_token (optional)") },
-                    singleLine = true,
-                    enabled = !loading,
-                    colors = textFieldColors
-                )
-                OutlinedTextField(
-                    value = expiresIn,
-                    onValueChange = { expiresIn = it },
-                    label = { Text("expires_in seconds (optional)") },
-                    singleLine = true,
-                    enabled = !loading,
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = textFieldColors
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = !loading,
-                onClick = { onSubmit(accessToken, refreshToken, expiresIn) }
-            ) { Text("저장", color = colors.accent) }
-        },
-        dismissButton = {
-            TextButton(enabled = !loading, onClick = onDismiss) { Text("취소", color = colors.textSecondary) }
-        }
-    )
 }
 
 /**
