@@ -3,8 +3,6 @@ package com.example.kairos_mobile.presentation.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kairos_mobile.domain.model.CalendarException
-import com.example.kairos_mobile.domain.model.LocalCalendar
 import com.example.kairos_mobile.domain.model.ThemePreference
 import com.example.kairos_mobile.domain.repository.AuthRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
@@ -12,9 +10,6 @@ import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.SubscriptionRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.capture.SubmitCaptureUseCase
-import com.example.kairos_mobile.domain.usecase.classification.GetPresetsUseCase
-import com.example.kairos_mobile.domain.usecase.classification.SetCustomInstructionUseCase
-import com.example.kairos_mobile.domain.usecase.classification.SetPresetUseCase
 import com.example.kairos_mobile.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.example.kairos_mobile.domain.usecase.settings.SetCalendarSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +22,8 @@ import javax.inject.Inject
 
 /**
  * Settings 화면 ViewModel
- * 테마/캘린더/알림/계정/구독 설정 관리
+ * 테마/캘린더 토글/계정/구독 설정 관리
+ * 캘린더 세부 설정과 AI 분류 설정은 각각의 세부 화면으로 분리됨
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -38,10 +34,7 @@ class SettingsViewModel @Inject constructor(
     private val submitCaptureUseCase: SubmitCaptureUseCase,
     private val imageRepository: ImageRepository,
     private val authRepository: AuthRepository,
-    private val subscriptionRepository: SubscriptionRepository,
-    private val getPresetsUseCase: GetPresetsUseCase,
-    private val setPresetUseCase: SetPresetUseCase,
-    private val setCustomInstructionUseCase: SetCustomInstructionUseCase
+    private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -56,7 +49,6 @@ class SettingsViewModel @Inject constructor(
         loadCalendarSettings()
         refreshCalendarPermissionState()
         loadAccountInfo()
-        loadPresets()
         loadCaptureFontSize()
     }
 
@@ -73,14 +65,8 @@ class SettingsViewModel @Inject constructor(
     private fun loadCalendarSettings() {
         viewModelScope.launch {
             val calendarEnabled = getCalendarSettingsUseCase.isCalendarEnabled()
-            val calendarMode = getCalendarSettingsUseCase.getCalendarMode()
-            val notificationEnabled = getCalendarSettingsUseCase.isNotificationEnabled()
             _uiState.update {
-                it.copy(
-                    isCalendarEnabled = calendarEnabled,
-                    calendarMode = calendarMode,
-                    isNotificationEnabled = notificationEnabled
-                )
+                it.copy(isCalendarEnabled = calendarEnabled)
             }
         }
     }
@@ -93,22 +79,6 @@ class SettingsViewModel @Inject constructor(
             val features = subscriptionRepository.getCachedFeatures()
             _uiState.update {
                 it.copy(user = user, subscriptionTier = tier, features = features)
-            }
-        }
-    }
-
-    /** 분류 프리셋 로드 */
-    private fun loadPresets() {
-        val presets = getPresetsUseCase()
-        viewModelScope.launch {
-            val currentPresetId = userPreferenceRepository.getString("classification_preset_id", "default")
-            val currentInstruction = userPreferenceRepository.getString("classification_custom_instruction", "")
-            _uiState.update {
-                it.copy(
-                    presets = presets,
-                    selectedPresetId = currentPresetId,
-                    customInstruction = currentInstruction
-                )
             }
         }
     }
@@ -132,16 +102,13 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isCalendarPermissionGranted = false,
-                        isCalendarEnabled = false,
-                        availableCalendars = emptyList(),
-                        selectedCalendarId = null
+                        isCalendarEnabled = false
                     )
                 }
                 return@launch
             }
 
             _uiState.update { it.copy(isCalendarPermissionGranted = true) }
-            loadAvailableCalendarsInternal()
         }
     }
 
@@ -154,8 +121,6 @@ class SettingsViewModel @Inject constructor(
                     it.copy(
                         isCalendarPermissionGranted = false,
                         isCalendarEnabled = false,
-                        availableCalendars = emptyList(),
-                        selectedCalendarId = null,
                         calendarAuthMessage = "캘린더 권한이 거부되었습니다."
                     )
                 }
@@ -170,29 +135,6 @@ class SettingsViewModel @Inject constructor(
                     calendarAuthMessage = "캘린더 권한이 허용되었습니다."
                 )
             }
-            loadAvailableCalendarsInternal()
-        }
-    }
-
-    /** 캘린더 목록 재조회 */
-    fun reloadAvailableCalendars() {
-        viewModelScope.launch {
-            loadAvailableCalendarsInternal()
-        }
-    }
-
-    /** 대상 캘린더 선택 */
-    fun setTargetCalendar(calendarId: Long) {
-        viewModelScope.launch {
-            runCatching {
-                calendarRepository.setTargetCalendarId(calendarId)
-            }.onSuccess {
-                _uiState.update { it.copy(selectedCalendarId = calendarId) }
-            }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(calendarAuthMessage = mapCalendarErrorMessage(throwable))
-                }
-            }
         }
     }
 
@@ -201,26 +143,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferenceRepository.setString(KEY_CAPTURE_FONT_SIZE, size)
             _uiState.update { it.copy(captureFontSize = size) }
-        }
-    }
-
-    /** 분류 프리셋 변경 */
-    fun setPreset(presetId: String) {
-        viewModelScope.launch {
-            setPresetUseCase(presetId)
-            _uiState.update { it.copy(selectedPresetId = presetId) }
-        }
-    }
-
-    /** 분류 커스텀 인스트럭션 변경 */
-    fun setCustomInstruction(instruction: String) {
-        _uiState.update { it.copy(customInstruction = instruction) }
-    }
-
-    /** 분류 커스텀 인스트럭션 저장 */
-    fun saveCustomInstruction() {
-        viewModelScope.launch {
-            setCustomInstructionUseCase(_uiState.value.customInstruction)
         }
     }
 
@@ -266,26 +188,6 @@ class SettingsViewModel @Inject constructor(
                     isCalendarPermissionGranted = calendarRepository.isCalendarPermissionGranted()
                 )
             }
-
-            if (enabled) {
-                loadAvailableCalendarsInternal()
-            }
-        }
-    }
-
-    /** 일정 추가 모드 변경 */
-    fun setCalendarMode(mode: String) {
-        viewModelScope.launch {
-            setCalendarSettingsUseCase.setCalendarMode(mode)
-            _uiState.update { it.copy(calendarMode = mode) }
-        }
-    }
-
-    /** 알림 설정 토글 */
-    fun toggleNotification(enabled: Boolean) {
-        viewModelScope.launch {
-            setCalendarSettingsUseCase.setNotificationEnabled(enabled)
-            _uiState.update { it.copy(isNotificationEnabled = enabled) }
         }
     }
 
@@ -332,54 +234,5 @@ class SettingsViewModel @Inject constructor(
     /** 디버그 결과 메시지 닫기 */
     fun dismissDebugResult() {
         _uiState.update { it.copy(debugResult = null) }
-    }
-
-    private suspend fun loadAvailableCalendarsInternal() {
-        runCatching {
-            val calendars = calendarRepository.getAvailableCalendars()
-            val selected = normalizeSelectedCalendar(calendars)
-            calendars to selected
-        }.onSuccess { (calendars, selectedCalendarId) ->
-            _uiState.update {
-                it.copy(
-                    availableCalendars = calendars,
-                    selectedCalendarId = selectedCalendarId,
-                    isCalendarPermissionGranted = true
-                )
-            }
-        }.onFailure { throwable ->
-            _uiState.update {
-                it.copy(
-                    availableCalendars = emptyList(),
-                    selectedCalendarId = null,
-                    calendarAuthMessage = mapCalendarErrorMessage(throwable)
-                )
-            }
-        }
-    }
-
-    private suspend fun normalizeSelectedCalendar(calendars: List<LocalCalendar>): Long? {
-        if (calendars.isEmpty()) {
-            return null
-        }
-
-        val selected = calendarRepository.getTargetCalendarId()
-        if (selected != null && calendars.any { it.id == selected }) {
-            return selected
-        }
-
-        val fallback = calendars.firstOrNull { it.isPrimary } ?: calendars.first()
-        calendarRepository.setTargetCalendarId(fallback.id)
-        return fallback.id
-    }
-
-    private fun mapCalendarErrorMessage(throwable: Throwable): String {
-        return when (throwable) {
-            is CalendarException.PermissionDenied -> "캘린더 권한이 필요합니다."
-            is CalendarException.NoCalendarSelected -> "연동할 캘린더를 선택해주세요."
-            is CalendarException.InsertFailed -> throwable.message ?: "캘린더 일정 추가에 실패했습니다."
-            is CalendarException.Unknown -> throwable.message ?: "캘린더 요청 실패"
-            else -> throwable.message ?: "요청 실패"
-        }
     }
 }

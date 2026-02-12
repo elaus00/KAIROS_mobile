@@ -19,12 +19,16 @@ data class CaptureDetailUiState(
     val errorMessage: String? = null,
     /** 연관된 Schedule ID (SCHEDULE 타입일 때) */
     val scheduleId: String? = null,
-    /** 일정 시작 시각 (Google Calendar 열기용) */
+    /** 일정 시작 시각 (기기 캘린더 열기용) */
     val scheduleStartTime: Long? = null,
-    /** Google Calendar 동기화 상태 (SCHEDULE 타입일 때만 의미) */
+    /** 기기 캘린더 동기화 상태 (SCHEDULE 타입일 때만 의미) */
     val calendarSyncStatus: CalendarSyncStatus? = null,
     /** 공유용 텍스트 (한 번 소비 후 null 초기화) */
     val shareText: String? = null,
     /** AI 자동 생성 태그 목록 */
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    /** 본문 글씨 크기 (설정에서 가져옴) */
+    val bodyFontSize: Int = 15,
+    /** 본문 줄 높이 (설정에서 가져옴) */
+    val bodyLineHeight: Int = 22
 )

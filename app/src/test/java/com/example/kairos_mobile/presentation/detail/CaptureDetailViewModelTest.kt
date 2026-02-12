@@ -7,6 +7,7 @@ import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
@@ -46,6 +47,7 @@ class CaptureDetailViewModelTest {
     private lateinit var trackEventUseCase: TrackEventUseCase
     private lateinit var formatCaptureForShare: FormatCaptureForShareUseCase
     private lateinit var tagRepository: TagRepository
+    private lateinit var userPreferenceRepository: UserPreferenceRepository
 
     @Before
     fun setUp() {
@@ -57,6 +59,8 @@ class CaptureDetailViewModelTest {
         trackEventUseCase = mockk(relaxed = true)
         formatCaptureForShare = mockk(relaxed = true)
         tagRepository = mockk(relaxed = true)
+        userPreferenceRepository = mockk(relaxed = true)
+        coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
     }
 
     @After
@@ -87,7 +91,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
 
@@ -118,7 +123,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
 
@@ -143,7 +149,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
 
@@ -175,7 +182,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
 
@@ -201,7 +209,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)
@@ -231,7 +240,8 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository
+            tagRepository = tagRepository,
+            userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
 

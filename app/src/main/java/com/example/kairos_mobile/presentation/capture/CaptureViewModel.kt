@@ -5,6 +5,7 @@ import android.os.Trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.net.Uri
+import com.example.kairos_mobile.domain.model.FontSizePreference
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ImageRepository
 import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
@@ -83,12 +84,10 @@ class CaptureViewModel @Inject constructor(
     fun loadFontSize() {
         viewModelScope.launch {
             val sizeKey = userPreferenceRepository.getString(KEY_CAPTURE_FONT_SIZE, "MEDIUM")
-            val (fontSize, lineHeight) = when (sizeKey) {
-                "SMALL" -> 16 to 28
-                "LARGE" -> 24 to 40
-                else -> 20 to 34
+            val pref = FontSizePreference.fromString(sizeKey)
+            _uiState.update {
+                it.copy(fontSize = pref.captureFontSize, lineHeight = pref.captureLineHeight)
             }
-            _uiState.update { it.copy(fontSize = fontSize, lineHeight = lineHeight) }
         }
     }
 

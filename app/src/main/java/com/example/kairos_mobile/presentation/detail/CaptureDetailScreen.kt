@@ -266,8 +266,8 @@ fun CaptureDetailScreen(
                     Text(
                         text = uiState.originalText,
                         color = colors.text,
-                        fontSize = 15.sp,
-                        lineHeight = 22.sp
+                        fontSize = uiState.bodyFontSize.sp,
+                        lineHeight = uiState.bodyLineHeight.sp
                     )
                 }
 
@@ -386,7 +386,7 @@ private fun CalendarSyncSection(
                 // 상태 텍스트 + 아이콘 (색맹 접근성)
                 val (statusText, statusColor, statusIcon) = when (syncStatus) {
                     CalendarSyncStatus.SYNCED -> Triple(
-                        "Google Calendar에 동기화됨",
+                        "기기 캘린더에 동기화됨",
                         colors.success,
                         Icons.Outlined.Check
                     )
@@ -469,7 +469,7 @@ private fun CalendarSyncSection(
                     Spacer(modifier = Modifier.height(12.dp))
                     TextButton(onClick = onOpenCalendar) {
                         Text(
-                            text = "Google Calendar에서 보기",
+                            text = "기기 캘린더에서 보기",
                             color = colors.accent,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
@@ -481,7 +481,7 @@ private fun CalendarSyncSection(
                     Spacer(modifier = Modifier.height(12.dp))
                     TextButton(onClick = onConnectCalendar) {
                         Text(
-                            text = "Google Calendar 연동하기",
+                            text = "기기 캘린더 연동하기",
                             color = colors.accent,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium

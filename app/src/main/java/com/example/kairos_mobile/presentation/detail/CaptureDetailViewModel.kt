@@ -4,12 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kairos_mobile.domain.model.ClassifiedType
+import com.example.kairos_mobile.domain.model.FontSizePreference
 import com.example.kairos_mobile.domain.model.NoteSubType
 import com.example.kairos_mobile.domain.model.CalendarSyncStatus
 import com.example.kairos_mobile.domain.repository.CalendarRepository
 import com.example.kairos_mobile.domain.repository.CaptureRepository
 import com.example.kairos_mobile.domain.repository.ScheduleRepository
 import com.example.kairos_mobile.domain.repository.TagRepository
+import com.example.kairos_mobile.domain.repository.UserPreferenceRepository
 import com.example.kairos_mobile.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.example.kairos_mobile.domain.usecase.analytics.TrackEventUseCase
 import com.example.kairos_mobile.domain.usecase.capture.FormatCaptureForShareUseCase
@@ -36,7 +38,8 @@ class CaptureDetailViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val trackEventUseCase: TrackEventUseCase,
     private val formatCaptureForShare: FormatCaptureForShareUseCase,
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    private val userPreferenceRepository: UserPreferenceRepository
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -46,6 +49,18 @@ class CaptureDetailViewModel @Inject constructor(
 
     init {
         loadCapture()
+        loadFontSize()
+    }
+
+    /** 본문 글씨 크기 로드 */
+    private fun loadFontSize() {
+        viewModelScope.launch {
+            val sizeKey = userPreferenceRepository.getString("capture_font_size", "MEDIUM")
+            val pref = FontSizePreference.fromString(sizeKey)
+            _uiState.update {
+                it.copy(bodyFontSize = pref.bodyFontSize, bodyLineHeight = pref.bodyLineHeight)
+            }
+        }
     }
 
     /**

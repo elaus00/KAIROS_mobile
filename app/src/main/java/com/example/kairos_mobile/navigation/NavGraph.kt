@@ -11,6 +11,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
@@ -33,7 +34,9 @@ import com.example.kairos_mobile.presentation.auth.LoginScreen
 import com.example.kairos_mobile.presentation.notes.reorganize.ReorganizeScreen
 import com.example.kairos_mobile.presentation.settings.SettingsScreen
 import com.example.kairos_mobile.presentation.settings.TermsOfServiceScreen
+import com.example.kairos_mobile.presentation.settings.ai.AiClassificationSettingsScreen
 import com.example.kairos_mobile.presentation.settings.analytics.AnalyticsDashboardScreen
+import com.example.kairos_mobile.presentation.settings.calendar.CalendarSettingsScreen
 import com.example.kairos_mobile.presentation.subscription.SubscriptionScreen
 import com.example.kairos_mobile.presentation.trash.TrashScreen
 
@@ -62,6 +65,8 @@ object NavRoutes {
     const val SUBSCRIPTION = "subscription"
     const val REORGANIZE = "reorganize"
     const val ANALYTICS = "analytics"
+    const val CALENDAR_SETTINGS = "calendar-settings"
+    const val AI_CLASSIFICATION_SETTINGS = "ai-classification-settings"
 
     /**
      * CaptureDetailScreen 라우트 생성
@@ -89,8 +94,18 @@ object NavRoutes {
 fun KairosNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = NavRoutes.HOME,
-    autoFocusCapture: Boolean = false
+    autoFocusCapture: Boolean = false,
+    pendingCaptureId: String? = null,
+    onPendingCaptureHandled: () -> Unit = {}
 ) {
+    // 위젯에서 할 일 항목 탭 시 상세 화면으로 이동
+    LaunchedEffect(pendingCaptureId) {
+        pendingCaptureId?.let { captureId ->
+            navController.navigate(NavRoutes.detail(captureId))
+            onPendingCaptureHandled()
+        }
+    }
+
     // 캡처 상세 화면으로 네비게이션
     val navigateToDetail: (String) -> Unit = { captureId ->
         navController.navigate(NavRoutes.detail(captureId))
@@ -193,6 +208,12 @@ fun KairosNavGraph(
                 },
                 onNavigateToAnalytics = {
                     navController.navigate(NavRoutes.ANALYTICS)
+                },
+                onNavigateToCalendarSettings = {
+                    navController.navigate(NavRoutes.CALENDAR_SETTINGS)
+                },
+                onNavigateToAiSettings = {
+                    navController.navigate(NavRoutes.AI_CLASSIFICATION_SETTINGS)
                 }
             )
         }
@@ -296,6 +317,59 @@ fun KairosNavGraph(
             AnalyticsDashboardScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        // 캘린더 설정 화면 (CALENDAR_SETTINGS) - 수평 슬라이드 전환
+        composable(
+            route = NavRoutes.CALENDAR_SETTINGS,
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffsetX = { it / 3 }
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = { fadeOut(animationSpec = tween(200)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffsetX = { it / 3 }
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            CalendarSettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // AI 분류 설정 화면 (AI_CLASSIFICATION_SETTINGS) - 수평 슬라이드 전환
+        composable(
+            route = NavRoutes.AI_CLASSIFICATION_SETTINGS,
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffsetX = { it / 3 }
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = { fadeOut(animationSpec = tween(200)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffsetX = { it / 3 }
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            AiClassificationSettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToSubscription = {
+                    navController.navigate(NavRoutes.SUBSCRIPTION)
                 }
             )
         }

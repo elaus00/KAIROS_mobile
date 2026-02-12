@@ -29,14 +29,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.kairos_mobile.BuildConfig
 import com.example.kairos_mobile.domain.model.SubscriptionTier
 import com.example.kairos_mobile.domain.model.ThemePreference
-import com.example.kairos_mobile.presentation.components.common.PremiumBadge
 import com.example.kairos_mobile.presentation.components.common.SectionHeader
 import com.example.kairos_mobile.presentation.subscription.PremiumGateSheet
 import com.example.kairos_mobile.ui.theme.KairosTheme
 
 /**
  * SettingsScreen
- * 설정 화면 (다크모드 3옵션 + 개인정보처리방침 + 이용약관 + 앱 버전)
+ * 설정 화면 — 화면(테마+글씨크기), 캘린더 토글, AI 분류 진입, 계정, 정보
+ * 캘린더 세부 설정과 AI 분류 설정은 각각의 세부 화면으로 분리됨
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,17 +47,17 @@ fun SettingsScreen(
     onNavigateToTermsOfService: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
     onNavigateToSubscription: () -> Unit = {},
-    onNavigateToAnalytics: () -> Unit = {}
+    onNavigateToAnalytics: () -> Unit = {},
+    onNavigateToCalendarSettings: () -> Unit = {},
+    onNavigateToAiSettings: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val colors = KairosTheme.colors
-    var showPresetDropdown by remember { mutableStateOf(false) }
     var showPremiumGateSheet by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
     val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
     val snackbarHostState = remember { SnackbarHostState() }
-    var showCalendarDropdown by remember { mutableStateOf(false) }
     val calendarPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -153,7 +153,16 @@ fun SettingsScreen(
                     thickness = 1.dp,
                     color = colors.border
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 글씨 크기 라벨
+                Text(
+                    text = "글씨 크기",
+                    color = colors.textMuted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
 
                 ThemeOptionItem(
                     title = "작게",
@@ -180,13 +189,14 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 캘린더 섹션
+            // 캘린더 섹션 — 토글만 남기고 세부 설정은 세부 화면으로 분리
             SectionHeader(title = "캘린더 연동")
 
             SettingsCard {
                 ToggleSettingItem(
                     title = "캘린더 연동",
-                    description = "일정을 기기 캘린더에 동기화",
+                    description = if (!uiState.isCalendarPermissionGranted) "활성화하면 캘린더 권한을 요청합니다"
+                        else "일정을 기기 캘린더에 동기화",
                     isChecked = uiState.isCalendarEnabled,
                     onToggle = { enabled ->
                         if (enabled && !uiState.isCalendarPermissionGranted) {
@@ -202,247 +212,34 @@ fun SettingsScreen(
                     }
                 )
 
-                if (!uiState.isCalendarPermissionGranted) {
-                    SettingsDivider()
-                    CalendarActionItem(
-                        title = "권한 요청",
-                        description = "캘린더 연동을 위해 권한을 허용해주세요",
-                        enabled = true,
-                        onClick = {
-                            calendarPermissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.READ_CALENDAR,
-                                    Manifest.permission.WRITE_CALENDAR
-                                )
-                            )
-                        }
-                    )
-                } else if (uiState.isCalendarEnabled) {
+                // 캘린더 연동이 켜져 있을 때만 세부 설정 진입점 표시
+                if (uiState.isCalendarPermissionGranted && uiState.isCalendarEnabled) {
                     SettingsDivider()
 
-                    Box {
-                        NavigationSettingItem(
-                            title = "연동 캘린더",
-                            description = uiState.availableCalendars
-                                .firstOrNull { it.id == uiState.selectedCalendarId }
-                                ?.displayName ?: "선택 필요",
-                            onClick = { showCalendarDropdown = true }
-                        )
-
-                        DropdownMenu(
-                            expanded = showCalendarDropdown,
-                            onDismissRequest = { showCalendarDropdown = false }
-                        ) {
-                            if (uiState.availableCalendars.isEmpty()) {
-                                DropdownMenuItem(
-                                    text = { Text("사용 가능한 캘린더가 없습니다.") },
-                                    onClick = { showCalendarDropdown = false }
-                                )
-                            } else {
-                                uiState.availableCalendars.forEach { calendar ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = if (calendar.isPrimary) {
-                                                    "${calendar.displayName} (기본)"
-                                                } else {
-                                                    calendar.displayName
-                                                }
-                                            )
-                                        },
-                                        onClick = {
-                                            viewModel.setTargetCalendar(calendar.id)
-                                            showCalendarDropdown = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    if (uiState.availableCalendars.isEmpty()) {
-                        SettingsDivider()
-                        CalendarActionItem(
-                            title = "캘린더 목록 새로고침",
-                            description = "기기 캘린더 목록을 다시 불러옵니다",
-                            enabled = true,
-                            onClick = { viewModel.reloadAvailableCalendars() }
-                        )
-                    }
-
-                    SettingsDivider()
-
-                    ThemeOptionItem(
-                        title = "자동 추가",
-                        description = "신뢰도 높은 일정은 자동 추가",
-                        isSelected = uiState.calendarMode == "auto",
-                        onClick = { viewModel.setCalendarMode("auto") }
-                    )
-
-                    SettingsDivider()
-
-                    ThemeOptionItem(
-                        title = "제안 모드",
-                        description = "일정 추가 전 승인 요청",
-                        isSelected = uiState.calendarMode == "suggest",
-                        onClick = { viewModel.setCalendarMode("suggest") }
-                    )
-
-                    SettingsDivider()
-
-                    ToggleSettingItem(
-                        title = "알림",
-                        description = "일정 추가 확인 및 제안 알림",
-                        isChecked = uiState.isNotificationEnabled,
-                        onToggle = { viewModel.toggleNotification(it) }
+                    NavigationSettingItem(
+                        title = "캘린더 설정",
+                        onClick = onNavigateToCalendarSettings
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // AI 분류 섹션
+            // AI 분류 섹션 — 세부 화면으로 진입하는 단일 항목
             SectionHeader(title = "AI 분류")
 
             SettingsCard {
-                val isPremium = isPremiumSubscriber
-
-                // 분류 프리셋 드롭다운
-                Box {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (isPremium) {
-                                    showPresetDropdown = true
-                                } else {
-                                    premiumGateFeatureName = "AI 분류 설정"
-                                    showPremiumGateSheet = true
-                                }
-                            }
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "분류 프리셋",
-                                    color = colors.text,
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                if (!isPremium) {
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    PremiumBadge()
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = uiState.presets.find { it.id == uiState.selectedPresetId }?.name ?: "기본",
-                                color = colors.textMuted,
-                                fontSize = 13.sp
-                            )
-                        }
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = colors.textMuted,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    // 프리셋 드롭다운 메뉴
-                    DropdownMenu(
-                        expanded = showPresetDropdown,
-                        onDismissRequest = { showPresetDropdown = false }
-                    ) {
-                        uiState.presets.forEach { preset ->
-                            DropdownMenuItem(
-                                text = {
-                                    Column {
-                                        Text(
-                                            text = preset.name,
-                                            fontWeight = if (preset.id == uiState.selectedPresetId) FontWeight.Bold else FontWeight.Normal
-                                        )
-                                        Text(
-                                            text = preset.description,
-                                            fontSize = 12.sp,
-                                            color = colors.textMuted
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    viewModel.setPreset(preset.id)
-                                    showPresetDropdown = false
-                                }
-                            )
+                NavigationSettingItem(
+                    title = "AI 분류 설정",
+                    onClick = {
+                        if (isPremiumSubscriber) {
+                            onNavigateToAiSettings()
+                        } else {
+                            premiumGateFeatureName = "AI 분류 설정"
+                            showPremiumGateSheet = true
                         }
                     }
-                }
-
-                SettingsDivider()
-
-                // 분류 규칙 (커스텀 인스트럭션)
-                Box {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "분류 규칙",
-                                color = colors.text,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                            if (!isPremium) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                PremiumBadge()
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = uiState.customInstruction,
-                            onValueChange = { viewModel.setCustomInstruction(it) },
-                            placeholder = { Text("예: 업무 관련 내용은 일정으로 분류", color = colors.placeholder) },
-                            enabled = isPremium,
-                            modifier = Modifier.fillMaxWidth(),
-                            minLines = 2,
-                            maxLines = 4,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = colors.accent,
-                                unfocusedBorderColor = colors.border,
-                                focusedTextColor = colors.text,
-                                unfocusedTextColor = colors.text,
-                                disabledTextColor = colors.textMuted,
-                                disabledBorderColor = colors.borderLight,
-                                cursorColor = colors.accent
-                            )
-                        )
-                        if (isPremium && uiState.customInstruction.isNotBlank()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextButton(
-                                onClick = { viewModel.saveCustomInstruction() },
-                                modifier = Modifier.align(Alignment.End)
-                            ) {
-                                Text("저장", color = colors.accent, fontSize = 14.sp)
-                            }
-                        }
-                    }
-                    // 비프리미엄 시 TextField 터치를 가로채는 투명 오버레이
-                    if (!isPremium) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clickable {
-                                    premiumGateFeatureName = "AI 분류 설정"
-                                    showPremiumGateSheet = true
-                                }
-                        )
-                    }
-                }
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -749,54 +546,6 @@ private fun ToggleSettingItem(
                 uncheckedBorderColor = colors.border
             )
         )
-    }
-}
-
-@Composable
-private fun CalendarActionItem(
-    title: String,
-    description: String,
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    val colors = KairosTheme.colors
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled) { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = if (enabled) colors.text else colors.textMuted,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = description,
-                color = colors.textMuted,
-                fontSize = 13.sp
-            )
-        }
-
-        if (enabled) {
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = colors.textMuted,
-                modifier = Modifier.size(20.dp)
-            )
-        } else {
-            CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                strokeWidth = 2.dp,
-                color = colors.textMuted
-            )
-        }
     }
 }
 
