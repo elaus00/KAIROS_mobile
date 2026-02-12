@@ -1,8 +1,8 @@
 # KAIROS — 데이터 모델 명세서
 
-> **Version**: 2.0
-**작성일**: 2026-02-06
-**기준**: PRD v10.0, 기능명세서 v2.0
+> **Version**: 2.2
+**작성일**: 2026-02-12
+**기준**: PRD v10.0, 기능명세서 v2.3
 >
 
 ---
@@ -14,6 +14,7 @@
 | 1.0 | 2026-02-06 | 초기 작성 (PRD v9.2 기준) |
 | 2.0 | 2026-02-06 | PRD v10.0 + 기능명세서 v2.0 반영 (불일치 시 PRD 우선). (1) 분류 체계 전면 변경 — classified_type을 SCHEDULE/TODO/NOTES/TEMP 4개로 재편, note_sub_type 필드 추가, (2) 삭제 모델 변경 — Phase 1: Soft Delete(3초) → Hard Delete, Phase 2a: 휴지통(30일) 도입으로 3단계화, is_trashed/trashed_at 필드 추가(Phase 2a), (3) AI 분류 확인 추적 — is_confirmed/confirmed_at 필드 추가 (AI 분류 현황 시트 뱃지 지원), (4) 멀티 인텐트 분할(Phase 2b) — parent_capture_id 필드 추가, source enum에 SPLIT 추가, (5) Folder에 BOOKMARKS 타입 및 system-bookmarks 시스템 폴더 추가, (6) AnalyticsEvent 이벤트 유형 업데이트 — classification_confirmed/trash_restored/split_capture_created 추가, inbox_item_resolved → temp_item_resolved 변경 |
 | 2.1 | 2026-02-07 | 서버 PostgreSQL 스키마 정렬. (1) analytics_events 저장 테이블을 서버 섹션에 명시, (2) Phase 2a 디바이스별 Google OAuth 토큰 저장용 google_device_tokens 테이블 추가 |
+| 2.2 | 2026-02-12 | 구현 기준 정합성 보정. (1) CaptureEntity에서 draft_text 필드 제거 (EncryptedSharedPreferences 전용), (2) UserPreference/GoogleAuth를 Room Entity에서 제거 — 실제로 EncryptedSharedPreferences로 구현, (3) 마이그레이션 전략을 v16 Destructive Migration으로 갱신, (4) Entity 수 12개 + FTS 1개로 명시 |
 
 ## 1. 아키텍처 개요
 
@@ -32,7 +33,8 @@
 ├── entities
 ├── classification_logs
 ├── analytics_events (큐)
-└── sync_queue
+├── sync_queue
+└── capture_search (FTS4)
 ```
 
 ### 1.2 데이터 흐름
@@ -69,7 +71,6 @@
 | deleted_at | Long? | | 소프트 삭제 시점 (Snackbar 3초 이내 실행 취소 가능) | 1 |
 | is_trashed | Boolean | ✓ | 휴지통 상태. 기본값 false | 2a |
 | trashed_at | Long? | | 휴지통 이동 시점 (30일 경과 시 하드 삭제) | 2a |
-| draft_text | String? | | 임시 저장 텍스트 (앱 이탈 시, EncryptedSharedPreferences 병행) | 1 |
 | created_at | Long | ✓ | 생성 시각 (epoch ms) | 1 |
 | updated_at | Long | ✓ | 최종 수정 시각 | 1 |
 | classification_completed_at | Long? | | AI 분류 완료 시각 | 1 |
@@ -403,14 +404,11 @@ PENDING → PROCESSING → COMPLETED
 PENDING → PROCESSING → PENDING (재시도 대기, next_retry_at 설정)
 ```
 
-### 2.12 UserPreference (사용자 설정) — Phase 1+
+### 2.12 비-Room 저장소 (EncryptedSharedPreferences)
 
-| 필드 | 타입 | 필수 | 설명 | Phase |
-| --- | --- | --- | --- | --- |
-| key | String | ✓ | PK. 설정 키 | 1 |
-| value | String | ✓ | 설정 값 | 1 |
+아래 데이터는 Room DB가 아닌 EncryptedSharedPreferences에 저장된다.
 
-**주요 설정 키:**
+**사용자 설정 (`UserPreferenceRepositoryImpl`):**
 
 | key | 기본값 | 설명 | Phase |
 | --- | --- | --- | --- |
@@ -420,16 +418,27 @@ PENDING → PROCESSING → PENDING (재시도 대기, next_retry_at 설정)
 | deadline_notification_enabled | true | 마감 알림 on/off | 3a |
 | deadline_notification_minutes | 30 | 마감 전 알림 시간 (분) | 3a |
 
-### 2.13 GoogleAuth — Phase 3a
+**인증 정보 (`AuthRepositoryImpl`):**
 
-| 필드 | 타입 | 필수 | 설명 |
-| --- | --- | --- | --- |
-| id | String | ✓ | PK |
-| google_id | String | ✓ | Google 계정 ID |
-| email | String | ✓ | Google 이메일 |
-| access_token | String | ✓ | EncryptedSharedPreferences에 저장 |
-| refresh_token | String | ✓ | EncryptedSharedPreferences에 저장 |
-| token_expiry | Long | ✓ | 토큰 만료 시각 |
+| key | 설명 | Phase |
+| --- | --- | --- |
+| access_token | JWT 액세스 토큰 | 3a |
+| refresh_token | JWT 리프레시 토큰 | 3a |
+| user_id | 사용자 ID | 3a |
+| user_email | Google 이메일 | 3a |
+
+**디바이스 식별 (`DeviceIdProvider`):**
+
+| key | 설명 | Phase |
+| --- | --- | --- |
+| device_id | 익명 디바이스 식별자 (UUID, 최초 생성 후 고정) | 1 |
+
+**구독 정보 캐시 (`SubscriptionRepositoryImpl`):**
+
+| key | 설명 | Phase |
+| --- | --- | --- |
+| subscription_tier | FREE / PREMIUM | 3a |
+| subscription_features | JSON 직렬화 feature flag 목록 | 3a |
 
 ---
 
@@ -623,15 +632,41 @@ Room FTS4를 사용한 전문 검색 테이블.
 
 ## 7. 마이그레이션 전략
 
-Room DB 스키마 변경 시 마이그레이션을 제공하여 데이터 손실을 방지한다.
+**현재 버전: v16 (Destructive Migration)**
 
-| 버전 | 변경 | Phase |
+Room DB는 Destructive Migration 전략을 사용한다. 스키마 변경 시 기존 로컬 데이터를 삭제하고 새로 생성한다. 모든 사용자 데이터는 서버 동기화를 통해 복원 가능하므로 데이터 손실 위험이 없다.
+
+```kotlin
+// DatabaseModule.kt
+Room.databaseBuilder(context, KairosDatabase::class.java, DATABASE_NAME)
+    .fallbackToDestructiveMigration()
+    .build()
+```
+
+**현재 스키마 (v16):**
+
+12개 Entity + 1개 FTS 가상 테이블:
+
+| 테이블 | Entity 클래스 | 설명 |
 | --- | --- | --- |
-| 1 | 초기 스키마: captures (classified_type=TEMP/SCHEDULE/TODO/NOTES, note_sub_type, is_confirmed, confirmed_at 포함. 휴지통 필드 미포함), todos, schedules, notes, folders (system-inbox/ideas/bookmarks), tags, capture_tags, entities, sync_queue, user_preferences, capture_search FTS | 1 |
-| 2 | captures에 is_trashed, trashed_at 추가 (휴지통 도입). classification_logs, analytics_events 테이블 추가. schedules에 calendar_sync_status, google_event_id 추가. captures에 image_uri 추가. todos에 deadline_source, sort_source 추가 | 2a |
-| 3 | captures에 parent_capture_id 추가. source enum에 SPLIT 추가. notes에 body 추가 | 2b |
-| 4 | google_auth 테이블 추가 | 3a |
+| captures | CaptureEntity | 캡처 원본 |
+| todos | TodoEntity | 할 일 파생 엔티티 |
+| schedules | ScheduleEntity | 일정 파생 엔티티 |
+| notes | NoteEntity | 노트 파생 엔티티 |
+| folders | FolderEntity | 폴더 |
+| tags | TagEntity | 태그 |
+| capture_tags | CaptureTagEntity | 캡처-태그 N:M 연결 |
+| entities | ExtractedEntityEntity | AI 추출 엔티티 |
+| classification_logs | ClassificationLogEntity | 분류 수정 로그 |
+| analytics_events | AnalyticsEventEntity | 분석 이벤트 큐 |
+| sync_queue | SyncQueueEntity | 동기화 큐 |
+| capture_search | CaptureSearchFts | FTS4 전문 검색 |
+
+**스키마 변경 시 규칙:**
+- 버전 번호 증가 필수
+- Destructive Migration이므로 별도 Migration 클래스 불필요
+- 시스템 폴더(Inbox/Ideas/Bookmarks)는 DB 생성/오픈 시 자동 시딩
 
 ---
 
-*Document Version: 2.1 | Last Updated: 2026-02-07*
+*Document Version: 2.2 | Last Updated: 2026-02-12*

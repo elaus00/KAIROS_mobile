@@ -9,7 +9,7 @@
 |------|------|------|
 | PRD | `Docs/direction/kairos_prd_v10.md` | 비전, 요구사항, Phase 정의 (최상위) |
 | 기능명세서 | `Docs/specs/functional_spec.md` | 기능별 동작 규칙, 상태 전이, 엣지 케이스 |
-| 화면정의서 | `Docs/specs/screen-spec.md` | 화면 상태, 인터랙션, UI 스펙 |
+| 화면정의서 | *(작성 예정)* | 화면 상태, 인터랙션, UI 스펙 |
 | 데이터모델 명세서 | `Docs/specs/data_model_spec.md` | 스키마, 관계, 상태 머신 |
 | API 명세서 | `Docs/specs/api_spec.md` | 엔드포인트, 요청/응답, 에러 코드 |
 
@@ -33,8 +33,7 @@
 - PRD/기능명세서 대비 일부 항목은 구현 보강 필요 (AI 현황 시트 UI 세부, 삭제 플로우 일부, Notes 삭제 UX 등)
 - 즉, 컴파일/유닛테스트는 완료 상태이나, 명세 100% 충족 기준으로는 추가 보완이 남아 있음
 
-**개발 계획**: `Docs/plan/phase1/`
-**Phase 2 공통 템플릿**: `Docs/plan/phase2/`
+**개발 계획**: *(아카이브 완료)*
 
 ## Phase 2a: 코어 루프 완성 — 구현 완료
 
@@ -56,7 +55,7 @@
 
 **구현 규모**: 81개 파일 (36 신규, 44 수정, 1 삭제), 17 UseCase 추가, 3 Worker 추가
 
-**개발 계획 및 보고서**: `Docs/plan/phase2a/`
+**개발 계획 및 보고서**: `Docs/archive/plan/phase2a/`
 
 ## Phase 2b: 사용성 확장 (최소 출시 기준) — 구현 완료
 
@@ -72,10 +71,10 @@
 | 검색 필터 | FTS 검색 + 유형/날짜 필터 | **완료** |
 | 할일 위젯 | 4×2 위젯, 오늘 마감 할일 + 체크박스 | **완료** |
 | 관측 지표 | 4개 신규 이벤트 (revisited, completed, search, split) | **완료** |
-| 유닛 테스트 | 112개 통과 + 추가 테스트 작성 중 | **진행 중** |
+| 유닛 테스트 | 112개+ 통과 (테스트 보강 완료) | **완료** |
 | 빌드 상태 | `:app:compileDebugKotlin` 통과 (2026-02-09) | **완료** |
 
-**개발 계획 및 보고서**: `Docs/plan/phase2b/`
+**개발 계획 및 보고서**: `Docs/archive/plan/phase2b/`
 
 ## Phase 3: 서버 연동 (Mock → 실제 API)
 
@@ -94,7 +93,7 @@
 
 **예상 규모**: ~23개 파일 (7 신규, 15 수정, 1 삭제)
 
-**개발 계획**: `Docs/plan/phase3/server_integration_plan.md`
+**개발 계획**: `Docs/archive/plan/phase3/server_integration_plan.md`
 
 ## Phase 3a: 서비스 지속성 — 구현 완료
 

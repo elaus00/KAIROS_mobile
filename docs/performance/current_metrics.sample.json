@@ -1,7 +1,0 @@
-{
-  "cold_start_ms": 780,
-  "first_input_latency_ms": 48,
-  "capture_save_completion_ms": 115,
-  "search_scroll_jank_percent": 5.1,
-  "ai_classification_completion_ms": 880
-}

@@ -28,8 +28,8 @@
 | `borderLight` | `#F0F0F0` | 연한 보더 |
 | `text` | `#111111` | 기본 텍스트 |
 | `textSecondary` | `#888888` | 보조 텍스트 |
-| `textMuted` | `#999999` | 희미한 텍스트 (대비 개선) |
-| `placeholder` | `#BBBBBB` | 플레이스홀더 (대비 개선) |
+| `textMuted` | `#737373` | 희미한 텍스트 (WCAG AA 4.54:1) |
+| `placeholder` | `#737373` | 플레이스홀더 (WCAG AA 4.54:1) |
 | `accent` | `#111111` | 강조 색상 (모노크롬) |
 | `accentBg` | `#F5F5F5` | 강조 배경 |
 | `chipBg` | `#F0F0F0` | 칩 배경 |
@@ -51,8 +51,8 @@
 | `borderLight` | `#222222` | 연한 보더 |
 | `text` | `#FFFFFF` (80% 투명도) | 기본 텍스트 |
 | `textSecondary` | `#888888` | 보조 텍스트 |
-| `textMuted` | `#555555` | 희미한 텍스트 |
-| `placeholder` | `#444444` | 플레이스홀더 |
+| `textMuted` | `#7A7A7A` | 희미한 텍스트 (WCAG AA 4.61:1) |
+| `placeholder` | `#7A7A7A` | 플레이스홀더 (WCAG AA 4.61:1) |
 | `accent` | `#FFFFFF` (80% 투명도) | 강조 색상 |
 | `accentBg` | `#252525` | 강조 배경 |
 | `chipBg` | `#2A2A2A` | 칩 배경 |
