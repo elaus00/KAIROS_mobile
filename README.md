@@ -27,7 +27,7 @@
 
 | 내부 유형 | 사용자 표시 | 목적지 |
 |-----------|------------|--------|
-| SCHEDULE | 일정 | 캘린더 탭 → Google Calendar 동기화 |
+| SCHEDULE | 일정 | 캘린더 탭 → 디바이스 캘린더(CalendarProvider) 동기화 |
 | TODO | 할 일 | 캘린더 탭 할 일 섹션 |
 | NOTES (IDEA) | 아이디어 | 노트 / Ideas 폴더 |
 | NOTES (INBOX) | 노트 | 노트 / Inbox 폴더 |
@@ -40,7 +40,7 @@
 - 분류 수정 이력 로깅
 
 ### 일정 관리
-- Google Calendar 동기화 (신뢰도 기반 조건부 쓰기)
+- 디바이스 캘린더(CalendarProvider) 동기화
 - 일정 제안 승인/거부 플로우
 - 일정 추가 모드 설정 (자동/제안/수동)
 
@@ -69,8 +69,11 @@
 
 ### 기타
 - 다크/라이트 테마 전환
-- 온보딩 (앱 소개, AI 분류 안내, Google Calendar 연결)
+- 온보딩 (앱 소개, AI 분류 안내, 캘린더 권한 안내)
 - 분류 품질 관측 지표 수집 (분류 수정률, 일정 제안 승인율 등)
+- Google OAuth 로그인 + JWT 인증
+- 구독 기능 (Premium 게이트, Play Billing 검증)
+- AI 고급 기능 (Inbox 자동 분류, 노트 재정리, 시맨틱 검색, OCR, 분석 대시보드)
 
 ## 기술 스택
 
@@ -80,9 +83,9 @@
 | UI | Jetpack Compose + Material 3 |
 | Architecture | Clean Architecture (단방향 의존) + MVVM |
 | DI | Hilt |
-| Database | Room (v12, 14 Entity, 14 DAO) |
+| Database | Room (v16, 12 Entity, 12 DAO) |
 | Network | Retrofit + OkHttp |
-| Background | WorkManager (5 Worker) |
+| Background | WorkManager (7 Worker) |
 | Widget | Glance AppWidget |
 | Local Storage | EncryptedSharedPreferences, DataStore |
 
@@ -92,7 +95,7 @@
 presentation/ → domain/ → data/ (단방향 의존)
 ```
 
-- **Domain Layer**: 순수 Kotlin (Android 의존성 없음), 43 UseCase
+- **Domain Layer**: 순수 Kotlin (Android 의존성 없음), 29 UseCase
 - **Data Layer**: Room DB, Retrofit, WorkManager, Repository 구현체
 - **Presentation Layer**: Compose UI, ViewModel, Navigation
 
@@ -105,23 +108,25 @@ presentation/ → domain/ → data/ (단방향 의존)
 ```
 app/src/main/java/com/example/kairos_mobile/
 ├── data/
-│   ├── local/database/          # Room DB v12
-│   │   ├── dao/                 # 14 DAO
-│   │   └── entities/            # 14 Entity (Capture, Todo, Schedule, Note, Folder, Tag, ...)
+│   ├── debug/                   # Debug/Benchmark 샘플 데이터 시드
+│   ├── local/database/          # Room DB v16
+│   │   ├── dao/                 # 12 DAO
+│   │   └── entities/            # 12 Entity (Capture, Todo, Schedule, Note, Folder, Tag, ...)
 │   ├── mapper/                  # Entity ↔ Domain 변환
 │   ├── notification/            # CalendarNotifier 구현체
 │   ├── remote/
-│   │   ├── api/                 # KairosApi, MockKairosApi
+│   │   ├── api/                 # KairosApi (실서버 연동)
 │   │   └── dto/v2/             # Request/Response DTO
-│   ├── repository/              # Repository 구현체 (9개)
-│   └── worker/                  # 5 Worker (Classify, ReclassifyTemp, TrashCleanup, AnalyticsBatch, CalendarSync)
+│   ├── repository/              # Repository 구현체 (17개)
+│   └── worker/                  # 7 Worker (Classify, ReclassifyTemp, TrashCleanup, AnalyticsBatch, CalendarSync, AutoGroup, InboxClassify)
 ├── di/                          # Hilt 모듈 (App, Network, Repository)
 ├── domain/
 │   ├── model/                   # 순수 Kotlin 모델 (Capture, Classification, Folder, Tag, ...)
 │   ├── repository/              # Repository 인터페이스
-│   └── usecase/                 # 43 UseCase (capture, classification, calendar, todo, note, folder, search, settings, analytics)
+│   └── usecase/                 # 29 UseCase (capture, classification, calendar, todo, note, folder, search, settings, auth, subscription, sync, analytics)
 ├── navigation/                  # NavGraph, NavRoutes
 ├── presentation/
+│   ├── auth/                    # 로그인 화면
 │   ├── capture/                 # 메인 캡처 화면
 │   ├── calendar/                # 캘린더 탭 (일정 + 할 일)
 │   ├── classification/          # AI 분류 현황 바텀시트
@@ -132,11 +137,11 @@ app/src/main/java/com/example/kairos_mobile/
 │   ├── onboarding/              # 온보딩 4페이지
 │   ├── search/                  # 검색 화면
 │   ├── settings/                # 설정 화면
+│   ├── subscription/            # 구독 화면/프리미엄 게이트
 │   ├── trash/                   # 휴지통 화면
 │   ├── widget/                  # 입력 위젯
 │   └── components/              # 공통 Compose 컴포넌트
 └── ui/
-    ├── components/              # Glassmorphism 모디파이어
     └── theme/                   # 다크/라이트 테마
 ```
 
@@ -146,20 +151,21 @@ app/src/main/java/com/example/kairos_mobile/
 |-------|------|------|
 | **Phase 1: MVP** | 캡처 → AI 분류 → 관리 핵심 루프 | **완료** |
 | **Phase 2a: 코어 루프 완성** | 휴지통, 이미지 첨부, 할일 고도화, 캘린더 동기화, 위젯, 알림 | **완료** |
-| **Phase 2b: 사용성 확장** | 멀티 인텐트 분할, 노트 편집, 필터링, 할일 위젯 | 다음 단계 |
-| Phase 3: 서버 연동 | Mock → 실제 FastAPI 서버 전환 | 예정 |
-| Phase 3a+: 고도화 | 사용자 인증, 구독, AI 개인화 | 예정 |
+| **Phase 2b: 사용성 확장** | 멀티 인텐트 분할, 노트 편집, 필터링, 할일 위젯 | **완료** |
+| **Phase 3: 서버 연동** | 실서버 API 연동, 에러 처리/동기화 정비 | **진행 중** |
+| **Phase 3a: 서비스 지속성** | 사용자 인증, 구독, AI 개인화 | **완료** |
+| **Phase 3b: 외부 확장** | OCR, 분석 대시보드, 외부 공유 | **완료** |
+| **Phase 4: 실시간 인식** | 실시간 캡처/인식 고도화 | 계획 |
 
-- **빌드**: `compileDebugKotlin` 통과
-- **테스트**: 96개 유닛 테스트 전부 PASSED
-- **구현 규모**: 120+ Kotlin 소스 파일, 16 테스트 파일
+- **구현 규모(로컬 스캔 기준)**: Kotlin 소스 236개, Unit Test 파일 24개
+- **참고**: `SyncRepositoryImpl`의 서버 Pull 결과 로컬 반영은 TODO로 남아 있음
 
 ## 빌드 및 실행
 
 ### 요구사항
-- Android Studio Hedgehog (2023.1.1) 이상
+- Android Studio 최신 안정 버전 권장
 - JDK 17
-- Android SDK 34
+- Android SDK 36
 
 ### 빌드
 ```bash
@@ -173,20 +179,20 @@ app/src/main/java/com/example/kairos_mobile/
 
 ### 테스트
 ```bash
-./gradlew testDebugUnitTest
+./gradlew :app:testDebugUnitTest
 ```
 
 ## 문서
 
 | 문서 | 위치 |
 |------|------|
-| PRD (최상위) | `Docs/direction/kairos_prd_v10.md` |
-| 기능명세서 | `Docs/specs/functional_spec.md` |
-| 화면정의서 | `Docs/specs/screen-spec.md` |
-| 데이터모델 명세서 | `Docs/specs/data_model_spec.md` |
-| API 명세서 | `Docs/specs/api_spec.md` |
-| 개발 로드맵 | `Docs/ROADMAP.md` |
-| 문서 인덱스 | `Docs/INDEX.md` |
+| PRD (최상위) | `docs/direction/kairos_prd_v10.md` |
+| 기능명세서 | `docs/specs/functional_spec.md` |
+| 데이터모델 명세서 | `docs/specs/data_model_spec.md` |
+| API 명세서 | `docs/specs/api_spec.md` |
+| 디자인 가이드 | `docs/specs/design-guide.md` |
+| 개발 로드맵 | `docs/ROADMAP.md` |
+| 문서 인덱스 | `docs/INDEX.md` |
 
 ## 라이선스
 
