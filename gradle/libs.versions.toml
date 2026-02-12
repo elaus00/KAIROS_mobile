@@ -25,6 +25,7 @@ ksp = "2.0.0-1.0.21"
 camerax = "1.5.1"
 coil-compose = "2.5.0"
 datastore = "1.0.0"
+glance = "1.1.1"
 securityCrypto = "1.0.0"
 browser = "1.7.0"
 benchmarkMacro = "1.3.4"
@@ -111,6 +112,10 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 
 # DataStore
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
+# Glance (위젯)
+glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
 # Security
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }

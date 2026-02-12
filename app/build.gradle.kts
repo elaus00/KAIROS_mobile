@@ -261,6 +261,10 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
+    // Glance (위젯)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
     // Security (EncryptedSharedPreferences)
     implementation(libs.security.crypto)
 

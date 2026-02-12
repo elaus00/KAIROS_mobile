@@ -149,6 +149,34 @@ interface TodoDao {
         LIMIT 5
     """)
     suspend fun getTodayIncompleteTodos(todayEndMs: Long?): List<TodoWithCaptureRow>
+
+    /**
+     * 오늘 마감 할 일 조회 — 완료 포함 (위젯용, 미완료 우선 정렬, 최대 5개)
+     */
+    @Query("""
+        SELECT t.id AS todoId, t.capture_id AS captureId,
+               c.ai_title AS aiTitle, c.original_text AS originalText,
+               t.deadline, t.is_completed AS isCompleted
+        FROM todos t
+        INNER JOIN captures c ON t.capture_id = c.id
+        WHERE c.is_deleted = 0 AND c.is_trashed = 0
+        AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
+        ORDER BY t.is_completed ASC, t.deadline ASC, t.sort_order ASC
+        LIMIT 5
+    """)
+    suspend fun getTodayTodosForWidget(todayEndMs: Long?): List<TodoWithCaptureRow>
+
+    /**
+     * 오늘 마감 할 일 전체 수 — 완료 포함 (위젯 오버플로우 표시용)
+     */
+    @Query("""
+        SELECT COUNT(*)
+        FROM todos t
+        INNER JOIN captures c ON t.capture_id = c.id
+        WHERE c.is_deleted = 0 AND c.is_trashed = 0
+        AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
+    """)
+    suspend fun getTodayTodoCountForWidget(todayEndMs: Long?): Int
 }
 
 /**
