@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.flit.app.presentation.calendar.TodoDisplayItem
 import com.flit.app.presentation.components.common.SectionHeader
+import com.flit.app.presentation.components.common.SwipeableCard
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -83,6 +84,7 @@ fun TaskList(
                 tasks = tasks,
                 onTaskComplete = onTaskComplete,
                 onReorder = onReorder,
+                onTaskDelete = onTaskDelete,
                 onTaskAction = onTaskAction
             )
 
@@ -107,6 +109,7 @@ private fun DraggableTaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
+    onTaskDelete: (String) -> Unit,
     onTaskAction: (TodoDisplayItem) -> Unit = {}
 ) {
     val colors = FlitTheme.colors
@@ -147,33 +150,38 @@ private fun DraggableTaskList(
                             }
                         }
                 ) {
-                    TaskItemWithDragHandle(
-                        task = task,
-                        isDragging = isDragging,
-                        onToggleComplete = { onTaskComplete(task.todoId) },
-                        onTaskAction = { onTaskAction(task) },
-                        onDragStart = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            draggingIndex = index
-                            dragOffsetY = 0f
-                        },
-                        onDrag = { deltaY ->
-                            dragOffsetY += deltaY
-                            val slotHeight = if (measuredItemHeight > 0f) measuredItemHeight + spacingPx else 60f
-                            val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
-                                .coerceIn(0, currentList.size - 1)
-                            if (targetIndex != index && targetIndex != draggingIndex) {
-                                currentList.add(targetIndex, currentList.removeAt(draggingIndex))
-                                draggingIndex = targetIndex
+                    SwipeableCard(
+                        onDismiss = { onTaskDelete(task.captureId) },
+                        enableSwipe = !isDragging
+                    ) {
+                        TaskItemWithDragHandle(
+                            task = task,
+                            isDragging = isDragging,
+                            onToggleComplete = { onTaskComplete(task.todoId) },
+                            onTaskAction = { onTaskAction(task) },
+                            onDragStart = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                draggingIndex = index
                                 dragOffsetY = 0f
+                            },
+                            onDrag = { deltaY ->
+                                dragOffsetY += deltaY
+                                val slotHeight = if (measuredItemHeight > 0f) measuredItemHeight + spacingPx else 60f
+                                val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
+                                    .coerceIn(0, currentList.size - 1)
+                                if (targetIndex != index && targetIndex != draggingIndex) {
+                                    currentList.add(targetIndex, currentList.removeAt(draggingIndex))
+                                    draggingIndex = targetIndex
+                                    dragOffsetY = 0f
+                                }
+                            },
+                            onDragEnd = {
+                                draggingIndex = -1
+                                dragOffsetY = 0f
+                                onReorder(currentList.map { it.todoId })
                             }
-                        },
-                        onDragEnd = {
-                            draggingIndex = -1
-                            dragOffsetY = 0f
-                            onReorder(currentList.map { it.todoId })
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

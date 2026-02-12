@@ -5,6 +5,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
@@ -25,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +70,7 @@ fun CalendarCard(
     // 스와이프 제스처 감지용 누적값
     var dragAmountX by remember { mutableFloatStateOf(0f) }
     var dragAmountY by remember { mutableFloatStateOf(0f) }
+    var weekSlideDirection by remember { mutableIntStateOf(0) } // 1: 다음 주, -1: 이전 주
 
     Column(
         modifier = modifier
@@ -96,14 +100,25 @@ fun CalendarCard(
                                 // 위로 스와이프 → 주간 축소
                                 onToggleExpand()
                             }
-                        } else if (isExpanded && abs(dragAmountX) > threshold) {
-                            // 월간 뷰에서 좌우 스와이프 → 달 변경
-                            if (dragAmountX < -threshold) {
-                                // 왼쪽 스와이프 → 다음 달
-                                onMonthChange(currentMonth.plusMonths(1))
-                            } else if (dragAmountX > threshold) {
-                                // 오른쪽 스와이프 → 이전 달
-                                onMonthChange(currentMonth.minusMonths(1))
+                        } else if (abs(dragAmountX) > threshold) {
+                            if (isExpanded) {
+                                // 월간 뷰에서 좌우 스와이프 → 달 변경
+                                if (dragAmountX < -threshold) {
+                                    // 왼쪽 스와이프 → 다음 달
+                                    onMonthChange(currentMonth.plusMonths(1))
+                                } else if (dragAmountX > threshold) {
+                                    // 오른쪽 스와이프 → 이전 달
+                                    onMonthChange(currentMonth.minusMonths(1))
+                                }
+                            } else {
+                                // 주간 뷰에서 좌우 스와이프 → 주 이동
+                                if (dragAmountX < -threshold) {
+                                    weekSlideDirection = 1
+                                    onDateSelected(selectedDate.plusWeeks(1))
+                                } else if (dragAmountX > threshold) {
+                                    weekSlideDirection = -1
+                                    onDateSelected(selectedDate.minusWeeks(1))
+                                }
                             }
                         }
                     }
@@ -196,12 +211,44 @@ fun CalendarCard(
                 }
             } else {
                 // 주간 뷰 (기본 상태)
-                CalendarWeekRow(
-                    selectedDate = selectedDate,
-                    today = today,
-                    datesWithSchedules = datesWithSchedules,
-                    onDateSelected = onDateSelected
-                )
+                AnimatedContent(
+                    targetState = selectedDate.minusDays(selectedDate.dayOfWeek.value.toLong() % 7),
+                    transitionSpec = {
+                        if (weekSlideDirection > 0) {
+                            slideInHorizontally(
+                                animationSpec = tween(220),
+                                initialOffsetX = { fullWidth -> fullWidth / 2 }
+                            ) + fadeIn(animationSpec = tween(220)) togetherWith
+                                slideOutHorizontally(
+                                    animationSpec = tween(220),
+                                    targetOffsetX = { fullWidth -> -fullWidth / 2 }
+                                ) + fadeOut(animationSpec = tween(220))
+                        } else if (weekSlideDirection < 0) {
+                            slideInHorizontally(
+                                animationSpec = tween(220),
+                                initialOffsetX = { fullWidth -> -fullWidth / 2 }
+                            ) + fadeIn(animationSpec = tween(220)) togetherWith
+                                slideOutHorizontally(
+                                    animationSpec = tween(220),
+                                    targetOffsetX = { fullWidth -> fullWidth / 2 }
+                                ) + fadeOut(animationSpec = tween(220))
+                        } else {
+                            fadeIn(animationSpec = tween(180)) togetherWith
+                                fadeOut(animationSpec = tween(180))
+                        }
+                    },
+                    label = "weekTransition"
+                ) {
+                    CalendarWeekRow(
+                        selectedDate = selectedDate,
+                        today = today,
+                        datesWithSchedules = datesWithSchedules,
+                        onDateSelected = { date ->
+                            weekSlideDirection = 0
+                            onDateSelected(date)
+                        }
+                    )
+                }
             }
         }
     }

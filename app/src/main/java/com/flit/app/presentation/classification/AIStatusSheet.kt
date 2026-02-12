@@ -193,6 +193,7 @@ private fun StatusSheetHeader(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onConfirmAll() }
+                    .defaultMinSize(minHeight = 48.dp)
                     .padding(horizontal = 12.dp, vertical = 14.dp)
             )
         }
@@ -249,7 +250,7 @@ private fun ClassificationItem(
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.accentBg)
                 .clickable { onConfirm() }
-                .defaultMinSize(minHeight = 36.dp)
+                .defaultMinSize(minHeight = 48.dp)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {

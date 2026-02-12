@@ -103,7 +103,7 @@ private fun FlitNavItem(
                 indication = null,
                 onClick = onClick
             )
-            .defaultMinSize(minHeight = 44.dp)
+            .defaultMinSize(minHeight = 48.dp)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {

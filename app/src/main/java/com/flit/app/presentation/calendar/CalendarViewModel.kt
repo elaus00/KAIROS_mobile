@@ -14,6 +14,7 @@ import com.flit.app.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.flit.app.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -55,6 +57,11 @@ class CalendarViewModel @Inject constructor(
     private var schedulesJob: Job? = null
     private var todosJob: Job? = null
     private var datesJob: Job? = null
+    private val pendingTrashJobs = mutableMapOf<String, Job>()
+
+    companion object {
+        private const val MOVE_TO_TRASH_DELAY_MS = 3_000L
+    }
 
     init {
         loadSchedulesForSelectedDate()
@@ -280,6 +287,7 @@ class CalendarViewModel @Inject constructor(
     fun undoDelete(captureId: String) {
         viewModelScope.launch {
             try {
+                pendingTrashJobs.remove(captureId)?.cancel()
                 captureRepository.undoSoftDelete(captureId)
                 _events.emit(CalendarUiEvent.UndoSuccess)
             } catch (e: Exception) {
@@ -294,6 +302,7 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 captureRepository.softDelete(captureId)
+                scheduleMoveToTrash(captureId)
                 _events.emit(CalendarUiEvent.DeleteSuccess(captureId))
             } catch (e: Exception) {
                 _uiState.update {
@@ -353,5 +362,36 @@ class CalendarViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun scheduleMoveToTrash(captureId: String) {
+        pendingTrashJobs.remove(captureId)?.cancel()
+        pendingTrashJobs[captureId] = viewModelScope.launch {
+            try {
+                delay(MOVE_TO_TRASH_DELAY_MS)
+                captureRepository.moveToTrash(captureId)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "휴지통 이동에 실패했습니다.")
+                }
+            } finally {
+                pendingTrashJobs.remove(captureId)
+            }
+        }
+    }
+
+    override fun onCleared() {
+        schedulesJob?.cancel()
+        todosJob?.cancel()
+        datesJob?.cancel()
+        val pendingIds = pendingTrashJobs.keys.toList()
+        pendingTrashJobs.values.forEach { it.cancel() }
+        pendingTrashJobs.clear()
+        runBlocking(Dispatchers.IO) {
+            pendingIds.forEach { captureId ->
+                runCatching { captureRepository.moveToTrash(captureId) }
+            }
+        }
+        super.onCleared()
     }
 }

@@ -20,7 +20,7 @@ import com.flit.app.ui.theme.FlitTheme
 /**
  * Flit Chip 컴포넌트 (PRD v4.0)
  * AI 분류 결과 표시용
- * 터치 영역 최소 44dp 확보 (Apple HIG 권장)
+ * 터치 영역 최소 48dp 확보 (WCAG 접근성 기준)
  */
 @Composable
 fun FlitChip(
@@ -40,7 +40,7 @@ fun FlitChip(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = 44.dp) // Apple HIG 최소 터치 영역
+            .defaultMinSize(minHeight = 48.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .then(

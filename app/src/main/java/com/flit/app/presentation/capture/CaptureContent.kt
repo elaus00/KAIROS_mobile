@@ -17,12 +17,9 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.PlatformTextStyle
@@ -61,6 +57,7 @@ import coil.request.ImageRequest
 import com.flit.app.presentation.classification.AIStatusSheet
 import com.flit.app.ui.theme.FlitTheme
 import com.flit.app.ui.theme.FlitWritingFontFamily
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -164,62 +161,69 @@ fun CaptureContent(
             ) {
                 val fontSize = uiState.fontSize.sp
                 val lineHeight = uiState.lineHeight.sp
-                BasicTextField(
-                    value = uiState.inputText,
-                    onValueChange = { viewModel.updateInput(it) },
+                val placeholderAlpha by animateFloatAsState(
+                    targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
+                    animationSpec = tween(200),
+                    label = "placeholderAlpha"
+                )
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .focusRequester(focusRequester)
-                        .testTag("capture_input"),
-                    textStyle = TextStyle(
-                        fontFamily = FlitWritingFontFamily,
-                        color = colors.text,
-                        fontSize = fontSize,
-                        lineHeight = lineHeight,
-                        letterSpacing = 0.3.sp,
-                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Top,
-                            trim = LineHeightStyle.Trim.None
-                        )
-                    ),
-                    cursorBrush = SolidColor(colors.accent),
-                    singleLine = false,
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 28.dp, vertical = 24.dp),
-                            contentAlignment = Alignment.TopStart
-                        ) {
-                            // 플레이스홀더 알파 페이드 애니메이션
-                            val placeholderAlpha by animateFloatAsState(
-                                targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
-                                animationSpec = tween(200),
-                                label = "placeholderAlpha"
+                        .padding(horizontal = 28.dp, vertical = 24.dp)
+                ) {
+                    TextField(
+                        value = uiState.inputText,
+                        onValueChange = { viewModel.updateInput(it) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .focusRequester(focusRequester)
+                            .testTag("capture_input"),
+                        textStyle = TextStyle(
+                            fontFamily = FlitWritingFontFamily,
+                            color = colors.text,
+                            fontSize = fontSize,
+                            lineHeight = lineHeight,
+                            letterSpacing = 0.3.sp,
+                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Top,
+                                trim = LineHeightStyle.Trim.None
                             )
-                            if (placeholderAlpha > 0f) {
-                                Text(
-                                    text = "떠오르는 생각을 자유롭게...",
-                                    style = TextStyle(
-                                        fontFamily = FlitWritingFontFamily,
-                                        color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                        fontSize = fontSize,
-                                        lineHeight = lineHeight,
-                                        letterSpacing = 0.3.sp,
-                                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                        lineHeightStyle = LineHeightStyle(
-                                            alignment = LineHeightStyle.Alignment.Top,
-                                            trim = LineHeightStyle.Trim.None
-                                        )
+                        ),
+                        placeholder = {
+                            Text(
+                                text = "떠오르는 생각을 자유롭게...",
+                                style = TextStyle(
+                                    fontFamily = FlitWritingFontFamily,
+                                    color = colors.placeholder.copy(alpha = placeholderAlpha),
+                                    fontSize = fontSize,
+                                    lineHeight = lineHeight,
+                                    letterSpacing = 0.3.sp,
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                    lineHeightStyle = LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Top,
+                                        trim = LineHeightStyle.Trim.None
                                     )
                                 )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
+                            )
+                        },
+                        singleLine = false,
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = colors.text,
+                            unfocusedTextColor = colors.text,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            cursorColor = colors.accent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            focusedPlaceholderColor = colors.placeholder,
+                            unfocusedPlaceholderColor = colors.placeholder
+                        )
+                    )
+                }
             }
 
             // 이미지 미리보기 — 부드러운 등장/퇴장 애니메이션
@@ -346,9 +350,15 @@ private fun CaptureTopBar(
 @Composable
 private fun DateDisplay() {
     val colors = FlitTheme.colors
-    val today = remember {
+    val currentTimeMs by produceState(initialValue = System.currentTimeMillis()) {
+        while (true) {
+            delay(60_000L)
+            value = System.currentTimeMillis()
+        }
+    }
+    val today = remember(currentTimeMs) {
         val format = SimpleDateFormat("yyyy년 M월 d일 EEEE", Locale.KOREAN)
-        format.format(Date())
+        format.format(Date(currentTimeMs))
     }
 
     Text(
@@ -464,18 +474,18 @@ private fun CaptureToolBar(
         }
 
         // 전송 버튼 — AnimatedContent로 아이콘/로딩 전환
-        Box(
+        FilledIconButton(
+            onClick = onSubmit,
+            enabled = !isSubmitting && canSubmit,
             modifier = Modifier
                 .testTag("capture_submit")
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(submitBgColor)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    enabled = !isSubmitting && canSubmit
-                ) { onSubmit() },
-            contentAlignment = Alignment.Center
+                .size(48.dp),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = submitBgColor,
+                contentColor = submitIconColor,
+                disabledContainerColor = submitBgColor,
+                disabledContentColor = submitIconColor
+            )
         ) {
             AnimatedContent(
                 targetState = isSubmitting,

@@ -12,6 +12,7 @@ import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.presentation.widget.WidgetUpdateHelper
+import com.flit.app.tracing.AppTrace
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,9 @@ class CaptureViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         private const val TRACE_FIRST_INPUT_LATENCY = "first_input_latency"
+        private const val TRACE_CAPTURE_SAVE = "capture_save_completion"
         private const val KEY_DRAFT_TEXT = "draft_capture"
+        private const val KEY_DRAFT_IMAGE_URI = "draft_capture_image_uri"
     }
 
 
@@ -70,10 +73,12 @@ class CaptureViewModel @Inject constructor(
     private fun loadDraft() {
         viewModelScope.launch {
             val draft = userPreferenceRepository.getString(KEY_DRAFT_TEXT, "")
-            if (draft.isNotBlank()) {
-                _uiState.update {
-                    it.copy(inputText = draft)
-                }
+            val draftImageUri = userPreferenceRepository.getString(KEY_DRAFT_IMAGE_URI, "")
+            _uiState.update {
+                it.copy(
+                    inputText = draft,
+                    imageUri = draftImageUri.takeIf { uri -> uri.isNotBlank() }
+                )
             }
         }
     }
@@ -120,38 +125,41 @@ class CaptureViewModel @Inject constructor(
         if (currentText.isBlank() && currentImageUri == null) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSubmitting = true) }
+            AppTrace.suspendSection(TRACE_CAPTURE_SAVE) {
+                _uiState.update { it.copy(isSubmitting = true) }
 
-            try {
-                // 이미지가 있으면 내부 저장소에 복사
-                val savedImageUri = currentImageUri?.let {
-                    imageRepository.saveImage(Uri.parse(it))
-                }
+                try {
+                    // 이미지가 있으면 내부 저장소에 복사
+                    val savedImageUri = currentImageUri?.let {
+                        imageRepository.saveImage(Uri.parse(it))
+                    }
 
-                submitCaptureUseCase(
-                    text = currentText.ifBlank { "이미지 캡처" },
-                    imageUri = savedImageUri
-                )
-
-                // 임시 저장 삭제
-                userPreferenceRepository.setString(KEY_DRAFT_TEXT, "")
-
-                _uiState.update {
-                    it.copy(
-                        isSubmitting = false,
-                        inputText = "",
-                        imageUri = null
+                    submitCaptureUseCase(
+                        text = currentText.ifBlank { "이미지 캡처" },
+                        imageUri = savedImageUri
                     )
-                }
-                _events.emit(CaptureEvent.SubmitSuccess)
-                // 위젯 갱신
-                WidgetUpdateHelper.updateCaptureWidget(application)
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isSubmitting = false,
-                        errorMessage = e.message ?: "저장에 실패했습니다."
-                    )
+
+                    // 임시 저장 삭제
+                    userPreferenceRepository.setString(KEY_DRAFT_TEXT, "")
+                    userPreferenceRepository.setString(KEY_DRAFT_IMAGE_URI, "")
+
+                    _uiState.update {
+                        it.copy(
+                            isSubmitting = false,
+                            inputText = "",
+                            imageUri = null
+                        )
+                    }
+                    _events.emit(CaptureEvent.SubmitSuccess)
+                    // 위젯 갱신
+                    WidgetUpdateHelper.updateCaptureWidget(application)
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(
+                            isSubmitting = false,
+                            errorMessage = e.message ?: "저장에 실패했습니다."
+                        )
+                    }
                 }
             }
         }
@@ -176,10 +184,11 @@ class CaptureViewModel @Inject constructor(
      */
     fun saveDraft() {
         val currentText = _uiState.value.inputText
-        if (currentText.isBlank()) return
+        val currentImageUri = _uiState.value.imageUri
 
         viewModelScope.launch {
             userPreferenceRepository.setString(KEY_DRAFT_TEXT, currentText)
+            userPreferenceRepository.setString(KEY_DRAFT_IMAGE_URI, currentImageUri ?: "")
         }
     }
 

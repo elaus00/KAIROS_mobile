@@ -6,6 +6,7 @@ import android.provider.CalendarContract
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +36,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.domain.model.ClassifiedType
+import com.flit.app.domain.model.NoteSubType
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -161,8 +164,9 @@ fun CaptureDetailScreen(
 
                 ClassificationChipRow(
                     currentType = uiState.classifiedType,
-                    onTypeSelected = { type ->
-                        viewModel.onChangeClassification(type)
+                    currentSubType = uiState.noteSubType,
+                    onTypeSelected = { type, subType ->
+                        viewModel.onChangeClassification(type, subType)
                     }
                 )
 
@@ -283,7 +287,8 @@ fun CaptureDetailScreen(
 @Composable
 private fun ClassificationChipRow(
     currentType: ClassifiedType,
-    onTypeSelected: (ClassifiedType) -> Unit,
+    currentSubType: NoteSubType?,
+    onTypeSelected: (ClassifiedType, NoteSubType?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -295,24 +300,23 @@ private fun ClassificationChipRow(
         ClassificationChip(
             label = "할 일",
             isSelected = currentType == ClassifiedType.TODO,
-            onClick = { onTypeSelected(ClassifiedType.TODO) }
+            onClick = { onTypeSelected(ClassifiedType.TODO, null) }
         )
         ClassificationChip(
             label = "일정",
             isSelected = currentType == ClassifiedType.SCHEDULE,
-            onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
+            onClick = { onTypeSelected(ClassifiedType.SCHEDULE, null) }
         )
         ClassificationChip(
             label = "노트",
-            isSelected = currentType == ClassifiedType.NOTES,
-            onClick = { onTypeSelected(ClassifiedType.NOTES) }
+            isSelected = currentType == ClassifiedType.NOTES && currentSubType != NoteSubType.IDEA,
+            onClick = { onTypeSelected(ClassifiedType.NOTES, NoteSubType.INBOX) }
         )
         ClassificationChip(
             label = "아이디어",
-            isSelected = false,
+            isSelected = currentType == ClassifiedType.NOTES && currentSubType == NoteSubType.IDEA,
             onClick = {
-                onTypeSelected(ClassifiedType.NOTES)
-                // NOTES + IDEA subtype은 ChangeClassificationUseCase에서 처리
+                onTypeSelected(ClassifiedType.NOTES, NoteSubType.IDEA)
             }
         )
     }
@@ -330,24 +334,28 @@ private fun ClassificationChip(
 ) {
     val colors = FlitTheme.colors
 
-    Box(
+    FilterChip(
+        selected = isSelected,
+        onClick = onClick,
+        label = {
+            Text(
+                text = label,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
+            )
+        },
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) colors.accent else colors.chipBg)
-            .clickable { onClick() }
-            .padding(horizontal = 14.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = label,
-            color = if (isSelected) {
-                if (colors.isDark) colors.background else colors.card
-            } else {
-                colors.textSecondary
-            },
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
+            .defaultMinSize(minHeight = 48.dp)
+            .padding(horizontal = 0.dp, vertical = 0.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = FilterChipDefaults.filterChipColors(
+            containerColor = colors.chipBg,
+            labelColor = colors.textSecondary,
+            selectedContainerColor = colors.accent,
+            selectedLabelColor = if (colors.isDark) colors.background else Color.White
+        ),
+        border = null
+    )
 }
 
 /**
@@ -434,30 +442,31 @@ private fun CalendarSyncSection(
                 if (syncStatus == CalendarSyncStatus.SUGGESTION_PENDING) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(colors.accent)
-                                .clickable { onApprove() }
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        Button(
+                            onClick = onApprove,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colors.accent,
+                                contentColor = if (colors.isDark) colors.background else Color.White
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Text(
                                 text = "캘린더에 추가",
-                                color = if (colors.isDark) colors.background else androidx.compose.ui.graphics.Color.White,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(colors.chipBg)
-                                .clickable { onReject() }
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        OutlinedButton(
+                            onClick = onReject,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = colors.chipBg,
+                                contentColor = colors.textSecondary
+                            ),
+                            border = BorderStroke(1.dp, colors.border),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Text(
                                 text = "무시",
-                                color = colors.textSecondary,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
