@@ -119,5 +119,23 @@ Docs/
 - 작업을 검증 가능한 목표로 변환
 - 멀티스텝 작업은 계획 명시: `[Step] → verify: [check]`
 
+## 구현 위임 정책
+
+**코드 구현은 기본적으로 Codex(gpt-5.3-codex)에 위임한다.**
+
+- Claude(Opus)는 **계획, 설계, 컨텍스트 수집, 검증** 역할을 담당
+- 코드 작성/수정은 `/codex-impl` 스킬을 통해 Codex에 위임
+- 사용자가 명시적으로 "Claude가 직접 구현해", "Codex 쓰지 마" 등으로 지시한 경우에만 Claude가 직접 코드를 작성
+- 단순 수정(1~2줄 오타, import 추가 등)은 Claude가 직접 처리 가능
+
+### Codex 위임 워크플로우
+
+```
+1. Claude: 작업 분석 → 관련 파일 읽기 → 구현 계획 수립
+2. Claude: Codex에 전달할 자기 완결적 프롬프트 작성
+3. Codex: codex exec --full-auto --ephemeral 로 구현
+4. Claude: git diff 확인 → 컴파일 체크 → 품질 검증 → 보고
+```
+
 ## 주의사항
 - 새로운 에이전트를 구축할때에는 Sonnet 모델을 사용할 것
