@@ -375,6 +375,100 @@
 | 저장 버튼 | `"저장"` | 버튼 | SettingsScreen.kt:648 | - (디버그) |
 | 취소 버튼 | `"취소"` | 버튼 | SettingsScreen.kt:651 | - (디버그) |
 
+### 2.20 로그인 화면 (LoginScreen) — Phase 3a 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"로그인"` | 제목 | LoginScreen.kt:99 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | LoginScreen.kt:108 | - |
+| 태그라인 | `"적으면, 알아서 정리됩니다"` | 부제목 | LoginScreen.kt:136 | - (PRD 공식 태그라인) |
+| Google 로그인 버튼 | `"Google로 로그인"` | 버튼 | LoginScreen.kt:165 | - |
+| 안내 텍스트 | `"로그인 없이도 기본 기능을 사용할 수 있습니다"` | 안내 | LoginScreen.kt:183 | - |
+| 주의 텍스트 | `"다른 Google 계정으로 로그인하면 기존 로컬 데이터는 초기화됩니다"` | 주의 | LoginScreen.kt:191 | - |
+| OAuth 미설정 에러 | `"GOOGLE_WEB_CLIENT_ID를 설정해주세요."` | 에러 | LoginScreen.kt:62 | - (개발자용) |
+| 로그인 실패 에러 | `"Google 로그인에 실패했습니다. 다시 시도해주세요."` | 에러 | LoginScreen.kt:64 | P1: "Google 로그인에 실패했어요. 다시 시도해주세요" |
+
+### 2.21 구독 화면 (SubscriptionScreen) — Phase 3a 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"구독 관리"` | 제목 | SubscriptionScreen.kt:66 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | SubscriptionScreen.kt:75 | - |
+| 기능 섹션 | `"Premium 기능"` | 섹션 제목 | SubscriptionScreen.kt:103 | - |
+| 기능 목록 | `"AI 그룹 분류"` `"받은함 자동 분류"` `"의미 검색"` `"노트 재구성"` `"분석 대시보드"` `"이미지 텍스트 인식 (OCR)"` `"분류 프리셋"` `"맞춤 지시어"` | 기능명 | SubscriptionScreen.kt:111-118 | - |
+| 업그레이드 버튼 | `"Premium으로 업그레이드"` | 버튼 | SubscriptionScreen.kt:166 | - |
+| 플랜 이름 | `"Premium"` / `"Free"` | 라벨 | SubscriptionScreen.kt:213 | - |
+| 플랜 설명 (Premium) | `"모든 기능을 사용할 수 있습니다"` | 설명 | SubscriptionScreen.kt:223 | P2: "모든 기능을 사용할 수 있어요" |
+| 플랜 설명 (Free) | `"기본 기능만 사용 가능합니다"` | 설명 | SubscriptionScreen.kt:223 | P2: "기본 기능만 사용할 수 있어요" |
+| 사용 가능 아이콘 | `"사용 가능"` | contentDescription | SubscriptionScreen.kt:261 | - |
+| 프리미엄 전용 아이콘 | `"프리미엄 전용"` | contentDescription | SubscriptionScreen.kt:268 | - |
+
+### 2.22 AI 재구성 화면 (ReorganizeScreen) — Phase 3b 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"AI 재구성"` | 제목 | ReorganizeScreen.kt:67 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | ReorganizeScreen.kt:77 | - |
+| 로딩 텍스트 | `"AI가 노트를 분석 중입니다..."` | 로딩 | ReorganizeScreen.kt:104 | - |
+| 다시 시도 | `"다시 시도"` | 버튼 | ReorganizeScreen.kt:127 | - |
+| 컬럼 헤더 | `"현재"` / `"AI 제안"` | 헤더 | ReorganizeScreen.kt:149,157 | - |
+| 액션 라벨 | `"새 폴더"` / `"이동"` | 라벨 | ReorganizeScreen.kt:176-177 | - (action 매핑 적용됨) |
+| 적용 버튼 | `"제안 적용 (N건)"` | 버튼 | ReorganizeScreen.kt:210 | - |
+
+### 2.23 분석 대시보드 (AnalyticsDashboardScreen) — Phase 3b 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"분석"` | 제목 | AnalyticsDashboardScreen.kt:63 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | AnalyticsDashboardScreen.kt:73 | - |
+| 다시 시도 | `"다시 시도"` | 버튼 | AnalyticsDashboardScreen.kt:101 | - |
+| 빈 상태 제목 | `"아직 분석할 데이터가 없어요"` | 빈 상태 | AnalyticsDashboardScreen.kt:127 | - |
+| 빈 상태 설명 | `"캡처를 시작하면 통계가 여기에 나타나요"` | 보조 텍스트 | AnalyticsDashboardScreen.kt:134 | - |
+| 총 캡처 | `"총 캡처"` | 통계 카드 | AnalyticsDashboardScreen.kt:164 | - |
+| 유형별 분포 | `"유형별 분포"` | 섹션 제목 | AnalyticsDashboardScreen.kt:172 | - |
+| 카운트 | `"N건"` | 카운트 | AnalyticsDashboardScreen.kt:193 | - |
+| 평균 분류 시간 | `"평균 분류 시간"` | 통계 카드 | AnalyticsDashboardScreen.kt:199 | - |
+| 인기 태그 | `"인기 태그"` | 섹션 제목 | AnalyticsDashboardScreen.kt:207 | - |
+| 태그 카운트 | `"N회"` | 카운트 | AnalyticsDashboardScreen.kt:223 | - |
+
+### 2.24 AI 분류 설정 (AiClassificationSettingsScreen) — Phase 3b 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"AI 분류 설정"` | 제목 | AiClassificationSettingsScreen.kt:83 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | AiClassificationSettingsScreen.kt:93 | - |
+| 분류 프리셋 헤더 | `"분류 프리셋"` | 섹션 헤더 | AiClassificationSettingsScreen.kt:115 | - |
+| 프리셋 라벨 | `"분류 프리셋"` | 라벨 | AiClassificationSettingsScreen.kt:140 | - |
+| 기본 프리셋 | `"기본"` | 옵션 | AiClassificationSettingsScreen.kt:152,296 | - |
+| 업무 프리셋 | `"업무"` | 옵션 | AiClassificationSettingsScreen.kt:301 | - |
+| 개인 프리셋 | `"개인"` | 옵션 | AiClassificationSettingsScreen.kt:306 | - |
+| 프리셋 설명 | `"일반적인 분류 규칙"` / `"업무 중심 분류"` / `"개인 생활 중심 분류"` | 설명 | AiClassificationSettingsScreen.kt:297,302,307 | - |
+| 분류 규칙 헤더 | `"분류 규칙"` | 섹션 헤더 | AiClassificationSettingsScreen.kt:197 | - |
+| 규칙 placeholder | `"예: 업무 관련 내용은 일정으로 분류"` | placeholder | AiClassificationSettingsScreen.kt:226 | - |
+| 저장 버튼 | `"저장"` | 버튼 | AiClassificationSettingsScreen.kt:251 | - |
+
+### 2.25 캘린더 설정 (CalendarSettingsScreen) — Phase 3b 추가
+
+| 위치 | 현재 텍스트 | 유형 | 파일:줄 | 개선 제안 |
+|------|------------|------|---------|----------|
+| 상단바 제목 | `"캘린더 설정"` | 제목 | CalendarSettingsScreen.kt:98 | - |
+| 뒤로가기 | `"뒤로가기"` | contentDescription | CalendarSettingsScreen.kt:108 | - |
+| 연동 캘린더 헤더 | `"연동 캘린더"` | 섹션 헤더 | CalendarSettingsScreen.kt:131 | - |
+| 연동 캘린더 라벨 | `"연동 캘린더"` | 라벨 | CalendarSettingsScreen.kt:137 | - |
+| 선택 필요 | `"선택 필요"` | 기본값 | CalendarSettingsScreen.kt:140 | - |
+| 새로고침 | `"캘린더 목록 새로고침"` | 액션 | CalendarSettingsScreen.kt:147 | - |
+| 새로고침 설명 | `"기기 캘린더 목록을 다시 불러옵니다"` | 설명 | CalendarSettingsScreen.kt:148 | P2: "기기 캘린더 목록을 다시 불러와요" |
+| 일정 추가 헤더 | `"일정 추가"` | 섹션 헤더 | CalendarSettingsScreen.kt:158 | - |
+| 자동 추가 | `"자동 추가"` | 토글 라벨 | CalendarSettingsScreen.kt:164 | - |
+| 자동 추가 설명 (ON) | `"신뢰도 높은 일정을 자동으로 캘린더에 추가"` | 설명 | CalendarSettingsScreen.kt:165 | - |
+| 자동 추가 설명 (OFF) | `"일정 추가 전 사용자 승인을 요청합니다"` | 설명 | CalendarSettingsScreen.kt:166 | P2: "일정 추가 전 승인을 요청해요" |
+| 알림 | `"알림"` | 토글 라벨 | CalendarSettingsScreen.kt:174 | - |
+| 알림 설명 (ON) | `"자동 추가된 일정을 알림으로 확인"` | 설명 | CalendarSettingsScreen.kt:175 | - |
+| 알림 설명 (OFF) | `"승인 대기 중인 일정이 있을 때 알림"` | 설명 | CalendarSettingsScreen.kt:176 | - |
+| 바텀시트 제목 | `"연동 캘린더 선택"` | 제목 | CalendarSettingsScreen.kt:253 | - |
+| 빈 캘린더 | `"사용 가능한 캘린더가 없습니다"` | 빈 상태 | CalendarSettingsScreen.kt:267 | P2: "사용 가능한 캘린더가 없어요" |
+| 선택됨 | `"선택됨"` | contentDescription | CalendarSettingsScreen.kt:294 | - |
+
 ---
 
 ## 3. 개선 제안 요약
@@ -392,7 +486,7 @@
 | 7 | `"뒤로"` (contentDescription) | `"뒤로가기"` | TrashScreen.kt:198, HistoryScreen.kt:231 | 다른 화면은 "뒤로가기"로 통일 |
 | 8 | `"할 일"` vs `"할일"` 혼용 | `"할 일"` 통일 | SearchScreen.kt:280, FilterChipRow.kt:43 | 검색 결과 칩에서도 통일 필요 |
 
-### P1 (개선 권장) — 톤앤매너 & 표현 개선
+### P1 (개선 권장) — 톤앤매너 & 표현 개선 ✅ 대부분 반영 완료 (2026-02-14)
 
 | # | 현재 | 개선 | 위치 | 이유 |
 |---|------|------|------|------|
@@ -400,12 +494,12 @@
 | 2 | `"저장에 실패했습니다."` | `"저장에 실패했어요. 다시 시도해주세요"` | CaptureViewModel.kt:132 | 해결 방법 안내 |
 | 3 | `"삭제되었습니다"` (x2) | `"삭제했어요"` | CalendarScreen.kt:44, HistoryScreen.kt:50 | 해요체, 능동형 |
 | 4 | `"캘린더에 추가되었습니다"` | `"캘린더에 추가했어요"` | CalendarScreen.kt:54 | 해요체 |
-| 5 | `"실행 취소에 실패했습니다."` | `"되돌리기에 실패했어요"` | CalendarViewModel.kt:235 | "실행 취소"보다 "되돌리기"가 친근 |
+| 5 | `"실행 취소에 실패했습니다."` | ~~`"되돌리기에 실패했어요"`~~ → `"실행 취소에 실패했어요"` | CalendarViewModel.kt:235 | ✅ 해요체 전환 완료. "실행 취소"는 design-guide 용어 통일표 공식 용어이므로 유지 |
 | 6 | `"삭제에 실패했습니다."` | `"삭제에 실패했어요"` | CalendarViewModel.kt:248 | 해요체 |
 | 7 | 에러 메시지들 `"~했습니다."` | `"~했어요"` | CalendarViewModel.kt:265,283 | 해요체 통일 |
-| 8 | `"Google OAuth 시작 (자동)"` | `"Google 계정 연결"` | SettingsScreen.kt:136 | 기술 용어 제거 |
-| 9 | `"브라우저 인증 후 앱으로 자동 복귀"` | `"브라우저에서 인증 후 자동으로 돌아와요"` | SettingsScreen.kt:137 | 친근한 표현 |
-| 10 | `"연결 실패"` | `"연결에 실패했어요. 다시 시도해주세요"` | SettingsViewModel.kt:145 | 해결 방법 안내 |
+| 8 | `"Google OAuth 시작 (자동)"` | `"Google 계정 연결"` | SettingsScreen.kt:136 | ⏭️ 코드에서 해당 텍스트 미발견 (이전 리팩토링으로 제거된 것으로 추정) |
+| 9 | `"브라우저 인증 후 앱으로 자동 복귀"` | `"브라우저에서 인증 후 자동으로 돌아와요"` | SettingsScreen.kt:137 | ⏭️ 코드에서 해당 텍스트 미발견 |
+| 10 | `"연결 실패"` | `"연결에 실패했어요. 다시 시도해주세요"` | SettingsViewModel.kt:145 | ⏭️ 코드에서 해당 텍스트 미발견 |
 | 11 | `"노트를 찾을 수 없습니다"` | `"노트를 찾을 수 없어요"` | NoteDetailViewModel.kt:72 | 해요체 |
 | 12 | `"캡처를 찾을 수 없습니다"` | `"캡처를 찾을 수 없어요"` | CaptureDetailViewModel.kt:84 | 해요체 |
 | 13 | `"사용자가 거부함"` | `"거부됨"` | CaptureDetailScreen.kt:340 | 간결하게 (다른 배지와 동일 형태) |
@@ -413,7 +507,7 @@
 | 15 | `"삭제: $trashedDate"` | `"삭제일: $trashedDate"` | TrashScreen.kt:263 | "삭제:"보다 "삭제일:"이 명확 |
 | 16 | `"Flit."` (위젯 접근성) | `"캡처 위젯"` | widget_capture.xml:15 | 브랜드명보다 기능 설명 |
 
-### P2 (향후 고려) — 감성적 표현 & 세련됨
+### P2 (향후 고려) — 감성적 표현 & 세련됨 ✅ 대부분 반영 완료 (2026-02-14)
 
 | # | 현재 | 개선 | 위치 | 이유 |
 |---|------|------|------|------|
@@ -433,7 +527,7 @@
 | 14 | `"일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있습니다."` | `"~받을 수 있어요"` | OnboardingScreen.kt:243 | 해요체 |
 | 15 | `"나중에 설정에서 연결할 수도 있습니다."` | `"나중에 설정에서 연결할 수도 있어요"` | OnboardingScreen.kt:289 | 해요체 |
 | 16 | `"캘린더 추가를 제안합니다"` | `"캘린더에 추가할까요?"` | CaptureDetailScreen.kt:338 | 질문형이 더 자연스러움 |
-| 17 | `"할 일이 없습니다"` (위젯) | `"할 일이 없어요"` | widget_todo.xml:36 | 해요체 |
+| 17 | `"할 일이 없습니다"` (위젯) | `"할 일이 없어요"` | widget_todo.xml:36 | ⏭️ widget_todo.xml 파일 미존재 |
 
 ---
 
@@ -441,19 +535,21 @@
 
 ### 4.1 통계
 
-| 항목 | 수량 |
-|------|------|
-| 전체 사용자 노출 텍스트 | **약 170개** |
-| P0 이슈 (즉시 수정) | **8건** |
-| P1 이슈 (개선 권장) | **16건** |
-| P2 이슈 (향후 고려) | **17건** |
+| 항목 | 수량 | 상태 |
+|------|------|------|
+| 전체 사용자 노출 텍스트 | **약 220개** (Phase 3a/3b 포함) | - |
+| P0 이슈 (즉시 수정) | **8건** | ✅ 전체 반영 (2026-02-12) |
+| P1 이슈 (개선 권장) | **16건** (13건 반영, 3건 코드 미발견) | ✅ 대부분 반영 (2026-02-14) |
+| P2 이슈 (향후 고려) | **17건** (14건 반영, 1건 파일 미존재, 2건 미반영) | ✅ 대부분 반영 (2026-02-14) |
+| 신규 화면 추가 텍스트 | **~50개** (6개 화면) | 감사 완료 (2026-02-14) |
 
-### 4.2 주요 문제점
+### 4.2 주요 문제점 (해결 현황)
 
-1. **한영 혼용 문제**: 헤더 제목이 "Notes", "Settings"로 영문인 반면, 하위 요소는 한글 사용. 탭 라벨도 영문 ("Notes", "Home", "Calendar")
-2. **문체 불일치 (합니다/해요)**: 스낵바/에러 메시지가 "~했습니다" 체를 사용하나, 앱 전반적 톤은 친근한 "해요"체가 더 적절
-3. **띄어쓰기 불일치**: "할 일" vs "할일" 혼용 (FilterChipRow vs ClassificationDropdown/SearchScreen)
-4. **contentDescription 불일치**: "뒤로" vs "뒤로가기" 혼용
+1. ~~**한영 혼용 문제**: 헤더 제목이 "Notes", "Settings"로 영문~~ → ✅ P0 전체 반영 (2026-02-12)
+2. ~~**문체 불일치 (합니다/해요)**: 스낵바/에러 메시지가 "~했습니다" 체~~ → ✅ 해요체 통일 완료 (2026-02-14)
+3. ~~**띄어쓰기 불일치**: "할 일" vs "할일" 혼용~~ → ✅ P0 전체 반영 (2026-02-12)
+4. ~~**contentDescription 불일치**: "뒤로" vs "뒤로가기" 혼용~~ → ✅ P0 전체 반영 (2026-02-12)
+5. **잔여 합니다체** (신규 화면): LoginScreen "실패했습니다", SubscriptionScreen "사용할 수 있습니다/가능합니다", CalendarSettingsScreen "요청합니다/불러옵니다/없습니다" — 향후 수정 필요
 
 ### 4.3 잘 된 점
 

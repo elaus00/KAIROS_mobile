@@ -340,4 +340,147 @@ class CalendarViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    // ========== 신규 이벤트 테스트 ==========
+
+    @Test
+    fun `updateTaskDeadline_delegates_to_repository`() = runTest {
+        // Given
+        coEvery { todoRepository.updateDeadline(any(), any()) } just runs
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // When
+        viewModel.onEvent(CalendarEvent.UpdateTaskDeadline("todo-1", 1700000000000L))
+        advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { todoRepository.updateDeadline("todo-1", 1700000000000L) }
+    }
+
+    @Test
+    fun `startEditSchedule_sets_editingSchedule`() = runTest {
+        // Given
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val schedule = ScheduleDisplayItem(
+            scheduleId = "sch-1", captureId = "cap-1", title = "회의",
+            startTime = 1000L, endTime = 2000L, location = "서울",
+            isAllDay = false
+        )
+
+        // When
+        viewModel.onEvent(CalendarEvent.StartEditSchedule(schedule))
+
+        // Then
+        assertEquals(schedule, viewModel.uiState.value.editingSchedule)
+    }
+
+    @Test
+    fun `dismissEditSchedule_clears_editingSchedule`() = runTest {
+        // Given
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val schedule = ScheduleDisplayItem(
+            scheduleId = "sch-1", captureId = "cap-1", title = "회의",
+            startTime = 1000L, endTime = 2000L, location = null,
+            isAllDay = false
+        )
+        viewModel.onEvent(CalendarEvent.StartEditSchedule(schedule))
+        assertEquals(schedule, viewModel.uiState.value.editingSchedule)
+
+        // When
+        viewModel.onEvent(CalendarEvent.DismissEditSchedule)
+
+        // Then
+        assertEquals(null, viewModel.uiState.value.editingSchedule)
+    }
+
+    @Test
+    fun `editSchedule_updates_repository_and_clears_state`() = runTest {
+        // Given
+        val existingSchedule = TestFixtures.schedule(
+            id = "sch-1", captureId = "cap-1",
+            startTime = 1000L, endTime = 2000L, location = "서울"
+        )
+        coEvery { scheduleRepository.getScheduleById("sch-1") } returns existingSchedule
+        coEvery { scheduleRepository.updateSchedule(any()) } just runs
+        coEvery { captureRepository.updateAiTitle(any(), any()) } just runs
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // 편집 상태 설정
+        val displayItem = ScheduleDisplayItem(
+            scheduleId = "sch-1", captureId = "cap-1", title = "회의",
+            startTime = 1000L, endTime = 2000L, location = "서울",
+            isAllDay = false
+        )
+        viewModel.onEvent(CalendarEvent.StartEditSchedule(displayItem))
+
+        // When
+        viewModel.onEvent(CalendarEvent.EditSchedule(
+            scheduleId = "sch-1", title = "수정된 회의",
+            startTime = 3000L, endTime = 4000L,
+            location = "부산", isAllDay = false
+        ))
+        advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { scheduleRepository.updateSchedule(any()) }
+        coVerify(exactly = 1) { captureRepository.updateAiTitle("cap-1", "수정된 회의") }
+        assertEquals(null, viewModel.uiState.value.editingSchedule)
+    }
+
+    @Test
+    fun `reorderSchedules_updates_ui_state`() = runTest {
+        // Given: 일정 2개
+        val sch1 = TestFixtures.schedule(id = "s1", captureId = "c1", startTime = 1000L)
+        val sch2 = TestFixtures.schedule(id = "s2", captureId = "c2", startTime = 2000L)
+        val cap1 = TestFixtures.capture(id = "c1", aiTitle = "일정1")
+        val cap2 = TestFixtures.capture(id = "c2", aiTitle = "일정2")
+
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        coEvery { captureRepository.getCaptureById("c1") } returns cap1
+        coEvery { captureRepository.getCaptureById("c2") } returns cap2
+
+        val viewModel = CalendarViewModel(
+            application, scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, toggleTodoCompletion,
+            reorderTodo, approveSuggestion
+        )
+        advanceUntilIdle()
+
+        // When: 순서 뒤집기
+        viewModel.onEvent(CalendarEvent.ReorderSchedules(listOf("s2", "s1")))
+
+        // Then: 순서가 변경됨
+        val schedules = viewModel.uiState.value.schedules
+        assertEquals("일정2", schedules[0].title)
+        assertEquals("일정1", schedules[1].title)
+    }
+
+    @Test
+    fun `navigateToDetail_emits_event`() = runTest {
+        // Given
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        // When + Then
+        viewModel.events.test {
+            viewModel.navigateToDetail("cap-1")
+            advanceUntilIdle()
+
+            val event = awaitItem()
+            assertTrue(event is CalendarUiEvent.NavigateToDetail)
+            assertEquals("cap-1", (event as CalendarUiEvent.NavigateToDetail).captureId)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
