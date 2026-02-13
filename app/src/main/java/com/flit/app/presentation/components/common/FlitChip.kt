@@ -27,7 +27,8 @@ fun FlitChip(
     text: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    selected: Boolean = false
+    selected: Boolean = false,
+    compact: Boolean = false
 ) {
     val colors = FlitTheme.colors
 
@@ -40,7 +41,7 @@ fun FlitChip(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = 48.dp)
+            .defaultMinSize(minHeight = if (compact) 36.dp else 48.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .then(
@@ -50,13 +51,16 @@ fun FlitChip(
                     Modifier
                 }
             )
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(
+                horizontal = if (compact) 12.dp else 14.dp,
+                vertical = if (compact) 8.dp else 12.dp
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             color = textColor,
-            fontSize = 13.sp,
+            fontSize = if (compact) 12.sp else 13.sp,
             fontWeight = FontWeight.Medium
         )
     }

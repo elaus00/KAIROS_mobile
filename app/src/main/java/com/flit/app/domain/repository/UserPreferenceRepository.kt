@@ -24,6 +24,9 @@ interface UserPreferenceRepository {
     /** 문자열 설정값 조회 */
     suspend fun getString(key: String, defaultValue: String): String
 
+    /** 문자열 설정값 실시간 관찰 */
+    fun observeString(key: String, defaultValue: String): Flow<String>
+
     /** 문자열 설정값 저장 */
     suspend fun setString(key: String, value: String)
 }

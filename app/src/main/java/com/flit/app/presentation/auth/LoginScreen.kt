@@ -1,5 +1,6 @@
 package com.flit.app.presentation.auth
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
@@ -21,6 +23,7 @@ import com.flit.app.ui.theme.FlitTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
@@ -34,9 +37,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
     val context = LocalContext.current
     val credentialManager = remember { CredentialManager.create(context) }
     val scope = rememberCoroutineScope()
@@ -68,6 +69,26 @@ fun LoginScreen(
         }
     }
 
+    LoginContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onStartGoogleLogin = viewModel::startGoogleLogin
+    )
+}
+
+/**
+ * 로그인 화면 Content
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginContent(
+    uiState: LoginUiState,
+    onNavigateBack: () -> Unit,
+    onStartGoogleLogin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FlitTheme.colors
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -95,7 +116,7 @@ fun LoginScreen(
         containerColor = colors.background
     ) { padding ->
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 20.dp),
@@ -119,7 +140,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = { viewModel.startGoogleLogin() },
+                onClick = onStartGoogleLogin,
                 enabled = !uiState.isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -172,6 +193,18 @@ fun LoginScreen(
             )
         }
     }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LoginContentPreview() {
+    FlitTheme {
+        LoginContent(
+            uiState = LoginUiState(),
+            onNavigateBack = {},
+            onStartGoogleLogin = {}
+        )
     }
 }
 

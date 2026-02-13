@@ -4,13 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.Folder
 import com.flit.app.domain.model.FolderType
+import com.flit.app.domain.model.NoteViewType
 import com.flit.app.domain.model.NoteWithCapturePreview
 import com.flit.app.domain.model.SubscriptionTier
+import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.FolderRepository
 import com.flit.app.domain.repository.NoteRepository
 import com.flit.app.domain.repository.SubscriptionRepository
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.folder.CreateFolderUseCase
 import com.flit.app.domain.usecase.folder.RenameFolderUseCase
+import com.flit.app.domain.usecase.note.UpdateNoteUseCase
+import com.flit.app.domain.usecase.settings.PreferenceKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
@@ -32,7 +37,10 @@ class NotesViewModel @Inject constructor(
     private val createFolderUseCase: CreateFolderUseCase,
     private val renameFolderUseCase: RenameFolderUseCase,
     private val noteRepository: NoteRepository,
-    private val subscriptionRepository: SubscriptionRepository
+    private val subscriptionRepository: SubscriptionRepository,
+    private val captureRepository: CaptureRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
+    private val updateNoteUseCase: UpdateNoteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NotesUiState())
@@ -42,6 +50,7 @@ class NotesViewModel @Inject constructor(
 
     init {
         loadSubscriptionStatus()
+        loadNoteViewType()
         loadData()
     }
 
@@ -62,6 +71,10 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.RenameFolder -> renameFolder(event.folderId, event.newName)
             is NotesEvent.DeleteFolder -> deleteFolder(event.folderId)
             is NotesEvent.DismissError -> dismissError()
+            is NotesEvent.ToggleNoteExpand -> toggleNoteExpand(event.noteId)
+            is NotesEvent.DeleteNote -> deleteNote(event.captureId)
+            is NotesEvent.DismissShareText -> _uiState.update { it.copy(shareText = null) }
+            is NotesEvent.MoveNoteToFolder -> moveNoteToFolder(event.noteId, event.folderId)
         }
     }
 
@@ -209,5 +222,66 @@ class NotesViewModel @Inject constructor(
 
     private fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    /** 노트 보기 유형 로드 */
+    private fun loadNoteViewType() {
+        viewModelScope.launch {
+            userPreferenceRepository.observeString(
+                PreferenceKeys.KEY_NOTE_VIEW_TYPE,
+                NoteViewType.LIST.name
+            ).collect { value ->
+                val viewType = try {
+                    NoteViewType.valueOf(value)
+                } catch (_: Exception) {
+                    NoteViewType.LIST
+                }
+                _uiState.update { it.copy(viewType = viewType) }
+            }
+        }
+    }
+
+    /** 노트 확장/축소 토글 (단일 확장 정책) */
+    private fun toggleNoteExpand(noteId: String) {
+        _uiState.update {
+            it.copy(
+                expandedNoteId = if (it.expandedNoteId == noteId) null else noteId
+            )
+        }
+    }
+
+    /** 노트 삭제 (휴지통으로 이동) */
+    private fun deleteNote(captureId: String) {
+        viewModelScope.launch {
+            try {
+                captureRepository.moveToTrash(captureId)
+                _uiState.update { it.copy(expandedNoteId = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
+    }
+
+    /** 노트 폴더 이동 */
+    private fun moveNoteToFolder(noteId: String, folderId: String) {
+        viewModelScope.launch {
+            try {
+                updateNoteUseCase.moveToFolder(noteId, folderId)
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
+        }
+    }
+
+    /** 노트 공유 텍스트 생성 */
+    fun shareNote(note: NoteWithCapture) {
+        val title = note.aiTitle ?: note.originalText.take(40)
+        val content = note.body ?: note.originalText
+        val text = buildString {
+            appendLine(title)
+            appendLine()
+            append(content)
+        }
+        _uiState.update { it.copy(shareText = text) }
     }
 }

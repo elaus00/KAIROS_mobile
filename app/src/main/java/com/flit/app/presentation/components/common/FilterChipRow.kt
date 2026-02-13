@@ -32,21 +32,25 @@ fun FilterChipRow(
         FlitChip(
             text = "전체",
             selected = selectedType == null,
+            compact = true,
             onClick = { onTypeSelected(null) }
         )
         FlitChip(
             text = "일정",
             selected = selectedType == ClassifiedType.SCHEDULE,
+            compact = true,
             onClick = { onTypeSelected(ClassifiedType.SCHEDULE) }
         )
         FlitChip(
             text = "할 일",
             selected = selectedType == ClassifiedType.TODO,
+            compact = true,
             onClick = { onTypeSelected(ClassifiedType.TODO) }
         )
         FlitChip(
             text = "노트",
             selected = selectedType == ClassifiedType.NOTES,
+            compact = true,
             onClick = { onTypeSelected(ClassifiedType.NOTES) }
         )
     }

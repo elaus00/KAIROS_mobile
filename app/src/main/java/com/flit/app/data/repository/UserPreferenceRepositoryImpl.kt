@@ -53,6 +53,10 @@ class UserPreferenceRepositoryImpl @Inject constructor(
         return prefs.getString(key, defaultValue) ?: defaultValue
     }
 
+    override fun observeString(key: String, defaultValue: String): Flow<String> {
+        return observeKey(key).map { it ?: defaultValue }
+    }
+
     override suspend fun setString(key: String, value: String) {
         prefs.edit().putString(key, value).apply()
     }

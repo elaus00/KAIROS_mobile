@@ -1,6 +1,12 @@
 package com.flit.app.presentation.trash
 
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,18 +42,43 @@ fun TrashScreen(
     modifier: Modifier = Modifier,
     viewModel: TrashViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
+
+    TrashContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onRestoreItem = viewModel::restoreItem,
+        onDeleteItem = viewModel::deleteItem,
+        onEmptyTrash = viewModel::emptyTrash,
+        onDismissError = viewModel::dismissError,
+        modifier = modifier
+    )
+}
+
+/**
+ * 휴지통 화면 Content
+ */
+@Composable
+fun TrashContent(
+    uiState: TrashUiState,
+    onNavigateBack: () -> Unit,
+    onRestoreItem: (String) -> Unit,
+    onDeleteItem: (String) -> Unit,
+    onEmptyTrash: () -> Unit,
+    onDismissError: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val colors = FlitTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
     var showEmptyTrashDialog by remember { mutableStateOf(false) }
     var deleteTargetId by remember { mutableStateOf<String?>(null) }
+    var expandedId by remember { mutableStateOf<String?>(null) }
 
     // 에러 메시지 표시
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
-            viewModel.dismissError()
+            onDismissError()
         }
     }
 
@@ -111,8 +144,8 @@ fun TrashScreen(
                 else -> {
                     LazyColumn(
                         modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(
                             items = uiState.items,
@@ -120,7 +153,11 @@ fun TrashScreen(
                         ) { item ->
                             TrashItem(
                                 capture = item,
-                                onRestore = { viewModel.restoreItem(item.id) },
+                                isExpanded = expandedId == item.id,
+                                onToggle = {
+                                    expandedId = if (expandedId == item.id) null else item.id
+                                },
+                                onRestore = { onRestoreItem(item.id) },
                                 onDelete = { deleteTargetId = item.id }
                             )
                         }
@@ -143,7 +180,7 @@ fun TrashScreen(
                 confirmButton = {
                     TextButton(onClick = {
                         showEmptyTrashDialog = false
-                        viewModel.emptyTrash()
+                        onEmptyTrash()
                     }) {
                         Text("삭제", color = colors.danger)
                     }
@@ -172,7 +209,7 @@ fun TrashScreen(
                 },
                 confirmButton = {
                     TextButton(onClick = {
-                        deleteTargetId?.let { viewModel.deleteItem(it) }
+                        deleteTargetId?.let { onDeleteItem(it) }
                         deleteTargetId = null
                     }) {
                         Text("삭제", color = colors.danger)
@@ -189,6 +226,21 @@ fun TrashScreen(
             )
         }
     }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TrashContentPreview() {
+    FlitTheme {
+        TrashContent(
+            uiState = TrashUiState(),
+            onNavigateBack = {},
+            onRestoreItem = {},
+            onDeleteItem = {},
+            onEmptyTrash = {},
+            onDismissError = {}
+        )
     }
 }
 
@@ -239,18 +291,25 @@ private fun TrashTopBar(
 }
 
 /**
- * 휴지통 항목
+ * 휴지통 항목 (확장 가능한 카드)
  */
 @Composable
 private fun TrashItem(
     capture: Capture,
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
     onRestore: () -> Unit,
     onDelete: () -> Unit
 ) {
     val colors = FlitTheme.colors
-    val dateFormat = remember { SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault()) }
+    val shortDateFormat = remember { SimpleDateFormat("M/d", Locale.getDefault()) }
+    val fullDateFormat = remember { SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault()) }
+
+    val shortDateText = remember(capture.trashedAt) {
+        capture.trashedAt?.let { shortDateFormat.format(Date(it)) } ?: ""
+    }
     val trashedDate = remember(capture.trashedAt) {
-        capture.trashedAt?.let { dateFormat.format(Date(it)) } ?: ""
+        capture.trashedAt?.let { fullDateFormat.format(Date(it)) } ?: ""
     }
     val remainingDays = remember(capture.trashedAt) {
         val trashedAt = capture.trashedAt ?: return@remember 0
@@ -268,85 +327,130 @@ private fun TrashItem(
         }
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = colors.card
-        )
+    val title = capture.aiTitle ?: capture.originalText.take(40)
+    val preview = capture.originalText.take(100)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(colors.card)
+            .border(0.5.dp, colors.border, RoundedCornerShape(16.dp))
+            .clickable(onClick = onToggle)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        // 첫 줄: 제목 + 날짜
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
         ) {
-            // 제목
             Text(
-                text = capture.aiTitle ?: capture.originalText.take(50),
+                text = title,
                 color = colors.text,
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                maxLines = 2
+                maxLines = if (isExpanded) 2 else 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
 
-            // 삭제 시각
-            if (trashedDate.isNotEmpty()) {
-                Text(
-                    text = "삭제: $trashedDate",
-                    color = colors.textMuted,
-                    fontSize = 12.sp
-                )
-            }
+            Spacer(modifier = Modifier.width(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = typeLabel,
-                    color = colors.chipText,
-                    fontSize = 11.sp,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(colors.chipBg)
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                )
-                Text(
-                    text = "남은 ${remainingDays}일",
-                    color = colors.textMuted,
-                    fontSize = 12.sp
-                )
-            }
+            Text(
+                text = shortDateText,
+                color = colors.textMuted,
+                fontSize = 12.sp
+            )
+        }
 
-            // 버튼
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = onRestore,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = colors.accent
-                    )
-                ) {
+        // 미리보기 텍스트 (접힌 상태에서만)
+        if (!isExpanded) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = preview,
+                color = colors.textSecondary,
+                fontSize = 13.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 20.sp
+            )
+        }
+
+        // 타입 칩
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = typeLabel,
+                color = colors.chipText,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(colors.chipBg)
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            )
+        }
+
+        // 확장 영역: 상세 정보 + 액션 버튼
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 삭제 시각
+                if (trashedDate.isNotEmpty()) {
                     Text(
-                        text = "복원",
-                        fontSize = 13.sp
+                        text = "삭제: $trashedDate",
+                        color = colors.textMuted,
+                        fontSize = 12.sp
                     )
                 }
 
-                OutlinedButton(
-                    onClick = onDelete,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = colors.danger
-                    )
+                // 남은 기간
+                Text(
+                    text = "남은 기간: ${remainingDays}일",
+                    color = colors.textMuted,
+                    fontSize = 12.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // 버튼
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "완전 삭제",
-                        fontSize = 13.sp
-                    )
+                    OutlinedButton(
+                        onClick = onRestore,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = colors.accent
+                        )
+                    ) {
+                        Text(
+                            text = "복원",
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = onDelete,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = colors.danger
+                        )
+                    ) {
+                        Text(
+                            text = "완전 삭제",
+                            fontSize = 13.sp
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.flit.app.presentation.search
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,14 +49,39 @@ fun SearchScreen(
     onNavigate: (String) -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SearchContent(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onCaptureClick = onCaptureClick,
+        onSearchTextChanged = viewModel::onSearchTextChanged,
+        onTypeFilterSelected = viewModel::setTypeFilter,
+        onToggleSemanticMode = viewModel::toggleSemanticMode,
+        onErrorDismissed = viewModel::onErrorDismissed
+    )
+}
+
+/**
+ * 검색 화면 Content
+ */
+@Composable
+fun SearchContent(
+    uiState: SearchUiState,
+    onBackClick: () -> Unit,
+    onCaptureClick: (String) -> Unit,
+    onSearchTextChanged: (String) -> Unit,
+    onTypeFilterSelected: (ClassifiedType?) -> Unit,
+    onToggleSemanticMode: (Boolean) -> Unit,
+    onErrorDismissed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val colors = FlitTheme.colors
     val focusRequester = remember { FocusRequester() }
 
-    // 자동 포커스
+    // 자동 포커스 (Robolectric 등 테스트 환경에서 FocusRequester 미연결 가능)
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        try { focusRequester.requestFocus() } catch (_: IllegalStateException) { }
     }
 
     // 에러 스낵바
@@ -62,12 +89,12 @@ fun SearchScreen(
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
             snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
-            viewModel.onErrorDismissed()
+            onErrorDismissed()
         }
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         containerColor = colors.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
@@ -98,7 +125,7 @@ fun SearchScreen(
                         .weight(1f)
                         .clip(RoundedCornerShape(12.dp))
                         .background(colors.card)
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -118,7 +145,7 @@ fun SearchScreen(
                             }
                             BasicTextField(
                                 value = uiState.searchText,
-                                onValueChange = viewModel::onSearchTextChanged,
+                                onValueChange = onSearchTextChanged,
                                 singleLine = true,
                                 textStyle = TextStyle(
                                     color = colors.text,
@@ -133,14 +160,14 @@ fun SearchScreen(
                         }
                         if (uiState.searchText.isNotEmpty()) {
                             IconButton(
-                                onClick = { viewModel.onSearchTextChanged("") },
-                                modifier = Modifier.size(48.dp)
+                                onClick = { onSearchTextChanged("") },
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "지우기",
                                     tint = colors.textMuted,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
@@ -152,7 +179,8 @@ fun SearchScreen(
                     FlitChip(
                         text = "AI",
                         selected = uiState.isSemanticMode,
-                        onClick = { viewModel.toggleSemanticMode(!uiState.isSemanticMode) }
+                        compact = true,
+                        onClick = { onToggleSemanticMode(!uiState.isSemanticMode) }
                     )
                 }
 
@@ -163,7 +191,7 @@ fun SearchScreen(
             if (!uiState.isSemanticMode) {
                 FilterChipRow(
                     selectedType = uiState.selectedType,
-                    onTypeSelected = { type -> viewModel.setTypeFilter(type) }
+                    onTypeSelected = onTypeFilterSelected
                 )
             }
 
@@ -329,6 +357,22 @@ fun SearchScreen(
             }
         }
     }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SearchContentPreview() {
+    FlitTheme {
+        SearchContent(
+            uiState = SearchUiState(),
+            onBackClick = {},
+            onCaptureClick = {},
+            onSearchTextChanged = {},
+            onTypeFilterSelected = {},
+            onToggleSemanticMode = {},
+            onErrorDismissed = {}
+        )
     }
 }
 

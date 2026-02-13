@@ -26,6 +26,10 @@ presentation/ → domain/ → data/ (단방향 의존)
 ./gradlew testDebugUnitTest        # 유닛 테스트
 ./gradlew :app:compileDebugKotlin  # 컴파일 체크
 ./gradlew assembleDebug            # APK 빌드
+
+# 스크린샷 테스트 (Roborazzi)
+./gradlew :app:testDebugUnitTest --tests "com.flit.app.screenshot.*"  # 전체 스크린샷 테스트
+./gradlew :app:testDebugUnitTest --tests "com.flit.app.screenshot.*" -Proborazzi.test.record  # 골든 이미지 기록
 ```
 
 ## Code Style

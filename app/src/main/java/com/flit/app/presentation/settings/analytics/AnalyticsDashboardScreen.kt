@@ -1,5 +1,6 @@
 package com.flit.app.presentation.settings.analytics
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,8 +30,27 @@ fun AnalyticsDashboardScreen(
     onNavigateBack: () -> Unit,
     viewModel: AnalyticsDashboardViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    AnalyticsDashboardContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onRetry = viewModel::loadDashboard,
+        onErrorDismissed = viewModel::onErrorDismissed
+    )
+}
+
+/** 분석 대시보드 화면 Content */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnalyticsDashboardContent(
+    uiState: AnalyticsDashboardUiState,
+    onNavigateBack: () -> Unit,
+    onRetry: () -> Unit,
+    onErrorDismissed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
 
     Scaffold(
@@ -60,7 +81,7 @@ fun AnalyticsDashboardScreen(
         when {
             uiState.isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    modifier = modifier.fillMaxSize().padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = colors.accent)
@@ -68,13 +89,13 @@ fun AnalyticsDashboardScreen(
             }
             uiState.errorMessage != null -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    modifier = modifier.fillMaxSize().padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(uiState.errorMessage ?: "", color = colors.textMuted, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = { viewModel.loadDashboard() }) {
+                        TextButton(onClick = onRetry) {
                             Text("다시 시도", color = colors.accent, fontSize = 14.sp)
                         }
                     }
@@ -83,7 +104,7 @@ fun AnalyticsDashboardScreen(
             uiState.dashboard != null -> {
                 DashboardContent(
                     dashboard = uiState.dashboard!!,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = modifier.padding(paddingValues)
                 )
             }
         }
@@ -199,5 +220,19 @@ private fun StatCard(
         Text(title, color = colors.textMuted, fontSize = 13.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Text(value, color = colors.text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AnalyticsDashboardContentPreview() {
+    FlitTheme {
+        AnalyticsDashboardContent(
+            uiState = AnalyticsDashboardUiState(),
+            onNavigateBack = {},
+            onRetry = {},
+            onErrorDismissed = {}
+        )
     }
 }

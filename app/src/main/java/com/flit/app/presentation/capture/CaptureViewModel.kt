@@ -5,12 +5,10 @@ import android.os.Trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.net.Uri
-import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ImageRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
-import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.presentation.widget.WidgetUpdateHelper
 import com.flit.app.tracing.AppTrace
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,11 +47,12 @@ class CaptureViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<CaptureEvent>()
     val events: SharedFlow<CaptureEvent> = _events.asSharedFlow()
+    private var lastSavedDraftText: String = ""
+    private var lastSavedDraftImageUri: String? = null
 
     init {
         observeUnconfirmedCount()
         loadDraft()
-        loadFontSize()
     }
 
     /**
@@ -74,24 +73,14 @@ class CaptureViewModel @Inject constructor(
         viewModelScope.launch {
             val draft = userPreferenceRepository.getString(KEY_DRAFT_TEXT, "")
             val draftImageUri = userPreferenceRepository.getString(KEY_DRAFT_IMAGE_URI, "")
+            val normalizedDraftImageUri = draftImageUri.takeIf { uri -> uri.isNotBlank() }
+            lastSavedDraftText = draft
+            lastSavedDraftImageUri = normalizedDraftImageUri
             _uiState.update {
                 it.copy(
                     inputText = draft,
-                    imageUri = draftImageUri.takeIf { uri -> uri.isNotBlank() }
+                    imageUri = normalizedDraftImageUri
                 )
-            }
-        }
-    }
-
-    /**
-     * 글씨 크기 설정 로드 (설정 변경 후 화면 복귀 시 재호출)
-     */
-    fun loadFontSize() {
-        viewModelScope.launch {
-            val sizeKey = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
-            val pref = FontSizePreference.fromString(sizeKey)
-            _uiState.update {
-                it.copy(fontSize = pref.captureFontSize, lineHeight = pref.captureLineHeight)
             }
         }
     }
@@ -120,6 +109,7 @@ class CaptureViewModel @Inject constructor(
      * 캡처 제출
      */
     fun submit() {
+        if (_uiState.value.isSubmitting) return
         val currentText = _uiState.value.inputText
         val currentImageUri = _uiState.value.imageUri
         if (currentText.isBlank() && currentImageUri == null) return
@@ -142,6 +132,8 @@ class CaptureViewModel @Inject constructor(
                     // 임시 저장 삭제
                     userPreferenceRepository.setString(KEY_DRAFT_TEXT, "")
                     userPreferenceRepository.setString(KEY_DRAFT_IMAGE_URI, "")
+                    lastSavedDraftText = ""
+                    lastSavedDraftImageUri = null
 
                     _uiState.update {
                         it.copy(
@@ -185,10 +177,13 @@ class CaptureViewModel @Inject constructor(
     fun saveDraft() {
         val currentText = _uiState.value.inputText
         val currentImageUri = _uiState.value.imageUri
+        if (currentText == lastSavedDraftText && currentImageUri == lastSavedDraftImageUri) return
 
         viewModelScope.launch {
             userPreferenceRepository.setString(KEY_DRAFT_TEXT, currentText)
             userPreferenceRepository.setString(KEY_DRAFT_IMAGE_URI, currentImageUri ?: "")
+            lastSavedDraftText = currentText
+            lastSavedDraftImageUri = currentImageUri
         }
     }
 

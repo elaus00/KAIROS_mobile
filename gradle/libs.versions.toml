@@ -34,8 +34,11 @@ uiautomator = "2.3.0"
 baselineProfilePlugin = "1.3.4"
 profileinstaller = "1.4.1"
 desugarJdkLibs = "2.1.4"
+splashscreen = "1.0.1"
 tracing = "1.3.0"
 composeRuntimeTracing = "1.7.6"
+roborazzi = "1.59.0"
+robolectric = "4.14.1"
 
 [libraries]
 # Core library desugaring (java.time 등 API 24-25 지원)
@@ -93,6 +96,12 @@ navigation-testing = { group = "androidx.navigation", name = "navigation-testing
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
 
+# Roborazzi (스크린샷 테스트)
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+
 # WorkManager
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
 work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workmanager" }
@@ -126,6 +135,7 @@ credentials = { group = "androidx.credentials", name = "credentials", version.re
 credentials-play = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacro" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
@@ -140,3 +150,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineProfilePlugin" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }

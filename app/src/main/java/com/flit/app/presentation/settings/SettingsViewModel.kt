@@ -11,6 +11,7 @@ import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.ImageRepository
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
+import com.flit.app.domain.model.NoteViewType
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.PreferenceKeys
@@ -52,6 +53,7 @@ class SettingsViewModel @Inject constructor(
         refreshCalendarPermissionState()
         loadAccountInfo()
         loadCaptureFontSize()
+        loadNoteViewType()
     }
 
     /** 설정 값 로드 */
@@ -137,6 +139,25 @@ class SettingsViewModel @Inject constructor(
                     calendarAuthMessage = "캘린더 권한이 허용되었습니다."
                 )
             }
+        }
+    }
+
+    /** 노트 보기 유형 로드 */
+    private fun loadNoteViewType() {
+        viewModelScope.launch {
+            val type = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_NOTE_VIEW_TYPE,
+                NoteViewType.LIST.name
+            )
+            _uiState.update { it.copy(noteViewType = type) }
+        }
+    }
+
+    /** 노트 보기 유형 변경 */
+    fun setNoteViewType(type: String) {
+        viewModelScope.launch {
+            userPreferenceRepository.setString(PreferenceKeys.KEY_NOTE_VIEW_TYPE, type)
+            _uiState.update { it.copy(noteViewType = type) }
         }
     }
 

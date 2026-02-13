@@ -1,6 +1,6 @@
 package com.flit.app.domain.usecase.note
 
-import com.flit.app.data.local.database.dao.CaptureDao
+import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.NoteRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,13 +12,13 @@ import javax.inject.Singleton
 @Singleton
 class UpdateNoteUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
-    private val captureDao: CaptureDao
+    private val captureRepository: CaptureRepository
 ) {
     /**
      * 노트 제목(AI 제목) 업데이트
      */
     suspend fun updateTitle(captureId: String, title: String) {
-        captureDao.updateAiTitle(captureId, title, System.currentTimeMillis())
+        captureRepository.updateAiTitle(captureId, title)
     }
 
     /**

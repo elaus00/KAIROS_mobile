@@ -1,5 +1,6 @@
 package com.flit.app.presentation.capture
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -27,6 +28,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
@@ -47,8 +49,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -64,23 +68,20 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * 캡처 화면 (Home Tab)
+ * 캡처 화면 (Home Tab) - ViewModel 보유
  * PRD v10.0: 상단바(Flit. + 벨 + 설정) + 날짜 + 빈 상태 + 하단 입력바
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CaptureContent(
+fun CaptureScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToHistory: () -> Unit = {},
     snackbarHostState: SnackbarHostState,
     autoFocusCapture: Boolean = false,
     modifier: Modifier = Modifier,
-    viewModel: CaptureViewModel
+    viewModel: CaptureViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     // 이벤트 처리
     LaunchedEffect(Unit) {
@@ -101,19 +102,58 @@ fun CaptureContent(
         }
     }
 
+    CaptureContent(
+        uiState = uiState,
+        onNavigateToSettings = onNavigateToSettings,
+        onNavigateToHistory = onNavigateToHistory,
+        autoFocusCapture = autoFocusCapture,
+        onUpdateInput = viewModel::updateInput,
+        onSubmit = viewModel::submit,
+        onImageSelected = viewModel::handleImageSelected,
+        onRemoveImage = viewModel::removeImage,
+        onToggleStatusSheet = viewModel::toggleStatusSheet,
+        onDismissStatusSheet = viewModel::dismissStatusSheet,
+        onSaveDraft = viewModel::saveDraft,
+        modifier = modifier
+    )
+}
+
+/**
+ * 캡처 화면 컨텐츠 - UI만 담당
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CaptureContent(
+    uiState: CaptureUiState,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    autoFocusCapture: Boolean,
+    onUpdateInput: (String) -> Unit,
+    onSubmit: () -> Unit,
+    onImageSelected: (Uri) -> Unit,
+    onRemoveImage: () -> Unit,
+    onToggleStatusSheet: () -> Unit,
+    onDismissStatusSheet: () -> Unit,
+    onSaveDraft: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
+    val colors = FlitTheme.colors
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val contentHorizontalPadding = 20.dp
+
     // 화면 복귀 시 글씨 크기 재로드 + 이탈 시 임시 저장
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_RESUME -> viewModel.loadFontSize()
-                Lifecycle.Event.ON_STOP -> viewModel.saveDraft()
+                Lifecycle.Event.ON_STOP -> onSaveDraft()
                 else -> Unit
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            viewModel.saveDraft()
+            onSaveDraft()
         }
     }
 
@@ -132,7 +172,7 @@ fun CaptureContent(
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
-        uri?.let { viewModel.handleImageSelected(it) }
+        uri?.let { onImageSelected(it) }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -144,7 +184,7 @@ fun CaptureContent(
             // 상단 바: Flit. + 벨 아이콘(뱃지) + 설정 아이콘
             CaptureTopBar(
                 unconfirmedCount = uiState.unconfirmedCount,
-                onBellClick = { viewModel.toggleStatusSheet() },
+                onBellClick = onToggleStatusSheet,
                 onHistoryClick = onNavigateToHistory,
                 onSettingsClick = onNavigateToSettings
             )
@@ -161,8 +201,8 @@ fun CaptureContent(
             CompositionLocalProvider(
                 LocalTextSelectionColors provides noHandleSelectionColors
             ) {
-                val fontSize = uiState.fontSize.sp
-                val lineHeight = uiState.lineHeight.sp
+                val captureFontSize = 20.sp
+                val captureLineHeight = 34.sp
                 val placeholderAlpha by animateFloatAsState(
                     targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
                     animationSpec = tween(200),
@@ -172,11 +212,11 @@ fun CaptureContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(horizontal = 28.dp, vertical = 24.dp)
+                        .padding(horizontal = contentHorizontalPadding, vertical = 24.dp)
                 ) {
                     TextField(
                         value = uiState.inputText,
-                        onValueChange = { viewModel.updateInput(it) },
+                        onValueChange = onUpdateInput,
                         modifier = Modifier
                             .fillMaxSize()
                             .focusRequester(focusRequester)
@@ -184,8 +224,8 @@ fun CaptureContent(
                         textStyle = TextStyle(
                             fontFamily = FlitWritingFontFamily,
                             color = colors.text,
-                            fontSize = fontSize,
-                            lineHeight = lineHeight,
+                            fontSize = captureFontSize,
+                            lineHeight = captureLineHeight,
                             letterSpacing = 0.3.sp,
                             platformStyle = PlatformTextStyle(includeFontPadding = false),
                             lineHeightStyle = LineHeightStyle(
@@ -199,8 +239,8 @@ fun CaptureContent(
                                 style = TextStyle(
                                     fontFamily = FlitWritingFontFamily,
                                     color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                    fontSize = fontSize,
-                                    lineHeight = lineHeight,
+                                    fontSize = captureFontSize,
+                                    lineHeight = captureLineHeight,
                                     letterSpacing = 0.3.sp,
                                     platformStyle = PlatformTextStyle(includeFontPadding = false),
                                     lineHeightStyle = LineHeightStyle(
@@ -239,7 +279,7 @@ fun CaptureContent(
                 val imageUri = uiState.imageUri ?: return@AnimatedVisibility
                 ImagePreview(
                     imageUri = imageUri,
-                    onRemove = { viewModel.removeImage() }
+                    onRemove = onRemoveImage
                 )
             }
 
@@ -248,7 +288,8 @@ fun CaptureContent(
                 isSubmitting = uiState.isSubmitting,
                 canSubmit = uiState.inputText.isNotBlank() || uiState.imageUri != null,
                 hasImage = uiState.imageUri != null,
-                onSubmit = { viewModel.submit() },
+                horizontalPadding = contentHorizontalPadding,
+                onSubmit = onSubmit,
                 onImageClick = {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -260,14 +301,45 @@ fun CaptureContent(
         // AI Status Sheet (바텀시트)
         if (uiState.showStatusSheet) {
             AIStatusSheet(
-                onDismiss = { viewModel.dismissStatusSheet() },
+                onDismiss = onDismissStatusSheet,
                 onNavigateToHistory = {
-                    viewModel.dismissStatusSheet()
+                    onDismissStatusSheet()
                     onNavigateToHistory()
                 }
             )
         }
     }
+    }
+}
+
+/**
+ * 캡처 화면 Preview
+ */
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CaptureContentPreview() {
+    FlitTheme {
+        CaptureContent(
+            uiState = CaptureUiState(
+                inputText = "떠오르는 생각을 자유롭게...",
+                unconfirmedCount = 3,
+                isSubmitting = false,
+                showStatusSheet = false,
+                imageUri = null,
+                errorMessage = null
+            ),
+            onNavigateToSettings = {},
+            onNavigateToHistory = {},
+            autoFocusCapture = false,
+            onUpdateInput = {},
+            onSubmit = {},
+            onImageSelected = {},
+            onRemoveImage = {},
+            onToggleStatusSheet = {},
+            onDismissStatusSheet = {},
+            onSaveDraft = {}
+        )
     }
 }
 
@@ -432,6 +504,7 @@ private fun CaptureToolBar(
     isSubmitting: Boolean,
     canSubmit: Boolean,
     hasImage: Boolean,
+    horizontalPadding: Dp,
     onSubmit: () -> Unit,
     onImageClick: () -> Unit
 ) {
@@ -463,7 +536,8 @@ private fun CaptureToolBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .imePadding()
+            .padding(start = horizontalPadding, end = horizontalPadding, top = 8.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

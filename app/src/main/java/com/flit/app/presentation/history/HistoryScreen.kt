@@ -1,5 +1,6 @@
 package com.flit.app.presentation.history
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,10 +20,12 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.domain.model.Capture
 import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.presentation.components.common.FlitChip
 import com.flit.app.presentation.components.common.SwipeableCard
@@ -42,15 +45,51 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
+
+    // 이벤트 처리 (삭제 → Snackbar + 실행 취소)
+    HistoryContent(
+        uiState = uiState,
+        events = viewModel.events,
+        onNavigateBack = onNavigateBack,
+        onCaptureClick = onCaptureClick,
+        onDeleteCapture = viewModel::deleteCaptureById,
+        onUndoDelete = viewModel::undoDelete,
+        onDismissError = viewModel::dismissError,
+        onTypeFilterSelected = viewModel::setTypeFilter,
+        onDateRangeSelected = viewModel::setDateRange,
+        onChangeClassification = viewModel::changeClassification,
+        onLoadMore = viewModel::loadMore,
+        modifier = modifier
+    )
+}
+
+/**
+ * 전체 기록 화면 Content
+ */
+@Composable
+fun HistoryContent(
+    uiState: HistoryUiState,
+    events: kotlinx.coroutines.flow.Flow<HistoryEvent>,
+    onNavigateBack: () -> Unit,
+    onCaptureClick: (String) -> Unit,
+    onDeleteCapture: (String) -> Unit,
+    onUndoDelete: (String) -> Unit,
+    onDismissError: () -> Unit,
+    onTypeFilterSelected: (ClassifiedType?) -> Unit,
+    onDateRangeSelected: (Long?, Long?) -> Unit,
+    onChangeClassification: (String, ClassifiedType, com.flit.app.domain.model.NoteSubType?) -> Unit,
+    onLoadMore: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    // 이벤트 처리 (삭제 → Snackbar + 실행 취소)
+    // 이벤트 처리
     LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
+        events.collect { event ->
             when (event) {
                 is HistoryEvent.DeleteSuccess -> {
                     val result = snackbarHostState.showSnackbar(
@@ -59,7 +98,7 @@ fun HistoryScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.undoDelete(event.captureId)
+                        onUndoDelete(event.captureId)
                     }
                 }
                 is HistoryEvent.UndoSuccess -> {
@@ -73,7 +112,7 @@ fun HistoryScreen(
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
-            viewModel.dismissError()
+            onDismissError()
         }
     }
 
@@ -87,7 +126,7 @@ fun HistoryScreen(
     }
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore) {
-            viewModel.loadMore()
+            onLoadMore()
         }
     }
 
@@ -107,10 +146,10 @@ fun HistoryScreen(
             // 필터 칩 (유형 + 날짜 범위 통합 1열)
             HistoryFilterRow(
                 selectedType = uiState.selectedType,
-                onTypeSelected = { viewModel.setTypeFilter(it) },
+                onTypeSelected = onTypeFilterSelected,
                 startDate = uiState.startDate,
                 endDate = uiState.endDate,
-                onDateRangeSelected = { start, end -> viewModel.setDateRange(start, end) }
+                onDateRangeSelected = onDateRangeSelected
             )
 
             // 콘텐츠
@@ -183,12 +222,12 @@ fun HistoryScreen(
                             key = { it.id }
                         ) { capture ->
                             SwipeableCard(
-                                onDismiss = { viewModel.deleteCaptureById(capture.id) }
+                                onDismiss = { onDeleteCapture(capture.id) }
                             ) {
                                 HistoryItem(
                                     capture = capture,
                                     onChangeType = { type, subType ->
-                                        viewModel.changeClassification(capture.id, type, subType)
+                                        onChangeClassification(capture.id, type, subType)
                                     },
                                     modifier = Modifier.clickable {
                                         onCaptureClick(capture.id)
@@ -219,6 +258,30 @@ fun HistoryScreen(
             }
         }
     }
+    }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun HistoryContentPreview() {
+    FlitTheme {
+        HistoryContent(
+            uiState = HistoryUiState(
+                captures = emptyList(),
+                isLoading = false
+            ),
+            events = kotlinx.coroutines.flow.emptyFlow(),
+            onNavigateBack = {},
+            onCaptureClick = {},
+            onDeleteCapture = {},
+            onUndoDelete = {},
+            onDismissError = {},
+            onTypeFilterSelected = {},
+            onDateRangeSelected = { _, _ -> },
+            onChangeClassification = { _, _, _ -> },
+            onLoadMore = {}
+        )
     }
 }
 

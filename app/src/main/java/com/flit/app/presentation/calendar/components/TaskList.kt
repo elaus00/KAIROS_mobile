@@ -70,7 +70,6 @@ fun TaskList(
     onTaskDelete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
     onToggleShowCompleted: () -> Unit,
-    onTaskAction: (TodoDisplayItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -84,8 +83,7 @@ fun TaskList(
                 tasks = tasks,
                 onTaskComplete = onTaskComplete,
                 onReorder = onReorder,
-                onTaskDelete = onTaskDelete,
-                onTaskAction = onTaskAction
+                onTaskDelete = onTaskDelete
             )
 
             // 완료 항목 토글
@@ -109,8 +107,7 @@ private fun DraggableTaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
-    onTaskDelete: (String) -> Unit,
-    onTaskAction: (TodoDisplayItem) -> Unit = {}
+    onTaskDelete: (String) -> Unit
 ) {
     val colors = FlitTheme.colors
     val haptic = LocalHapticFeedback.current
@@ -158,7 +155,7 @@ private fun DraggableTaskList(
                             task = task,
                             isDragging = isDragging,
                             onToggleComplete = { onTaskComplete(task.todoId) },
-                            onTaskAction = { onTaskAction(task) },
+                            onTaskDelete = { onTaskDelete(task.captureId) },
                             onDragStart = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 draggingIndex = index
@@ -196,7 +193,7 @@ private fun TaskItemWithDragHandle(
     task: TodoDisplayItem,
     isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
-    onTaskAction: () -> Unit = {},
+    onTaskDelete: () -> Unit,
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
@@ -205,8 +202,8 @@ private fun TaskItemWithDragHandle(
     val colors = FlitTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
 
-    // 확장 가능 여부 판단
-    val hasExpandableContent = task.deadline != null || task.title.length > 25
+    // 모든 할일에 삭제 버튼을 표시하기 위해 항상 확장 가능
+    val hasExpandableContent = true
 
     Box(
         modifier = modifier
@@ -226,12 +223,8 @@ private fun TaskItemWithDragHandle(
                 )
             }
             .clickable {
-                if (isExpanded) {
-                    onTaskAction()
-                } else if (hasExpandableContent) {
-                    isExpanded = true
-                } else {
-                    onTaskAction()
+                if (hasExpandableContent) {
+                    isExpanded = !isExpanded
                 }
             }
             .padding(horizontal = 14.dp, vertical = 8.dp)
@@ -295,6 +288,20 @@ private fun TaskItemWithDragHandle(
                             text = task.title,
                             color = colors.textSecondary,
                             fontSize = 13.sp
+                        )
+                    }
+
+                    // 삭제 버튼
+                    Spacer(modifier = Modifier.height(4.dp))
+                    androidx.compose.material3.TextButton(
+                        onClick = onTaskDelete,
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(
+                            text = "삭제",
+                            color = colors.danger,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }

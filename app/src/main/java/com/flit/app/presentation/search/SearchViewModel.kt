@@ -12,6 +12,7 @@ import com.flit.app.domain.usecase.search.SemanticSearchUseCase
 import com.flit.app.tracing.AppTrace
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -127,8 +128,10 @@ class SearchViewModel @Inject constructor(
                 }
             } else {
                 // 기본 검색 (Flow 수집)
+                var searchEventTracked = false
                 searchCapturesUseCase(query)
                     .catch { e ->
+                        if (e is CancellationException) throw e
                         _uiState.update {
                             it.copy(errorMessage = e.message ?: "검색 실패")
                         }
@@ -138,13 +141,18 @@ class SearchViewModel @Inject constructor(
                             it.copy(searchResults = results, hasSearched = true)
                         }
 
-                        // 검색 수행 분석 이벤트
-                        trackEventUseCase(
-                            eventType = "search_performed",
-                            eventData = """{"result_count":${results.size},"result_clicked":false}"""
-                        )
+                        if (!searchEventTracked) {
+                            // 검색 수행 분석 이벤트는 검색 실행당 1회만 기록
+                            trackEventUseCase(
+                                eventType = "search_performed",
+                                eventData = """{"result_count":${results.size},"result_clicked":false}"""
+                            )
+                            searchEventTracked = true
+                        }
                     }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             _uiState.update {
                 it.copy(errorMessage = e.message ?: "검색 실패")
@@ -192,6 +200,8 @@ class SearchViewModel @Inject constructor(
                             errorMessage = "Premium 구독이 필요합니다"
                         )
                     }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     _uiState.update {
                         it.copy(

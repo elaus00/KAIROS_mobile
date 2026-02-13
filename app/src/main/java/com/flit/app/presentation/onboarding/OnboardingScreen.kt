@@ -1,11 +1,15 @@
 package com.flit.app.presentation.onboarding
 
 import android.Manifest
+import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -20,12 +24,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.flit.app.ui.theme.FlitTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
@@ -42,8 +46,6 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
-    val scope = rememberCoroutineScope()
     val calendarPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -51,11 +53,6 @@ fun OnboardingScreen(
         val writeGranted = result[Manifest.permission.WRITE_CALENDAR] == true
         viewModel.onCalendarPermissionResult(readGranted && writeGranted)
     }
-
-    val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { 4 }
-    )
 
     // 이벤트 처리
     LaunchedEffect(Unit) {
@@ -66,8 +63,44 @@ fun OnboardingScreen(
         }
     }
 
+    OnboardingContent(
+        uiState = uiState,
+        onSkip = viewModel::skip,
+        onUpdateInput = viewModel::updateInput,
+        onCompleteOnboarding = viewModel::completeOnboarding,
+        onCalendarConnect = {
+            calendarPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_CALENDAR,
+                    Manifest.permission.WRITE_CALENDAR
+                )
+            )
+        }
+    )
+}
+
+/**
+ * 온보딩 화면 Content
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun OnboardingContent(
+    uiState: OnboardingUiState,
+    onSkip: () -> Unit,
+    onUpdateInput: (String) -> Unit,
+    onCompleteOnboarding: () -> Unit,
+    onCalendarConnect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FlitTheme.colors
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { 4 }
+    )
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(colors.background)
             .systemBarsPadding()
@@ -80,7 +113,7 @@ fun OnboardingScreen(
             contentAlignment = Alignment.CenterEnd
         ) {
             TextButton(
-                onClick = { viewModel.skip() },
+                onClick = onSkip,
                 modifier = Modifier.heightIn(min = 48.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
@@ -104,21 +137,14 @@ fun OnboardingScreen(
                     colors = colors,
                     isConnected = uiState.isCalendarPermissionGranted,
                     errorMessage = uiState.calendarConnectionError,
-                    onConnect = {
-                        calendarPermissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.READ_CALENDAR,
-                                Manifest.permission.WRITE_CALENDAR
-                            )
-                        )
-                    }
+                    onConnect = onCalendarConnect
                 )
                 3 -> OnboardingPage3(
                     colors = colors,
                     inputText = uiState.inputText,
                     isSubmitting = uiState.isSubmitting,
-                    onInputChange = viewModel::updateInput,
-                    onSubmit = viewModel::completeOnboarding
+                    onInputChange = onUpdateInput,
+                    onSubmit = onCompleteOnboarding
                 )
             }
         }
@@ -133,7 +159,7 @@ fun OnboardingScreen(
                     if (pagerState.currentPage < 3) {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     } else {
-                        viewModel.completeOnboarding()
+                        onCompleteOnboarding()
                     }
                 }
             }
@@ -503,5 +529,21 @@ private fun OnboardingBottomBar(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun OnboardingContentPreview() {
+    FlitTheme {
+        OnboardingContent(
+            uiState = OnboardingUiState(),
+            onSkip = {},
+            onUpdateInput = {},
+            onCompleteOnboarding = {},
+            onCalendarConnect = {}
+        )
     }
 }

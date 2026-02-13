@@ -8,7 +8,6 @@ import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ImageRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
-import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.util.MainDispatcherRule
 import com.flit.app.util.TestFixtures
 import io.mockk.coEvery
@@ -76,10 +75,11 @@ class CaptureViewModelTest {
      */
     private fun createViewModel(
         draftText: String = "",
+        draftImageUri: String = "",
         unconfirmedCount: Int = 0
     ): CaptureViewModel {
         coEvery { userPreferenceRepository.getString("draft_capture", "") } returns draftText
-        coEvery { userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, "MEDIUM") } returns "MEDIUM"
+        coEvery { userPreferenceRepository.getString("draft_capture_image_uri", "") } returns draftImageUri
         every { captureRepository.getUnconfirmedCount() } returns flowOf(unconfirmedCount)
         return CaptureViewModel(
             application,
@@ -165,6 +165,7 @@ class CaptureViewModelTest {
         vm.updateInput("캡처 내용")
         coEvery { submitCaptureUseCase(any(), any()) } returns TestFixtures.capture()
         coEvery { userPreferenceRepository.setString("draft_capture", "") } just runs
+        coEvery { userPreferenceRepository.setString("draft_capture_image_uri", "") } just runs
 
         // when: 이벤트 수집 시작 + 제출
         vm.events.test {
@@ -180,6 +181,7 @@ class CaptureViewModelTest {
         assertEquals("", vm.uiState.value.inputText)
         assertFalse(vm.uiState.value.isSubmitting)
         coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture", "") }
+        coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture_image_uri", "") }
     }
 
     @Test
@@ -223,6 +225,7 @@ class CaptureViewModelTest {
         // given: 텍스트 입력
         vm.updateInput("저장할 내용")
         coEvery { userPreferenceRepository.setString("draft_capture", any()) } just runs
+        coEvery { userPreferenceRepository.setString("draft_capture_image_uri", any()) } just runs
 
         // when: 임시 저장
         vm.saveDraft()
@@ -230,6 +233,7 @@ class CaptureViewModelTest {
 
         // then: userPreferenceRepository.setString 호출됨
         coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture", "저장할 내용") }
+        coVerify(exactly = 1) { userPreferenceRepository.setString("draft_capture_image_uri", "") }
     }
 
     @Test

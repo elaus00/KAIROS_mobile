@@ -1,6 +1,7 @@
 package com.flit.app.presentation.notes.detail
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.core.net.toUri
 import androidx.compose.animation.AnimatedVisibility
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -33,12 +33,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.domain.model.Folder
+import com.flit.app.domain.model.FolderType
+import com.flit.app.domain.model.NoteDetail
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
@@ -61,11 +65,8 @@ fun NoteDetailScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: NoteDetailViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
 
     // 자동 저장 후 뒤로가기 (§4.1 입력 보호)
     BackHandler {
@@ -92,6 +93,44 @@ fun NoteDetailScreen(
         }
     }
 
+    NoteDetailContent(
+        uiState = uiState,
+        onNavigateBack = viewModel::autoSaveAndExit,
+        onShare = viewModel::onShare,
+        onDelete = viewModel::onDelete,
+        onRetry = viewModel::onRetry,
+        onTitleChanged = viewModel::onTitleChanged,
+        onBodyChanged = viewModel::onBodyChanged,
+        onToggleOriginalText = viewModel::onToggleOriginalText,
+        onFolderChanged = viewModel::onFolderChanged,
+        onUndoDelete = viewModel::onUndoDelete
+    )
+}
+
+/**
+ * NoteDetailContent
+ * 노트 상세/편집 화면 본문
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NoteDetailContent(
+    uiState: NoteDetailUiState,
+    onNavigateBack: () -> Unit,
+    onShare: () -> Unit,
+    onDelete: () -> Unit,
+    onRetry: () -> Unit,
+    onTitleChanged: (String) -> Unit,
+    onBodyChanged: (String) -> Unit,
+    onToggleOriginalText: () -> Unit,
+    onFolderChanged: (String) -> Unit,
+    onUndoDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
+    val colors = FlitTheme.colors
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showFolderSheet by remember { mutableStateOf(false) }
+
     // 삭제 시 Snackbar 표시 (§4.4 실행 취소)
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) {
@@ -101,22 +140,17 @@ fun NoteDetailScreen(
                 duration = SnackbarDuration.Short
             )
             if (result == SnackbarResult.ActionPerformed) {
-                viewModel.onUndoDelete()
+                onUndoDelete()
             }
         }
     }
-
-    // 폴더 선택 바텀시트 상태
-    var showFolderSheet by remember { mutableStateOf(false) }
-    // 더보기 메뉴 상태
-    var showMoreMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { viewModel.autoSaveAndExit() }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "뒤로가기",
@@ -125,33 +159,28 @@ fun NoteDetailScreen(
                     }
                 },
                 actions = {
-                    // 더보기 메뉴 (공유, 폴더 이동, 삭제, 정보)
-                    Box {
-                        IconButton(onClick = { showMoreMenu = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreHoriz,
-                                contentDescription = "더보기",
-                                tint = colors.text
-                            )
-                        }
-                        NoteMoreMenu(
-                            expanded = showMoreMenu,
-                            onDismiss = { showMoreMenu = false },
-                            onShare = {
-                                showMoreMenu = false
-                                viewModel.onShare()
-                            },
-                            onMoveFolder = {
-                                showMoreMenu = false
-                                showFolderSheet = true
-                            },
-                            onDelete = {
-                                showMoreMenu = false
-                                viewModel.onDelete()
-                            },
-                            noteDetail = uiState.noteDetail,
-                            folders = uiState.folders,
-                            selectedFolderId = uiState.selectedFolderId
+                    // 공유
+                    IconButton(onClick = onShare) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "공유",
+                            tint = colors.text
+                        )
+                    }
+                    // 폴더 이동
+                    IconButton(onClick = { showFolderSheet = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.FolderOpen,
+                            contentDescription = "폴더 이동",
+                            tint = colors.text
+                        )
+                    }
+                    // 삭제
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "삭제",
+                            tint = colors.text
                         )
                     }
                 },
@@ -170,7 +199,8 @@ fun NoteDetailScreen(
                 )
             }
         },
-        containerColor = colors.background
+        containerColor = colors.background,
+        modifier = modifier
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
@@ -200,7 +230,7 @@ fun NoteDetailScreen(
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        TextButton(onClick = { viewModel.onRetry() }) {
+                        TextButton(onClick = onRetry) {
                             Text(
                                 text = "다시 시도",
                                 color = colors.accent,
@@ -232,7 +262,7 @@ fun NoteDetailScreen(
                     // 제목 입력 (큰 폰트, Apple Notes 스타일)
                     BasicTextField(
                         value = uiState.editedTitle,
-                        onValueChange = { viewModel.onTitleChanged(it) },
+                        onValueChange = onTitleChanged,
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(
                             color = colors.text,
@@ -293,7 +323,7 @@ fun NoteDetailScreen(
                     // 본문 입력 (자연스러운 연속 영역)
                     BasicTextField(
                         value = uiState.editedBody,
-                        onValueChange = { viewModel.onBodyChanged(it) },
+                        onValueChange = onBodyChanged,
                         modifier = Modifier
                             .fillMaxWidth()
                             .defaultMinSize(minHeight = 300.dp),
@@ -327,7 +357,7 @@ fun NoteDetailScreen(
                             OriginalTextSection(
                                 originalText = originalText,
                                 expanded = uiState.showOriginalText,
-                                onToggle = { viewModel.onToggleOriginalText() }
+                                onToggle = onToggleOriginalText
                             )
                         }
                     }
@@ -348,6 +378,16 @@ fun NoteDetailScreen(
                         )
                     }
 
+                    // 노트 정보 (생성/수정 날짜)
+                    uiState.noteDetail?.let { detail ->
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "생성 ${formatDateTime(detail.createdAt)} · 수정 ${formatDateTime(detail.updatedAt)}",
+                            color = colors.textMuted,
+                            fontSize = 12.sp
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(48.dp))
                 }
             }
@@ -360,12 +400,54 @@ fun NoteDetailScreen(
             folders = uiState.folders,
             selectedFolderId = uiState.selectedFolderId,
             onFolderSelected = { folderId ->
-                viewModel.onFolderChanged(folderId)
+                onFolderChanged(folderId)
                 showFolderSheet = false
             },
             onDismiss = { showFolderSheet = false }
         )
     }
+    }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun NoteDetailContentPreview() {
+    FlitTheme {
+        NoteDetailContent(
+            uiState = NoteDetailUiState(
+                isLoading = false,
+                noteDetail = NoteDetail(
+                    noteId = "1",
+                    captureId = "capture1",
+                    aiTitle = "샘플 노트",
+                    originalText = "원본 텍스트",
+                    body = "샘플 본문",
+                    classifiedType = ClassifiedType.NOTES,
+                    noteSubType = null,
+                    folderId = "folder1",
+                    imageUri = null,
+                    tags = listOf("태그1", "태그2"),
+                    createdAt = System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis()
+                ),
+                editedTitle = "샘플 노트",
+                editedBody = "샘플 본문",
+                selectedFolderId = "folder1",
+                folders = listOf(
+                    Folder(id = "folder1", name = "폴더1", type = FolderType.USER)
+                )
+            ),
+            onNavigateBack = {},
+            onShare = {},
+            onDelete = {},
+            onRetry = {},
+            onTitleChanged = {},
+            onBodyChanged = {},
+            onToggleOriginalText = {},
+            onFolderChanged = {},
+            onUndoDelete = {}
+        )
     }
 }
 
@@ -454,124 +536,6 @@ private fun OriginalTextSection(
                     .clip(RoundedCornerShape(8.dp))
                     .background(colors.chipBg)
                     .padding(12.dp)
-            )
-        }
-    }
-}
-
-/**
- * 더보기 드롭다운 메뉴 (공유, 폴더 이동, 삭제, 노트 정보)
- */
-@Composable
-private fun NoteMoreMenu(
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    onShare: () -> Unit,
-    onMoveFolder: () -> Unit,
-    onDelete: () -> Unit,
-    noteDetail: com.flit.app.domain.model.NoteDetail?,
-    folders: List<Folder>,
-    selectedFolderId: String?
-) {
-    val colors = FlitTheme.colors
-    val folderName = folders.find { it.id == selectedFolderId }?.name
-
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismiss,
-        shape = RoundedCornerShape(12.dp),
-        containerColor = colors.card,
-        shadowElevation = 4.dp,
-        modifier = Modifier.widthIn(min = 200.dp)
-    ) {
-        // 공유
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "공유",
-                    color = colors.text,
-                    fontSize = 15.sp
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = null,
-                    tint = colors.textSecondary,
-                    modifier = Modifier.size(18.dp)
-                )
-            },
-            onClick = onShare
-        )
-        // 폴더 이동
-        DropdownMenuItem(
-            text = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "폴더",
-                        color = colors.text,
-                        fontSize = 15.sp
-                    )
-                    if (folderName != null) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = folderName,
-                            color = colors.textMuted,
-                            fontSize = 13.sp
-                        )
-                    }
-                }
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.FolderOpen,
-                    contentDescription = null,
-                    tint = colors.textSecondary,
-                    modifier = Modifier.size(18.dp)
-                )
-            },
-            onClick = onMoveFolder
-        )
-        // 삭제 (§4.4 Snackbar 실행 취소)
-        DropdownMenuItem(
-            text = {
-                Text(
-                    text = "삭제",
-                    color = colors.danger,
-                    fontSize = 15.sp
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = colors.danger,
-                    modifier = Modifier.size(18.dp)
-                )
-            },
-            onClick = onDelete
-        )
-        // 노트 정보 (날짜)
-        noteDetail?.let { detail ->
-            HorizontalDivider(color = colors.divider)
-            DropdownMenuItem(
-                text = {
-                    Column {
-                        Text(
-                            text = "생성  ${formatDateTime(detail.createdAt)}",
-                            color = colors.textMuted,
-                            fontSize = 12.sp
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "수정  ${formatDateTime(detail.updatedAt)}",
-                            color = colors.textMuted,
-                            fontSize = 12.sp
-                        )
-                    }
-                },
-                onClick = {},
-                enabled = false
             )
         }
     }

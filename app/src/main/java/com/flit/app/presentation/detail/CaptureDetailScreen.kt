@@ -1,6 +1,8 @@
 package com.flit.app.presentation.detail
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.provider.CalendarContract
 import androidx.compose.foundation.background
@@ -29,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,9 +57,7 @@ fun CaptureDetailScreen(
     onNavigateToSettings: () -> Unit = {},
     viewModel: CaptureDetailViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
     val context = LocalContext.current
 
     // 공유 텍스트가 설정되면 ShareSheet 실행
@@ -70,6 +71,39 @@ fun CaptureDetailScreen(
             viewModel.onShareHandled()
         }
     }
+
+    CaptureDetailContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToSettings = onNavigateToSettings,
+        onShare = viewModel::onShare,
+        onRetry = viewModel::onRetry,
+        onChangeClassification = viewModel::onChangeClassification,
+        onApproveCalendarSync = viewModel::onApproveCalendarSync,
+        onRejectCalendarSync = viewModel::onRejectCalendarSync
+    )
+}
+
+/**
+ * CaptureDetailContent
+ * 캡처 상세 화면 본문
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun CaptureDetailContent(
+    uiState: CaptureDetailUiState,
+    onNavigateBack: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onShare: () -> Unit,
+    onRetry: () -> Unit,
+    onChangeClassification: (ClassifiedType, NoteSubType?) -> Unit,
+    onApproveCalendarSync: (String) -> Unit,
+    onRejectCalendarSync: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
+    val colors = FlitTheme.colors
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -93,7 +127,7 @@ fun CaptureDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.onShare() }) {
+                    IconButton(onClick = onShare) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "공유",
@@ -106,7 +140,8 @@ fun CaptureDetailScreen(
                 )
             )
         },
-        containerColor = colors.background
+        containerColor = colors.background,
+        modifier = modifier
     ) { paddingValues ->
         if (uiState.isLoading) {
             Box(
@@ -134,7 +169,7 @@ fun CaptureDetailScreen(
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    TextButton(onClick = { viewModel.onRetry() }) {
+                    TextButton(onClick = onRetry) {
                         Text(
                             text = "다시 시도",
                             color = colors.accent,
@@ -168,7 +203,7 @@ fun CaptureDetailScreen(
                     currentType = uiState.classifiedType,
                     currentSubType = uiState.noteSubType,
                     onTypeSelected = { type, subType ->
-                        viewModel.onChangeClassification(type, subType)
+                        onChangeClassification(type, subType)
                     }
                 )
 
@@ -192,10 +227,10 @@ fun CaptureDetailScreen(
                     CalendarSyncSection(
                         syncStatus = syncStatus,
                         onApprove = {
-                            uiState.scheduleId?.let { viewModel.onApproveCalendarSync(it) }
+                            uiState.scheduleId?.let { onApproveCalendarSync(it) }
                         },
                         onReject = {
-                            uiState.scheduleId?.let { viewModel.onRejectCalendarSync(it) }
+                            uiState.scheduleId?.let { onRejectCalendarSync(it) }
                         },
                         onOpenCalendar = {
                             openGoogleCalendar(context, uiState.scheduleStartTime)
@@ -281,6 +316,29 @@ fun CaptureDetailScreen(
             }
         }
     }
+    }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CaptureDetailContentPreview() {
+    FlitTheme {
+        CaptureDetailContent(
+            uiState = CaptureDetailUiState(
+                aiTitle = "캡처 상세 예시",
+                originalText = "이것은 원문 텍스트입니다.",
+                classifiedType = ClassifiedType.TODO,
+                tags = listOf("태그1", "태그2")
+            ),
+            onNavigateBack = {},
+            onNavigateToSettings = {},
+            onShare = {},
+            onRetry = {},
+            onChangeClassification = { _, _ -> },
+            onApproveCalendarSync = {},
+            onRejectCalendarSync = {}
+        )
     }
 }
 
@@ -515,7 +573,7 @@ private fun formatDateTime(epochMs: Long): String {
     return dateTime.format(DateTimeFormatter.ofPattern("yyyy.M.d HH:mm"))
 }
 
-private fun openGoogleCalendar(context: android.content.Context, startTime: Long?) {
+private fun openGoogleCalendar(context: Context, startTime: Long?) {
     val targetTime = startTime ?: System.currentTimeMillis()
     val deepLink = Uri.Builder()
         .scheme("content")

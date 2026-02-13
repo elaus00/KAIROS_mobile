@@ -17,11 +17,7 @@ data class CaptureUiState(
     /** 첨부 이미지 URI */
     val imageUri: String? = null,
     /** 에러 메시지 */
-    val errorMessage: String? = null,
-    /** 캡처 입력 글씨 크기 (sp) */
-    val fontSize: Int = 20,
-    /** 캡처 입력 줄 높이 (sp) */
-    val lineHeight: Int = 34
+    val errorMessage: String? = null
 )
 
 /**

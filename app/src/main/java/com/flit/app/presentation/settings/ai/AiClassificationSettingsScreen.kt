@@ -1,5 +1,6 @@
 package com.flit.app.presentation.settings.ai
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.domain.model.ClassificationPreset
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.PremiumBadge
@@ -28,26 +31,51 @@ import com.flit.app.presentation.subscription.PremiumGateSheet
 import com.flit.app.ui.theme.FlitTheme
 
 /**
- * AI 분류 설정 세부 화면
- * - 분류 프리셋 드롭다운
- * - 분류 규칙 (커스텀 인스트럭션) 텍스트필드
- * - 비프리미엄 시 PremiumGateSheet
+ * AI 분류 설정 화면 - ViewModel 보유
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AiClassificationSettingsScreen(
     viewModel: AiClassificationSettingsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
     onNavigateToSubscription: () -> Unit = {}
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
+
+    AiClassificationSettingsContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToSubscription = onNavigateToSubscription,
+        onSetPreset = viewModel::setPreset,
+        onSetCustomInstruction = viewModel::setCustomInstruction,
+        onSaveCustomInstruction = viewModel::saveCustomInstruction
+    )
+}
+
+/**
+ * AI 분류 설정 컨텐츠 - UI만 담당
+ * - 분류 프리셋 드롭다운
+ * - 분류 규칙 (커스텀 인스트럭션) 텍스트필드
+ * - 비프리미엄 시 PremiumGateSheet
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AiClassificationSettingsContent(
+    uiState: AiClassificationSettingsUiState,
+    onNavigateBack: () -> Unit,
+    onNavigateToSubscription: () -> Unit,
+    onSetPreset: (String) -> Unit,
+    onSetCustomInstruction: (String) -> Unit,
+    onSaveCustomInstruction: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
     val isPremium = uiState.subscriptionTier == SubscriptionTier.PREMIUM
     var showPresetDropdown by remember { mutableStateOf(false) }
     var showPremiumGateSheet by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -154,7 +182,7 @@ fun AiClassificationSettingsScreen(
                                     }
                                 },
                                 onClick = {
-                                    viewModel.setPreset(preset.id)
+                                    onSetPreset(preset.id)
                                     showPresetDropdown = false
                                 }
                             )
@@ -192,7 +220,7 @@ fun AiClassificationSettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = uiState.customInstruction,
-                            onValueChange = { viewModel.setCustomInstruction(it) },
+                            onValueChange = onSetCustomInstruction,
                             placeholder = {
                                 Text(
                                     "예: 업무 관련 내용은 일정으로 분류",
@@ -217,7 +245,7 @@ fun AiClassificationSettingsScreen(
                         if (isPremium && uiState.customInstruction.isNotBlank()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             TextButton(
-                                onClick = { viewModel.saveCustomInstruction() },
+                                onClick = onSaveCustomInstruction,
                                 modifier = Modifier.align(Alignment.End)
                             ) {
                                 Text("저장", color = colors.accent, fontSize = 14.sp)
@@ -249,5 +277,45 @@ fun AiClassificationSettingsScreen(
             onDismiss = { showPremiumGateSheet = false }
         )
     }
+    }
+}
+
+/**
+ * AI 분류 설정 화면 Preview
+ */
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AiClassificationSettingsContentPreview() {
+    FlitTheme {
+        AiClassificationSettingsContent(
+            uiState = AiClassificationSettingsUiState(
+                presets = listOf(
+                    ClassificationPreset(
+                        id = "default",
+                        name = "기본",
+                        description = "일반적인 분류 규칙"
+                    ),
+                    ClassificationPreset(
+                        id = "work",
+                        name = "업무",
+                        description = "업무 중심 분류"
+                    ),
+                    ClassificationPreset(
+                        id = "personal",
+                        name = "개인",
+                        description = "개인 생활 중심 분류"
+                    )
+                ),
+                selectedPresetId = "default",
+                customInstruction = "",
+                subscriptionTier = SubscriptionTier.PREMIUM
+            ),
+            onNavigateBack = {},
+            onNavigateToSubscription = {},
+            onSetPreset = {},
+            onSetCustomInstruction = {},
+            onSaveCustomInstruction = {}
+        )
     }
 }

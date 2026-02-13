@@ -1,6 +1,7 @@
 package com.flit.app.presentation.notes
 
 import com.flit.app.domain.model.Folder
+import com.flit.app.domain.model.NoteViewType
 
 /**
  * 노트 탭 UI 상태
@@ -22,7 +23,13 @@ data class NotesUiState(
     /** 에러 메시지 */
     val errorMessage: String? = null,
     /** 프리미엄 구독 여부 (AI 재구성 버튼 표시 제어) */
-    val isPremium: Boolean = false
+    val isPremium: Boolean = false,
+    /** 노트 보기 유형 */
+    val viewType: NoteViewType = NoteViewType.LIST,
+    /** 확장된 노트 ID (단일 확장 정책) */
+    val expandedNoteId: String? = null,
+    /** 공유 텍스트 (ShareSheet 트리거) */
+    val shareText: String? = null
 )
 
 /**
@@ -71,4 +78,12 @@ sealed interface NotesEvent {
     data class DeleteFolder(val folderId: String) : NotesEvent
     /** 에러 메시지 닫기 */
     data object DismissError : NotesEvent
+    /** 노트 확장/축소 토글 */
+    data class ToggleNoteExpand(val noteId: String) : NotesEvent
+    /** 노트 삭제 */
+    data class DeleteNote(val captureId: String) : NotesEvent
+    /** 노트 공유 텍스트 생성 완료 후 소비 */
+    data object DismissShareText : NotesEvent
+    /** 노트 폴더 이동 */
+    data class MoveNoteToFolder(val noteId: String, val folderId: String) : NotesEvent
 }

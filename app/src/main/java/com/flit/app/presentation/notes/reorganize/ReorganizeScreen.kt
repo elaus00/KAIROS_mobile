@@ -1,5 +1,6 @@
 package com.flit.app.presentation.notes.reorganize
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,20 +25,41 @@ import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
 /**
- * 노트 AI 재구성 화면
- * Before/After 2컬럼 비교: 현재 매핑 vs AI 제안 매핑
+ * 노트 AI 재구성 화면 - ViewModel 보유
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReorganizeScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: ReorganizeViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
+
+    ReorganizeContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onApply = viewModel::onApply,
+        onRetry = viewModel::onRetry
+    )
+}
+
+/**
+ * 노트 AI 재구성 컨텐츠 - UI만 담당
+ * Before/After 2컬럼 비교: 현재 매핑 vs AI 제안 매핑
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReorganizeContent(
+    uiState: ReorganizeUiState,
+    onNavigateBack: () -> Unit,
+    onApply: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -99,7 +122,7 @@ fun ReorganizeScreen(
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        TextButton(onClick = { viewModel.onRetry() }) {
+                        TextButton(onClick = onRetry) {
                             Text(
                                 text = "다시 시도",
                                 color = colors.accent,
@@ -160,7 +183,7 @@ fun ReorganizeScreen(
                     // 적용 버튼
                     if (uiState.proposals.isNotEmpty()) {
                         Button(
-                            onClick = { viewModel.onApply() },
+                            onClick = onApply,
                             enabled = !uiState.isApplying,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -260,5 +283,40 @@ private fun MoveComparisonRow(
                 overflow = TextOverflow.Ellipsis
             )
         }
+    }
+}
+
+/**
+ * 노트 AI 재구성 화면 Preview
+ */
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ReorganizeContentPreview() {
+    FlitTheme {
+        ReorganizeContent(
+            uiState = ReorganizeUiState(
+                isLoading = false,
+                isApplying = false,
+                proposals = listOf(
+                    ProposedItem(
+                        folderName = "업무",
+                        folderType = "CUSTOM",
+                        action = "CREATE",
+                        captureIds = listOf("1", "2", "3")
+                    ),
+                    ProposedItem(
+                        folderName = "개인",
+                        folderType = "CUSTOM",
+                        action = "MOVE",
+                        captureIds = listOf("4", "5")
+                    )
+                ),
+                error = null
+            ),
+            onNavigateBack = {},
+            onApply = {},
+            onRetry = {}
+        )
     }
 }

@@ -84,6 +84,9 @@ interface CaptureRepository {
         offset: Int
     ): List<Capture>
 
+    /** AI 제목 업데이트 */
+    suspend fun updateAiTitle(captureId: String, title: String)
+
     /** FTS 검색 + 필터 (분류 유형 + 날짜 범위) */
     suspend fun searchCapturesFiltered(
         query: String,

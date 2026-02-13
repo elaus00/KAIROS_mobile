@@ -1,5 +1,9 @@
 package com.flit.app.presentation.notes
 
+import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
@@ -9,14 +13,21 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoFixHigh
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.StickyNote2
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,6 +45,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,8 +53,10 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.domain.model.Folder
 import com.flit.app.domain.model.FolderType
 import com.flit.app.domain.model.NoteSubType
+import com.flit.app.domain.model.NoteViewType
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FlitChip
 import com.flit.app.ui.theme.FlitTheme
@@ -73,6 +87,7 @@ fun NotesContent(
         onNoteClick = onNoteClick,
         onTrashClick = onTrashClick,
         onReorganizeClick = onReorganizeClick,
+        onShareNote = viewModel::shareNote,
         modifier = modifier
     )
     }
@@ -82,23 +97,41 @@ fun NotesContent(
  * 노트 화면 내부 구현
  * 노트 우선 뷰: 헤더 → 폴더 필터 칩 → 노트 리스트
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun NotesContentInternal(
+internal fun NotesContentInternal(
     uiState: NotesUiState,
     onEvent: (NotesEvent) -> Unit,
     onSearchClick: () -> Unit,
     onNoteClick: (String) -> Unit,
     onTrashClick: () -> Unit = {},
     onReorganizeClick: () -> Unit = {},
+    onShareNote: (NoteWithCapture) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 폴더 선택 바텀시트 상태
+    var folderSheetNoteId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
             onEvent(NotesEvent.DismissError)
+        }
+    }
+
+    // 공유 텍스트가 설정되면 ShareSheet 실행
+    LaunchedEffect(uiState.shareText) {
+        uiState.shareText?.let { text ->
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, text)
+                type = "text/plain"
+            }
+            context.startActivity(Intent.createChooser(sendIntent, null))
+            onEvent(NotesEvent.DismissShareText)
         }
     }
 
@@ -172,11 +205,39 @@ private fun NotesContentInternal(
                 }
 
                 else -> {
-                    NotesList(
-                        notes = uiState.notes,
-                        onNoteClick = onNoteClick,
-                        modifier = Modifier.weight(1f)
-                    )
+                    when (uiState.viewType) {
+                        NoteViewType.LIST -> {
+                            NotesListView(
+                                notes = uiState.notes,
+                                expandedNoteId = uiState.expandedNoteId,
+                                onToggleExpand = { onEvent(NotesEvent.ToggleNoteExpand(it)) },
+                                onNoteClick = onNoteClick,
+                                onShareNote = onShareNote,
+                                onDeleteNote = { onEvent(NotesEvent.DeleteNote(it)) },
+                                onMoveFolderNote = { noteId -> folderSheetNoteId = noteId },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        NoteViewType.GRID -> {
+                            NotesGridView(
+                                notes = uiState.notes,
+                                onNoteClick = onNoteClick,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        NoteViewType.COMPACT -> {
+                            NotesCompactView(
+                                notes = uiState.notes,
+                                expandedNoteId = uiState.expandedNoteId,
+                                onToggleExpand = { onEvent(NotesEvent.ToggleNoteExpand(it)) },
+                                onNoteClick = onNoteClick,
+                                onShareNote = onShareNote,
+                                onDeleteNote = { onEvent(NotesEvent.DeleteNote(it)) },
+                                onMoveFolderNote = { noteId -> folderSheetNoteId = noteId },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -186,6 +247,18 @@ private fun NotesContentInternal(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 16.dp)
+        )
+    }
+
+    // 폴더 선택 바텀시트
+    folderSheetNoteId?.let { noteId ->
+        FolderSelectSheet(
+            folders = uiState.folders.map { it.folder },
+            onFolderSelected = { folderId ->
+                onEvent(NotesEvent.MoveNoteToFolder(noteId, folderId))
+                folderSheetNoteId = null
+            },
+            onDismiss = { folderSheetNoteId = null }
         )
     }
 }
@@ -368,13 +441,22 @@ private fun FolderFilterChips(
     }
 }
 
+// ──────────────────────────────────────────
+// 리스트 뷰 (확장 가능 카드)
+// ──────────────────────────────────────────
+
 /**
- * 노트 리스트
+ * 리스트 뷰 — 확장 가능 카드
  */
 @Composable
-private fun NotesList(
+private fun NotesListView(
     notes: List<NoteWithCapture>,
+    expandedNoteId: String?,
+    onToggleExpand: (String) -> Unit,
     onNoteClick: (String) -> Unit,
+    onShareNote: (NoteWithCapture) -> Unit,
+    onDeleteNote: (String) -> Unit,
+    onMoveFolderNote: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -388,26 +470,37 @@ private fun NotesList(
         ) { _, note ->
             NoteListItem(
                 note = note,
-                onClick = { onNoteClick(note.noteId) }
+                isExpanded = expandedNoteId == note.noteId,
+                onToggleExpand = { onToggleExpand(note.noteId) },
+                onEdit = { onNoteClick(note.noteId) },
+                onShare = { onShareNote(note) },
+                onDelete = { onDeleteNote(note.captureId) },
+                onMoveFolder = { onMoveFolderNote(note.noteId) }
             )
         }
     }
 }
 
 /**
- * 개별 노트 아이템
- * 제목 + 본문 미리보기 + 폴더 태그 + 날짜
+ * 개별 노트 아이템 (확장 가능)
+ * 축소: 제목 1줄 + 본문 미리보기 2줄 + 날짜 + 타입칩 + 폴더
+ * 확장: 제목 전문 + 본문 전문 (최대 10줄) + 폴더 + 액션 Row
  */
 @Composable
 private fun NoteListItem(
     note: NoteWithCapture,
-    onClick: () -> Unit,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+    onEdit: () -> Unit,
+    onShare: () -> Unit,
+    onDelete: () -> Unit,
+    onMoveFolder: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
     val title = note.aiTitle ?: note.originalText.take(40)
 
-    // 본문 미리보기: body가 있으면 body, 없으면 originalText (제목과 다를 때만)
+    // 본문 미리보기
     val preview = when {
         !note.body.isNullOrBlank() -> note.body
         note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
@@ -423,7 +516,7 @@ private fun NoteListItem(
             .clip(RoundedCornerShape(16.dp))
             .background(colors.card)
             .border(0.5.dp, colors.border, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
+            .clickable(onClick = onToggleExpand)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         // 첫 줄: 제목 + 날짜
@@ -436,8 +529,8 @@ private fun NoteListItem(
                 color = colors.text,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                overflow = if (isExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
 
@@ -450,20 +543,20 @@ private fun NoteListItem(
             )
         }
 
-        // 본문 미리보기
+        // 본문 미리보기 / 전문
         if (preview != null) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = preview,
                 color = colors.textSecondary,
                 fontSize = 13.sp,
-                maxLines = 2,
+                maxLines = if (isExpanded) 10 else 2,
                 overflow = TextOverflow.Ellipsis,
                 lineHeight = 20.sp
             )
         }
 
-        // 분류 칩 + 폴더 태그 (§4.3 분류 칩 항상 표시)
+        // 분류 칩 + 폴더 태그
         val subTypeLabel = noteSubTypeLabel(note.noteSubType)
         if (subTypeLabel != null || note.folderName != null) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -471,7 +564,6 @@ private fun NoteListItem(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 서브타입 칩 (IDEA, BOOKMARK 등)
                 if (subTypeLabel != null) {
                     Text(
                         text = subTypeLabel,
@@ -484,13 +576,361 @@ private fun NoteListItem(
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
-                // 폴더 이름
                 if (note.folderName != null) {
                     Text(
                         text = note.folderName,
                         color = colors.textMuted,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+        }
+
+        // 확장 시 액션 Row
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            NoteActionRow(
+                onShare = onShare,
+                onMoveFolder = onMoveFolder,
+                onDelete = onDelete,
+                onEdit = onEdit,
+                modifier = Modifier.padding(top = 12.dp)
+            )
+        }
+    }
+}
+
+/**
+ * 노트 액션 Row — 공유 | 폴더 | 삭제 | 편집
+ */
+@Composable
+private fun NoteActionRow(
+    onShare: () -> Unit,
+    onMoveFolder: () -> Unit,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FlitTheme.colors
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        IconButton(onClick = onShare) {
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = "공유",
+                tint = colors.textSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        IconButton(onClick = onMoveFolder) {
+            Icon(
+                imageVector = Icons.Outlined.FolderOpen,
+                contentDescription = "폴더 이동",
+                tint = colors.textSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        IconButton(onClick = onDelete) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "삭제",
+                tint = colors.danger,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        IconButton(onClick = onEdit) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "편집",
+                tint = colors.textSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+// ──────────────────────────────────────────
+// 그리드 뷰 (2열 카드)
+// ──────────────────────────────────────────
+
+/**
+ * 그리드 뷰 — 2열 카드형, 탭 → NoteDetailScreen
+ */
+@Composable
+private fun NotesGridView(
+    notes: List<NoteWithCapture>,
+    onNoteClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = modifier.testTag("notes_grid"),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(
+            items = notes,
+            key = { it.noteId }
+        ) { note ->
+            NoteGridItem(
+                note = note,
+                onClick = { onNoteClick(note.noteId) }
+            )
+        }
+    }
+}
+
+/**
+ * 그리드 노트 카드
+ */
+@Composable
+private fun NoteGridItem(
+    note: NoteWithCapture,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FlitTheme.colors
+    val title = note.aiTitle ?: note.originalText.take(40)
+
+    val preview = when {
+        !note.body.isNullOrBlank() -> note.body
+        note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
+        else -> null
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(colors.card)
+            .border(0.5.dp, colors.border, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+    ) {
+        Text(
+            text = title,
+            color = colors.text,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        if (preview != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = preview,
+                color = colors.textSecondary,
+                fontSize = 12.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 18.sp
+            )
+        }
+
+        val subTypeLabel = noteSubTypeLabel(note.noteSubType)
+        if (subTypeLabel != null) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = subTypeLabel,
+                color = colors.accent,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(colors.accentBg)
+                    .padding(horizontal = 5.dp, vertical = 1.dp)
+            )
+        }
+    }
+}
+
+// ──────────────────────────────────────────
+// 컴팩트 뷰 (제목만, 확장 가능)
+// ──────────────────────────────────────────
+
+/**
+ * 컴팩트 뷰 — 제목 + 날짜만, 확장 시 본문 + 액션
+ */
+@Composable
+private fun NotesCompactView(
+    notes: List<NoteWithCapture>,
+    expandedNoteId: String?,
+    onToggleExpand: (String) -> Unit,
+    onNoteClick: (String) -> Unit,
+    onShareNote: (NoteWithCapture) -> Unit,
+    onDeleteNote: (String) -> Unit,
+    onMoveFolderNote: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier.testTag("notes_compact"),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        itemsIndexed(
+            items = notes,
+            key = { _, note -> note.noteId }
+        ) { _, note ->
+            NoteCompactItem(
+                note = note,
+                isExpanded = expandedNoteId == note.noteId,
+                onToggleExpand = { onToggleExpand(note.noteId) },
+                onEdit = { onNoteClick(note.noteId) },
+                onShare = { onShareNote(note) },
+                onDelete = { onDeleteNote(note.captureId) },
+                onMoveFolder = { onMoveFolderNote(note.noteId) }
+            )
+        }
+    }
+}
+
+/**
+ * 컴팩트 노트 아이템
+ * 축소: 제목 1줄 + 날짜
+ * 확장: 본문 + 액션 Row
+ */
+@Composable
+private fun NoteCompactItem(
+    note: NoteWithCapture,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+    onEdit: () -> Unit,
+    onShare: () -> Unit,
+    onDelete: () -> Unit,
+    onMoveFolder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = FlitTheme.colors
+    val title = note.aiTitle ?: note.originalText.take(40)
+    val dateFormat = remember { SimpleDateFormat("M/d", Locale.getDefault()) }
+    val dateText = dateFormat.format(Date(note.createdAt))
+
+    val preview = when {
+        !note.body.isNullOrBlank() -> note.body
+        note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
+        else -> null
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(colors.card)
+            .border(0.5.dp, colors.border, RoundedCornerShape(12.dp))
+            .clickable(onClick = onToggleExpand)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = colors.text,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = dateText,
+                color = colors.textMuted,
+                fontSize = 12.sp
+            )
+        }
+
+        // 확장 영역
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column {
+                if (preview != null) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = preview,
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        maxLines = 10,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 20.sp
+                    )
+                }
+
+                NoteActionRow(
+                    onShare = onShare,
+                    onMoveFolder = onMoveFolder,
+                    onDelete = onDelete,
+                    onEdit = onEdit,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────
+// 공통 컴포넌트
+// ──────────────────────────────────────────
+
+/**
+ * 폴더 선택 바텀시트
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FolderSelectSheet(
+    folders: List<Folder>,
+    onFolderSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = FlitTheme.colors
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = colors.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Text(
+                text = "폴더 선택",
+                color = colors.text,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            folders.forEach { folder ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onFolderSelected(folder.id) }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = folder.name,
+                        color = colors.text,
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }

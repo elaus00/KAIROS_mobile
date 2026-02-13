@@ -8,12 +8,6 @@ android {
     namespace = "com.flit.app.baselineprofile"
     compileSdk = 36
 
-    sourceSets {
-        getByName("main") {
-            java.srcDir("${rootProject.projectDir}/benchmark/src/main/java")
-        }
-    }
-
     defaultConfig {
         minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -180,6 +180,10 @@ class CaptureRepositoryImpl @Inject constructor(
         ).map { captureMapper.toDomain(it) }
     }
 
+    override suspend fun updateAiTitle(captureId: String, title: String) {
+        captureDao.updateAiTitle(captureId, title, System.currentTimeMillis())
+    }
+
     override suspend fun searchCapturesFiltered(
         query: String,
         type: ClassifiedType?,

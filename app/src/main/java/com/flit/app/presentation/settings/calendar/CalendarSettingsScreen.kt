@@ -1,5 +1,6 @@
 package com.flit.app.presentation.settings.calendar
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,21 +35,14 @@ import com.flit.app.presentation.settings.components.ToggleSettingItem
 import com.flit.app.ui.theme.FlitTheme
 
 /**
- * 캘린더 설정 세부 화면
- * - 연동 캘린더 선택 (BottomSheet)
- * - 자동 추가 토글 (auto/suggest 통합)
- * - 알림 토글
+ * 캘린더 설정 화면 - ViewModel 보유
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarSettingsScreen(
     viewModel: CalendarSettingsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {}
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
-    var showCalendarSheet by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.errorMessage) {
@@ -60,7 +55,41 @@ fun CalendarSettingsScreen(
         }
     }
 
+    CalendarSettingsContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onNavigateBack = onNavigateBack,
+        onToggleAutoAdd = viewModel::toggleAutoAdd,
+        onToggleNotification = viewModel::toggleNotification,
+        onSetTargetCalendar = viewModel::setTargetCalendar,
+        onReloadCalendars = viewModel::reloadAvailableCalendars
+    )
+}
+
+/**
+ * 캘린더 설정 컨텐츠 - UI만 담당
+ * - 연동 캘린더 선택 (BottomSheet)
+ * - 자동 추가 토글 (auto/suggest 통합)
+ * - 알림 토글
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CalendarSettingsContent(
+    uiState: CalendarSettingsUiState,
+    snackbarHostState: SnackbarHostState,
+    onNavigateBack: () -> Unit,
+    onToggleAutoAdd: (Boolean) -> Unit,
+    onToggleNotification: (Boolean) -> Unit,
+    onSetTargetCalendar: (Long) -> Unit,
+    onReloadCalendars: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
+    val colors = FlitTheme.colors
+    var showCalendarSheet by remember { mutableStateOf(false) }
+
     Scaffold(
+        modifier = modifier,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -117,7 +146,7 @@ fun CalendarSettingsScreen(
                     ActionItem(
                         title = "캘린더 목록 새로고침",
                         description = "기기 캘린더 목록을 다시 불러옵니다",
-                        onClick = { viewModel.reloadAvailableCalendars() }
+                        onClick = onReloadCalendars
                     )
                 }
             }
@@ -136,7 +165,7 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "신뢰도 높은 일정을 자동으로 캘린더에 추가"
                         else "일정 추가 전 사용자 승인을 요청합니다",
                     isChecked = uiState.isAutoAddEnabled,
-                    onToggle = { viewModel.toggleAutoAdd(it) }
+                    onToggle = onToggleAutoAdd
                 )
 
                 SettingsDivider()
@@ -146,7 +175,7 @@ fun CalendarSettingsScreen(
                     description = if (uiState.isAutoAddEnabled) "자동 추가된 일정을 알림으로 확인"
                         else "승인 대기 중인 일정이 있을 때 알림",
                     isChecked = uiState.isNotificationEnabled,
-                    onToggle = { viewModel.toggleNotification(it) }
+                    onToggle = onToggleNotification
                 )
             }
 
@@ -165,7 +194,7 @@ fun CalendarSettingsScreen(
                 calendars = uiState.availableCalendars,
                 selectedId = uiState.selectedCalendarId,
                 onSelect = { calendarId ->
-                    viewModel.setTargetCalendar(calendarId)
+                    onSetTargetCalendar(calendarId)
                     showCalendarSheet = false
                 }
             )
@@ -273,5 +302,45 @@ private fun CalendarSelectionSheet(
                 }
             }
         }
+    }
+}
+
+/**
+ * 캘린더 설정 화면 Preview
+ */
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CalendarSettingsContentPreview() {
+    FlitTheme {
+        CalendarSettingsContent(
+            uiState = CalendarSettingsUiState(
+                availableCalendars = listOf(
+                    LocalCalendar(
+                        id = 1L,
+                        displayName = "개인 캘린더",
+                        accountName = "user@gmail.com",
+                        color = -16711936,
+                        isPrimary = true
+                    ),
+                    LocalCalendar(
+                        id = 2L,
+                        displayName = "업무 캘린더",
+                        accountName = "work@company.com",
+                        color = -16776961,
+                        isPrimary = false
+                    )
+                ),
+                selectedCalendarId = 1L,
+                isAutoAddEnabled = true,
+                isNotificationEnabled = true
+            ),
+            snackbarHostState = SnackbarHostState(),
+            onNavigateBack = {},
+            onToggleAutoAdd = {},
+            onToggleNotification = {},
+            onSetTargetCalendar = {},
+            onReloadCalendars = {}
+        )
     }
 }

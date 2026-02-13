@@ -14,6 +14,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMetricApi::class)
 class ScrollJankBenchmark {
+    companion object {
+        private const val SEARCH_BENCHMARK_KEYWORD = "bench55555"
+    }
 
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
@@ -54,9 +57,11 @@ class ScrollJankBenchmark {
             startActivityAndWait()
             dismissOnboardingIfVisible()
             waitForHomeReady()
+            tapHomeTab()
+            enterCaptureAndSubmit("search seed $SEARCH_BENCHMARK_KEYWORD")
             tapNotesTab()
             openSearchScreenFromNotes()
-            enterSearchKeyword("벤치")
+            enterSearchKeyword(SEARCH_BENCHMARK_KEYWORD)
             scrollDownRepeatedly(times = 15)
         }
     }

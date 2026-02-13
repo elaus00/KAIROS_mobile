@@ -32,5 +32,8 @@ data class SettingsUiState(
     val features: SubscriptionFeatures = SubscriptionFeatures(),
 
     // 캡처 글씨 크기 (SMALL / MEDIUM / LARGE)
-    val captureFontSize: String = FontSizePreference.MEDIUM.name
+    val captureFontSize: String = FontSizePreference.MEDIUM.name,
+
+    // 노트 보기 유형 (LIST / GRID / COMPACT)
+    val noteViewType: String = "LIST"
 )

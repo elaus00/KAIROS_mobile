@@ -1,6 +1,7 @@
 package com.flit.app.presentation.settings
 
 import android.Manifest
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -23,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.BuildConfig
 import com.flit.app.domain.model.FontSizePreference
+import com.flit.app.domain.model.NoteViewType
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.presentation.components.common.SectionHeader
@@ -57,14 +60,8 @@ fun SettingsScreen(
     onNavigateToCalendarSettings: () -> Unit = {},
     onNavigateToAiSettings: () -> Unit = {}
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
-    val colors = FlitTheme.colors
-    var showPremiumGateSheet by remember { mutableStateOf(false) }
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
-    val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
-    val snackbarHostState = remember { SnackbarHostState() }
+
     val calendarPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -73,6 +70,74 @@ fun SettingsScreen(
         viewModel.onCalendarPermissionResult(readGranted && writeGranted)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshCalendarPermissionState()
+    }
+
+    SettingsContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
+        onNavigateToTermsOfService = onNavigateToTermsOfService,
+        onNavigateToLogin = onNavigateToLogin,
+        onNavigateToSubscription = onNavigateToSubscription,
+        onNavigateToAnalytics = onNavigateToAnalytics,
+        onNavigateToCalendarSettings = onNavigateToCalendarSettings,
+        onNavigateToAiSettings = onNavigateToAiSettings,
+        onSetTheme = viewModel::setTheme,
+        onSetCaptureFontSize = viewModel::setCaptureFontSize,
+        onSetNoteViewType = viewModel::setNoteViewType,
+        onToggleCalendar = viewModel::toggleCalendar,
+        onRequestCalendarPermission = {
+            calendarPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_CALENDAR,
+                    Manifest.permission.WRITE_CALENDAR
+                )
+            )
+        },
+        onLogout = viewModel::logout,
+        onDebugSubmitImage = viewModel::debugSubmitImage,
+        onDismissDebugResult = viewModel::dismissDebugResult,
+        onDismissCalendarAuthMessage = viewModel::dismissCalendarAuthMessage
+    )
+}
+
+/**
+ * SettingsContent
+ * 설정 화면 본문
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsContent(
+    uiState: SettingsUiState,
+    onNavigateBack: () -> Unit,
+    onNavigateToPrivacyPolicy: () -> Unit,
+    onNavigateToTermsOfService: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToSubscription: () -> Unit,
+    onNavigateToAnalytics: () -> Unit,
+    onNavigateToCalendarSettings: () -> Unit,
+    onNavigateToAiSettings: () -> Unit,
+    onSetTheme: (ThemePreference) -> Unit,
+    onSetCaptureFontSize: (String) -> Unit,
+    onSetNoteViewType: (String) -> Unit,
+    onToggleCalendar: (Boolean) -> Unit,
+    onRequestCalendarPermission: () -> Unit,
+    onLogout: () -> Unit,
+    onDebugSubmitImage: (Uri) -> Unit,
+    onDismissDebugResult: () -> Unit,
+    onDismissCalendarAuthMessage: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
+    val colors = FlitTheme.colors
+    var showPremiumGateSheet by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var premiumGateFeatureName by remember { mutableStateOf("AI 분류 설정") }
+    val isPremiumSubscriber = uiState.subscriptionTier == SubscriptionTier.PREMIUM
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // 캘린더 인증 메시지 Snackbar 표시
     LaunchedEffect(uiState.calendarAuthMessage) {
         uiState.calendarAuthMessage?.let { message ->
@@ -80,12 +145,8 @@ fun SettingsScreen(
                 message = message,
                 duration = SnackbarDuration.Short
             )
-            viewModel.dismissCalendarAuthMessage()
+            onDismissCalendarAuthMessage()
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.refreshCalendarPermissionState()
     }
 
     Scaffold(
@@ -114,7 +175,8 @@ fun SettingsScreen(
                 )
             )
         },
-        containerColor = colors.background
+        containerColor = colors.background,
+        modifier = modifier
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -137,7 +199,7 @@ fun SettingsScreen(
                     title = "시스템 설정",
                     description = "기기 설정에 따름",
                     isSelected = uiState.themePreference == ThemePreference.SYSTEM,
-                    onClick = { viewModel.setTheme(ThemePreference.SYSTEM) }
+                    onClick = { onSetTheme(ThemePreference.SYSTEM) }
                 )
 
                 SettingsDivider()
@@ -145,7 +207,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "라이트 모드",
                     isSelected = uiState.themePreference == ThemePreference.LIGHT,
-                    onClick = { viewModel.setTheme(ThemePreference.LIGHT) }
+                    onClick = { onSetTheme(ThemePreference.LIGHT) }
                 )
 
                 SettingsDivider()
@@ -153,7 +215,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "다크 모드",
                     isSelected = uiState.themePreference == ThemePreference.DARK,
-                    onClick = { viewModel.setTheme(ThemePreference.DARK) }
+                    onClick = { onSetTheme(ThemePreference.DARK) }
                 )
 
                 // 굵은 구분선 (테마 ↔ 글씨 크기)
@@ -177,7 +239,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "작게",
                     isSelected = uiState.captureFontSize == FontSizePreference.SMALL.name,
-                    onClick = { viewModel.setCaptureFontSize(FontSizePreference.SMALL.name) }
+                    onClick = { onSetCaptureFontSize(FontSizePreference.SMALL.name) }
                 )
 
                 SettingsDivider()
@@ -185,7 +247,7 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "보통",
                     isSelected = uiState.captureFontSize == FontSizePreference.MEDIUM.name,
-                    onClick = { viewModel.setCaptureFontSize(FontSizePreference.MEDIUM.name) }
+                    onClick = { onSetCaptureFontSize(FontSizePreference.MEDIUM.name) }
                 )
 
                 SettingsDivider()
@@ -193,7 +255,50 @@ fun SettingsScreen(
                 ThemeOptionItem(
                     title = "크게",
                     isSelected = uiState.captureFontSize == FontSizePreference.LARGE.name,
-                    onClick = { viewModel.setCaptureFontSize(FontSizePreference.LARGE.name) }
+                    onClick = { onSetCaptureFontSize(FontSizePreference.LARGE.name) }
+                )
+
+                // 굵은 구분선 (글씨 크기 ↔ 노트 보기)
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 1.dp,
+                    color = colors.border
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 노트 보기 라벨
+                Text(
+                    text = "노트 보기",
+                    color = colors.textMuted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+
+                ThemeOptionItem(
+                    title = "리스트",
+                    description = "확장 가능한 카드 목록",
+                    isSelected = uiState.noteViewType == NoteViewType.LIST.name,
+                    onClick = { onSetNoteViewType(NoteViewType.LIST.name) }
+                )
+
+                SettingsDivider()
+
+                ThemeOptionItem(
+                    title = "그리드",
+                    description = "2열 카드",
+                    isSelected = uiState.noteViewType == NoteViewType.GRID.name,
+                    onClick = { onSetNoteViewType(NoteViewType.GRID.name) }
+                )
+
+                SettingsDivider()
+
+                ThemeOptionItem(
+                    title = "컴팩트",
+                    description = "제목만 표시",
+                    isSelected = uiState.noteViewType == NoteViewType.COMPACT.name,
+                    onClick = { onSetNoteViewType(NoteViewType.COMPACT.name) }
                 )
             }
 
@@ -213,14 +318,9 @@ fun SettingsScreen(
                     isChecked = uiState.isCalendarEnabled,
                     onToggle = { enabled ->
                         if (enabled && !uiState.isCalendarPermissionGranted) {
-                            calendarPermissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.READ_CALENDAR,
-                                    Manifest.permission.WRITE_CALENDAR
-                                )
-                            )
+                            onRequestCalendarPermission()
                         } else {
-                            viewModel.toggleCalendar(enabled)
+                            onToggleCalendar(enabled)
                         }
                     }
                 )
@@ -277,6 +377,7 @@ fun SettingsScreen(
                     SettingsDivider()
                     NavigationSettingItem(
                         title = "로그아웃",
+                        showArrow = false,
                         onClick = { showLogoutDialog = true }
                     )
                 } else {
@@ -350,8 +451,8 @@ fun SettingsScreen(
                     DebugImageUploadItem(
                         isSubmitting = uiState.debugSubmitting,
                         result = uiState.debugResult,
-                        onImageSelected = { uri -> viewModel.debugSubmitImage(uri) },
-                        onDismissResult = { viewModel.dismissDebugResult() }
+                        onImageSelected = { uri -> onDebugSubmitImage(uri) },
+                        onDismissResult = onDismissDebugResult
                     )
                 }
             }
@@ -384,7 +485,7 @@ fun SettingsScreen(
             text = { Text("로그아웃하시겠습니까?", color = dialogColors.text) },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.logout()
+                    onLogout()
                     showLogoutDialog = false
                 }) { Text("로그아웃", color = dialogColors.danger) }
             },
@@ -395,6 +496,34 @@ fun SettingsScreen(
             }
         )
     }
+    }
+}
+
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SettingsContentPreview() {
+    FlitTheme {
+        SettingsContent(
+            uiState = SettingsUiState(),
+            onNavigateBack = {},
+            onNavigateToPrivacyPolicy = {},
+            onNavigateToTermsOfService = {},
+            onNavigateToLogin = {},
+            onNavigateToSubscription = {},
+            onNavigateToAnalytics = {},
+            onNavigateToCalendarSettings = {},
+            onNavigateToAiSettings = {},
+            onSetTheme = {},
+            onSetCaptureFontSize = {},
+            onSetNoteViewType = {},
+            onToggleCalendar = {},
+            onRequestCalendarPermission = {},
+            onLogout = {},
+            onDebugSubmitImage = {},
+            onDismissDebugResult = {},
+            onDismissCalendarAuthMessage = {}
+        )
     }
 }
 

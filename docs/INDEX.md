@@ -46,6 +46,8 @@ Docs/
 | `api_spec.md` | API 명세서 — 엔드포인트/요청/응답/에러 코드 | v2.5 | PRD v10.0, 기능명세서 v2.3, 데이터모델 v2.0 | 2026-02-10 |
 | `design-guide.md` | 디자인 가이드 — 철학/구현원칙/색상/타이포/간격/컴포넌트/UX패턴/라이팅/접근성 | v2.0 | PRD v10.0, philosophy_principles v2.0, Apple HIG | 2026-02-12 |
 | `ux-writing-audit.md` | UX 라이팅 감사 — P0 8건 반영 완료, P1 16건, P2 17건 | v1.1 | PRD v10.0, design-guide v1.1 | 2026-02-12 |
+| `brand-identity.md` | 브랜드 아이덴티티 — 브랜드 에센스, 로고 컨셉, 색상 전략, 태그라인 | v1.0 | PRD v10.0, philosophy_principles v2.0 | 2026-02-13 |
+| `design-presentation-template.md` | 디자인 프레젠테이션 HTML 템플릿 — 카드/그리드/배지/시나리오 양식 | v1.0 | design-guide v2.0 | 2026-02-13 |
 
 ### plan/
 

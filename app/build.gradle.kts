@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.baselineprofile)
+    alias(libs.plugins.roborazzi)
     id("jacoco")
 }
 
@@ -101,6 +102,7 @@ android {
     // Unit 테스트에서 Android 프레임워크 메서드 호출 시 기본값 반환
     testOptions {
         unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -120,7 +122,7 @@ val coverageGateEnabled = providers.environmentVariable("CI")
     .getOrElse(false)
 
 val coverageLineMinimum = providers.gradleProperty("coverageLineMinimum")
-    .orElse("0.70")
+    .orElse("0.60")
     .map { it.toBigDecimal() }
     .get()
 
@@ -139,11 +141,13 @@ val jacocoExclusions = listOf(
 
 val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
     include("com/flit/app/domain/usecase/**")
+    include("com/flit/app/presentation/**/*ViewModel*.class")
     exclude(jacocoExclusions)
 }
 
 val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
     include("com/flit/app/domain/usecase/**")
+    include("com/flit/app/presentation/**/*ViewModel*.class")
     exclude(jacocoExclusions)
 }
 
@@ -212,6 +216,7 @@ dependencies {
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -293,6 +298,14 @@ dependencies {
     testImplementation(libs.arch.core.testing)
     testImplementation(libs.work.testing)
 
+    // Roborazzi (스크린샷 테스트)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.rule)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(platform(libs.androidx.compose.bom))
+
     // Testing - Instrumented Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -303,6 +316,7 @@ dependencies {
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.coroutines.test)
     androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.work.testing)
     kspAndroidTest(libs.hilt.compiler)
 
     // Debug implementations

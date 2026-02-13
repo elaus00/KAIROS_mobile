@@ -44,14 +44,35 @@ internal fun MacrobenchmarkScope.waitForHomeReady() {
 }
 
 internal fun MacrobenchmarkScope.tapNotesTab() {
-    clickFirstAvailable(
+    val notesTab = findFirstAvailableOrNull(
         By.res(TARGET_PACKAGE, "tab_notes"),
         By.res("tab_notes"),
+        By.res(TARGET_PACKAGE, "tab_notes_button"),
+        By.res("tab_notes_button"),
+        By.descContains("노트"),
         By.desc("노트"),
         By.text("노트"),
+        By.descContains("Notes"),
         By.desc("Notes"),
         By.text("Notes")
     )
+    if (notesTab != null) {
+        notesTab.click()
+    } else {
+        // 하단 네비 좌측 탭(Notes) 좌표 fallback
+        val width = device.displayWidth
+        val height = device.displayHeight
+        device.click((width * 0.22f).toInt(), (height * 0.95f).toInt())
+    }
+    // 노트 화면 진입 확인(상단 타이틀 또는 검색 아이콘)
+    val enteredNotes = device.wait(Until.findObject(By.text("노트")), WAIT_TIMEOUT_MS)
+        ?: device.wait(Until.findObject(By.desc("검색")), WAIT_TIMEOUT_MS)
+    if (enteredNotes == null) {
+        // 첫 탭이 누락된 경우 한번 더 좌표 탭
+        val width = device.displayWidth
+        val height = device.displayHeight
+        device.click((width * 0.22f).toInt(), (height * 0.95f).toInt())
+    }
     device.waitForIdle()
 }
 
@@ -81,7 +102,7 @@ internal fun MacrobenchmarkScope.openIdeasFolder() {
 }
 
 internal fun MacrobenchmarkScope.openSearchScreenFromNotes() {
-    clickFirstAvailable(
+    val searchButton = findFirstAvailableOrNull(
         By.res(TARGET_PACKAGE, "search_button"),
         By.res("search_button"),
         By.desc("검색"),
@@ -90,6 +111,22 @@ internal fun MacrobenchmarkScope.openSearchScreenFromNotes() {
         By.desc("Search"),
         By.text("Search")
     )
+    if (searchButton != null) {
+        searchButton.click()
+    } else {
+        // 노트 헤더 우측 검색 버튼 좌표 fallback
+        val width = device.displayWidth
+        val height = device.displayHeight
+        device.click((width * 0.90f).toInt(), (height * 0.09f).toInt())
+    }
+    // 검색 입력창 진입 확인
+    findFirstAvailable(
+        By.res(TARGET_PACKAGE, "search_input"),
+        By.res("search_input"),
+        By.text("캡처 검색"),
+        By.desc("검색")
+    )
+    device.waitForIdle()
 }
 
 internal fun MacrobenchmarkScope.enterCaptureAndSubmit(text: String) {
@@ -166,8 +203,24 @@ internal fun MacrobenchmarkScope.enterSearchKeyword(keyword: String) {
         input.click()
         device.waitForIdle()
         val success = runCatching {
+            input.text = ""
+            device.waitForIdle()
             input.text = keyword
-            true
+            device.waitForIdle()
+            val typed = input.text?.trim().orEmpty()
+            typed.contains(keyword, ignoreCase = true)
+        }.recoverCatching {
+            val retriedInput = findFirstAvailable(
+                By.res(TARGET_PACKAGE, "search_input"),
+                By.res("search_input"),
+                By.clazz("android.widget.EditText")
+            )
+            retriedInput.text = ""
+            device.waitForIdle()
+            retriedInput.text = keyword
+            device.waitForIdle()
+            val typed = retriedInput.text?.trim().orEmpty()
+            typed.contains(keyword, ignoreCase = true)
         }.getOrElse { false }
         if (success) return
         if (attempt < 2) device.waitForIdle()

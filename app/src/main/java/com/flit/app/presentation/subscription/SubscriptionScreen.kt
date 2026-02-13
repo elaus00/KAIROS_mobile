@@ -1,5 +1,6 @@
 package com.flit.app.presentation.subscription
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -15,27 +16,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.domain.model.SubscriptionFeatures
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
 /**
- * 구독 관리 화면
- * 현재 플랜 + 기능 목록 + 업그레이드 버튼
+ * 구독 관리 화면 - ViewModel 보유
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubscriptionScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: SubscriptionViewModel = hiltViewModel()
 ) {
-    AppFontScaleProvider {
     val uiState by viewModel.uiState.collectAsState()
+
+    SubscriptionContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onUpgrade = viewModel::onUpgrade
+    )
+}
+
+/**
+ * 구독 관리 컨텐츠 - UI만 담당
+ * 현재 플랜 + 기능 목록 + 업그레이드 버튼
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubscriptionContent(
+    uiState: SubscriptionUiState,
+    onNavigateBack: () -> Unit,
+    onUpgrade: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppFontScaleProvider {
     val colors = FlitTheme.colors
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -119,7 +141,7 @@ fun SubscriptionScreen(
             // 업그레이드/구매 버튼
             if (uiState.tier == SubscriptionTier.FREE) {
                 Button(
-                    onClick = { viewModel.onUpgrade() },
+                    onClick = onUpgrade,
                     enabled = !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -240,5 +262,62 @@ private fun FeatureItem(
                 modifier = Modifier.size(18.dp)
             )
         }
+    }
+}
+
+/**
+ * 구독 관리 화면 Preview
+ */
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SubscriptionContentPreview() {
+    FlitTheme {
+        SubscriptionContent(
+            uiState = SubscriptionUiState(
+                tier = SubscriptionTier.FREE,
+                features = SubscriptionFeatures(
+                    aiGrouping = false,
+                    inboxClassify = false,
+                    semanticSearch = false,
+                    noteReorganize = false,
+                    analyticsDashboard = false,
+                    ocr = false,
+                    classificationPreset = false,
+                    customInstruction = false
+                ),
+                isLoading = false,
+                error = null
+            ),
+            onNavigateBack = {},
+            onUpgrade = {}
+        )
+    }
+}
+
+@Preview(name = "Premium Light")
+@Preview(name = "Premium Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SubscriptionContentPremiumPreview() {
+    FlitTheme {
+        SubscriptionContent(
+            uiState = SubscriptionUiState(
+                tier = SubscriptionTier.PREMIUM,
+                features = SubscriptionFeatures(
+                    aiGrouping = true,
+                    inboxClassify = true,
+                    semanticSearch = true,
+                    noteReorganize = true,
+                    analyticsDashboard = true,
+                    ocr = true,
+                    classificationPreset = true,
+                    customInstruction = true
+                ),
+                isLoading = false,
+                error = null
+            ),
+            onNavigateBack = {},
+            onUpgrade = {}
+        )
     }
 }

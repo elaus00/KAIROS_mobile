@@ -13,4 +13,7 @@ object PreferenceKeys {
 
     /** AI 분류 커스텀 인스트럭션 설정 키 */
     const val KEY_CLASSIFICATION_CUSTOM_INSTRUCTION = "classification_custom_instruction"
+
+    /** 노트 보기 유형 설정 키 */
+    const val KEY_NOTE_VIEW_TYPE = "note_view_type"
 }

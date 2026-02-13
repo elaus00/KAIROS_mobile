@@ -2,13 +2,17 @@ package com.flit.app.presentation.notes
 
 import com.flit.app.domain.model.Folder
 import com.flit.app.domain.model.FolderType
+import com.flit.app.domain.model.NoteViewType
 import com.flit.app.domain.model.NoteWithCapturePreview
 import com.flit.app.domain.model.SubscriptionTier
+import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.FolderRepository
 import com.flit.app.domain.repository.NoteRepository
 import com.flit.app.domain.repository.SubscriptionRepository
+import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.folder.CreateFolderUseCase
 import com.flit.app.domain.usecase.folder.RenameFolderUseCase
+import com.flit.app.domain.usecase.note.UpdateNoteUseCase
 import com.flit.app.util.MainDispatcherRule
 import com.flit.app.util.TestFixtures
 import io.mockk.coEvery
@@ -46,6 +50,9 @@ class NotesViewModelTest {
     private lateinit var renameFolderUseCase: RenameFolderUseCase
     private lateinit var noteRepository: NoteRepository
     private lateinit var subscriptionRepository: SubscriptionRepository
+    private lateinit var captureRepository: CaptureRepository
+    private lateinit var userPreferenceRepository: UserPreferenceRepository
+    private lateinit var updateNoteUseCase: UpdateNoteUseCase
 
     @Before
     fun setUp() {
@@ -54,7 +61,11 @@ class NotesViewModelTest {
         renameFolderUseCase = mockk()
         noteRepository = mockk()
         subscriptionRepository = mockk()
+        captureRepository = mockk()
+        userPreferenceRepository = mockk()
+        updateNoteUseCase = mockk()
         every { subscriptionRepository.getCachedTier() } returns SubscriptionTier.FREE
+        every { userPreferenceRepository.observeString(any(), any()) } returns flowOf(NoteViewType.LIST.name)
     }
 
     @After
@@ -76,7 +87,10 @@ class NotesViewModelTest {
             createFolderUseCase,
             renameFolderUseCase,
             noteRepository,
-            subscriptionRepository
+            subscriptionRepository,
+            captureRepository,
+            userPreferenceRepository,
+            updateNoteUseCase
         )
     }
 

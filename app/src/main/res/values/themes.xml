@@ -3,6 +3,14 @@
 
     <style name="Theme.Flit" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <!-- 스플래시 스크린 테마 (IC-5a 아이콘 + 브랜드 배경) -->
+    <style name="Theme.Flit.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_icon_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.Flit</item>
+    </style>
+
     <!-- 위젯 퀵 캡처용 투명 다이얼로그 테마 (시스템 다크/라이트 자동 대응) -->
     <style name="Theme.Flit.QuickCapture" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
