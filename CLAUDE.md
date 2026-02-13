@@ -12,6 +12,12 @@
 - "핵심 루프(기록 → 정리 → 실행)를 방해하는가?"
 - "AI 분류 품질을 타협하는가?"
 
+## 패키지 식별자
+
+- **applicationId** (Play Store 식별자): `app.flit.mobile`
+- **namespace** (코드 패키지명): `com.flit.app`
+- 두 값은 독립적임. 소스 코드의 import/패키지는 `com.flit.app` 유지
+
 ## Architecture
 
 ```
@@ -121,12 +127,13 @@ Docs/
 
 ## 구현 위임 정책
 
-**코드 구현은 기본적으로 Codex(gpt-5.3-codex)에 위임한다.**
+**코드 구현은 기본적으로 Codex(gpt-5.3-codex-medium)에 위임한다.**
 
 - Claude(Opus)는 **계획, 설계, 컨텍스트 수집, 검증** 역할을 담당
 - 코드 작성/수정은 `/codex-impl` 스킬을 통해 Codex에 위임
 - 사용자가 명시적으로 "Claude가 직접 구현해", "Codex 쓰지 마" 등으로 지시한 경우에만 Claude가 직접 코드를 작성
 - 단순 수정(1~2줄 오타, import 추가 등)은 Claude가 직접 처리 가능
+- Claude 자체 세팅이나 웹 조사 같은 경우는 자체적으로 판단해서 처리
 
 ### Codex 위임 워크플로우
 
@@ -136,6 +143,20 @@ Docs/
 3. Codex: codex exec --full-auto --ephemeral 로 구현
 4. Claude: git diff 확인 → 컴파일 체크 → 품질 검증 → 보고
 ```
+
+## Claude 설정 작업 필수 참조
+
+스킬, 커맨드, 에이전트, 훅, MCP 서버 등 Claude Code 설정 관련 작업 시 반드시 `plugin-dev` 플러그인의 해당 스킬을 참조해야 한다:
+
+| 작업 유형 | 참조 스킬 |
+|---|---|
+| 플러그인 구조/매니페스트 | `/plugin-dev:plugin-structure` |
+| 스킬 생성/수정 | `/plugin-dev:skill-development` |
+| 슬래시 커맨드 생성/수정 | `/plugin-dev:command-development` |
+| 에이전트 생성/수정 | `/plugin-dev:agent-development` |
+| 훅 생성/수정 | `/plugin-dev:hook-development` |
+| MCP 서버 통합 | `/plugin-dev:mcp-integration` |
+| 플러그인 설정 관리 | `/plugin-dev:plugin-settings` |
 
 ## 주의사항
 - 새로운 에이전트를 구축할때에는 Sonnet 모델을 사용할 것
