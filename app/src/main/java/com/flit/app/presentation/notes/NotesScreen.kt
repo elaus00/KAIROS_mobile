@@ -212,7 +212,7 @@ private fun NotesHeader(
         Text(
             text = "노트",
             color = colors.text,
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
         )
 

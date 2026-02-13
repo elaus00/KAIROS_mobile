@@ -85,21 +85,21 @@ fun CalendarContent(
             .background(colors.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // 고정 헤더
-            Text(
-                text = "일정 및 할 일",
-                color = colors.text,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
-            )
-
             // 스크롤 콘텐츠
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                // 헤더 (스크롤과 함께 이동)
+                Text(
+                    text = "일정 및 할 일",
+                    color = colors.text,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                )
+
                 Spacer(modifier = Modifier.height(8.dp))
 
             CalendarCard(

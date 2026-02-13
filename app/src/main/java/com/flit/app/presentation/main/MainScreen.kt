@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -73,16 +72,16 @@ fun MainScreen(
         // 초기 상태 확인
         val activeNetwork = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-        isOffline = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) != true
+        isOffline = activeNetwork == null ||
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) != true ||
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED).not()
 
+        // 기본 네트워크만 추적하여 다른 네트워크 전환 시 오프라인 오탐 방지
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) { isOffline = false }
             override fun onLost(network: Network) { isOffline = true }
         }
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-        connectivityManager.registerNetworkCallback(request, callback)
+        connectivityManager.registerDefaultNetworkCallback(callback)
         onDispose { connectivityManager.unregisterNetworkCallback(callback) }
     }
 

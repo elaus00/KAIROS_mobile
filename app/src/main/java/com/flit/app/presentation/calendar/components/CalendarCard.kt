@@ -371,15 +371,22 @@ private fun CalendarDayCell(
 ) {
     val colors = FlitTheme.colors
 
+    // 오늘 날짜만 accent 마커, 선택된 날짜는 은은한 배경
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) colors.accent else Color.Transparent,
+        targetValue = when {
+            isSelected && isToday -> colors.accent
+            isToday -> Color.Transparent
+            isSelected -> colors.textMuted.copy(alpha = 0.15f)
+            else -> Color.Transparent
+        },
         animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 
     val textColor = when {
-        isSelected -> if (colors.isDark) colors.background else Color.White
+        isSelected && isToday -> if (colors.isDark) colors.background else Color.White
         isToday -> colors.accent
+        isSelected -> colors.text
         else -> colors.text
     }
 
@@ -538,15 +545,22 @@ private fun MonthDayCell(
 ) {
     val colors = FlitTheme.colors
 
+    // 오늘 날짜만 accent 마커, 선택된 날짜는 은은한 배경
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) colors.accent else Color.Transparent,
+        targetValue = when {
+            isSelected && isToday -> colors.accent
+            isToday -> Color.Transparent
+            isSelected -> colors.textMuted.copy(alpha = 0.15f)
+            else -> Color.Transparent
+        },
         animationSpec = tween(durationMillis = 200),
         label = "bgColor"
     )
 
     val textColor = when {
-        isSelected -> if (colors.isDark) colors.background else Color.White
+        isSelected && isToday -> if (colors.isDark) colors.background else Color.White
         isToday -> colors.accent
+        isSelected -> colors.text
         else -> colors.text
     }
 
