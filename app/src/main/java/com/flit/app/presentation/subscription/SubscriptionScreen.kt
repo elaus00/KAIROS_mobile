@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -260,6 +261,13 @@ private fun FeatureItem(
                 contentDescription = "사용 가능",
                 tint = colors.accent,
                 modifier = Modifier.size(18.dp)
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Outlined.Lock,
+                contentDescription = "프리미엄 전용",
+                tint = colors.textMuted,
+                modifier = Modifier.size(16.dp)
             )
         }
     }

@@ -28,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.flit.app.presentation.components.common.FlitWordmark
+import com.flit.app.presentation.components.common.FlitWordmarkSize
 import com.flit.app.ui.theme.FlitTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -179,19 +181,16 @@ private fun OnboardingPage1(colors: com.flit.app.ui.theme.FlitColors) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 아이콘/일러스트 영역
-        Text(
-            text = "Flit.",
-            color = colors.text,
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+        // 브랜드 워드마크
+        FlitWordmark(
+            size = FlitWordmarkSize.DEFAULT,
+            color = colors.text
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            text = "적으면\n알아서 정리됩니다",
+            text = "적으면\n알아서 정리돼요",
             color = colors.text,
             fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold,
@@ -202,7 +201,7 @@ private fun OnboardingPage1(colors: com.flit.app.ui.theme.FlitColors) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "떠오르는 순간, 바로 던지면 끝.\n정리는 AI가 알아서 합니다.",
+            text = "떠오르는 순간, 바로 던지면 끝.\n정리는 AI가 알아서 해요.",
             color = colors.textSecondary,
             fontSize = 16.sp,
             lineHeight = 24.sp,
@@ -236,7 +235,7 @@ private fun OnboardingPage2(colors: com.flit.app.ui.theme.FlitColors) {
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            text = "AI가 자동으로\n분류합니다",
+            text = "AI가 자동으로\n분류해요",
             color = colors.text,
             fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold,
@@ -247,7 +246,7 @@ private fun OnboardingPage2(colors: com.flit.app.ui.theme.FlitColors) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "틀리면 탭 한 번으로 수정하세요.\n당신은 기록만 하면 됩니다.",
+            text = "틀리면 탭 한 번으로 수정하세요.\n기록만 하면 돼요.",
             color = colors.textSecondary,
             fontSize = 16.sp,
             lineHeight = 24.sp,
@@ -285,7 +284,7 @@ private fun OnboardingPageCalendar(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있습니다.",
+            text = "일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있어요.",
             color = colors.textSecondary,
             fontSize = 16.sp,
             lineHeight = 24.sp,
@@ -343,7 +342,7 @@ private fun OnboardingPageCalendar(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "나중에 설정에서 연결할 수도 있습니다.",
+            text = "나중에 설정에서 연결할 수도 있어요.",
             color = colors.textMuted,
             fontSize = 13.sp,
             textAlign = TextAlign.Center

@@ -298,7 +298,7 @@ fun SearchContent(
                                     modifier = Modifier.size(48.dp)
                                 )
                                 Text(
-                                    text = "캡처를 검색하세요",
+                                    text = "캡처를 검색해보세요",
                                     color = colors.textMuted,
                                     fontSize = 15.sp
                                 )

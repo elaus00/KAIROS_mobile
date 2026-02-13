@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -133,11 +134,20 @@ fun TrashContent(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "휴지통이 비어 있습니다",
-                            color = colors.textMuted,
-                            fontSize = 14.sp
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Outlined.DeleteOutline,
+                                contentDescription = null,
+                                tint = colors.textMuted,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "휴지통이 비어 있어요",
+                                color = colors.textMuted,
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
 
@@ -406,7 +416,7 @@ private fun TrashItem(
                 // 삭제 시각
                 if (trashedDate.isNotEmpty()) {
                     Text(
-                        text = "삭제: $trashedDate",
+                        text = "삭제일: $trashedDate",
                         color = colors.textMuted,
                         fontSize = 12.sp
                     )

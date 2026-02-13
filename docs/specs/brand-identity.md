@@ -88,18 +88,18 @@ Flit. 로고는 **타이포그래피 워드마크 + 채움 도트**로 구성된
 
 ### 2.5 앱 아이콘 (IC-5a)
 
-검정 배경 위 흰색 F + 채움 도트. 워드마크와 별도의 고정 스펙을 갖는다.
+시스템 테마에 따라 동적으로 전환되는 Adaptive Icon. Play Store 기본은 라이트(흰색 배경) 버전.
 
-| 속성 | 값 |
-|------|------|
-| **배경** | #111111 |
-| **F 폰트** | Sora, weight 450 |
-| **F 크기** | 28px (64px 아이콘 기준) |
-| **F 색상** | #FFFFFF |
-| **도트** | 6px filled circle |
-| **도트 색상** | #FFFFFF |
-| **도트 간격** | 1px |
-| **도트 위치** | top 8px |
+| 속성 | 라이트 모드 (기본/Play Store) | 다크 모드 |
+|------|------|------|
+| **배경** | #FFFFFF | #111111 |
+| **F 폰트** | Sora, weight 450 | Sora, weight 450 |
+| **F 크기** | 28px (64px 아이콘 기준) | 28px |
+| **F + 도트 색상** | #111111 | #FFFFFF |
+| **도트** | 6px filled circle | 6px filled circle |
+| **도트 간격** | 1px | 1px |
+| **도트 위치** | top 8px | top 8px |
+| **모노크롬** | F + 도트 (시스템 색상 적용) | — |
 
 아이콘 사이즈별 비례:
 
@@ -182,14 +182,14 @@ Flit. 디자인 시스템은 **미니멀리스트 모노크롬** 기조를 채�
 |------|------------|----------|
 | 워드마크 + 도트 | #111111 | rgba(255,255,255, 0.85) |
 | 워드마크 배경 | #FAFAFA 또는 투명 | #0A0A0A 또는 투명 |
-| 앱 아이콘 배경 | #111111 (반전) | #111111 (동일) |
-| 앱 아이콘 F + 도트 | #FFFFFF | #FFFFFF |
+| 앱 아이콘 배경 | #FFFFFF | #111111 |
+| 앱 아이콘 F + 도트 | #111111 | #FFFFFF |
 | 스플래시 배경 | #FAFAFA | #0A0A0A |
 
-Adaptive Icon 레이어:
-- **Foreground**: F + 채움 도트 (흰색, 투명 배경)
-- **Background**: 단색 #111111
-- **Monochrome**: F + 채움 도트 (시스템 색상 적용)
+Adaptive Icon 레이어 (night-qualified resources로 테마별 전환):
+- **라이트 (기본/Play Store)**: Foreground(#111111 F+도트) + Background(#FFFFFF)
+- **다크**: Foreground(#FFFFFF F+도트) + Background(#111111)
+- **Monochrome**: F + 채움 도트 (시스템 색상 적용, Android 13+)
 
 ---
 
@@ -304,11 +304,13 @@ Flit + ● (별도의 시각 요소)
 
 ### 7.1 앱 아이콘 (IC-5a)
 
-- **형태**: 검정 배경 + 흰색 F + 채움 도트
+- **형태**: 테마별 동적 전환 (night-qualified resources)
+- **라이트 (기본/Play Store)**: 흰색 배경 + 검은 F + 채움 도트
+- **다크**: 검정 배경 + 흰색 F + 채움 도트
 - **Adaptive Icon**:
-  - Foreground: F + 채움 도트 (흰색, 투명 배경)
-  - Background: 단색 #111111
-  - Monochrome: F + 채움 도트 (시스템 테마 색상)
+  - Foreground: F + 채움 도트 (라이트: #111111, 다크: #FFFFFF)
+  - Background: 단색 (라이트: #FFFFFF, 다크: #111111)
+  - Monochrome: F + 채움 도트 (시스템 테마 색상, Android 13+)
   - Safe Zone: 66dp 내 F + 도트 배치
 
 ---
@@ -362,35 +364,52 @@ Flit + ● (별도의 시각 요소)
 
 ---
 
-## 9. 다음 단계
+## 9. 구현 현황
 
-### 9.1 앱 아이콘 구현 (IC-5a)
+### 9.1 앱 아이콘 구현 (IC-5a) — ✅ 완료
 
-1. Adaptive Icon XML 제작 — Foreground(F+도트, 흰색)/Background(#111111)/Monochrome 레이어 분리
-2. Vector Drawable (ic_launcher_foreground.xml) 작성 — Sora 450 기반 F + 6px 채움 도트
-3. 48dp/66dp/108dp 크기에서 인식성 테스트
-4. Google Play 스토어 아이콘 512×512px PNG 생성
+1. ✅ Adaptive Icon XML 제작 — night-qualified resources로 라이트/다크 동적 전환
+2. ✅ Vector Drawable 작성 — Sora 450 기반 F + 채움 도트 (foreground/background/monochrome)
+3. ⬜ 48dp/66dp/108dp 크기에서 인식성 테스트 (실기기 검증 필요)
+4. ⬜ Google Play 스토어 아이콘 512×512px PNG 생성
 
-### 9.2 스플래시 스크린 구현
+**구현 파일**:
+- `drawable/ic_launcher_foreground.xml` — 라이트 포그라운드 (#111111)
+- `drawable/ic_launcher_background.xml` — 라이트 배경 (#FFFFFF)
+- `drawable-night/ic_launcher_foreground.xml` — 다크 포그라운드 (#FFFFFF)
+- `drawable-night/ic_launcher_background.xml` — 다크 배경 (#111111)
+- `drawable/ic_launcher_monochrome.xml` — Android 13+ 테마 아이콘
 
-1. 스플래시 스크린 레이아웃 — 워드마크 "Flit" + 채움 도트 중앙 배치 (Sora 480, 32px)
-2. Light/Dark 모드 배경 대응 (#FAFAFA / #0A0A0A)
-3. 태그라인 "적으면, 알아서 정리됩니다" 선택적 표시
-4. Compose 진입 애니메이션 (페이드인 또는 스케일)
+### 9.2 스플래시 스크린 구현 — ✅ 완료
 
-### 9.3 앱 내 워드마크 적용
+1. ✅ Compose 브랜드 스플래시 — 워드마크 + 태그라인, 중앙 배치 (Sora 480, 32sp)
+2. ✅ Light/Dark 모드 배경 대응 (#FAFAFA / #0A0A0A)
+3. ✅ 태그라인 "적으면, 알아서 정리됩니다" 표시
+4. ✅ 페이드인(400ms) → 노출(1200ms) → 페이드아웃(300ms) 애니메이션
+5. ✅ 시스템 스플래시는 배경색만 표시 (아이콘 제거) → 이중 표시 방지
 
-1. 앱바 좌측 워드마크 (Sora 480, 20px, 도트 3.5px)
-2. Settings 화면 워드마크 (Sora 480, 28px, 도트 5px)
-3. 온보딩 1페이지 워드마크 + 태그라인 (Sora 480, 44px)
-4. About 화면 워드마크 + 버전 표시
+**구현 파일**:
+- `presentation/splash/FlitSplashScreen.kt` — Compose 브랜드 스플래시
+- `drawable/splash_icon_blank.xml` — 시스템 스플래시 투명 아이콘
+- `values/themes.xml` — Theme.Flit.Splash (배경색만, 아이콘 없음)
 
-### 9.4 브랜드 에셋 패키지
+### 9.3 앱 내 워드마크 적용 — ✅ 완료
 
-1. 프레스킷 SVG/PNG (투명 배경, 라이트/다크 변형)
-2. 소셜 미디어용 프로필 이미지 (IC-5a 기반)
-3. 스토어 등록용 Feature Graphic (1024×500px)
+1. ✅ 앱바 좌측 워드마크 — `CaptureContent.kt` → `FlitWordmark(NAVIGATION)` (20sp)
+2. ⬜ Settings 화면 워드마크 — 현재 별도 브랜드 표시 없음 (미래 About 섹션)
+3. ✅ 온보딩 1페이지 워드마크 — `OnboardingScreen.kt` → `FlitWordmark(DEFAULT)` (44sp)
+4. ✅ 로그인 화면 워드마크 — `LoginScreen.kt` → `FlitWordmark(SPLASH)` (32sp)
+5. ✅ 위젯 퀵캡처 브랜드 — `QuickCaptureActivity.kt` → `FlitBrandView` (Sora + Canvas 도트)
+
+**공통 컴포넌트**:
+- `components/common/FlitWordmark.kt` — Compose 워드마크 (6단계 사이즈 프리셋)
+- `ui/theme/Type.kt` — SoraFontFamily 정의
+- `res/font/sora_variable.ttf` — Sora 가변 폰트 (OFL 라이선스)
+
+### 9.4 브랜드 에셋 패키지 — ✅ 완료
+
+디렉토리: `docs/brand-assets/` — 아이콘 SVG/PNG, 워드마크 SVG/PNG, Feature Graphic, 소셜 프로필
 
 ---
 
-*Document Version: 2.0 | Last Updated: 2026-02-13*
+*Document Version: 2.2 | Last Updated: 2026-02-14*

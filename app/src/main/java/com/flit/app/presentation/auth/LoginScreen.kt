@@ -19,6 +19,8 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.BuildConfig
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.presentation.components.common.FlitWordmark
+import com.flit.app.presentation.components.common.FlitWordmarkSize
 import com.flit.app.ui.theme.FlitTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -123,16 +125,15 @@ fun LoginContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Flit.",
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+            FlitWordmark(
+                size = FlitWordmarkSize.SPLASH,
                 color = colors.accent,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "AI 캡처의 모든 것",
+                text = "적으면, 알아서 정리됩니다",
                 style = MaterialTheme.typography.bodyLarge,
                 color = colors.textMuted
             )

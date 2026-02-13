@@ -1,7 +1,12 @@
 package com.flit.app.presentation.widget
 
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
+import androidx.core.content.res.ResourcesCompat
+import com.flit.app.R
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -119,16 +124,11 @@ class QuickCaptureActivity : ComponentActivity() {
             setPadding(dp(16), dp(12), dp(16), dp(12))
         }
 
-        // 좌측: "Flit." 텍스트
-        val brandText = TextView(this).apply {
-            text = "Flit."
-            textSize = 12f * fontScale
-            setTextColor(colors.brandText)
-            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-            letterSpacing = 0.1f
-        }
+        // 좌측: 브랜드 워드마크 (Sora 폰트 + 채움 도트)
+        val soraTypeface = ResourcesCompat.getFont(this, R.font.sora_variable)
+        val brandView = FlitBrandView(this, soraTypeface, 12f * fontScale, colors.brandText)
         val brandParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-        toolbar.addView(brandText, brandParams)
+        toolbar.addView(brandView, brandParams)
 
         // 우측: "완료" 버튼 (44dp 터치 타겟 확보)
         doneButton = TextView(this).apply {
@@ -321,4 +321,58 @@ class QuickCaptureActivity : ComponentActivity() {
         val buttonBackground: Int,
         val buttonText: Int
     )
+
+    /**
+     * "Flit" 텍스트 + 채움 도트(●)를 그리는 커스텀 View
+     * Compose FlitWordmark와 동일한 브랜드 표현 (MINIMUM 사이즈 기반)
+     */
+    private class FlitBrandView(
+        context: android.content.Context,
+        soraTypeface: Typeface?,
+        private val textSizeSp: Float,
+        private val color: Int
+    ) : View(context) {
+
+        private val density = context.resources.displayMetrics.density
+
+        private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = soraTypeface ?: Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            this.textSize = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_SP, textSizeSp, context.resources.displayMetrics
+            )
+            this.color = this@FlitBrandView.color
+            letterSpacing = 0.08f  // ≈ 1sp / 12sp
+        }
+
+        // 도트 크기: MINIMUM 프리셋 기준 2.5dp, 갭 0.5dp
+        private val dotRadius = 1.25f * density
+        private val dotGap = 0.5f * density
+
+        private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = this@FlitBrandView.color
+            style = Paint.Style.FILL
+        }
+
+        private val textWidth = textPaint.measureText("Flit")
+        private val fontMetrics = textPaint.fontMetrics
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val w = (textWidth + dotGap + dotRadius * 2).toInt() + paddingLeft + paddingRight
+            val h = (fontMetrics.descent - fontMetrics.ascent).toInt() + paddingTop + paddingBottom
+            setMeasuredDimension(w, h)
+        }
+
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val baseline = paddingTop - fontMetrics.ascent
+
+            // "Flit" 텍스트
+            canvas.drawText("Flit", paddingLeft.toFloat(), baseline, textPaint)
+
+            // 채움 도트 — 베이스라인 높이에 중심
+            val dotCx = paddingLeft + textWidth + dotGap + dotRadius
+            val dotCy = baseline - dotRadius + (1f * density)  // 베이스라인 약간 위
+            canvas.drawCircle(dotCx, dotCy, dotRadius, dotPaint)
+        }
+    }
 }

@@ -3,17 +3,17 @@ package com.flit.app.presentation.components.common
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -26,10 +26,8 @@ import com.flit.app.ui.theme.SoraFontFamily
 /**
  * 워드마크 크기 프리셋 (brand-identity.md 스케일링 규칙 기반)
  *
- * @param fontSize Sora 텍스트 크기
- * @param dotSize 채움 도트 지름
- * @param dotGap 텍스트-도트 간격
- * @param dotOffset 도트 수직 오프셋 (위에서 아래로)
+ * dotOffset은 CSS `position:relative; top:Xpx` 과 동일한 의미:
+ * 텍스트 베이스라인에서 아래로 이동하는 거리.
  */
 enum class FlitWordmarkSize(
     val fontSize: TextUnit,
@@ -55,7 +53,7 @@ enum class FlitWordmarkSize(
  * Flit. 브랜드 워드마크 컴포넌트
  *
  * Sora weight 480 텍스트 "Flit" + 독립 채움 도트(●)로 구성.
- * 마침표(.)를 폰트 글리프가 아닌 독립적 원형으로 표현하여 "완결" 의미 강조.
+ * 도트는 텍스트 베이스라인 기준으로 배치 (CSS position:relative; top 과 동일).
  *
  * @param size 워드마크 크기 프리셋
  * @param color 워드마크 색상 (기본: FlitTheme.colors.text)
@@ -67,25 +65,49 @@ fun FlitWordmark(
     color: Color = FlitTheme.colors.text,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        verticalAlignment = Alignment.Top,
+    val density = LocalDensity.current
+    val gapPx = with(density) { size.dotGap.roundToPx() }
+    val offsetPx = with(density) { size.dotOffset.roundToPx() }
+
+    Layout(
+        content = {
+            // [0] 텍스트
+            Text(
+                text = "Flit",
+                fontFamily = SoraFontFamily,
+                fontWeight = FontWeight(480),
+                fontSize = size.fontSize,
+                letterSpacing = 1.sp,
+                color = color
+            )
+            // [1] 채움 도트
+            Box(
+                modifier = Modifier
+                    .size(size.dotSize)
+                    .background(color, CircleShape)
+            )
+        },
         modifier = modifier
-    ) {
-        Text(
-            text = "Flit",
-            fontFamily = SoraFontFamily,
-            fontWeight = FontWeight(480),
-            fontSize = size.fontSize,
-            letterSpacing = 1.sp,
-            color = color
-        )
-        Spacer(modifier = Modifier.width(size.dotGap))
-        Box(
-            modifier = Modifier
-                .offset(y = size.dotOffset)
-                .size(size.dotSize)
-                .background(color, CircleShape)
-        )
+    ) { measurables, constraints ->
+        val textPlaceable = measurables[0].measure(constraints)
+        val dotPlaceable = measurables[1].measure(constraints)
+
+        // 텍스트 베이스라인 위치 (상단 기준)
+        val baseline = textPlaceable[FirstBaseline]
+
+        // 도트 Y: 베이스라인 - 도트높이 + 오프셋
+        // CSS 동작: inline-block 하단이 baseline에 정렬 → relative top으로 아래 이동
+        val dotY = baseline - dotPlaceable.height + offsetPx
+        val dotX = textPlaceable.width + gapPx
+
+        // 전체 크기: 도트가 텍스트 아래로 넘어갈 수 있으므로 maxOf
+        val width = dotX + dotPlaceable.width
+        val height = maxOf(textPlaceable.height, dotY + dotPlaceable.height)
+
+        layout(width, height) {
+            textPlaceable.placeRelative(0, 0)
+            dotPlaceable.placeRelative(dotX, dotY)
+        }
     }
 }
 
@@ -105,9 +127,9 @@ private fun FlitWordmarkPreview() {
 private fun FlitWordmarkSizesPreview() {
     FlitTheme {
         Box(Modifier.background(FlitTheme.colors.background)) {
-            androidx.compose.foundation.layout.Column {
-                FlitWordmarkSize.entries.forEach { size ->
-                    FlitWordmark(size = size)
+            Column {
+                FlitWordmarkSize.entries.forEach { wmSize ->
+                    FlitWordmark(size = wmSize)
                     Spacer(modifier = Modifier.size(8.dp))
                 }
             }

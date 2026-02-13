@@ -48,7 +48,8 @@ android {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias") ?: ""
             keyPassword = keystoreProperties.getProperty("keyPassword") ?: ""
-            storeFile = keystoreProperties.getProperty("storeFile")?.let { path -> file(path) }
+            // Resolve path from project root so `keystore.properties` can use `flit-upload.jks`.
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { path -> rootProject.file(path) }
             storePassword = keystoreProperties.getProperty("storePassword") ?: ""
         }
     }

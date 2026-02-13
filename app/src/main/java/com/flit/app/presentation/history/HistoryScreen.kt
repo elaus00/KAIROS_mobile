@@ -166,12 +166,12 @@ fun HistoryContent(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(32.dp),
                                 strokeWidth = 2.dp,
-                                color = colors.textMuted
+                                color = colors.accent
                             )
                             Text(
-                                text = "로드 중...",
+                                text = "불러오는 중...",
                                 color = colors.textMuted,
                                 fontSize = 13.sp
                             )
@@ -197,12 +197,12 @@ fun HistoryContent(
                                 modifier = Modifier.size(48.dp)
                             )
                             Text(
-                                text = "기록이 없습니다",
+                                text = "기록이 없어요",
                                 color = colors.textMuted,
                                 fontSize = 15.sp
                             )
                             Text(
-                                text = "캡처한 내용이 여기에 시간순으로 표시됩니다",
+                                text = "캡처하면 시간순으로 여기에 나타나요",
                                 color = colors.textMuted.copy(alpha = 0.7f),
                                 fontSize = 13.sp
                             )

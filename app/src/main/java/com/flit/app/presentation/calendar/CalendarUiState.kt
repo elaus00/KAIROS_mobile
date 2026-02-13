@@ -38,6 +38,9 @@ data class CalendarUiState(
     // 연동 캘린더 이름 (배지/Snackbar 표시용)
     val targetCalendarName: String? = null,
 
+    // 편집 중인 일정 (BottomSheet 표시)
+    val editingSchedule: ScheduleDisplayItem? = null,
+
     // 에러 메시지
     val errorMessage: String? = null
 )
@@ -75,7 +78,9 @@ data class TodoDisplayItem(
     /** 완료 여부 */
     val isCompleted: Boolean,
     /** 마감일 소스 (AI / USER) */
-    val deadlineSource: String? = null
+    val deadlineSource: String? = null,
+    /** 캡처 원문 (AI 제목과 다를 때 확장 영역 표시) */
+    val originalText: String? = null
 )
 
 /**
@@ -96,6 +101,23 @@ sealed interface CalendarEvent {
     data object ToggleShowCompleted : CalendarEvent
     /** 할 일 드래그 순서 변경 */
     data class ReorderTasks(val todoIds: List<String>) : CalendarEvent
+    /** 할 일 마감일 업데이트 */
+    data class UpdateTaskDeadline(val todoId: String, val deadlineMs: Long) : CalendarEvent
+    /** 일정 편집 시작 */
+    data class StartEditSchedule(val schedule: ScheduleDisplayItem) : CalendarEvent
+    /** 일정 편집 저장 */
+    data class EditSchedule(
+        val scheduleId: String,
+        val title: String,
+        val startTime: Long?,
+        val endTime: Long?,
+        val location: String?,
+        val isAllDay: Boolean
+    ) : CalendarEvent
+    /** 일정 편집 닫기 */
+    data object DismissEditSchedule : CalendarEvent
+    /** 일정 드래그 순서 변경 (메모리 전용) */
+    data class ReorderSchedules(val scheduleIds: List<String>) : CalendarEvent
 }
 
 /**
@@ -108,4 +130,6 @@ sealed class CalendarUiEvent {
     data class SyncApproved(val calendarName: String? = null) : CalendarUiEvent()
     /** 캘린더 동기화 거부 완료 */
     data object SyncRejected : CalendarUiEvent()
+    /** 상세 화면 네비게이션 */
+    data class NavigateToDetail(val captureId: String) : CalendarUiEvent()
 }

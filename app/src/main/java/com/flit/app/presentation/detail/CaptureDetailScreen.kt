@@ -460,7 +460,7 @@ private fun CalendarSyncSection(
                         Icons.Outlined.Check
                     )
                     CalendarSyncStatus.SUGGESTION_PENDING -> Triple(
-                        "캘린더 추가를 제안합니다",
+                        "캘린더에 추가할까요?",
                         colors.warning,
                         Icons.Outlined.Info
                     )
@@ -470,7 +470,7 @@ private fun CalendarSyncSection(
                         Icons.Outlined.Warning
                     )
                     CalendarSyncStatus.REJECTED -> Triple(
-                        "사용자가 거부함",
+                        "거부됨",
                         colors.textMuted,
                         Icons.Outlined.LinkOff
                     )

@@ -3,11 +3,10 @@
 
     <style name="Theme.Flit" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <!-- 스플래시 스크린 테마 (IC-5a 아이콘 + 브랜드 배경) -->
+    <!-- 스플래시 스크린 테마 — 배경색만 표시, 아이콘 없음 (브랜드 스플래시는 Compose에서 처리) -->
     <style name="Theme.Flit.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="windowSplashScreenIconBackgroundColor">@color/splash_icon_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon_blank</item>
         <item name="postSplashScreenTheme">@style/Theme.Flit</item>
     </style>
 

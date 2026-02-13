@@ -121,7 +121,7 @@ class NoteDetailViewModelTest {
 
         // then
         assertFalse(viewModel.uiState.value.isLoading)
-        assertEquals("노트를 찾을 수 없습니다", viewModel.uiState.value.error)
+        assertEquals("노트를 찾을 수 없어요", viewModel.uiState.value.error)
     }
 
     // ── 2. 노트 로드 시 상태 반영 ──

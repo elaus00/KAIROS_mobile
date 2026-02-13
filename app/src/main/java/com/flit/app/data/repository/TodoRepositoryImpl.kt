@@ -54,6 +54,10 @@ class TodoRepositoryImpl @Inject constructor(
         todoDao.updateSortOrder(todoId, sortOrder, sortSource, System.currentTimeMillis())
     }
 
+    override suspend fun updateDeadline(todoId: String, deadlineMs: Long) {
+        todoDao.updateDeadline(todoId, deadlineMs, System.currentTimeMillis())
+    }
+
     override suspend fun deleteByCaptureId(captureId: String) {
         todoDao.deleteByCaptureId(captureId)
     }

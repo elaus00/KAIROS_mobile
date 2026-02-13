@@ -975,14 +975,14 @@ private fun EmptyNotesView(
                 modifier = Modifier.size(48.dp)
             )
             Text(
-                text = if (hasFilter) "이 폴더에 노트가 없습니다"
-                else "아직 노트가 없습니다",
+                text = if (hasFilter) "이 폴더에 노트가 없어요"
+                else "아직 노트가 없어요",
                 color = colors.textMuted,
                 fontSize = 15.sp
             )
             if (!hasFilter) {
                 Text(
-                    text = "캡처한 내용 중 노트로 분류된 항목이 여기에 표시됩니다",
+                    text = "캡처하면 노트로 분류된 항목이 여기에 나타나요",
                     color = colors.placeholder,
                     fontSize = 13.sp
                 )

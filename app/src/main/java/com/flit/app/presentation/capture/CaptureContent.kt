@@ -59,6 +59,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.presentation.components.common.FlitWordmark
+import com.flit.app.presentation.components.common.FlitWordmarkSize
 import com.flit.app.presentation.classification.AIStatusSheet
 import com.flit.app.ui.theme.FlitTheme
 import com.flit.app.ui.theme.FlitWritingFontFamily
@@ -88,7 +90,7 @@ fun CaptureScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is CaptureEvent.SubmitSuccess -> {
-                    snackbarHostState.showSnackbar("캡처가 저장되었습니다")
+                    snackbarHostState.showSnackbar("캡처가 저장되었어요")
                 }
             }
         }
@@ -362,12 +364,10 @@ private fun CaptureTopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 왼쪽: 앱 제목
-        Text(
-            text = "Flit.",
-            color = colors.text,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold
+        // 왼쪽: 브랜드 워드마크
+        FlitWordmark(
+            size = FlitWordmarkSize.NAVIGATION,
+            color = colors.text
         )
 
         // 오른쪽: 벨 + 히스토리 + 설정

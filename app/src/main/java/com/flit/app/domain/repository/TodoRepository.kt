@@ -32,6 +32,9 @@ interface TodoRepository {
     /** 정렬 순서 업데이트 */
     suspend fun updateSortOrder(todoId: String, sortOrder: Int, sortSource: String)
 
+    /** 마감일 업데이트 */
+    suspend fun updateDeadline(todoId: String, deadlineMs: Long)
+
     /** capture_id로 삭제 */
     suspend fun deleteByCaptureId(captureId: String)
 }

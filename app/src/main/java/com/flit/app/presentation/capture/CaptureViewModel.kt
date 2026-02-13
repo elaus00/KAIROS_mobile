@@ -149,7 +149,7 @@ class CaptureViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isSubmitting = false,
-                            errorMessage = e.message ?: "저장에 실패했습니다."
+                            errorMessage = e.message ?: "저장에 실패했어요. 다시 시도해주세요"
                         )
                     }
                 }

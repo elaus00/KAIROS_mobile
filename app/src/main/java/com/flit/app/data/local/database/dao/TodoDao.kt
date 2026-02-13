@@ -181,6 +181,12 @@ interface TodoDao {
     """)
     suspend fun getTodayTodoCountForWidget(todayEndMs: Long?): Int
 
+    /**
+     * 마감일 업데이트
+     */
+    @Query("UPDATE todos SET deadline = :deadlineMs, updated_at = :updatedAt WHERE id = :todoId")
+    suspend fun updateDeadline(todoId: String, deadlineMs: Long, updatedAt: Long)
+
     /** 동기화용 전체 할 일 조회 */
     @Query("SELECT * FROM todos")
     suspend fun getAllForSync(): List<TodoEntity>

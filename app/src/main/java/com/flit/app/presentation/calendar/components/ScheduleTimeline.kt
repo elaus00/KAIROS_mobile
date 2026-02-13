@@ -5,19 +5,38 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.presentation.calendar.ScheduleDisplayItem
 import com.flit.app.presentation.components.common.SectionHeader
@@ -28,10 +47,11 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 /**
  * ScheduleTimeline 컴포넌트
- * 시간 기반 일정 목록 (타임라인 형태)
+ * 시간 기반 일정 목록 (타임라인 형태) + long press 드래그 재정렬
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -40,14 +60,25 @@ fun ScheduleTimeline(
     targetCalendarName: String? = null,
     onScheduleClick: (ScheduleDisplayItem) -> Unit,
     onScheduleDelete: (String) -> Unit,
+    onReorder: (List<String>) -> Unit = {},
     modifier: Modifier = Modifier,
     onApproveSuggestion: (String) -> Unit = {},
     onRejectSuggestion: (String) -> Unit = {}
 ) {
+    val haptic = LocalHapticFeedback.current
+    val density = LocalDensity.current
+
+    // 드래그 상태 관리
+    val currentList = remember(schedules) { mutableStateListOf(*schedules.toTypedArray()) }
+    var draggingIndex by remember { mutableIntStateOf(-1) }
+    var dragOffsetY by remember { mutableFloatStateOf(0f) }
+    var measuredItemHeight by remember { mutableFloatStateOf(0f) }
+    val spacingPx = with(density) { 12.dp.toPx() }
+
     Column(modifier = modifier) {
         SectionHeader(title = "일정", fontSize = 15.sp)
 
-        if (schedules.isEmpty()) {
+        if (currentList.isEmpty()) {
             ScheduleEmptyState()
         } else {
             Column(
@@ -55,29 +86,73 @@ fun ScheduleTimeline(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
             ) {
-                schedules.forEachIndexed { index, schedule ->
-                    // 날짜+시간 전체를 비교 (미래 일정이 dimmed 되지 않도록)
-                    val now = LocalDateTime.now()
-                    val scheduleDateTime = schedule.startTime?.let {
-                        Instant.ofEpochMilli(it)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime()
-                    }
-                    val isPast = scheduleDateTime?.isBefore(now) ?: false
-                    val isFirst = index == 0
-                    val isLast = index == schedules.lastIndex
+                currentList.forEachIndexed { index, schedule ->
+                    key(schedule.scheduleId) {
+                        val isDragging = draggingIndex == index
 
-                    ScheduleTimelineItem(
-                        schedule = schedule,
-                        isPast = isPast,
-                        isFirst = isFirst,
-                        isLast = isLast,
-                        targetCalendarName = targetCalendarName,
-                        onClick = { onScheduleClick(schedule) },
-                        onDelete = { onScheduleDelete(schedule.captureId) },
-                        onApprove = { onApproveSuggestion(schedule.scheduleId) },
-                        onReject = { onRejectSuggestion(schedule.scheduleId) }
-                    )
+                        // 날짜+시간 전체를 비교 (미래 일정이 dimmed 되지 않도록)
+                        val now = LocalDateTime.now()
+                        val scheduleDateTime = schedule.startTime?.let {
+                            Instant.ofEpochMilli(it)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime()
+                        }
+                        val isPast = scheduleDateTime?.isBefore(now) ?: false
+                        val isFirst = index == 0
+                        val isLast = index == currentList.lastIndex
+
+                        Box(
+                            modifier = Modifier
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .onSizeChanged { size ->
+                                    if (measuredItemHeight == 0f) {
+                                        measuredItemHeight = size.height.toFloat()
+                                    }
+                                }
+                                .graphicsLayer {
+                                    if (isDragging) {
+                                        translationY = dragOffsetY
+                                        shadowElevation = 8f
+                                        scaleX = 1.02f
+                                        scaleY = 1.02f
+                                        alpha = 0.92f
+                                    }
+                                }
+                        ) {
+                            ScheduleTimelineItem(
+                                schedule = schedule,
+                                isPast = isPast,
+                                isFirst = isFirst,
+                                isLast = isLast,
+                                targetCalendarName = targetCalendarName,
+                                onClick = { onScheduleClick(schedule) },
+                                onDelete = { onScheduleDelete(schedule.captureId) },
+                                onApprove = { onApproveSuggestion(schedule.scheduleId) },
+                                onReject = { onRejectSuggestion(schedule.scheduleId) },
+                                onDragStart = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    draggingIndex = index
+                                    dragOffsetY = 0f
+                                },
+                                onDrag = { deltaY ->
+                                    dragOffsetY += deltaY
+                                    val slotHeight = if (measuredItemHeight > 0f) measuredItemHeight + spacingPx else 80f
+                                    val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
+                                        .coerceIn(0, currentList.size - 1)
+                                    if (targetIndex != index && targetIndex != draggingIndex) {
+                                        currentList.add(targetIndex, currentList.removeAt(draggingIndex))
+                                        draggingIndex = targetIndex
+                                        dragOffsetY = 0f
+                                    }
+                                },
+                                onDragEnd = {
+                                    draggingIndex = -1
+                                    dragOffsetY = 0f
+                                    onReorder(currentList.map { it.scheduleId })
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -99,6 +174,9 @@ private fun ScheduleTimelineItem(
     onDelete: () -> Unit,
     onApprove: () -> Unit = {},
     onReject: () -> Unit = {},
+    onDragStart: () -> Unit = {},
+    onDrag: (Float) -> Unit = {},
+    onDragEnd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -106,7 +184,18 @@ private fun ScheduleTimelineItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min),
+            .height(IntrinsicSize.Min)
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { onDragStart() },
+                    onDrag = { change, offset ->
+                        change.consume()
+                        onDrag(offset.y)
+                    },
+                    onDragEnd = { onDragEnd() },
+                    onDragCancel = { onDragEnd() }
+                )
+            },
         verticalAlignment = Alignment.Top
     ) {
         // 왼쪽: 시간 + 타임라인
@@ -334,10 +423,19 @@ private fun ScheduleEmptyState(
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "일정이 없습니다",
-            color = colors.textMuted,
-            fontSize = 14.sp
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Outlined.CalendarMonth,
+                contentDescription = null,
+                tint = colors.textMuted,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "오늘은 일정이 없어요",
+                color = colors.textMuted,
+                fontSize = 14.sp
+            )
+        }
     }
 }

@@ -30,7 +30,7 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Flit"
+            android:theme="@style/Theme.Flit.Splash"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

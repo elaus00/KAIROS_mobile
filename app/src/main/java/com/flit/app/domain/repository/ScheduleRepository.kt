@@ -23,6 +23,9 @@ interface ScheduleRepository {
     /** 일정이 있는 날짜 목록 조회 (캘린더 도트 표시용) */
     fun getDatesWithSchedules(rangeStartMs: Long, rangeEndMs: Long): Flow<List<Long>>
 
+    /** 일정 업데이트 */
+    suspend fun updateSchedule(schedule: Schedule)
+
     /** capture_id로 삭제 */
     suspend fun deleteByCaptureId(captureId: String)
 }

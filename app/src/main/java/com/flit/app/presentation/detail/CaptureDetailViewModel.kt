@@ -106,7 +106,7 @@ class CaptureDetailViewModel @Inject constructor(
                 )
             } else {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "캡처를 찾을 수 없습니다")
+                    it.copy(isLoading = false, errorMessage = "캡처를 찾을 수 없어요")
                 }
             }
         }

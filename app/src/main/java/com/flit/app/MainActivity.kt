@@ -6,11 +6,14 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.flit.app.domain.model.CaptureSource
@@ -19,6 +22,7 @@ import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.navigation.FlitNavGraph
 import com.flit.app.navigation.NavRoutes
+import com.flit.app.presentation.splash.FlitSplashScreen
 import com.flit.app.tracing.AppTrace
 import com.flit.app.ui.theme.FlitTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,6 +51,7 @@ class MainActivity : ComponentActivity() {
     private val pendingCaptureId = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         AppTrace.section(TRACE_ACTIVITY_CREATE) {
@@ -76,15 +81,22 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // 브랜드 스플래시 표시 여부
+                var showBrandSplash by remember { mutableStateOf(true) }
+
                 FlitTheme(darkTheme = isDarkTheme) {
-                    startDestination?.let { destination ->
-                        FlitNavGraph(
-                            navController = rememberNavController(),
-                            startDestination = destination,
-                            autoFocusCapture = autoFocusCapture.value,
-                            pendingCaptureId = pendingCaptureId.value,
-                            onPendingCaptureHandled = { pendingCaptureId.value = null }
-                        )
+                    if (showBrandSplash) {
+                        FlitSplashScreen(onFinished = { showBrandSplash = false })
+                    } else {
+                        startDestination?.let { destination ->
+                            FlitNavGraph(
+                                navController = rememberNavController(),
+                                startDestination = destination,
+                                autoFocusCapture = autoFocusCapture.value,
+                                pendingCaptureId = pendingCaptureId.value,
+                                onPendingCaptureHandled = { pendingCaptureId.value = null }
+                            )
+                        }
                     }
                 }
             }

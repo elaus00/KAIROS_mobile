@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flit.app.domain.model.AnalyticsDashboard
+import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.ui.theme.FlitTheme
 
@@ -107,6 +109,35 @@ fun AnalyticsDashboardContent(
                     modifier = modifier.padding(paddingValues)
                 )
             }
+            else -> {
+                // 빈 상태: 데이터 없음
+                Box(
+                    modifier = modifier.fillMaxSize().padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Outlined.BarChart,
+                            contentDescription = null,
+                            tint = colors.textMuted,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "아직 분석할 데이터가 없어요",
+                            color = colors.textMuted,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "캡처를 시작하면 통계가 여기에 나타나요",
+                            color = colors.textMuted.copy(alpha = 0.7f),
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
         }
     }
     }
@@ -145,12 +176,10 @@ private fun DashboardContent(
         )
 
         dashboard.capturesByType.forEach { (type, count) ->
-            val label = when (type) {
-                "TODO" -> "할 일"
-                "SCHEDULE" -> "일정"
-                "NOTES" -> "노트"
-                "TEMP" -> "미분류"
-                else -> type
+            val label = try {
+                ClassifiedType.valueOf(type).displayName
+            } catch (_: IllegalArgumentException) {
+                type
             }
             Row(
                 modifier = Modifier

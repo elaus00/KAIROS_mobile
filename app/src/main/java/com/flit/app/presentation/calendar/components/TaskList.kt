@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.CheckBox
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +26,13 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -70,6 +72,8 @@ fun TaskList(
     onTaskDelete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
     onToggleShowCompleted: () -> Unit,
+    onTaskClick: (String) -> Unit = {},
+    onDeadlineEdit: (String, Long) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -83,7 +87,9 @@ fun TaskList(
                 tasks = tasks,
                 onTaskComplete = onTaskComplete,
                 onReorder = onReorder,
-                onTaskDelete = onTaskDelete
+                onTaskDelete = onTaskDelete,
+                onTaskClick = onTaskClick,
+                onDeadlineEdit = onDeadlineEdit
             )
 
             // 완료 항목 토글
@@ -107,9 +113,10 @@ private fun DraggableTaskList(
     tasks: List<TodoDisplayItem>,
     onTaskComplete: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
-    onTaskDelete: (String) -> Unit
+    onTaskDelete: (String) -> Unit,
+    onTaskClick: (String) -> Unit,
+    onDeadlineEdit: (String, Long) -> Unit
 ) {
-    val colors = FlitTheme.colors
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
 
@@ -117,7 +124,8 @@ private fun DraggableTaskList(
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
     var draggingIndex by remember { mutableIntStateOf(-1) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
-    var measuredItemHeight by remember { mutableFloatStateOf(0f) }
+    // 가변 높이 대응: 아이템별 높이 Map
+    val itemHeights = remember { mutableStateMapOf<String, Float>() }
     val spacingPx = with(density) { 6.dp.toPx() }
 
     Column(
@@ -134,16 +142,15 @@ private fun DraggableTaskList(
                     modifier = Modifier
                         .zIndex(if (isDragging) 1f else 0f)
                         .onSizeChanged { size ->
-                            if (measuredItemHeight == 0f) {
-                                measuredItemHeight = size.height.toFloat()
-                            }
+                            itemHeights[task.todoId] = size.height.toFloat()
                         }
                         .graphicsLayer {
                             if (isDragging) {
                                 translationY = dragOffsetY
-                                shadowElevation = 2f
-                                scaleX = 1.01f
-                                scaleY = 1.01f
+                                shadowElevation = 8f
+                                scaleX = 1.03f
+                                scaleY = 1.03f
+                                alpha = 0.92f
                             }
                         }
                 ) {
@@ -156,6 +163,8 @@ private fun DraggableTaskList(
                             isDragging = isDragging,
                             onToggleComplete = { onTaskComplete(task.todoId) },
                             onTaskDelete = { onTaskDelete(task.captureId) },
+                            onTaskClick = { onTaskClick(task.captureId) },
+                            onDeadlineEdit = onDeadlineEdit,
                             onDragStart = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 draggingIndex = index
@@ -163,7 +172,11 @@ private fun DraggableTaskList(
                             },
                             onDrag = { deltaY ->
                                 dragOffsetY += deltaY
-                                val slotHeight = if (measuredItemHeight > 0f) measuredItemHeight + spacingPx else 60f
+                                // 가변 높이 기반 슬롯 계산
+                                val avgHeight = if (itemHeights.isNotEmpty()) {
+                                    itemHeights.values.average().toFloat()
+                                } else 60f
+                                val slotHeight = avgHeight + spacingPx
                                 val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
                                     .coerceIn(0, currentList.size - 1)
                                 if (targetIndex != index && targetIndex != draggingIndex) {
@@ -194,6 +207,8 @@ private fun TaskItemWithDragHandle(
     isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
     onTaskDelete: () -> Unit,
+    onTaskClick: () -> Unit,
+    onDeadlineEdit: (String, Long) -> Unit,
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
@@ -202,8 +217,10 @@ private fun TaskItemWithDragHandle(
     val colors = FlitTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
 
-    // 모든 할일에 삭제 버튼을 표시하기 위해 항상 확장 가능
-    val hasExpandableContent = true
+    // 원문이 제목과 다를 때만 표시
+    val showOriginalText = task.originalText != null &&
+            task.originalText != task.title &&
+            task.originalText.length > task.title.length
 
     Box(
         modifier = modifier
@@ -222,11 +239,7 @@ private fun TaskItemWithDragHandle(
                     onDragCancel = { onDragEnd() }
                 )
             }
-            .clickable {
-                if (hasExpandableContent) {
-                    isExpanded = !isExpanded
-                }
-            }
+            .clickable { isExpanded = !isExpanded }
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Column {
@@ -280,28 +293,77 @@ private fun TaskItemWithDragHandle(
                 )
             }
 
-            AnimatedVisibility(visible = isExpanded && hasExpandableContent) {
+            // 확장 영역: 캡처 원문 + 마감일 편집 + 상세 보기 + 삭제
+            AnimatedVisibility(visible = isExpanded) {
                 Column(modifier = Modifier.padding(top = 8.dp)) {
-                    // 확장 시 제목 전문 표시 (긴 제목일 때)
-                    if (task.title.length > 25) {
+                    // 1. 캡처 원문 (AI 제목과 다를 때만)
+                    if (showOriginalText) {
                         Text(
-                            text = task.title,
+                            text = task.originalText!!,
                             color = colors.textSecondary,
-                            fontSize = 13.sp
+                            fontSize = 13.sp,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // 2. 마감일 행
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Schedule,
+                            contentDescription = null,
+                            tint = colors.textSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = task.deadline?.let { formatDeadline(it) } ?: "마감일 없음",
+                            color = colors.textSecondary,
+                            fontSize = 13.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "마감일 편집",
+                            tint = colors.textMuted,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable {
+                                    // DatePicker는 CalendarScreen에서 처리
+                                    onDeadlineEdit(
+                                        task.todoId,
+                                        task.deadline ?: System.currentTimeMillis()
+                                    )
+                                }
                         )
                     }
 
-                    // 삭제 버튼
-                    Spacer(modifier = Modifier.height(4.dp))
-                    androidx.compose.material3.TextButton(
-                        onClick = onTaskDelete,
-                        modifier = Modifier.align(Alignment.End)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 3. 하단 액션 행: 상세 보기 + 삭제
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            text = "상세 보기",
+                            color = colors.textSecondary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.clickable { onTaskClick() }
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = "삭제",
                             color = colors.danger,
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.clickable { onTaskDelete() }
                         )
                     }
                 }
@@ -509,10 +571,19 @@ private fun TaskEmptyState(
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "할 일이 없습니다",
-            color = colors.textMuted,
-            fontSize = 14.sp
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Outlined.CheckBox,
+                contentDescription = null,
+                tint = colors.textMuted,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "할 일이 없어요",
+                color = colors.textMuted,
+                fontSize = 14.sp
+            )
+        }
     }
 }

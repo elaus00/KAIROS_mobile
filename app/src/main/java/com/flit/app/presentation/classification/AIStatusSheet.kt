@@ -95,7 +95,7 @@ fun AIStatusSheet(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "미확인 분류가 없습니다",
+                        text = "미확인 분류가 없어요",
                         color = colors.textMuted,
                         fontSize = 14.sp
                     )

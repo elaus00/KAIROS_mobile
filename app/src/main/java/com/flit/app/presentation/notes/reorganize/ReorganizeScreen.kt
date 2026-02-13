@@ -172,9 +172,14 @@ fun ReorganizeContent(
                             items = uiState.proposals,
                             key = { it.folderName }
                         ) { proposal ->
+                            val actionLabel = when (proposal.action) {
+                                "CREATE" -> "새 폴더"
+                                "MOVE" -> "이동"
+                                else -> proposal.action ?: "이동"
+                            }
                             MoveComparisonRow(
                                 noteTitle = "${proposal.captureIds.size}개 노트",
-                                currentFolder = proposal.action ?: "이동",
+                                currentFolder = actionLabel,
                                 suggestedFolder = proposal.folderName
                             )
                         }
@@ -302,13 +307,13 @@ private fun ReorganizeContentPreview() {
                     ProposedItem(
                         folderName = "업무",
                         folderType = "CUSTOM",
-                        action = "CREATE",
+                        action = "새 폴더",
                         captureIds = listOf("1", "2", "3")
                     ),
                     ProposedItem(
                         folderName = "개인",
                         folderType = "CUSTOM",
-                        action = "MOVE",
+                        action = "이동",
                         captureIds = listOf("4", "5")
                     )
                 ),

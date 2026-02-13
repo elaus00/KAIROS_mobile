@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    IC-5a 포그라운드 (다크 모드)
+    검정 배경 위에 표시 → 흰색 F + 도트
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- F 글리프 (Sora weight 450 기반) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M41,38 H59 V42 H46 V52 H58 V56 H46 V70 H41 Z" />
+
+    <!-- 채움 도트 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,66.5 A3.5,3.5,0,0,1,67,66.5 A3.5,3.5,0,0,1,60,66.5 Z" />
+</vector>

@@ -39,6 +39,10 @@ class ScheduleRepositoryImpl @Inject constructor(
         return scheduleDao.getDatesWithSchedules(rangeStartMs, rangeEndMs)
     }
 
+    override suspend fun updateSchedule(schedule: Schedule) {
+        scheduleDao.update(scheduleMapper.toEntity(schedule))
+    }
+
     override suspend fun deleteByCaptureId(captureId: String) {
         scheduleDao.deleteByCaptureId(captureId)
     }

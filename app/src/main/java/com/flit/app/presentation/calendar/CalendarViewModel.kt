@@ -85,6 +85,11 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
             is CalendarEvent.ToggleShowCompleted -> toggleShowCompleted()
             is CalendarEvent.ReorderTasks -> reorderTasks(event.todoIds)
+            is CalendarEvent.UpdateTaskDeadline -> updateTaskDeadline(event.todoId, event.deadlineMs)
+            is CalendarEvent.StartEditSchedule -> startEditSchedule(event.schedule)
+            is CalendarEvent.EditSchedule -> editSchedule(event)
+            is CalendarEvent.DismissEditSchedule -> dismissEditSchedule()
+            is CalendarEvent.ReorderSchedules -> reorderSchedules(event.scheduleIds)
         }
     }
 
@@ -183,7 +188,8 @@ class CalendarViewModel @Inject constructor(
                             title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
                             deadline = todo.deadline,
                             isCompleted = false,
-                            deadlineSource = todo.deadlineSource?.name
+                            deadlineSource = todo.deadlineSource?.name,
+                            originalText = capture?.originalText
                         )
                     }
                     _uiState.update { it.copy(tasks = displayItems) }
@@ -202,7 +208,8 @@ class CalendarViewModel @Inject constructor(
                             title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
                             deadline = todo.deadline,
                             isCompleted = true,
-                            deadlineSource = todo.deadlineSource?.name
+                            deadlineSource = todo.deadlineSource?.name,
+                            originalText = capture?.originalText
                         )
                     }
                     _uiState.update { it.copy(completedTasks = displayItems) }
@@ -231,6 +238,85 @@ class CalendarViewModel @Inject constructor(
         // DB 업데이트
         viewModelScope.launch {
             reorderTodo(todoIds)
+        }
+    }
+
+    /**
+     * 할 일 마감일 업데이트
+     */
+    private fun updateTaskDeadline(todoId: String, deadlineMs: Long) {
+        viewModelScope.launch {
+            try {
+                todoRepository.updateDeadline(todoId, deadlineMs)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "마감일 변경에 실패했어요")
+                }
+            }
+        }
+    }
+
+    /**
+     * 상세 화면 네비게이션 이벤트 발행
+     */
+    fun navigateToDetail(captureId: String) {
+        viewModelScope.launch {
+            _events.emit(CalendarUiEvent.NavigateToDetail(captureId))
+        }
+    }
+
+    /**
+     * 일정 편집 시작
+     */
+    private fun startEditSchedule(schedule: ScheduleDisplayItem) {
+        _uiState.update { it.copy(editingSchedule = schedule) }
+    }
+
+    /**
+     * 일정 편집 닫기
+     */
+    private fun dismissEditSchedule() {
+        _uiState.update { it.copy(editingSchedule = null) }
+    }
+
+    /**
+     * 일정 편집 저장
+     */
+    private fun editSchedule(event: CalendarEvent.EditSchedule) {
+        viewModelScope.launch {
+            try {
+                val existing = scheduleRepository.getScheduleById(event.scheduleId) ?: return@launch
+                val updated = existing.copy(
+                    startTime = event.startTime,
+                    endTime = event.endTime,
+                    location = event.location,
+                    isAllDay = event.isAllDay,
+                    updatedAt = System.currentTimeMillis()
+                )
+                scheduleRepository.updateSchedule(updated)
+
+                // 제목이 변경되었으면 Capture.aiTitle도 업데이트
+                captureRepository.updateAiTitle(existing.captureId, event.title)
+
+                _uiState.update { it.copy(editingSchedule = null) }
+                loadSchedulesForSelectedDate()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = e.message ?: "일정 수정에 실패했어요")
+                }
+            }
+        }
+    }
+
+    /**
+     * 일정 드래그 순서 변경 (메모리 전용)
+     */
+    private fun reorderSchedules(scheduleIds: List<String>) {
+        _uiState.update { state ->
+            val reordered = scheduleIds.mapNotNull { id ->
+                state.schedules.find { it.scheduleId == id }
+            }
+            state.copy(schedules = reordered)
         }
     }
 
@@ -292,7 +378,7 @@ class CalendarViewModel @Inject constructor(
                 _events.emit(CalendarUiEvent.UndoSuccess)
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message ?: "실행 취소에 실패했습니다.")
+                    it.copy(errorMessage = e.message ?: "실행 취소에 실패했어요")
                 }
             }
         }
@@ -306,7 +392,7 @@ class CalendarViewModel @Inject constructor(
                 _events.emit(CalendarUiEvent.DeleteSuccess(captureId))
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message ?: "삭제에 실패했습니다.")
+                    it.copy(errorMessage = e.message ?: "삭제에 실패했어요")
                 }
             }
         }
@@ -341,7 +427,7 @@ class CalendarViewModel @Inject constructor(
                 loadSchedulesForSelectedDate()
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message ?: "캘린더 동기화에 실패했습니다.")
+                    it.copy(errorMessage = e.message ?: "캘린더 동기화에 실패했어요")
                 }
             }
         }
@@ -358,7 +444,7 @@ class CalendarViewModel @Inject constructor(
                 loadSchedulesForSelectedDate()
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message ?: "캘린더 동기화 거부에 실패했습니다.")
+                    it.copy(errorMessage = e.message ?: "캘린더 동기화 거부에 실패했어요")
                 }
             }
         }

@@ -131,7 +131,7 @@ class CaptureDetailViewModelTest {
         // then
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertEquals("캡처를 찾을 수 없습니다", state.errorMessage)
+        assertEquals("캡처를 찾을 수 없어요", state.errorMessage)
     }
 
     /** onChangeClassification 호출 시 분류 유형이 변경된다 */
@@ -213,7 +213,7 @@ class CaptureDetailViewModelTest {
             userPreferenceRepository = userPreferenceRepository
         )
         advanceUntilIdle()
-        assertEquals("캡처를 찾을 수 없습니다", viewModel.uiState.value.errorMessage)
+        assertEquals("캡처를 찾을 수 없어요", viewModel.uiState.value.errorMessage)
 
         // when
         viewModel.onErrorDismissed()
