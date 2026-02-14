@@ -4,8 +4,11 @@ import android.content.Context
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.CalendarRepository
+import com.flit.app.domain.repository.ImageRepository
+import com.flit.app.domain.repository.ScheduleRepository
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
+import com.flit.app.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.flit.app.util.MainDispatcherRule
@@ -38,8 +41,11 @@ class SettingsViewModelTest {
     private lateinit var userPreferenceRepository: UserPreferenceRepository
     private lateinit var appContext: Context
     private lateinit var calendarRepository: CalendarRepository
+    private lateinit var imageRepository: ImageRepository
+    private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
+    private lateinit var syncScheduleToCalendarUseCase: SyncScheduleToCalendarUseCase
     private lateinit var authRepository: AuthRepository
     private lateinit var subscriptionRepository: SubscriptionRepository
 
@@ -48,12 +54,16 @@ class SettingsViewModelTest {
         userPreferenceRepository = mockk()
         appContext = mockk(relaxed = true)
         calendarRepository = mockk(relaxed = true)
+        imageRepository = mockk(relaxed = true)
+        scheduleRepository = mockk(relaxed = true)
         getCalendarSettingsUseCase = mockk(relaxed = true)
         setCalendarSettingsUseCase = mockk(relaxed = true)
+        syncScheduleToCalendarUseCase = mockk(relaxed = true)
         authRepository = mockk(relaxed = true)
         subscriptionRepository = mockk(relaxed = true)
         every { calendarRepository.isCalendarPermissionGranted() } returns true
         coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
+        coEvery { scheduleRepository.getAllSchedulesForSync() } returns emptyList()
     }
 
     @After
@@ -66,8 +76,11 @@ class SettingsViewModelTest {
             appContext,
             userPreferenceRepository,
             calendarRepository,
+            imageRepository,
+            scheduleRepository,
             getCalendarSettingsUseCase,
             setCalendarSettingsUseCase,
+            syncScheduleToCalendarUseCase,
             authRepository,
             subscriptionRepository
         )

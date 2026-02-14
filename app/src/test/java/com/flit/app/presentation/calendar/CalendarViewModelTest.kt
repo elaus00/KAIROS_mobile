@@ -76,8 +76,7 @@ class CalendarViewModelTest {
         // init에서 호출되는 Repository 메서드에 대한 기본 응답 (타임존 의존 ms 파라미터 → any())
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
 
         return CalendarViewModel(
             application,
@@ -104,8 +103,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("cap-1") } returns capture
 
         // When
@@ -132,8 +130,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(listOf(todo))
         coEvery { captureRepository.getCaptureById("cap-2") } returns capture
 
         // When
@@ -162,8 +159,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(startTimeMs))
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
 
         // When
         val viewModel = CalendarViewModel(
@@ -244,8 +240,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("c1") } returns cap1
         coEvery { captureRepository.getCaptureById("c2") } returns cap2
 
@@ -271,8 +266,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(schedule))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("missing-cap") } returns null
 
         // When
@@ -292,8 +286,18 @@ class CalendarViewModelTest {
     @Test
     fun `toggleTaskComplete_delegates`() = runTest {
         // Given
-        coEvery { toggleTodoCompletion(any()) } just runs
-        val viewModel = createViewModel()
+        coEvery { toggleTodoCompletion(any(), any()) } just runs
+        val todo = TestFixtures.todo(id = "todo-1", captureId = "cap-1", isCompleted = false)
+        val capture = TestFixtures.capture(id = "cap-1", aiTitle = "토글 테스트")
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(listOf(todo))
+        coEvery { captureRepository.getCaptureById("cap-1") } returns capture
+        val viewModel = CalendarViewModel(
+            application, scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, toggleTodoCompletion,
+            reorderTodo, approveSuggestion
+        )
         advanceUntilIdle()
 
         // When
@@ -301,7 +305,7 @@ class CalendarViewModelTest {
         advanceUntilIdle()
 
         // Then: UseCase 호출됨
-        coVerify(exactly = 1) { toggleTodoCompletion("todo-1") }
+        coVerify(exactly = 1) { toggleTodoCompletion("todo-1", false) }
     }
 
     @Test
@@ -311,10 +315,9 @@ class CalendarViewModelTest {
         val capture = TestFixtures.capture(id = "cap-1", aiTitle = "즉시 반영 확인")
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(listOf(todo))
         coEvery { captureRepository.getCaptureById("cap-1") } returns capture
-        coEvery { toggleTodoCompletion(any()) } just runs
+        coEvery { toggleTodoCompletion(any(), any()) } just runs
 
         val viewModel = CalendarViewModel(
             application, scheduleRepository, todoRepository, captureRepository,
@@ -327,12 +330,12 @@ class CalendarViewModelTest {
         // When: 체크 이벤트 발생 직후
         viewModel.onEvent(CalendarEvent.ToggleTaskComplete("todo-1"))
 
-        // Then: DB 반영 전에 UI 상태가 먼저 변경됨
+        // Then: DB 반영 전에 UI 상태가 먼저 변경됨(리스트 내 체크 상태 반전)
+        assertEquals("todo-1", viewModel.uiState.value.tasks.first().todoId)
         assertTrue(viewModel.uiState.value.tasks.first().isCompleted)
-        coVerify(exactly = 0) { toggleTodoCompletion(any()) }
 
         advanceUntilIdle()
-        coVerify(exactly = 1) { toggleTodoCompletion("todo-1") }
+        coVerify(exactly = 1) { toggleTodoCompletion("todo-1", false) }
     }
 
     @Test
@@ -479,8 +482,7 @@ class CalendarViewModelTest {
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(listOf(sch1, sch2))
         every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
-        every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
-        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        every { todoRepository.getAllTodos() } returns flowOf(emptyList())
         coEvery { captureRepository.getCaptureById("c1") } returns cap1
         coEvery { captureRepository.getCaptureById("c2") } returns cap2
 
