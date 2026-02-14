@@ -88,19 +88,19 @@ abstract class FlitDatabase : RoomDatabase() {
                 db.execSQL(
                     """
                     INSERT OR IGNORE INTO folders (id, name, type, sort_order, created_at)
-                    VALUES ('system-inbox', 'Inbox', 'INBOX', 0, $now)
+                    VALUES ('system-inbox', '받은함', 'INBOX', 0, $now)
                     """.trimIndent()
                 )
                 db.execSQL(
                     """
                     INSERT OR IGNORE INTO folders (id, name, type, sort_order, created_at)
-                    VALUES ('system-ideas', 'Ideas', 'IDEAS', 1, $now)
+                    VALUES ('system-ideas', '아이디어', 'IDEAS', 1, $now)
                     """.trimIndent()
                 )
                 db.execSQL(
                     """
                     INSERT OR IGNORE INTO folders (id, name, type, sort_order, created_at)
-                    VALUES ('system-bookmarks', 'Bookmarks', 'BOOKMARKS', 2, $now)
+                    VALUES ('system-bookmarks', '북마크', 'BOOKMARKS', 2, $now)
                     """.trimIndent()
                 )
             }

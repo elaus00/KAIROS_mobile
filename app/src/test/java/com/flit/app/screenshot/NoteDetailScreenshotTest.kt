@@ -137,7 +137,7 @@ class NoteDetailScreenshotTest {
                         editedBody = "",
                         selectedFolderId = "folder1",
                         folders = listOf(
-                            Folder(id = "folder1", name = "Inbox", type = FolderType.INBOX)
+                            Folder(id = "folder1", name = "받은함", type = FolderType.INBOX)
                         )
                     ),
                     onNavigateBack = {},

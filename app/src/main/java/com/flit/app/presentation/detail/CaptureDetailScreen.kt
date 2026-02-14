@@ -150,10 +150,18 @@ fun CaptureDetailContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    color = colors.accent,
-                    modifier = Modifier.size(32.dp)
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(
+                        color = colors.accent,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "로딩 중...",
+                        color = colors.textMuted,
+                        fontSize = 14.sp
+                    )
+                }
             }
         } else if (uiState.errorMessage != null) {
             Box(

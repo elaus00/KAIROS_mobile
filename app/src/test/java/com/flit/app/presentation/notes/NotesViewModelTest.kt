@@ -133,7 +133,7 @@ class NotesViewModelTest {
     @Test
     fun `inbox_hidden_when_count_zero`() = runTest {
         // Given: INBOX 폴더, 노트 0개
-        val inbox = TestFixtures.folder(id = "inbox", name = "Inbox", type = FolderType.INBOX)
+        val inbox = TestFixtures.folder(id = "inbox", name = "받은함", type = FolderType.INBOX)
         val countMap = mapOf("inbox" to 0)
 
         // When
@@ -147,7 +147,7 @@ class NotesViewModelTest {
     @Test
     fun `inbox_shown_when_count_positive`() = runTest {
         // Given: INBOX 폴더, 노트 2개
-        val inbox = TestFixtures.folder(id = "inbox", name = "Inbox", type = FolderType.INBOX)
+        val inbox = TestFixtures.folder(id = "inbox", name = "받은함", type = FolderType.INBOX)
         val countMap = mapOf("inbox" to 2)
 
         // When
@@ -162,8 +162,8 @@ class NotesViewModelTest {
     @Test
     fun `ideas_bookmarks_always_visible`() = runTest {
         // Given: IDEAS, BOOKMARKS 폴더 — 노트 0개
-        val ideas = TestFixtures.folder(id = "ideas", name = "Ideas", type = FolderType.IDEAS)
-        val bookmarks = TestFixtures.folder(id = "bm", name = "Bookmarks", type = FolderType.BOOKMARKS)
+        val ideas = TestFixtures.folder(id = "ideas", name = "아이디어", type = FolderType.IDEAS)
+        val bookmarks = TestFixtures.folder(id = "bm", name = "북마크", type = FolderType.BOOKMARKS)
         val countMap = mapOf("ideas" to 0, "bm" to 0)
 
         // When
