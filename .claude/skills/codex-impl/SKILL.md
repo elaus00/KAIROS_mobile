@@ -3,7 +3,7 @@ name: codex-impl
 description: Codex(gpt-5.3-codex)에 구현 작업을 위임합니다. Claude가 계획/설계하고 Codex가 코드를 구현합니다.
 argument-hint: <구현할 작업 설명>
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash, Write
+allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 ---
 
 # Codex 구현 위임 스킬
@@ -22,7 +22,8 @@ $ARGUMENTS를 분석하여 구현에 필요한 파일과 컨텍스트를 파악�
 
 ### 2단계: 구현 프롬프트 작성
 
-Codex에 전달할 **자기 완결적인 구현 지시서**를 작성하여 `/tmp/codex-prompt.txt`에 저장한다.
+Codex에 전달할 **자기 완결적인 구현 지시서**를 작성하여 임시 파일에 저장한다.
+병렬 실행 시 충돌을 방지하기 위해 **고유한 파일명**을 사용한다: `/tmp/codex-prompt-{작업식별자}.txt` (예: `/tmp/codex-prompt-auth-login.txt`)
 
 프롬프트에 반드시 포함할 내용:
 - **목표**: 무엇을 구현/수정해야 하는지
@@ -45,11 +46,13 @@ Codex에 전달할 **자기 완결적인 구현 지시서**를 작성하여 `/tm
 
 ### 3단계: Codex 실행
 
-Write 도구로 `/tmp/codex-prompt.txt`에 프롬프트를 저장한 뒤, 아래 Bash 명령을 실행한다:
+Write 도구로 프롬프트 파일을 저장한 뒤, 아래 형식의 Bash 명령을 실행한다:
 
 ```bash
-codex exec --full-auto --ephemeral -o /tmp/codex-result.txt - < /tmp/codex-prompt.txt
+codex exec --full-auto --ephemeral -o /tmp/codex-result-{작업식별자}.txt - < /tmp/codex-prompt-{작업식별자}.txt
 ```
+
+`{작업식별자}`는 2단계에서 사용한 것과 동일한 값을 사용한다.
 
 **주의**: 이 명령은 시간이 걸릴 수 있으므로 timeout을 충분히 설정한다 (최소 300000ms).
 
@@ -57,7 +60,7 @@ codex exec --full-auto --ephemeral -o /tmp/codex-result.txt - < /tmp/codex-promp
 
 Codex 완료 후 반드시 수행:
 
-1. `/tmp/codex-result.txt`를 Read로 읽어 Codex 작업 결과 확인
+1. 결과 파일(`/tmp/codex-result-{작업식별자}.txt`)을 Read로 읽어 Codex 작업 결과 확인
 2. `git diff`로 실제 변경된 파일과 내용 확인
 3. 변경된 파일을 Read로 읽어 코드 품질 검증:
    - 프로젝트 규칙 준수 여부
