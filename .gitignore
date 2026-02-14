@@ -11,6 +11,9 @@
 local.properties
 .kotlin/
 
+# MkDocs
+site/
+
 # Release signing
 keystore.properties
 *.jks

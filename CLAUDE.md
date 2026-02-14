@@ -64,7 +64,7 @@ UI/UX 관련 작업(화면 추가, 컴포넌트 수정, 디자인 변경 등) �
 
 ```
 Docs/
-├── INDEX.md                 # 문서 인덱스 (전체 목록 + 상태)
+├── doc-index.md             # 문서 인덱스 (전체 목록 + 상태)
 ├── ROADMAP.md               # 개발 로드맵 + Phase별 참조 문서 매핑
 ├── direction/               # 사용자 직접 작성 문서 (PRD = 최상위)
 ├── specs/                   # 명세서 (기능/화면/데이터모델/API)
@@ -96,11 +96,11 @@ Docs/
 
 ### 문서 인덱스 관리
 
-- `Docs/` 디렉토리에 문서를 추가/편집/삭제할 때 반드시 `Docs/INDEX.md`를 함께 업데이트해야 한다
+- `Docs/` 디렉토리에 문서를 추가/편집/삭제할 때 반드시 `Docs/doc-index.md`를 함께 업데이트해야 한다
 
 ## 참조
 
-- 문서 인덱스: `Docs/INDEX.md`
+- 문서 인덱스: `Docs/doc-index.md`
 - 로드맵: `Docs/ROADMAP.md`
 - PRD: `Docs/direction/flit_prd_v10.md`
 
