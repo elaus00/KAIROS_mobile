@@ -1,6 +1,5 @@
 package com.flit.app.presentation.calendar.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.animateColorAsState
@@ -14,8 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.CheckBox
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +53,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 /**
  * TaskList 컴포넌트
@@ -107,6 +103,7 @@ private fun DraggableTaskList(
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val cardShape = RoundedCornerShape(12.dp)
+    var editingTask by remember { mutableStateOf<TodoDisplayItem?>(null) }
 
     // 드래그 상태 관리
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
@@ -154,11 +151,11 @@ private fun DraggableTaskList(
                     ) {
                         TaskItemWithDragHandle(
                             task = task,
-                            isDragging = isDragging,
                             onToggleComplete = { onTaskComplete(task.todoId) },
-                            onTaskDelete = { onTaskDelete(task.captureId) },
-                            onTaskClick = { onTaskClick(task.captureId) },
-                            onDeadlineEdit = onDeadlineEdit,
+                            onTaskClick = {
+                                onTaskClick(task.captureId)
+                                editingTask = task
+                            },
                             onDragStart = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             },
@@ -173,13 +170,32 @@ private fun DraggableTaskList(
                                 }
 
                                 dragOffsetY += deltaY
-                                // 가변 높이 기반 슬롯 계산
-                                val avgHeight = if (itemHeights.isNotEmpty()) {
-                                    itemHeights.values.average().toFloat()
-                                } else 60f
-                                val slotHeight = avgHeight + spacingPx
-                                val targetIndex = (currentIndex + (dragOffsetY / slotHeight).roundToInt())
-                                    .coerceIn(0, currentList.size - 1)
+                                // 누적 높이 기반 정확한 슬롯 계산
+                                var accumulatedOffset = 0f
+                                var targetIndex = currentIndex
+                                if (dragOffsetY > 0) {
+                                    // 아래로 드래그
+                                    for (i in currentIndex + 1 until currentList.size) {
+                                        val itemHeight = itemHeights[currentList[i].todoId] ?: 60f
+                                        accumulatedOffset += itemHeight + spacingPx
+                                        if (dragOffsetY >= accumulatedOffset) {
+                                            targetIndex = i
+                                        } else {
+                                            break
+                                        }
+                                    }
+                                } else if (dragOffsetY < 0) {
+                                    // 위로 드래그
+                                    for (i in currentIndex - 1 downTo 0) {
+                                        val itemHeight = itemHeights[currentList[i].todoId] ?: 60f
+                                        accumulatedOffset -= itemHeight + spacingPx
+                                        if (dragOffsetY <= accumulatedOffset) {
+                                            targetIndex = i
+                                        } else {
+                                            break
+                                        }
+                                    }
+                                }
                                 if (targetIndex != currentIndex) {
                                     val movedSlots = targetIndex - currentIndex
                                     val oldIndexById = currentList
@@ -193,19 +209,33 @@ private fun DraggableTaskList(
                                         if (id == task.todoId) return@forEach
                                         val newIndex = newIndexById[id] ?: return@forEach
                                         if (oldIndex != newIndex) {
+                                            // 이동된 아이템의 실제 높이 사용
+                                            val itemHeight = itemHeights[id] ?: 60f
+                                            val slotHeight = itemHeight + spacingPx
                                             val deltaY = (oldIndex - newIndex) * slotHeight
                                             val anim = placementAnimations[id] ?: return@forEach
                                             scope.launch {
                                                 anim.snapTo(deltaY)
                                                 anim.animateTo(
                                                     targetValue = 0f,
-                                                    animationSpec = tween(durationMillis = 350)
+                                                    animationSpec = tween(durationMillis = 300)
                                                 )
                                             }
                                         }
                                     }
-                                    // 슬롯 이동만큼 오프셋을 차감해 드래그 연속성을 유지
-                                    dragOffsetY -= movedSlots * slotHeight
+                                    // 이동한 만큼 오프셋 조정
+                                    val movedDistance = if (movedSlots > 0) {
+                                        // 아래로 이동: currentIndex+1 ~ targetIndex 아이템들의 높이 합
+                                        (currentIndex + 1..targetIndex).sumOf { i ->
+                                            (itemHeights[currentList[i].todoId] ?: 60f).toDouble() + spacingPx
+                                        }.toFloat()
+                                    } else {
+                                        // 위로 이동: targetIndex ~ currentIndex-1 아이템들의 높이 합 (음수)
+                                        -(targetIndex until currentIndex).sumOf { i ->
+                                            (itemHeights[currentList[i].todoId] ?: 60f).toDouble() + spacingPx
+                                        }.toFloat()
+                                    }
+                                    dragOffsetY -= movedDistance
                                 }
                             },
                             onDragEnd = {
@@ -222,6 +252,21 @@ private fun DraggableTaskList(
             }
         }
     }
+
+    editingTask?.let { task ->
+        TodoEditDialog(
+            task = task,
+            onDismiss = { editingTask = null },
+            onDeadlineEdit = { todoId, deadlineMs ->
+                onDeadlineEdit(todoId, deadlineMs)
+                editingTask = null
+            },
+            onDelete = { captureId ->
+                onTaskDelete(captureId)
+                editingTask = null
+            }
+        )
+    }
 }
 
 /**
@@ -230,23 +275,14 @@ private fun DraggableTaskList(
 @Composable
 private fun TaskItemWithDragHandle(
     task: TodoDisplayItem,
-    isDragging: Boolean = false,
     onToggleComplete: () -> Unit,
-    onTaskDelete: () -> Unit,
     onTaskClick: () -> Unit,
-    onDeadlineEdit: (String, Long) -> Unit,
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
-    var isExpanded by remember { mutableStateOf(false) }
-
-    // 원문이 제목과 다를 때만 표시
-    val showOriginalText = task.originalText != null &&
-            task.originalText != task.title &&
-            task.originalText.length > task.title.length
 
     Box(
         modifier = modifier
@@ -265,141 +301,48 @@ private fun TaskItemWithDragHandle(
                     onDragCancel = { onDragEnd() }
                 )
             }
-            .clickable { isExpanded = !isExpanded }
-            .padding(horizontal = 14.dp, vertical = 8.dp)
+            .clickable { onTaskClick() }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 내용
-                Column(modifier = Modifier.weight(1f)) {
-                    val titleColor = if (task.isCompleted) colors.textMuted else colors.text
-                    Text(
-                        text = task.title,
-                        color = titleColor,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                        overflow = if (isExpanded) TextOverflow.Clip else TextOverflow.Ellipsis
-                    )
-
-                    task.deadline?.let { deadlineMs ->
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            val deadlineText = formatDeadline(deadlineMs)
-                            val isOverdue = deadlineMs < System.currentTimeMillis()
-                            Text(
-                                text = deadlineText,
-                                color = when {
-                                    task.isCompleted -> colors.textMuted
-                                    isOverdue -> colors.danger
-                                    else -> colors.textSecondary
-                                },
-                                fontSize = 12.sp
-                            )
-                            if (task.deadlineSource == "AI") {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "AI",
-                                    color = colors.accent,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(colors.accent.copy(alpha = 0.15f))
-                                        .padding(horizontal = 4.dp, vertical = 1.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                TaskCheckbox(
-                    isChecked = task.isCompleted,
-                    onToggle = onToggleComplete
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 내용
+            Column(modifier = Modifier.weight(1f)) {
+                val titleColor = if (task.isCompleted) colors.textMuted else colors.text
+                Text(
+                    text = task.title,
+                    color = titleColor,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-            }
 
-            // 확장 영역: 캡처 원문 + 마감일 편집 + 상세 보기 + 삭제
-            AnimatedVisibility(visible = isExpanded) {
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    // 1. 캡처 원문 (AI 제목과 다를 때만)
-                    if (showOriginalText) {
-                        Text(
-                            text = task.originalText!!,
-                            color = colors.textSecondary,
-                            fontSize = 13.sp,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-
-                    // 2. 마감일 행
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Schedule,
-                            contentDescription = null,
-                            tint = colors.textSecondary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = task.deadline?.let { formatDeadline(it) } ?: "마감일 없음",
-                            color = colors.textSecondary,
-                            fontSize = 13.sp,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = "마감일 편집",
-                            tint = colors.textMuted,
-                            modifier = Modifier
-                                .size(18.dp)
-                                .clickable {
-                                    // DatePicker는 CalendarScreen에서 처리
-                                    onDeadlineEdit(
-                                        task.todoId,
-                                        task.deadline ?: System.currentTimeMillis()
-                                    )
-                                }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // 3. 하단 액션 행: 상세 보기 + 삭제
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "상세 보기",
-                            color = colors.textSecondary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.clickable { onTaskClick() }
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = "삭제",
-                            color = colors.danger,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.clickable { onTaskDelete() }
-                        )
-                    }
+                task.deadline?.let { deadlineMs ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    val deadlineText = formatDeadline(deadlineMs)
+                    val isOverdue = deadlineMs < System.currentTimeMillis()
+                    Text(
+                        text = deadlineText,
+                        color = when {
+                            task.isCompleted -> colors.textMuted
+                            isOverdue -> colors.danger
+                            else -> colors.textSecondary
+                        },
+                        fontSize = 11.sp
+                    )
                 }
             }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            TaskCheckbox(
+                isChecked = task.isCompleted,
+                onToggle = onToggleComplete
+            )
         }
     }
 }
@@ -427,7 +370,7 @@ private fun TaskCheckbox(
         label = "borderColor"
     )
 
-    // 48dp 터치 영역, 24dp 시각적 크기
+    // 48dp 터치 영역, 22dp 시각적 크기
     Box(
         modifier = modifier
             .size(48.dp)
@@ -441,7 +384,7 @@ private fun TaskCheckbox(
     ) {
         Box(
             modifier = Modifier
-                .size(24.dp)
+                .size(22.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(backgroundColor)
                 .border(1.5.dp, borderColor, RoundedCornerShape(6.dp)),

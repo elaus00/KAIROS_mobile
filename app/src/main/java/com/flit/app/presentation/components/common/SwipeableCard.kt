@@ -70,23 +70,12 @@ fun SwipeableCard(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = "삭제",
-                            color = Color.White,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "삭제",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "삭제",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
 
@@ -109,13 +98,17 @@ fun SwipeableCard(
                                 scope.launch { offsetX.animateTo(0f, tween(200)) }
                             },
                             onHorizontalDrag = { change, dragAmount ->
-                                change.consume()
-                                scope.launch {
-                                    // 왼←오 방향만 허용 (음수 offset)
-                                    val newValue =
-                                        (offsetX.value + dragAmount).coerceIn(-revealWidthPx, 0f)
-                                    offsetX.snapTo(newValue)
+                                // 왼쪽으로 스와이프(dragAmount < 0) 또는 이미 열린 상태(offsetX < 0)일 때만 처리
+                                if (dragAmount < 0 || offsetX.value < 0) {
+                                    change.consume()
+                                    scope.launch {
+                                        // 왼←오 방향만 허용 (음수 offset)
+                                        val newValue =
+                                            (offsetX.value + dragAmount).coerceIn(-revealWidthPx, 0f)
+                                        offsetX.snapTo(newValue)
+                                    }
                                 }
+                                // 오른쪽 스와이프(dragAmount > 0)는 부모(HorizontalPager)로 전파
                             }
                         )
                     }
