@@ -129,7 +129,7 @@ body {
   font-size: 13px !important;
   font-weight: 600;
   color: var(--flit-text);
-  padding: 0.6rem 0.6rem 0.3rem !important;
+  padding: 0.6rem 0.6rem 0.3rem 0.9rem !important;
   margin-top: 0.8rem;
   border-bottom: 1px solid var(--flit-divider);
 }
@@ -143,7 +143,8 @@ body {
   font-family: var(--flit-font);
   font-size: 13px !important;
   color: var(--flit-text-secondary);
-  padding-left: 0.6rem !important;
+  padding-left: 0.9rem !important;
+  overflow: visible;
 }
 
 .md-nav--primary .md-nav--nested .md-nav__link:hover,
@@ -163,7 +164,7 @@ body {
 }
 
 .md-nav--primary .md-nav__item {
-  padding-left: 0 !important;
+  padding-left: 0.2rem !important;
 }
 
 /* --- 오른쪽 사이드바: TOC ------------------------------------------------- */
@@ -177,6 +178,7 @@ body {
   border-radius: 8px;
   padding: 0.8rem;
   border: 1px solid var(--flit-border);
+  text-align: right;
 }
 
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {
@@ -191,6 +193,7 @@ body {
   padding: 0 0.4rem 0.4rem !important;
   margin-bottom: 0.4rem;
   border-bottom: 1px solid var(--flit-divider);
+  text-align: right;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
@@ -198,6 +201,7 @@ body {
   font-size: 13px !important;
   color: var(--flit-text-secondary);
   padding: 0.15rem 0.4rem !important;
+  text-align: right;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link:hover,
@@ -208,7 +212,12 @@ body {
 /* --- 본문 ---------------------------------------------------------------- */
 
 .md-content {
-  max-width: 640px;
+  max-width: 700px;
+}
+
+.md-main__inner {
+  margin-left: 0.4rem;
+  margin-right: 0.4rem;
 }
 
 .md-typeset code {

@@ -192,7 +192,7 @@ app/src/main/java/com/flit/app/
 | API 명세서 | `docs/specs/api_spec.md` |
 | 디자인 가이드 | `docs/specs/design-guide.md` |
 | 개발 로드맵 | `docs/ROADMAP.md` |
-| 문서 인덱스 | `docs/INDEX.md` |
+| 문서 인덱스 | `docs/doc-index.md` |
 
 ## 라이선스
 
