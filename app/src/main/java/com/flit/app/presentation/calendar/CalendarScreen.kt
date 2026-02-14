@@ -136,6 +136,7 @@ fun CalendarContentBody(
 
             CalendarCard(
                 selectedDate = uiState.selectedDate,
+                currentMonth = uiState.currentMonth,
                 datesWithSchedules = uiState.datesWithSchedules,
                 isExpanded = uiState.isMonthExpanded,
                 onDateSelected = { date -> onEvent(CalendarEvent.SelectDate(date)) },

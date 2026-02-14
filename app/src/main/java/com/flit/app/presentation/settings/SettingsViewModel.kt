@@ -1,18 +1,19 @@
 package com.flit.app.presentation.settings
 
+import android.content.ContentValues
 import android.content.Context
-import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.CalendarRepository
-import com.flit.app.domain.repository.ImageRepository
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.model.NoteViewType
-import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
@@ -38,8 +39,6 @@ class SettingsViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
     private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase,
-    private val submitCaptureUseCase: SubmitCaptureUseCase,
-    private val imageRepository: ImageRepository,
     private val authRepository: AuthRepository,
     private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
@@ -228,35 +227,85 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(calendarAuthMessage = message) }
     }
 
-    /** 디버그: 이미지 URI로 캡처 제출 */
-    fun debugSubmitImage(uri: Uri) {
+    /** 내보내기 결과 메시지 닫기 */
+    fun dismissExportResult() {
+        _uiState.update { it.copy(exportResult = null) }
+    }
+
+    /** 캡처 이미지를 Downloads/Flit/으로 내보내기 */
+    fun exportCaptureImages() {
         viewModelScope.launch {
-            _uiState.update { it.copy(debugSubmitting = true, debugResult = null) }
+            _uiState.update { it.copy(isExporting = true, exportResult = null) }
             try {
-                val savedUri = imageRepository.saveImage(uri)
-                val capture = submitCaptureUseCase(
-                    text = "[디버그] 이미지 캡처 테스트",
-                    imageUri = savedUri
-                )
+                val capturesDir = java.io.File(appContext.filesDir, "captures")
+                if (!capturesDir.exists() || !capturesDir.isDirectory) {
+                    _uiState.update {
+                        it.copy(isExporting = false, exportResult = "내보낼 이미지가 없습니다")
+                    }
+                    return@launch
+                }
+
+                val imageFiles = capturesDir.listFiles()?.filter {
+                    it.isFile && it.extension.lowercase() in listOf("jpg", "jpeg", "png", "webp")
+                } ?: emptyList()
+
+                if (imageFiles.isEmpty()) {
+                    _uiState.update {
+                        it.copy(isExporting = false, exportResult = "내보낼 이미지가 없습니다")
+                    }
+                    return@launch
+                }
+
+                var exportedCount = 0
+                val resolver = appContext.contentResolver
+
+                imageFiles.forEach { file ->
+                    val mimeType = when (file.extension.lowercase()) {
+                        "png" -> "image/png"
+                        "webp" -> "image/webp"
+                        else -> "image/jpeg"
+                    }
+
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
+                        put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            put(MediaStore.Images.Media.RELATIVE_PATH, "Download/Flit")
+                            put(MediaStore.Images.Media.IS_PENDING, 1)
+                        }
+                    }
+
+                    val uri = resolver.insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        contentValues
+                    ) ?: return@forEach
+
+                    resolver.openOutputStream(uri)?.use { output ->
+                        file.inputStream().use { input ->
+                            input.copyTo(output)
+                        }
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        contentValues.clear()
+                        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                        resolver.update(uri, contentValues, null, null)
+                    }
+
+                    exportedCount++
+                }
+
                 _uiState.update {
                     it.copy(
-                        debugSubmitting = false,
-                        debugResult = "캡처 생성됨: ${capture.id.take(8)}..."
+                        isExporting = false,
+                        exportResult = "${exportedCount}장 내보냄 → Downloads/Flit/"
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(
-                        debugSubmitting = false,
-                        debugResult = "실패: ${e.message}"
-                    )
+                    it.copy(isExporting = false, exportResult = "실패: ${e.message}")
                 }
             }
         }
-    }
-
-    /** 디버그 결과 메시지 닫기 */
-    fun dismissDebugResult() {
-        _uiState.update { it.copy(debugResult = null) }
     }
 }

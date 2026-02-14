@@ -109,10 +109,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 월 변경 (스와이프로 달 이동 시 selectedDate도 함께 이동)
+     * 월 변경
+     * 오늘이 포함된 달이면 오늘을 자동 선택, 아니면 선택 해제
      */
     private fun changeMonth(yearMonth: YearMonth) {
-        val newSelectedDate = yearMonth.atDay(1)
+        val today = LocalDate.now()
+        val newSelectedDate = if (YearMonth.from(today) == yearMonth) today else null
         _uiState.update { it.copy(selectedDate = newSelectedDate, currentMonth = yearMonth) }
         loadSchedulesForSelectedDate()
         loadDatesWithSchedules()
@@ -130,10 +132,13 @@ class CalendarViewModel @Inject constructor(
      */
     private fun loadSchedulesForSelectedDate() {
         schedulesJob?.cancel()
+        val selectedDate = _uiState.value.selectedDate
+        if (selectedDate == null) {
+            _uiState.update { it.copy(schedules = emptyList(), isLoading = false) }
+            return
+        }
         schedulesJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
-            val selectedDate = _uiState.value.selectedDate
             val zone = ZoneId.systemDefault()
             val startMs = selectedDate.atStartOfDay(zone).toInstant().toEpochMilli()
             val endMs = selectedDate.atTime(LocalTime.MAX).atZone(zone).toInstant().toEpochMilli()

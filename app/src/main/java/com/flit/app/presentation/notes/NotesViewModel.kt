@@ -241,6 +241,13 @@ class NotesViewModel @Inject constructor(
         }
     }
 
+    /** 노트 보기 유형 변경 */
+    fun setNoteViewType(type: NoteViewType) {
+        viewModelScope.launch {
+            userPreferenceRepository.setString(PreferenceKeys.KEY_NOTE_VIEW_TYPE, type.name)
+        }
+    }
+
     /** 노트 확장/축소 토글 (단일 확장 정책) */
     private fun toggleNoteExpand(noteId: String) {
         _uiState.update {

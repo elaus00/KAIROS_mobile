@@ -130,7 +130,7 @@ fun AiClassificationSettingsContent(
                                     showPremiumGateSheet = true
                                 }
                             }
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -139,7 +139,7 @@ fun AiClassificationSettingsContent(
                                 Text(
                                     text = "분류 프리셋",
                                     color = colors.text,
-                                    fontSize = 15.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 if (!isPremium) {
@@ -151,7 +151,7 @@ fun AiClassificationSettingsContent(
                             Text(
                                 text = uiState.presets.find { it.id == uiState.selectedPresetId }?.name ?: "기본",
                                 color = colors.textMuted,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         }
                         Icon(
@@ -191,7 +191,7 @@ fun AiClassificationSettingsContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             SectionHeader(
                 title = "분류 규칙",
@@ -203,13 +203,13 @@ fun AiClassificationSettingsContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "분류 규칙",
                                 color = colors.text,
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
                             if (!isPremium) {
@@ -263,7 +263,7 @@ fun AiClassificationSettingsContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 

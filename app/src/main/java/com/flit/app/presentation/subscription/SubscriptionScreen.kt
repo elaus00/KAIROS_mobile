@@ -109,7 +109,7 @@ fun SubscriptionContent(
 
             val features = listOf(
                 "AI 그룹 분류" to uiState.features.aiGrouping,
-                "받은함 자동 분류" to uiState.features.inboxClassify,
+                "인박스 자동 분류" to uiState.features.inboxClassify,
                 "의미 검색" to uiState.features.semanticSearch,
                 "노트 재구성" to uiState.features.noteReorganize,
                 "분석 대시보드" to uiState.features.analyticsDashboard,

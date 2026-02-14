@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -88,6 +89,7 @@ fun NotesContent(
         onTrashClick = onTrashClick,
         onReorganizeClick = onReorganizeClick,
         onShareNote = viewModel::shareNote,
+        onSetNoteViewType = viewModel::setNoteViewType,
         modifier = modifier
     )
     }
@@ -107,6 +109,7 @@ internal fun NotesContentInternal(
     onTrashClick: () -> Unit = {},
     onReorganizeClick: () -> Unit = {},
     onShareNote: (NoteWithCapture) -> Unit = {},
+    onSetNoteViewType: (NoteViewType) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -166,7 +169,9 @@ internal fun NotesContentInternal(
                 onTrashClick = onTrashClick,
                 onSearchClick = onSearchClick,
                 onReorganizeClick = onReorganizeClick,
-                showReorganize = uiState.isPremium
+                showReorganize = uiState.isPremium,
+                currentViewType = uiState.viewType,
+                onSetNoteViewType = onSetNoteViewType
             )
 
             // 폴더 필터 칩
@@ -271,9 +276,12 @@ private fun NotesHeader(
     onTrashClick: () -> Unit,
     onSearchClick: () -> Unit,
     onReorganizeClick: () -> Unit = {},
-    showReorganize: Boolean = false
+    showReorganize: Boolean = false,
+    currentViewType: NoteViewType = NoteViewType.LIST,
+    onSetNoteViewType: (NoteViewType) -> Unit = {}
 ) {
     val colors = FlitTheme.colors
+    var showViewTypeMenu by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -313,6 +321,41 @@ private fun NotesHeader(
                     contentDescription = "검색",
                     tint = colors.icon
                 )
+            }
+            // 노트 보기 유형 메뉴
+            Box {
+                IconButton(onClick = { showViewTypeMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "보기 설정",
+                        tint = colors.icon
+                    )
+                }
+                DropdownMenu(
+                    expanded = showViewTypeMenu,
+                    onDismissRequest = { showViewTypeMenu = false }
+                ) {
+                    NoteViewType.entries.forEach { type ->
+                        val label = when (type) {
+                            NoteViewType.LIST -> "리스트"
+                            NoteViewType.GRID -> "그리드"
+                            NoteViewType.COMPACT -> "컴팩트"
+                        }
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = label,
+                                    color = colors.text,
+                                    fontWeight = if (type == currentViewType) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            onClick = {
+                                onSetNoteViewType(type)
+                                showViewTypeMenu = false
+                            }
+                        )
+                    }
+                }
             }
         }
     }

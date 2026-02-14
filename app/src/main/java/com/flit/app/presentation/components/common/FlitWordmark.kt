@@ -36,17 +36,19 @@ enum class FlitWordmarkSize(
     val dotOffset: Dp
 ) {
     /** 히어로 섹션 (64sp) */
-    HERO(64.sp, 11.dp, 3.5.dp, 19.dp),
+    HERO(64.sp, 11.dp, 3.5.dp, 1.5.dp),
     /** 기본 워드마크 (44sp) */
-    DEFAULT(44.sp, 7.5.dp, 2.5.dp, 13.dp),
+    DEFAULT(44.sp, 7.5.dp, 2.5.dp, 1.dp),
     /** 스플래시 화면 (32sp) */
-    SPLASH(32.sp, 5.5.dp, 2.dp, 10.dp),
+    SPLASH(32.sp, 5.5.dp, 2.dp, 1.dp),
     /** 헤더/설정 (28sp) */
-    HEADER(28.sp, 5.dp, 1.5.dp, 8.dp),
+    HEADER(28.sp, 5.dp, 1.5.dp, 1.dp),
+    /** 홈 앱바 (24sp) */
+    TITLE(24.sp, 4.dp, 1.25.dp, 0.5.dp),
     /** 네비게이션/앱바 (20sp) */
-    NAVIGATION(20.sp, 3.5.dp, 1.dp, 6.dp),
+    NAVIGATION(20.sp, 3.5.dp, 1.dp, 0.5.dp),
     /** 최소 크기 (14sp) */
-    MINIMUM(14.sp, 2.5.dp, 0.5.dp, 4.dp)
+    MINIMUM(14.sp, 2.5.dp, 0.5.dp, 0.5.dp)
 }
 
 /**

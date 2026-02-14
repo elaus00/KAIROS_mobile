@@ -8,8 +8,8 @@ import java.time.YearMonth
  * CalendarScreen UI 상태
  */
 data class CalendarUiState(
-    // 선택된 날짜
-    val selectedDate: LocalDate = LocalDate.now(),
+    // 선택된 날짜 (null = 선택 없음, 다른 달 탐색 시)
+    val selectedDate: LocalDate? = LocalDate.now(),
 
     // 현재 표시 중인 월
     val currentMonth: YearMonth = YearMonth.now(),

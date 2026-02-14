@@ -20,9 +20,9 @@ data class SettingsUiState(
     // 에러 메시지
     val errorMessage: String? = null,
 
-    // 디버그: 이미지 캡처 제출 상태
-    val debugSubmitting: Boolean = false,
-    val debugResult: String? = null,
+    // 이미지 내보내기 상태
+    val isExporting: Boolean = false,
+    val exportResult: String? = null,
 
     val calendarAuthMessage: String? = null,
 

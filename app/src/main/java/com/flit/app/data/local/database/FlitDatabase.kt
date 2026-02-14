@@ -88,7 +88,7 @@ abstract class FlitDatabase : RoomDatabase() {
                 db.execSQL(
                     """
                     INSERT OR IGNORE INTO folders (id, name, type, sort_order, created_at)
-                    VALUES ('system-inbox', '받은함', 'INBOX', 0, $now)
+                    VALUES ('system-inbox', '인박스', 'INBOX', 0, $now)
                     """.trimIndent()
                 )
                 db.execSQL(

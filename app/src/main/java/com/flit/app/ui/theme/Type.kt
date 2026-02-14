@@ -2,8 +2,10 @@ package com.flit.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.flit.app.R
@@ -19,8 +21,15 @@ val FlitWritingFontFamily = FontFamily.Serif
  * Sora 가변 폰트 (Google Fonts, OFL 라이선스)
  * 브랜드 워드마크 전용 — 기하학적 산세리프, weight 480 사용
  */
+@OptIn(ExperimentalTextApi::class)
 val SoraFontFamily = FontFamily(
-    Font(R.font.sora_variable)
+    Font(
+        R.font.sora_variable,
+        weight = FontWeight(480),
+        variationSettings = FontVariation.Settings(
+            FontVariation.weight(480)
+        )
+    )
 )
 
 // Flit 앱 타이포그래피 정의 (UI용 — 기본 시스템 고딕)

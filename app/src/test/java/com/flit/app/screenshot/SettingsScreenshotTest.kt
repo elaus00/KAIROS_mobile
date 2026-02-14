@@ -44,8 +44,8 @@ class SettingsScreenshotTest {
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onDebugSubmitImage = {},
-                    onDismissDebugResult = {},
+                    onExportCaptureImages = {},
+                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }
@@ -83,8 +83,8 @@ class SettingsScreenshotTest {
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onDebugSubmitImage = {},
-                    onDismissDebugResult = {},
+                    onExportCaptureImages = {},
+                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }
@@ -114,8 +114,8 @@ class SettingsScreenshotTest {
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onDebugSubmitImage = {},
-                    onDismissDebugResult = {},
+                    onExportCaptureImages = {},
+                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }

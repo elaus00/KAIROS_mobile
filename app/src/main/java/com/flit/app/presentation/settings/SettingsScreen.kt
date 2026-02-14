@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.BuildConfig
 import com.flit.app.domain.model.FontSizePreference
-import com.flit.app.domain.model.NoteViewType
 import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.presentation.components.common.SectionHeader
@@ -100,8 +98,8 @@ fun SettingsScreen(
             )
         },
         onLogout = viewModel::logout,
-        onDebugSubmitImage = viewModel::debugSubmitImage,
-        onDismissDebugResult = viewModel::dismissDebugResult,
+        onExportCaptureImages = viewModel::exportCaptureImages,
+        onDismissExportResult = viewModel::dismissExportResult,
         onDismissCalendarAuthMessage = viewModel::dismissCalendarAuthMessage
     )
 }
@@ -128,8 +126,8 @@ fun SettingsContent(
     onToggleCalendar: (Boolean) -> Unit,
     onRequestCalendarPermission: () -> Unit,
     onLogout: () -> Unit,
-    onDebugSubmitImage: (Uri) -> Unit,
-    onDismissDebugResult: () -> Unit,
+    onExportCaptureImages: () -> Unit = {},
+    onDismissExportResult: () -> Unit = {},
     onDismissCalendarAuthMessage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -261,48 +259,6 @@ fun SettingsContent(
                     onClick = { onSetCaptureFontSize(FontSizePreference.LARGE.name) }
                 )
 
-                // 굵은 구분선 (글씨 크기 ↔ 노트 보기)
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = 1.dp,
-                    color = colors.border
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 노트 보기 라벨
-                Text(
-                    text = "노트 보기",
-                    color = colors.textMuted,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-
-                ThemeOptionItem(
-                    title = "리스트",
-                    description = "확장 가능한 카드 목록",
-                    isSelected = uiState.noteViewType == NoteViewType.LIST.name,
-                    onClick = { onSetNoteViewType(NoteViewType.LIST.name) }
-                )
-
-                SettingsDivider()
-
-                ThemeOptionItem(
-                    title = "그리드",
-                    description = "2열 카드",
-                    isSelected = uiState.noteViewType == NoteViewType.GRID.name,
-                    onClick = { onSetNoteViewType(NoteViewType.GRID.name) }
-                )
-
-                SettingsDivider()
-
-                ThemeOptionItem(
-                    title = "컴팩트",
-                    description = "제목만 표시",
-                    isSelected = uiState.noteViewType == NoteViewType.COMPACT.name,
-                    onClick = { onSetNoteViewType(NoteViewType.COMPACT.name) }
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -469,12 +425,52 @@ fun SettingsContent(
                 )
 
                 SettingsCard {
-                    DebugImageUploadItem(
-                        isSubmitting = uiState.debugSubmitting,
-                        result = uiState.debugResult,
-                        onImageSelected = { uri -> onDebugSubmitImage(uri) },
-                        onDismissResult = onDismissDebugResult
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clickable(enabled = !uiState.isExporting) { onExportCaptureImages() }
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "이미지 내보내기",
+                                    color = colors.text,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "캡처 이미지를 Downloads/Flit/으로 복사",
+                                    color = colors.textMuted,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            if (uiState.isExporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = colors.textMuted
+                                )
+                            }
+                        }
+
+                        // 결과 표시
+                        if (uiState.exportResult != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = uiState.exportResult,
+                                color = if (uiState.exportResult.startsWith("실패")) colors.danger else colors.success,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
                 }
             }
 
@@ -541,8 +537,8 @@ private fun SettingsContentPreview() {
             onToggleCalendar = {},
             onRequestCalendarPermission = {},
             onLogout = {},
-            onDebugSubmitImage = {},
-            onDismissDebugResult = {},
+            onExportCaptureImages = {},
+            onDismissExportResult = {},
             onDismissCalendarAuthMessage = {}
         )
     }
@@ -598,74 +594,3 @@ private fun ThemeOptionItem(
     }
 }
 
-/**
- * 디버그: 이미지 업로드 테스트 아이템
- * 갤러리에서 이미지를 선택하면 캡처로 제출
- */
-@Composable
-private fun DebugImageUploadItem(
-    isSubmitting: Boolean,
-    result: String?,
-    onImageSelected: (Uri) -> Unit,
-    onDismissResult: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = FlitTheme.colors
-
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        uri?.let { onImageSelected(it) }
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable(enabled = !isSubmitting) {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-            }
-            .padding(horizontal = 16.dp, vertical = 14.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "이미지 캡처 테스트",
-                    color = colors.text,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "갤러리에서 이미지를 선택하여 캡처로 제출",
-                    color = colors.textMuted,
-                    fontSize = 13.sp
-                )
-            }
-
-            if (isSubmitting) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = colors.textMuted
-                )
-            }
-        }
-
-        // 결과 표시
-        if (result != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = result,
-                color = if (result.startsWith("실패")) colors.danger else colors.success,
-                fontSize = 12.sp
-            )
-        }
-    }
-}

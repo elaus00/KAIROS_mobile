@@ -366,7 +366,7 @@ private fun CaptureTopBar(
     ) {
         // 왼쪽: 브랜드 워드마크
         FlitWordmark(
-            size = FlitWordmarkSize.NAVIGATION,
+            size = FlitWordmarkSize.TITLE,
             color = colors.text
         )
 
@@ -537,7 +537,7 @@ private fun CaptureToolBar(
         modifier = Modifier
             .fillMaxWidth()
             .imePadding()
-            .padding(start = horizontalPadding, end = horizontalPadding, top = 8.dp, bottom = 4.dp),
+            .padding(start = horizontalPadding, end = horizontalPadding, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

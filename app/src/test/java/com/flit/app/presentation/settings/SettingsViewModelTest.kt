@@ -4,10 +4,8 @@ import android.content.Context
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.CalendarRepository
-import com.flit.app.domain.repository.ImageRepository
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
-import com.flit.app.domain.usecase.capture.SubmitCaptureUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
 import com.flit.app.util.MainDispatcherRule
@@ -42,8 +40,6 @@ class SettingsViewModelTest {
     private lateinit var calendarRepository: CalendarRepository
     private lateinit var getCalendarSettingsUseCase: GetCalendarSettingsUseCase
     private lateinit var setCalendarSettingsUseCase: SetCalendarSettingsUseCase
-    private lateinit var submitCaptureUseCase: SubmitCaptureUseCase
-    private lateinit var imageRepository: ImageRepository
     private lateinit var authRepository: AuthRepository
     private lateinit var subscriptionRepository: SubscriptionRepository
 
@@ -54,8 +50,6 @@ class SettingsViewModelTest {
         calendarRepository = mockk(relaxed = true)
         getCalendarSettingsUseCase = mockk(relaxed = true)
         setCalendarSettingsUseCase = mockk(relaxed = true)
-        submitCaptureUseCase = mockk(relaxed = true)
-        imageRepository = mockk(relaxed = true)
         authRepository = mockk(relaxed = true)
         subscriptionRepository = mockk(relaxed = true)
         every { calendarRepository.isCalendarPermissionGranted() } returns true
@@ -74,8 +68,6 @@ class SettingsViewModelTest {
             calendarRepository,
             getCalendarSettingsUseCase,
             setCalendarSettingsUseCase,
-            submitCaptureUseCase,
-            imageRepository,
             authRepository,
             subscriptionRepository
         )

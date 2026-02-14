@@ -26,6 +26,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -122,6 +124,8 @@ fun MainContent(
     val scope = rememberCoroutineScope()
     val colors = FlitTheme.colors
     val snackbarHostState = remember { SnackbarHostState() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     // Pager 상태 (HOME이 가운데 = index 1)
     val pagerState = rememberPagerState(
@@ -132,6 +136,17 @@ fun MainContent(
     // 현재 선택된 탭
     val currentTab by remember {
         derivedStateOf { FlitTab.entries[pagerState.currentPage] }
+    }
+
+    // 페이지 스크롤 시 키보드 숨기기 + 포커스 해제
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.isScrollInProgress }
+            .collect { scrolling ->
+                if (scrolling) {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            }
     }
 
     Scaffold(
@@ -153,6 +168,7 @@ fun MainContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             // 오프라인 배너
             AnimatedVisibility(
