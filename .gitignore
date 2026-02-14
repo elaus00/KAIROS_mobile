@@ -3,6 +3,7 @@
 /local.properties
 /.idea/
 .DS_Store
+.claude/.direct-impl
 /build
 **/build/
 /captures
