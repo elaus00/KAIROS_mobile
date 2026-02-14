@@ -1,5 +1,7 @@
 package com.flit.app.data.repository
 
+import android.util.Log
+import com.flit.app.BuildConfig
 import com.flit.app.data.local.database.dao.TodoDao
 import com.flit.app.data.mapper.TodoMapper
 import com.flit.app.domain.model.Todo
@@ -47,7 +49,18 @@ class TodoRepositoryImpl @Inject constructor(
 
     override suspend fun toggleCompletion(todoId: String) {
         val now = System.currentTimeMillis()
+        val before = todoDao.getById(todoId)
+        logDebug(
+            "toggleCompletion start todoId=$todoId, now=$now, beforeExists=${before != null}, " +
+                "beforeDone=${before?.isCompleted}, beforeUpdatedAt=${before?.updatedAt}"
+        )
         todoDao.toggleCompletion(todoId, now, now)
+        val after = todoDao.getById(todoId)
+        logDebug(
+            "toggleCompletion end todoId=$todoId, afterExists=${after != null}, " +
+                "afterDone=${after?.isCompleted}, afterUpdatedAt=${after?.updatedAt}, " +
+                "afterCompletedAt=${after?.completedAt}"
+        )
     }
 
     override suspend fun updateSortOrder(todoId: String, sortOrder: Int, sortSource: String) {
@@ -60,5 +73,13 @@ class TodoRepositoryImpl @Inject constructor(
 
     override suspend fun deleteByCaptureId(captureId: String) {
         todoDao.deleteByCaptureId(captureId)
+    }
+}
+
+private const val TODO_REPOSITORY_TAG = "TodoRepositoryTrace"
+
+private fun logDebug(message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(TODO_REPOSITORY_TAG, message)
     }
 }
