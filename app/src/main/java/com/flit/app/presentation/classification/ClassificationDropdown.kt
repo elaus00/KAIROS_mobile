@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -37,14 +38,14 @@ fun ClassificationDropdown(
         // 현재 분류 칩
         Row(
             modifier = Modifier
+                .defaultMinSize(minHeight = 36.dp)  // 36dp 높이
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.chipBg)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) { expanded = true }
-                .defaultMinSize(minHeight = 48.dp)
-                .padding(horizontal = 12.dp, vertical = 4.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),  // FlitChip과 일관성
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {

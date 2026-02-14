@@ -469,7 +469,7 @@ private fun FolderFilterChips(
             // 새 폴더 추가 버튼
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(36.dp)  // FlitChip과 일관성
                     .clip(RoundedCornerShape(10.dp))
                     .background(colors.chipBg)
                     .clickable { onCreateFolder() },

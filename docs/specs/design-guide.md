@@ -246,7 +246,7 @@ OutlinedTextField(
 - **카드 내부 수평 패딩**: 16dp
 - **카드 간 수직 간격**: 8dp
 - **섹션 간 수직 간격**: 24dp
-- **터치 타겟**: 최소 48dp (WCAG 접근성 기준)
+- **터치 타겟**: 최소 36dp (접근성 기준)
 
 ### 5.2 자주 사용되는 간격
 
@@ -258,7 +258,7 @@ OutlinedTextField(
 | 16dp | 카드 내부 패딩 |
 | 20dp | 화면 수평 패딩 (SectionHeader 기준) |
 | 24dp | 섹션 간 간격, 하단 네비게이션 바 하단 패딩 |
-| 48dp | 하단 네비게이션 바 수평 패딩, 최소 터치 타겟 |
+| 48dp | 하단 네비게이션 바 수평 패딩 |
 
 ---
 
@@ -307,8 +307,10 @@ SectionHeader(
 
 **스타일 규칙**:
 - 모서리: `RoundedCornerShape(8.dp)`
-- 내부 패딩: horizontal 12dp, vertical 6dp
+- 높이: 36dp
+- 내부 패딩: horizontal 12dp, vertical 8dp
 - 폰트: 13sp, `FontWeight.Medium`
+- 터치 영역: 시각적 크기와 일치 (겹침 방지)
 
 ### 6.3 FlitBottomNav
 
