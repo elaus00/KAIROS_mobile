@@ -177,8 +177,10 @@ private fun DraggableTaskList(
                                     // 아래로 드래그
                                     for (i in currentIndex + 1 until currentList.size) {
                                         val itemHeight = itemHeights[currentList[i].todoId] ?: 60f
-                                        accumulatedOffset += itemHeight + spacingPx
-                                        if (dragOffsetY >= accumulatedOffset) {
+                                        val slotHeight = itemHeight + spacingPx
+                                        accumulatedOffset += slotHeight
+                                        // 중간(50%)을 넘으면 스왑
+                                        if (dragOffsetY >= accumulatedOffset - slotHeight / 2) {
                                             targetIndex = i
                                         } else {
                                             break
@@ -188,8 +190,10 @@ private fun DraggableTaskList(
                                     // 위로 드래그
                                     for (i in currentIndex - 1 downTo 0) {
                                         val itemHeight = itemHeights[currentList[i].todoId] ?: 60f
-                                        accumulatedOffset -= itemHeight + spacingPx
-                                        if (dragOffsetY <= accumulatedOffset) {
+                                        val slotHeight = itemHeight + spacingPx
+                                        accumulatedOffset -= slotHeight
+                                        // 중간(50%)을 넘으면 스왑
+                                        if (dragOffsetY <= accumulatedOffset + slotHeight / 2) {
                                             targetIndex = i
                                         } else {
                                             break
