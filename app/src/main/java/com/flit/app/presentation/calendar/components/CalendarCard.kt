@@ -66,11 +66,13 @@ import kotlin.math.roundToInt
 fun CalendarCard(
     selectedDate: LocalDate?,
     currentMonth: YearMonth,
+    weekReference: LocalDate? = null,
     datesWithSchedules: Set<LocalDate> = emptySet(),
     isExpanded: Boolean,
     onDateSelected: (LocalDate) -> Unit,
     onToggleExpand: () -> Unit,
     onMonthChange: (YearMonth) -> Unit = {},
+    onWeekChange: (LocalDate) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -78,13 +80,13 @@ fun CalendarCard(
     val scope = rememberCoroutineScope()
 
     // 주간 뷰에서 표시할 기준 날짜 (주차 결정용)
-    val weekReferenceDate = selectedDate
+    val weekReferenceDate = weekReference ?: selectedDate
         ?: if (YearMonth.from(today) == currentMonth) today
         else currentMonth.atDay(1)
 
     // pointerInput 내부에서 최신 값을 참조하기 위한 State
     val currentWeekRef by rememberUpdatedState(weekReferenceDate)
-    val currentSelectedDate by rememberUpdatedState(selectedDate)
+    val latestOnWeekChange by rememberUpdatedState(onWeekChange)
 
     // 스와이프 제스처 감지용 누적값
     var dragAmountX by remember { mutableFloatStateOf(0f) }
@@ -160,8 +162,7 @@ fun CalendarCard(
                                             )
                                         ) { value, _ -> weekDragOffsetX = value }
                                         weekDragOffsetX = 0f
-                                        val ref = currentSelectedDate ?: currentWeekRef
-                                        onDateSelected(ref.plusWeeks(deltaWeek))
+                                        latestOnWeekChange(currentWeekRef.plusWeeks(deltaWeek))
                                     } else {
                                         animate(
                                             initialValue = weekDragOffsetX,

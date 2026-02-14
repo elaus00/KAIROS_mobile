@@ -45,7 +45,7 @@ interface ScheduleDao {
         SELECT s.* FROM schedules s
         INNER JOIN captures c ON c.id = s.capture_id
         WHERE s.start_time >= :startOfDay
-        AND s.start_time < :endOfDay
+        AND s.start_time <= :endOfDay
         AND c.is_deleted = 0
         AND c.is_trashed = 0
         ORDER BY s.start_time ASC
@@ -68,10 +68,10 @@ interface ScheduleDao {
 
     /**
      * 일정이 있는 날짜 목록 조회 (캘린더 점 표시용)
-     * start_time을 epoch day로 변환하여 distinct
+     * start_time ms 반환 → 호출측에서 타임존 변환
      */
     @Query("""
-        SELECT DISTINCT (s.start_time / 86400000) AS epoch_day
+        SELECT DISTINCT s.start_time
         FROM schedules s
         INNER JOIN captures c ON c.id = s.capture_id
         WHERE s.start_time >= :startTime

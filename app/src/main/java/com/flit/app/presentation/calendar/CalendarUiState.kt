@@ -11,6 +11,9 @@ data class CalendarUiState(
     // 선택된 날짜 (null = 선택 없음, 다른 달 탐색 시)
     val selectedDate: LocalDate? = LocalDate.now(),
 
+    // 주간 뷰 기준 날짜 (null = selectedDate 또는 오늘에서 파생)
+    val weekReference: LocalDate? = null,
+
     // 현재 표시 중인 월
     val currentMonth: YearMonth = YearMonth.now(),
 
@@ -118,6 +121,8 @@ sealed interface CalendarEvent {
     data object DismissEditSchedule : CalendarEvent
     /** 일정 드래그 순서 변경 (메모리 전용) */
     data class ReorderSchedules(val scheduleIds: List<String>) : CalendarEvent
+    /** 주간 뷰 주차 이동 (선택 변경 없이) */
+    data class NavigateWeek(val referenceDate: LocalDate) : CalendarEvent
 }
 
 /**

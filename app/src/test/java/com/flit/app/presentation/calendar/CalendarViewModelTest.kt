@@ -153,11 +153,15 @@ class CalendarViewModelTest {
 
     @Test
     fun `init_loads_dates_with_schedules`() = runTest {
-        // Given: epochDay 리스트 반환
-        val epochDay = LocalDate.of(2026, 2, 7).toEpochDay()
+        // Given: start_time ms 반환 (로컬 타임존 기준 2026-02-07 12:00)
+        val startTimeMs = LocalDate.of(2026, 2, 7)
+            .atTime(12, 0)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
 
         every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
-        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(epochDay))
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(listOf(startTimeMs))
         every { todoRepository.getActiveTodos() } returns flowOf(emptyList())
         every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
 
@@ -169,7 +173,7 @@ class CalendarViewModelTest {
         )
         advanceUntilIdle()
 
-        // Then: LocalDate 세트로 변환됨
+        // Then: 로컬 타임존 기준 LocalDate 세트로 변환됨
         val dates = viewModel.uiState.value.datesWithSchedules
         assertTrue(dates.contains(LocalDate.of(2026, 2, 7)))
     }

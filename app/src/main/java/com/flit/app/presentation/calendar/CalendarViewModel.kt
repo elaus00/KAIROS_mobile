@@ -90,14 +90,31 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.EditSchedule -> editSchedule(event)
             is CalendarEvent.DismissEditSchedule -> dismissEditSchedule()
             is CalendarEvent.ReorderSchedules -> reorderSchedules(event.scheduleIds)
+            is CalendarEvent.NavigateWeek -> navigateWeek(event.referenceDate)
         }
+    }
+
+    /**
+     * 주간 뷰 주차 이동 (선택 없이)
+     * 오늘이 포함된 주로 돌아오면 오늘 자동 선택
+     */
+    private fun navigateWeek(referenceDate: LocalDate) {
+        val today = LocalDate.now()
+        val startOfWeek = referenceDate.minusDays(referenceDate.dayOfWeek.value.toLong() % 7)
+        val endOfWeek = startOfWeek.plusDays(6)
+        if (today in startOfWeek..endOfWeek) {
+            _uiState.update { it.copy(selectedDate = today, weekReference = null) }
+        } else {
+            _uiState.update { it.copy(selectedDate = null, weekReference = referenceDate) }
+        }
+        loadSchedulesForSelectedDate()
     }
 
     /**
      * 날짜 선택
      */
     private fun selectDate(date: LocalDate) {
-        _uiState.update { it.copy(selectedDate = date) }
+        _uiState.update { it.copy(selectedDate = date, weekReference = null) }
         loadSchedulesForSelectedDate()
 
         // 선택된 날짜가 다른 월이면 월도 변경
@@ -115,7 +132,7 @@ class CalendarViewModel @Inject constructor(
     private fun changeMonth(yearMonth: YearMonth) {
         val today = LocalDate.now()
         val newSelectedDate = if (YearMonth.from(today) == yearMonth) today else null
-        _uiState.update { it.copy(selectedDate = newSelectedDate, currentMonth = yearMonth) }
+        _uiState.update { it.copy(selectedDate = newSelectedDate, currentMonth = yearMonth, weekReference = null) }
         loadSchedulesForSelectedDate()
         loadDatesWithSchedules()
     }
@@ -338,11 +355,11 @@ class CalendarViewModel @Inject constructor(
 
             scheduleRepository.getDatesWithSchedules(startMs, endMs)
                 .catch { /* 에러 무시 */ }
-                .collect { epochDays ->
-                    // epoch day → LocalDate 변환
-                    val dates = epochDays.mapNotNull { epochDay ->
+                .collect { startTimes ->
+                    // start_time ms → 로컬 타임존 기준 LocalDate 변환
+                    val dates = startTimes.mapNotNull { ms ->
                         try {
-                            LocalDate.ofEpochDay(epochDay)
+                            Instant.ofEpochMilli(ms).atZone(zone).toLocalDate()
                         } catch (_: Exception) {
                             null
                         }

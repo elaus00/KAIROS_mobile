@@ -137,11 +137,13 @@ fun CalendarContentBody(
             CalendarCard(
                 selectedDate = uiState.selectedDate,
                 currentMonth = uiState.currentMonth,
+                weekReference = uiState.weekReference,
                 datesWithSchedules = uiState.datesWithSchedules,
                 isExpanded = uiState.isMonthExpanded,
                 onDateSelected = { date -> onEvent(CalendarEvent.SelectDate(date)) },
                 onToggleExpand = { onEvent(CalendarEvent.ToggleMonthExpand) },
                 onMonthChange = { yearMonth -> onEvent(CalendarEvent.ChangeMonth(yearMonth)) },
+                onWeekChange = { refDate -> onEvent(CalendarEvent.NavigateWeek(refDate)) },
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
