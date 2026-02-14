@@ -26,12 +26,37 @@ presentation/ → domain/ → data/ (단방향 의존)
 - Domain Layer: 순수 Kotlin (Android 의존성 없음)
 - DTO: data/remote/dto/, Entity: data/local/database/entities/
 
+## Product Flavors (환경별 빌드)
+
+서버의 3단계 환경과 매핑되는 Product Flavors:
+
+| Flavor | API 엔드포인트 | Application ID | 앱 이름 | 용도 |
+|--------|---------------|----------------|---------|------|
+| `dev` | kairos-flit-server-dev | `app.flit.mobile.dev` | Flit (Dev) | 개발/디버깅 |
+| `staging` | kairos-flit-server-staging | `app.flit.mobile.staging` | Flit (Staging) | QA/내부 테스트 |
+| `production` | api.flit.app | `app.flit.mobile` | Flit | Play Store 배포 |
+
+**활성화된 Build Variants**:
+- `devDebug` - 개발 환경 디버깅
+- `stagingRelease` - QA/내부 테스터 배포
+- `productionRelease` - Play Store 배포
+- `productionBenchmark` - 성능 벤치마크
+
+**동시 설치**: applicationId가 다르므로 dev/staging/production 앱을 한 기기에 동시 설치 가능
+
 ## Commands
 
 ```bash
-./gradlew testDebugUnitTest        # 유닛 테스트
-./gradlew :app:compileDebugKotlin  # 컴파일 체크
-./gradlew assembleDebug            # APK 빌드
+# 유닛 테스트
+./gradlew testDebugUnitTest
+
+# 환경별 빌드
+./gradlew :app:assembleDevDebug              # 개발 환경
+./gradlew :app:assembleStagingRelease        # 스테이징 환경
+./gradlew :app:assembleProductionRelease     # 프로덕션 환경
+
+# APK/AAB 생성
+./gradlew :app:bundleProductionRelease       # Play Store AAB
 
 # 스크린샷 테스트 (Roborazzi)
 ./gradlew :app:testDebugUnitTest --tests "com.flit.app.screenshot.*"  # 전체 스크린샷 테스트

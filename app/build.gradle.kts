@@ -54,13 +54,68 @@ android {
         }
     }
 
-    buildTypes {
-        debug {
-            // 기본값은 Android 에뮬레이터(localhost -> 10.0.2.2)
-            // 필요 시 -PFLIT_API_BASE_URL=https://... 로 오버라이드 가능
-            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"https://kairos-flit-server-dev-507341941644.asia-northeast3.run.app/api/v1\""
+            )
             buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+        }
+
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"https://kairos-flit-server-staging-507341941644.asia-northeast3.run.app/api/v1\""
+            )
+            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+        }
+
+        create("production") {
+            dimension = "environment"
+            // applicationIdSuffix 없음 (프로덕션은 기본 ID 유지)
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"https://api.flit.app/api/v1\""
+            )
+            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
+            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+        }
+    }
+
+    // 불필요한 variant 필터링 (devDebug, stagingRelease, productionRelease, productionBenchmark만 활성화)
+    androidComponents {
+        beforeVariants { variantBuilder ->
+            val flavor = variantBuilder.productFlavors.firstOrNull()?.second
+            val buildType = variantBuilder.buildType
+
+            // 비활성화할 조합
+            variantBuilder.enable = when {
+                flavor == "dev" && buildType == "release" -> false          // devRelease 비활성화
+                flavor == "dev" && buildType == "benchmark" -> false        // devBenchmark 비활성화
+                flavor == "staging" && buildType == "debug" -> false        // stagingDebug 비활성화
+                flavor == "staging" && buildType == "benchmark" -> false    // stagingBenchmark 비활성화
+                flavor == "production" && buildType == "debug" -> false     // productionDebug 비활성화
+                else -> true  // 나머지는 활성화 (devDebug, stagingRelease, productionRelease, productionBenchmark)
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         create("benchmark") {
@@ -68,9 +123,6 @@ android {
             matchingFallbacks += listOf("release")
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = false
-            buildConfigField("String", "API_BASE_URL", "\"$benchmarkApiBaseUrl\"")
-            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
-            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
@@ -81,9 +133,6 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            buildConfigField("String", "API_BASE_URL", "\"https://api.flit.app/api/v1\"")
-            buildConfigField("String", "GOOGLE_ANDROID_CLIENT_ID", "\"$googleAndroidClientId\"")
-            buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
         }
     }
