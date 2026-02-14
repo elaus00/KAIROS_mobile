@@ -1,8 +1,10 @@
 package com.flit.app.presentation.settings
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -426,6 +429,24 @@ fun SettingsContent(
                 NavigationSettingItem(
                     title = "이용약관",
                     onClick = onNavigateToTermsOfService
+                )
+
+                SettingsDivider()
+
+                val context = LocalContext.current
+                NavigationSettingItem(
+                    title = "의견 보내기",
+                    description = "버그 신고, 기능 제안, 사용 후기",
+                    onClick = {
+                        val subject = "[Flit.] v${BuildConfig.VERSION_NAME} / ${Build.MODEL} / Android ${Build.VERSION.RELEASE}"
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:elaus.dev@gmail.com")
+                            putExtra(Intent.EXTRA_SUBJECT, subject)
+                        }
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: Exception) { }
+                    }
                 )
 
                 SettingsDivider()
