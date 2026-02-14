@@ -93,6 +93,51 @@ presentation/ → domain/ → data/ (단방향 의존)
 
 **참고**: API Base URL은 빌드 설정 또는 환경 변수로 관리
 
+## 워크플로우
+
+### 일상 개발
+```bash
+# 1. develop 브랜치에서 작업
+git checkout develop
+# ... 코드 작성 ...
+git add . && git commit -m "feat: 새 기능"
+git push origin develop
+
+# 2. Android Studio에서 devDebug 빌드로 테스트
+#    (Build Variants 창에서 선택 또는 Git hook으로 자동 선택)
+```
+
+### QA/스테이징 테스트
+```bash
+# 1. release 브랜치 생성
+git checkout -b release/v2.1.0
+git push origin release/v2.1.0
+
+# 2. stagingRelease 빌드로 테스트
+#    → 서버 staging 환경과 연동
+```
+
+### 프로덕션 배포
+```bash
+# 1. master에 머지
+git checkout master
+git merge release/v2.1.0
+git push origin master
+
+# 2. productionRelease 빌드로 Play Store 배포
+```
+
+### Build Variant 자동 전환
+Claude hook이 브랜치에 맞는 Build Variant를 자동으로 설정:
+- `develop` → `devDebug`
+- `release/*` → `stagingRelease`
+- `master` → `productionRelease`
+- `feature/*` → `devDebug` (기본값)
+
+**동작 방식**: Claude와 대화를 시작할 때마다 현재 브랜치를 확인하고 `.idea/gradle.xml`의 Build Variant를 자동 변경합니다.
+
+Hook 위치: `.claude/hooks/user-prompt-submit-hook.sh`
+
 ## Code Style
 
 - 주석: 한글 필수
