@@ -7,6 +7,11 @@
 /* --- 폰트 임포트 --------------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;480;500;600&display=swap');
 
+/* --- 1. 부드러운 스크롤 --------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
 /* --- CSS 변수 (Flit 디자인 토큰) ----------------------------------------- */
 
 /* 라이트 테마 */
@@ -19,15 +24,16 @@
 
   --flit-bg: #FAFAFA;
   --flit-card: #FFFFFF;
-  --flit-border: #EEEEEE;
+  --flit-border: #E5E5E5;
   --flit-text: #111111;
   --flit-text-secondary: #888888;
   --flit-text-muted: #737373;
-  --flit-divider: #F0F0F0;
+  --flit-divider: #E0E0E0;
   --flit-chip-bg: #F0F0F0;
   --flit-accent-bg: #F5F5F5;
   --flit-sidebar-bg: #F7F7F7;
   --flit-icon: #555555;
+  --flit-header-text: #111111;
 }
 
 /* 다크 테마 */
@@ -50,6 +56,7 @@
   --flit-accent-bg: #252525;
   --flit-sidebar-bg: #141414;
   --flit-icon: #AAAAAA;
+  --flit-header-text: rgba(255, 255, 255, 0.8);
 }
 
 /* --- 전역 타이포그래피 ---------------------------------------------------- */
@@ -64,7 +71,6 @@ body {
   line-height: 1.7;
 }
 
-/* 헤딩: Sora (브랜드 폰트) */
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3,
@@ -79,52 +85,62 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* --- 헤더 ---------------------------------------------------------------- */
+/* --- 2. 헤더 — 아이콘/로고 색상 수정 ------------------------------------- */
 
 .md-header {
   background-color: var(--flit-card);
   box-shadow: 0 1px 0 var(--flit-border);
+  color: var(--flit-header-text);
 }
 
 .md-header__title {
   font-family: 'Sora', sans-serif;
   font-weight: 480;
   letter-spacing: 0.02em;
+  color: var(--flit-header-text);
 }
 
-/* --- 1. 왼쪽 사이드바 ----------------------------------------------------- */
-
-.md-sidebar--primary .md-sidebar__inner {
-  padding: 0.6rem;
+/* 헤더 내 모든 아이콘 버튼 (검색, 테마 토글, 레포 링크 등) */
+.md-header .md-header__button {
+  color: var(--flit-header-text);
 }
 
-/* 사이드바 컨테이너 레이어 */
-.md-sidebar--primary .md-nav--primary {
-  background: var(--flit-sidebar-bg);
-  border-radius: 12px;
-  padding: 0.8rem 0.6rem;
-  border: 1px solid var(--flit-border);
+.md-header .md-header__button:hover {
+  opacity: 0.7;
 }
 
-/* 섹션 레이블 (제품 방향, 인사이트, ...) — 들여쓰기 없이 크기만 구분 */
+/* 헤더 내 레포 아이콘 */
+.md-header .md-source {
+  color: var(--flit-header-text);
+}
+
+/* 검색바 */
+.md-search__input {
+  color: var(--flit-text);
+}
+
+/* --- 왼쪽 사이드바 -------------------------------------------------------- */
+
+/* 섹션 레이블 (제품 방향, 인사이트, ...) */
 .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link {
   font-family: 'Sora', sans-serif;
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--flit-text);
-  padding: 0.6rem 0.4rem 0.3rem;
+  padding: 0.6rem 0.6rem 0.3rem;
   margin-top: 0.8rem;
+  border-bottom: 1px solid var(--flit-divider);
 }
 
 .md-nav--primary > .md-nav__list > .md-nav__item--nested:first-child > .md-nav__link {
   margin-top: 0;
 }
 
-/* 하위 문서 링크 — 들여쓰기 제거, 패딩으로만 처리 */
+/* 하위 문서 링크 */
 .md-nav--primary .md-nav--nested .md-nav__link {
   font-size: 0.64rem;
   color: var(--flit-text-secondary);
-  padding-left: 0.4rem;
+  padding-left: 0.6rem;
 }
 
 .md-nav--primary .md-nav--nested .md-nav__link:hover,
@@ -137,10 +153,10 @@ body {
   margin-left: 0;
 }
 
-/* --- 2. 오른쪽 사이드바: TOC 레이어 --------------------------------------- */
+/* --- 4. 오른쪽 사이드바: TOC — transparent 요소 제거 ----------------------- */
 
 .md-sidebar--secondary .md-sidebar__inner {
-  padding: 0.6rem;
+  padding-right: 0.6rem;
 }
 
 /* TOC 컨테이너 */
@@ -151,7 +167,7 @@ body {
   border: 1px solid var(--flit-border);
 }
 
-/* "목차" 타이틀 — 배경 제거 */
+/* "목차" 타이틀 — 배경을 sidebar-bg로 통일 (transparent 제거) */
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {
   font-family: 'Sora', sans-serif;
   font-size: 0.62rem;
@@ -159,13 +175,14 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--flit-text-muted);
-  background: none;
-  box-shadow: none;
+  background: var(--flit-sidebar-bg);
+  box-shadow: 0 0 0.4rem 0.4rem var(--flit-sidebar-bg);
   padding: 0 0.4rem 0.4rem;
   margin-bottom: 0.4rem;
   border-bottom: 1px solid var(--flit-divider);
 }
 
+/* TOC 링크 */
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
   font-size: 0.64rem;
   color: var(--flit-text-secondary);
@@ -182,7 +199,6 @@ body {
   max-width: 52rem;
 }
 
-/* 코드 블록 */
 .md-typeset code {
   background: var(--flit-chip-bg);
   border-radius: 4px;
@@ -195,7 +211,6 @@ body {
   border: 1px solid var(--flit-border);
 }
 
-/* 테이블 */
 .md-typeset table:not([class]) {
   border: 1px solid var(--flit-border);
   border-radius: 8px;
@@ -211,12 +226,10 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* 구분선 */
 .md-typeset hr {
   border-color: var(--flit-divider);
 }
 
-/* 링크 */
 .md-typeset a {
   color: var(--flit-text);
   text-decoration: underline;
@@ -228,7 +241,6 @@ body {
   text-decoration-color: var(--flit-text);
 }
 
-/* admonition (접이식 박스) */
 .md-typeset .admonition,
 .md-typeset details {
   border-radius: 8px;
