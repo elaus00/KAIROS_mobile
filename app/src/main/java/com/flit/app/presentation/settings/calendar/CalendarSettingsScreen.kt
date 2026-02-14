@@ -2,7 +2,6 @@ package com.flit.app.presentation.settings.calendar
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,13 +11,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -148,7 +145,7 @@ fun CalendarSettingsContent(
 
                 if (uiState.availableCalendars.isEmpty()) {
                     SettingsDivider()
-                    ActionItem(
+                    NavigationSettingItem(
                         title = "캘린더 목록 새로고침",
                         description = "기기 캘린더 목록을 다시 불러옵니다",
                         onClick = onReloadCalendars
@@ -209,37 +206,6 @@ fun CalendarSettingsContent(
 }
 
 // ---- 하위 Composable 컴포넌트 ----
-
-@Composable
-private fun ActionItem(
-    title: String,
-    description: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = FlitTheme.colors
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = colors.text, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(text = description, color = colors.textMuted, fontSize = 13.sp)
-        }
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = colors.textMuted,
-            modifier = Modifier.size(20.dp)
-        )
-    }
-}
 
 @Composable
 private fun CalendarSelectionSheet(

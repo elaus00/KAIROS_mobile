@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,8 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.presentation.components.common.FlitWordmark
 import com.flit.app.presentation.components.common.FlitWordmarkSize
+import com.flit.app.ui.theme.FlitColors
 import com.flit.app.ui.theme.FlitTheme
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
@@ -173,7 +172,7 @@ fun OnboardingContent(
  * 온보딩 1페이지: 앱 소개
  */
 @Composable
-private fun OnboardingPage1(colors: com.flit.app.ui.theme.FlitColors) {
+private fun OnboardingPage1(colors: FlitColors) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -214,7 +213,7 @@ private fun OnboardingPage1(colors: com.flit.app.ui.theme.FlitColors) {
  * 온보딩 2페이지: AI 분류 안내
  */
 @Composable
-private fun OnboardingPage2(colors: com.flit.app.ui.theme.FlitColors) {
+private fun OnboardingPage2(colors: FlitColors) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -260,7 +259,7 @@ private fun OnboardingPage2(colors: com.flit.app.ui.theme.FlitColors) {
  */
 @Composable
 private fun OnboardingPageCalendar(
-    colors: com.flit.app.ui.theme.FlitColors,
+    colors: FlitColors,
     isConnected: Boolean,
     errorMessage: String?,
     onConnect: () -> Unit
@@ -356,7 +355,7 @@ private fun OnboardingPageCalendar(
 @Composable
 private fun ClassificationChip(
     label: String,
-    colors: com.flit.app.ui.theme.FlitColors
+    colors: FlitColors
 ) {
     Box(
         modifier = Modifier
@@ -378,7 +377,7 @@ private fun ClassificationChip(
  */
 @Composable
 private fun OnboardingPage3(
-    colors: com.flit.app.ui.theme.FlitColors,
+    colors: FlitColors,
     inputText: String,
     isSubmitting: Boolean,
     onInputChange: (String) -> Unit,
@@ -487,7 +486,7 @@ private fun OnboardingPage3(
 private fun OnboardingBottomBar(
     currentPage: Int,
     totalPages: Int,
-    colors: com.flit.app.ui.theme.FlitColors,
+    colors: FlitColors,
     onNext: () -> Unit
 ) {
     Row(

@@ -80,29 +80,6 @@ fun FlitSplashScreen(
 @Composable
 private fun FlitSplashScreenPreview() {
     FlitTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(FlitTheme.colors.background),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                FlitWordmark(
-                    size = FlitWordmarkSize.SPLASH,
-                    color = FlitTheme.colors.text
-                )
-                Text(
-                    text = "적으면, 알아서 정리됩니다",
-                    fontFamily = SoraFontFamily,
-                    fontWeight = FontWeight(300),
-                    fontSize = 12.sp,
-                    letterSpacing = 0.5.sp,
-                    color = FlitTheme.colors.textSecondary
-                )
-            }
-        }
+        FlitSplashScreen(onFinished = {})
     }
 }

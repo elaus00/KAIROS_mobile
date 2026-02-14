@@ -27,14 +27,15 @@ fun FlitSnackbar(
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
+    val shape = RoundedCornerShape(12.dp)
 
     Box(
         modifier = modifier
             .padding(horizontal = 20.dp)
-            .shadow(elevation = 12.dp, shape = RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
+            .shadow(elevation = 12.dp, shape = shape)
+            .clip(shape)
             .background(colors.card)
-            .border(1.dp, colors.border, RoundedCornerShape(12.dp))
+            .border(1.dp, colors.border, shape)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(

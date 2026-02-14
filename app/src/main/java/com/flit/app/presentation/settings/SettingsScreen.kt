@@ -8,11 +8,9 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -22,8 +20,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -535,23 +531,22 @@ fun SettingsContent(
 
     // 로그아웃 확인 다이얼로그
     if (showLogoutDialog) {
-        val dialogColors = FlitTheme.colors
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            containerColor = dialogColors.card,
-            titleContentColor = dialogColors.text,
-            textContentColor = dialogColors.text,
-            title = { Text("로그아웃", color = dialogColors.text) },
-            text = { Text("로그아웃하시겠습니까?", color = dialogColors.text) },
+            containerColor = colors.card,
+            titleContentColor = colors.text,
+            textContentColor = colors.text,
+            title = { Text("로그아웃", color = colors.text) },
+            text = { Text("로그아웃하시겠습니까?", color = colors.text) },
             confirmButton = {
                 TextButton(onClick = {
                     onLogout()
                     showLogoutDialog = false
-                }) { Text("로그아웃", color = dialogColors.danger) }
+                }) { Text("로그아웃", color = colors.danger) }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("취소", color = dialogColors.textSecondary)
+                    Text("취소", color = colors.textSecondary)
                 }
             }
         )

@@ -25,7 +25,6 @@ import com.flit.app.ui.theme.FlitTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
@@ -168,10 +167,11 @@ fun LoginContent(
                 }
             }
 
-            if (uiState.error != null) {
+            val error = uiState.error
+            if (error != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = uiState.error!!,
+                    text = error,
                     color = colors.danger,
                     style = MaterialTheme.typography.bodyMedium
                 )

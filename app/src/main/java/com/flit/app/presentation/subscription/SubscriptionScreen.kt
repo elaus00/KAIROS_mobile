@@ -55,133 +55,134 @@ fun SubscriptionContent(
     modifier: Modifier = Modifier
 ) {
     AppFontScaleProvider {
-    val colors = FlitTheme.colors
+        val colors = FlitTheme.colors
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "구독 관리",
-                        color = colors.text,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로가기",
-                            tint = colors.text
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "구독 관리",
+                            color = colors.text,
+                            style = MaterialTheme.typography.headlineSmall
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.background
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "뒤로가기",
+                                tint = colors.text
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colors.background
+                    )
                 )
-            )
-        },
-        containerColor = colors.background
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 현재 플랜 표시
-            CurrentPlanCard(tier = uiState.tier)
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Premium 기능 목록
-            Text(
-                text = "Premium 기능",
-                color = colors.text,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            val features = listOf(
-                "AI 그룹 분류" to uiState.features.aiGrouping,
-                "인박스 자동 분류" to uiState.features.inboxClassify,
-                "의미 검색" to uiState.features.semanticSearch,
-                "노트 재구성" to uiState.features.noteReorganize,
-                "분석 대시보드" to uiState.features.analyticsDashboard,
-                "이미지 텍스트 인식 (OCR)" to uiState.features.ocr,
-                "분류 프리셋" to uiState.features.classificationPreset,
-                "맞춤 지시어" to uiState.features.customInstruction
-            )
-
+            },
+            containerColor = colors.background
+        ) { padding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colors.card)
-                    .border(0.5.dp, colors.borderLight, RoundedCornerShape(12.dp))
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp)
             ) {
-                features.forEachIndexed { index, (name, enabled) ->
-                    FeatureItem(name = name, enabled = enabled)
-                    if (index < features.lastIndex) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            thickness = 0.5.dp,
-                            color = colors.borderLight
-                        )
-                    }
-                }
-            }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
+                // 현재 플랜 표시
+                CurrentPlanCard(tier = uiState.tier)
 
-            // 업그레이드/구매 버튼
-            if (uiState.tier == SubscriptionTier.FREE) {
-                Button(
-                    onClick = onUpgrade,
-                    enabled = !uiState.isLoading,
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Premium 기능 목록
+                Text(
+                    text = "Premium 기능",
+                    color = colors.text,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val features = listOf(
+                    "AI 그룹 분류" to uiState.features.aiGrouping,
+                    "인박스 자동 분류" to uiState.features.inboxClassify,
+                    "의미 검색" to uiState.features.semanticSearch,
+                    "노트 재구성" to uiState.features.noteReorganize,
+                    "분석 대시보드" to uiState.features.analyticsDashboard,
+                    "이미지 텍스트 인식 (OCR)" to uiState.features.ocr,
+                    "분류 프리셋" to uiState.features.classificationPreset,
+                    "맞춤 지시어" to uiState.features.customInstruction
+                )
+
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.accent,
-                        contentColor = colors.background,
-                        disabledContainerColor = colors.accentBg,
-                        disabledContentColor = colors.textMuted
-                    )
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(colors.card)
+                        .border(0.5.dp, colors.borderLight, RoundedCornerShape(12.dp))
                 ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = colors.background
-                        )
-                    } else {
-                        Text(
-                            text = "Premium으로 업그레이드",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
-                        )
+                    features.forEachIndexed { index, (name, enabled) ->
+                        FeatureItem(name = name, enabled = enabled)
+                        if (index < features.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = colors.borderLight
+                            )
+                        }
                     }
                 }
-            }
 
-            if (uiState.error != null) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = uiState.error!!,
-                    color = colors.danger,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(32.dp))
+                // 업그레이드/구매 버튼
+                if (uiState.tier == SubscriptionTier.FREE) {
+                    Button(
+                        onClick = onUpgrade,
+                        enabled = !uiState.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colors.accent,
+                            contentColor = colors.background,
+                            disabledContainerColor = colors.accentBg,
+                            disabledContentColor = colors.textMuted
+                        )
+                    ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = colors.background
+                            )
+                        } else {
+                            Text(
+                                text = "Premium으로 업그레이드",
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
+                            )
+                        }
+                    }
+                }
+
+                val error = uiState.error
+                if (error != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = error,
+                        color = colors.danger,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+            }
         }
-    }
     }
 }
 

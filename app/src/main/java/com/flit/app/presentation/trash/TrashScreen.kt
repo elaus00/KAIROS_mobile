@@ -183,61 +183,27 @@ fun TrashContent(
 
         // 휴지통 비우기 확인 다이얼로그
         if (showEmptyTrashDialog) {
-            AlertDialog(
-                onDismissRequest = { showEmptyTrashDialog = false },
-                title = { Text("휴지통 비우기", color = colors.text) },
-                text = {
-                    Text(
-                        "모든 항목이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.",
-                        color = colors.textSecondary
-                    )
+            TrashConfirmDialog(
+                title = "휴지통 비우기",
+                message = "모든 항목이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.",
+                onConfirm = {
+                    showEmptyTrashDialog = false
+                    onEmptyTrash()
                 },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showEmptyTrashDialog = false
-                        onEmptyTrash()
-                    }) {
-                        Text("삭제", color = colors.danger)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showEmptyTrashDialog = false }) {
-                        Text("취소", color = colors.textSecondary)
-                    }
-                },
-                containerColor = colors.card,
-                titleContentColor = colors.text,
-                textContentColor = colors.textSecondary
+                onDismiss = { showEmptyTrashDialog = false }
             )
         }
 
         // 개별 항목 완전 삭제 확인 다이얼로그
         if (deleteTargetId != null) {
-            AlertDialog(
-                onDismissRequest = { deleteTargetId = null },
-                title = { Text("완전 삭제", color = colors.text) },
-                text = {
-                    Text(
-                        "이 항목을 영구적으로 삭제합니다.\n이 작업은 되돌릴 수 없습니다.",
-                        color = colors.textSecondary
-                    )
+            TrashConfirmDialog(
+                title = "완전 삭제",
+                message = "이 항목을 영구적으로 삭제합니다.\n이 작업은 되돌릴 수 없습니다.",
+                onConfirm = {
+                    deleteTargetId?.let { onDeleteItem(it) }
+                    deleteTargetId = null
                 },
-                confirmButton = {
-                    TextButton(onClick = {
-                        deleteTargetId?.let { onDeleteItem(it) }
-                        deleteTargetId = null
-                    }) {
-                        Text("삭제", color = colors.danger)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { deleteTargetId = null }) {
-                        Text("취소", color = colors.textSecondary)
-                    }
-                },
-                containerColor = colors.card,
-                titleContentColor = colors.text,
-                textContentColor = colors.textSecondary
+                onDismiss = { deleteTargetId = null }
             )
         }
     }
@@ -257,6 +223,38 @@ private fun TrashContentPreview() {
             onDismissError = {}
         )
     }
+}
+
+/**
+ * 삭제 확인 다이얼로그 공통 컴포넌트
+ */
+@Composable
+private fun TrashConfirmDialog(
+    title: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = FlitTheme.colors
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title, color = colors.text) },
+        text = { Text(message, color = colors.textSecondary) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("삭제", color = colors.danger)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("취소", color = colors.textSecondary)
+            }
+        },
+        containerColor = colors.card,
+        titleContentColor = colors.text,
+        textContentColor = colors.textSecondary
+    )
 }
 
 /**

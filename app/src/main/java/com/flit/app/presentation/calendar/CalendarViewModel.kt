@@ -13,8 +13,9 @@ import com.flit.app.domain.usecase.todo.ReorderTodoUseCase
 import com.flit.app.domain.usecase.todo.ToggleTodoCompletionUseCase
 import com.flit.app.presentation.widget.WidgetUpdateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -83,7 +83,6 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.DeleteSchedule -> deleteByCaptureId(event.captureId)
             is CalendarEvent.ApproveSuggestion -> approveCalendarSuggestion(event.scheduleId)
             is CalendarEvent.RejectSuggestion -> rejectCalendarSuggestion(event.scheduleId)
-            is CalendarEvent.ToggleShowCompleted -> toggleShowCompleted()
             is CalendarEvent.ReorderTasks -> reorderTasks(event.todoIds)
             is CalendarEvent.UpdateTaskDeadline -> updateTaskDeadline(event.todoId, event.deadlineMs)
             is CalendarEvent.StartEditSchedule -> startEditSchedule(event.schedule)
@@ -194,12 +193,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     /**
-     * 할 일 로드 — 미완료/완료 분리
+     * 할 일 로드 — 완료/미완료 통합
      */
     private fun loadTodos() {
         todosJob?.cancel()
         todosJob = viewModelScope.launch {
-            todoRepository.getActiveTodos()
+            todoRepository.getAllTodos()
                 .catch { /* 에러 무시 */ }
                 .collect { todos ->
                     val displayItems = todos.map { todo ->
@@ -209,7 +208,7 @@ class CalendarViewModel @Inject constructor(
                             captureId = todo.captureId,
                             title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
                             deadline = todo.deadline,
-                            isCompleted = false,
+                            isCompleted = todo.isCompleted,
                             deadlineSource = todo.deadlineSource?.name,
                             originalText = capture?.originalText
                         )
@@ -217,33 +216,6 @@ class CalendarViewModel @Inject constructor(
                     _uiState.update { it.copy(tasks = displayItems) }
                 }
         }
-        // 완료 할 일 별도 로드
-        viewModelScope.launch {
-            todoRepository.getCompletedTodos()
-                .catch { /* 에러 무시 */ }
-                .collect { todos ->
-                    val displayItems = todos.map { todo ->
-                        val capture = captureRepository.getCaptureById(todo.captureId)
-                        TodoDisplayItem(
-                            todoId = todo.id,
-                            captureId = todo.captureId,
-                            title = capture?.aiTitle ?: capture?.originalText?.take(30) ?: "",
-                            deadline = todo.deadline,
-                            isCompleted = true,
-                            deadlineSource = todo.deadlineSource?.name,
-                            originalText = capture?.originalText
-                        )
-                    }
-                    _uiState.update { it.copy(completedTasks = displayItems) }
-                }
-        }
-    }
-
-    /**
-     * 완료 항목 표시 토글
-     */
-    private fun toggleShowCompleted() {
-        _uiState.update { it.copy(showCompleted = !it.showCompleted) }
     }
 
     /**
@@ -372,23 +344,35 @@ class CalendarViewModel @Inject constructor(
 
     /**
      * 할 일 완료 토글
-     * 즉시 UI에 반영 후 DB 업데이트 (체크해도 제자리 유지)
+     * 즉시 UI에 반영 후 DB 업데이트
      */
     private fun toggleTaskComplete(taskId: String) {
-        // 즉시 UI에 토글 상태 반영
+        val beforeToggle = _uiState.value
+        if (beforeToggle.tasks.none { it.todoId == taskId }) return
+
+        // 즉시 UI 반영: 같은 리스트에서 완료 상태만 반전
         _uiState.update { state ->
             state.copy(
-                tasks = state.tasks.map {
-                    if (it.todoId == taskId) it.copy(isCompleted = !it.isCompleted) else it
+                tasks = state.tasks.map { task ->
+                    if (task.todoId == taskId) task.copy(isCompleted = !task.isCompleted) else task
                 }
             )
         }
+
         viewModelScope.launch {
-            delay(300) // 체크 애니메이션 표시
-            toggleTodoCompletion(taskId)
+            runCatching {
+                toggleTodoCompletion(taskId, trackEvent = false)
+            }.onFailure { error ->
+                // DB 반영 실패 시 직전 상태로 롤백
+                _uiState.update {
+                    it.copy(
+                        tasks = beforeToggle.tasks,
+                        errorMessage = error.message ?: "할 일 상태 변경에 실패했어요"
+                    )
+                }
+            }
             // 위젯 갱신
             WidgetUpdateHelper.updateTodoWidget(application)
-            // Flow(getAllTodos)가 자동으로 UI 업데이트 — 제자리 유지
         }
     }
 

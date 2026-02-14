@@ -41,27 +41,30 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSyncing = true) }
             val message = try {
-                val user = authRepository.getCurrentUser()
-                if (user == null) {
-                    "로그인 후 동기화를 다시 시도해주세요."
-                } else {
-                    val pushResult = syncRepository.pushLocalData(user.id)
-                    if (!pushResult.success) {
-                        pushResult.message ?: "로컬 데이터 업로드 동기화에 실패했습니다."
-                    } else {
-                        val pullResult = syncRepository.pullServerData(user.id)
-                        if (!pullResult.success) {
-                            pullResult.message ?: "서버 데이터 다운로드 동기화에 실패했습니다."
-                        } else {
-                            "동기화 완료: 업로드 ${pushResult.pushedCount}건, 다운로드 ${pullResult.pulledCount}건"
-                        }
-                    }
-                }
+                performSync()
             } catch (e: Exception) {
                 e.message ?: "동기화 재시도 중 오류가 발생했습니다."
             }
             _events.emit(MainUiEvent.ShowMessage(message))
             _uiState.update { it.copy(isSyncing = false) }
         }
+    }
+
+    /** push → pull 순서로 동기화 수행, 실패 시 에러 메시지 반환 */
+    private suspend fun performSync(): String {
+        val user = authRepository.getCurrentUser()
+            ?: return "로그인 후 동기화를 다시 시도해주세요."
+
+        val pushResult = syncRepository.pushLocalData(user.id)
+        if (!pushResult.success) {
+            return pushResult.message ?: "로컬 데이터 업로드 동기화에 실패했습니다."
+        }
+
+        val pullResult = syncRepository.pullServerData(user.id)
+        if (!pullResult.success) {
+            return pullResult.message ?: "서버 데이터 다운로드 동기화에 실패했습니다."
+        }
+
+        return "동기화 완료: 업로드 ${pushResult.pushedCount}건, 다운로드 ${pullResult.pulledCount}건"
     }
 }

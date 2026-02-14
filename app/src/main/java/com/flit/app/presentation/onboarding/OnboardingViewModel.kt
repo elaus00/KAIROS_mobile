@@ -136,11 +136,7 @@ class OnboardingViewModel @Inject constructor(
 
     /** 스킵 (텍스트 입력 없이 완료) */
     fun skip() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSubmitting = true) }
-            userPreferenceRepository.setOnboardingCompleted()
-            _events.emit(OnboardingEvent.NavigateToHome)
-            _uiState.update { it.copy(isSubmitting = false) }
-        }
+        _uiState.update { it.copy(inputText = "") }
+        completeOnboarding()
     }
 }

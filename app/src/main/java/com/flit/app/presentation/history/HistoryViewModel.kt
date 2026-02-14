@@ -213,31 +213,9 @@ class HistoryViewModel @Inject constructor(
                     limit = PAGE_SIZE,
                     offset = page * PAGE_SIZE
                 )
-                pageSnapshots[page] = captures
-                val mergedCaptures = (0..highestPageRequested)
-                    .flatMap { index -> pageSnapshots[index].orEmpty() }
-                    .distinctBy { capture -> capture.id }
-                val hasMore = captures.size >= PAGE_SIZE
-                val isLoadingMoreFinished = loadingMorePage == page
-                if (isLoadingMoreFinished) loadingMorePage = null
-                _uiState.update { s ->
-                    s.copy(
-                        captures = mergedCaptures,
-                        isLoading = false,
-                        isLoadingMore = if (isLoadingMoreFinished) false else s.isLoadingMore,
-                        hasMore = hasMore,
-                        errorMessage = null
-                    )
-                }
+                applyPageResult(page, captures, hasMore = captures.size >= PAGE_SIZE)
             } catch (e: Exception) {
-                if (loadingMorePage == page) loadingMorePage = null
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoadingMore = false,
-                        errorMessage = e.message ?: "기록을 불러오지 못했습니다."
-                    )
-                }
+                applyPageError(page, e)
             }
         }
     }
@@ -277,37 +255,47 @@ class HistoryViewModel @Inject constructor(
                     offset = page * PAGE_SIZE,
                     limit = PAGE_SIZE
                 ).collect { captures ->
-                    pageSnapshots[page] = captures
-                    val mergedCaptures = (0..highestPageRequested)
-                        .flatMap { index -> pageSnapshots[index].orEmpty() }
-                        .distinctBy { capture -> capture.id }
                     val hasMore = pageSnapshots[highestPageRequested]?.size ?: 0 >= PAGE_SIZE
-                    val isLoadingMoreFinished = loadingMorePage == page
-                    if (isLoadingMoreFinished) {
-                        loadingMorePage = null
-                    }
-                    _uiState.update { state ->
-                        state.copy(
-                            captures = mergedCaptures,
-                            isLoading = false,
-                            isLoadingMore = if (isLoadingMoreFinished) false else state.isLoadingMore,
-                            hasMore = hasMore,
-                            errorMessage = null
-                        )
-                    }
+                    applyPageResult(page, captures, hasMore)
                 }
             } catch (e: Exception) {
-                if (loadingMorePage == page) {
-                    loadingMorePage = null
-                }
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoadingMore = false,
-                        errorMessage = e.message ?: "기록을 불러오지 못했습니다."
-                    )
-                }
+                applyPageError(page, e)
             }
+        }
+    }
+
+    /**
+     * 페이지 로드 결과를 UI 상태에 반영
+     */
+    private fun applyPageResult(page: Int, captures: List<Capture>, hasMore: Boolean) {
+        pageSnapshots[page] = captures
+        val mergedCaptures = (0..highestPageRequested)
+            .flatMap { index -> pageSnapshots[index].orEmpty() }
+            .distinctBy { capture -> capture.id }
+        val isLoadingMoreFinished = loadingMorePage == page
+        if (isLoadingMoreFinished) loadingMorePage = null
+        _uiState.update { state ->
+            state.copy(
+                captures = mergedCaptures,
+                isLoading = false,
+                isLoadingMore = if (isLoadingMoreFinished) false else state.isLoadingMore,
+                hasMore = hasMore,
+                errorMessage = null
+            )
+        }
+    }
+
+    /**
+     * 페이지 로드 에러를 UI 상태에 반영
+     */
+    private fun applyPageError(page: Int, e: Exception) {
+        if (loadingMorePage == page) loadingMorePage = null
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                isLoadingMore = false,
+                errorMessage = e.message ?: "기록을 불러오지 못했습니다."
+            )
         }
     }
 

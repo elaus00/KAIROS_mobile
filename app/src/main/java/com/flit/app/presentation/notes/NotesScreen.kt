@@ -543,14 +543,8 @@ private fun NoteListItem(
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
-    val title = note.aiTitle ?: note.originalText.take(40)
-
-    // 본문 미리보기
-    val preview = when {
-        !note.body.isNullOrBlank() -> note.body
-        note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
-        else -> null
-    }
+    val title = note.displayTitle()
+    val preview = note.previewText()
 
     val dateFormat = remember { SimpleDateFormat("M/d", Locale.getDefault()) }
     val dateText = dateFormat.format(Date(note.createdAt))
@@ -743,13 +737,8 @@ private fun NoteGridItem(
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
-    val title = note.aiTitle ?: note.originalText.take(40)
-
-    val preview = when {
-        !note.body.isNullOrBlank() -> note.body
-        note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
-        else -> null
-    }
+    val title = note.displayTitle()
+    val preview = note.previewText()
 
     Column(
         modifier = modifier
@@ -855,15 +844,10 @@ private fun NoteCompactItem(
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
-    val title = note.aiTitle ?: note.originalText.take(40)
+    val title = note.displayTitle()
     val dateFormat = remember { SimpleDateFormat("M/d", Locale.getDefault()) }
     val dateText = dateFormat.format(Date(note.createdAt))
-
-    val preview = when {
-        !note.body.isNullOrBlank() -> note.body
-        note.aiTitle != null && note.originalText != note.aiTitle -> note.originalText
-        else -> null
-    }
+    val preview = note.previewText()
 
     Column(
         modifier = modifier
@@ -924,6 +908,21 @@ private fun NoteCompactItem(
             }
         }
     }
+}
+
+// ──────────────────────────────────────────
+// 공통 유틸
+// ──────────────────────────────────────────
+
+/** 노트 제목 결정 (aiTitle 우선, 없으면 원문 앞 40자) */
+private fun NoteWithCapture.displayTitle(): String =
+    aiTitle ?: originalText.take(40)
+
+/** 노트 미리보기 텍스트 (본문 > 원문, 제목과 동일하면 null) */
+private fun NoteWithCapture.previewText(): String? = when {
+    !body.isNullOrBlank() -> body
+    aiTitle != null && originalText != aiTitle -> originalText
+    else -> null
 }
 
 // ──────────────────────────────────────────

@@ -147,7 +147,6 @@ fun AnalyticsDashboardContent(
 @Composable
 private fun DashboardContent(
     dashboard: AnalyticsDashboard,
-    fontScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors
@@ -163,7 +162,6 @@ private fun DashboardContent(
         StatCard(
             title = "총 캡처",
             value = dashboard.totalCaptures.toString(),
-            fontScale = fontScale,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -197,8 +195,7 @@ private fun DashboardContent(
         // 평균 분류 시간
         StatCard(
             title = "평균 분류 시간",
-            value = "${dashboard.avgClassificationTimeMs}ms",
-            fontScale = fontScale
+            value = "${dashboard.avgClassificationTimeMs}ms"
         )
 
         // 인기 태그
@@ -234,7 +231,6 @@ private fun DashboardContent(
 private fun StatCard(
     title: String,
     value: String,
-    fontScale: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val colors = FlitTheme.colors

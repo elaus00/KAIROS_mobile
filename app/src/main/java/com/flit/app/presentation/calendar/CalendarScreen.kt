@@ -88,7 +88,7 @@ fun CalendarContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
-        onNavigateToDetail = { captureId -> viewModel.navigateToDetail(captureId) },
+        onNavigateToDetail = viewModel::navigateToDetail,
         modifier = modifier
     )
 }
@@ -197,8 +197,6 @@ fun CalendarContentBody(
 
                 TaskList(
                     tasks = uiState.tasks,
-                    completedTasks = uiState.completedTasks,
-                    showCompleted = uiState.showCompleted,
                     onTaskComplete = { taskId ->
                         onEvent(CalendarEvent.ToggleTaskComplete(taskId))
                     },
@@ -207,9 +205,6 @@ fun CalendarContentBody(
                     },
                     onReorder = { todoIds ->
                         onEvent(CalendarEvent.ReorderTasks(todoIds))
-                    },
-                    onToggleShowCompleted = {
-                        onEvent(CalendarEvent.ToggleShowCompleted)
                     },
                     onTaskClick = { captureId ->
                         onNavigateToDetail(captureId)

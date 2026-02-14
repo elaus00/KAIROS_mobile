@@ -184,7 +184,6 @@ fun SearchContent(
                     FlitChip(
                         text = "AI",
                         selected = uiState.isSemanticMode,
-                        compact = true,
                         onClick = { onToggleSemanticMode(!uiState.isSemanticMode) }
                     )
                 }
@@ -218,51 +217,20 @@ fun SearchContent(
                         }
                     }
                     !uiState.hasSearched -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = null,
-                                    tint = colors.textMuted.copy(alpha = 0.5f),
-                                    modifier = Modifier.size(48.dp)
-                                )
-                                Text(
-                                    text = "AI로 의미 기반 검색",
-                                    color = colors.textMuted,
-                                    fontSize = 15.sp
-                                )
-                            }
-                        }
+                        SearchEmptyState(
+                            icon = Icons.Default.Search,
+                            iconTint = colors.textMuted.copy(alpha = 0.5f),
+                            message = "AI로 의미 기반 검색"
+                        )
                     }
                     uiState.semanticResults.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.SearchOff,
-                                    contentDescription = null,
-                                    tint = colors.textMuted,
-                                    modifier = Modifier.size(48.dp)
-                                )
-                                Text(
-                                    text = "결과 없음",
-                                    color = colors.textMuted,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
+                        SearchEmptyState(
+                            icon = Icons.Outlined.SearchOff,
+                            iconTint = colors.textMuted,
+                            message = "결과 없음",
+                            messageFontWeight = FontWeight.Medium,
+                            messageFontSize = 16.sp
+                        )
                     }
                     else -> {
                         LazyColumn(
@@ -288,56 +256,21 @@ fun SearchContent(
                 // FTS 검색 결과
                 when {
                     !uiState.hasSearched -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = null,
-                                    tint = colors.textMuted.copy(alpha = 0.5f),
-                                    modifier = Modifier.size(48.dp)
-                                )
-                                Text(
-                                    text = "캡처를 검색해보세요",
-                                    color = colors.textMuted,
-                                    fontSize = 15.sp
-                                )
-                            }
-                        }
+                        SearchEmptyState(
+                            icon = Icons.Default.Search,
+                            iconTint = colors.textMuted.copy(alpha = 0.5f),
+                            message = "캡처를 검색해보세요"
+                        )
                     }
                     uiState.searchResults.isEmpty() -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.SearchOff,
-                                    contentDescription = null,
-                                    tint = colors.textMuted,
-                                    modifier = Modifier.size(48.dp)
-                                )
-                                Text(
-                                    text = "결과 없음",
-                                    color = colors.textMuted,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = "다른 키워드로 검색해보세요",
-                                    color = colors.textMuted.copy(alpha = 0.7f),
-                                    fontSize = 13.sp
-                                )
-                            }
-                        }
+                        SearchEmptyState(
+                            icon = Icons.Outlined.SearchOff,
+                            iconTint = colors.textMuted,
+                            message = "결과 없음",
+                            messageFontWeight = FontWeight.Medium,
+                            messageFontSize = 16.sp,
+                            subMessage = "다른 키워드로 검색해보세요"
+                        )
                     }
                     else -> {
                         LazyColumn(
@@ -378,6 +311,51 @@ private fun SearchContentPreview() {
             onToggleSemanticMode = {},
             onErrorDismissed = {}
         )
+    }
+}
+
+/**
+ * 검색 빈 상태 공통 컴포넌트
+ */
+@Composable
+private fun SearchEmptyState(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
+    message: String,
+    messageFontWeight: FontWeight? = null,
+    messageFontSize: androidx.compose.ui.unit.TextUnit = 15.sp,
+    subMessage: String? = null
+) {
+    val colors = FlitTheme.colors
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(48.dp)
+            )
+            Text(
+                text = message,
+                color = colors.textMuted,
+                fontSize = messageFontSize,
+                fontWeight = messageFontWeight
+            )
+            if (subMessage != null) {
+                Text(
+                    text = subMessage,
+                    color = colors.textMuted.copy(alpha = 0.7f),
+                    fontSize = 13.sp
+                )
+            }
+        }
     }
 }
 

@@ -210,9 +210,7 @@ fun CaptureDetailContent(
                 ClassificationChipRow(
                     currentType = uiState.classifiedType,
                     currentSubType = uiState.noteSubType,
-                    onTypeSelected = { type, subType ->
-                        onChangeClassification(type, subType)
-                    }
+                    onTypeSelected = onChangeClassification
                 )
 
                 // AI 자동 태그 표시
@@ -315,8 +313,8 @@ fun CaptureDetailContent(
                     Text(
                         text = uiState.originalText,
                         color = colors.text,
-                        fontSize = uiState.bodyFontSize.sp,
-                        lineHeight = uiState.bodyLineHeight.sp
+                        fontSize = 15.sp,
+                        lineHeight = 22.sp
                     )
                 }
 
@@ -414,8 +412,7 @@ private fun ClassificationChip(
             )
         },
         modifier = modifier
-            .defaultMinSize(minHeight = 48.dp)
-            .padding(horizontal = 0.dp, vertical = 0.dp),
+            .defaultMinSize(minHeight = 48.dp),
         shape = RoundedCornerShape(8.dp),
         colors = FilterChipDefaults.filterChipColors(
             containerColor = colors.chipBg,

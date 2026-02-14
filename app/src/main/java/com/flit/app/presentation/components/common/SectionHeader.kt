@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.flit.app.ui.theme.FlitTheme
 
@@ -20,7 +21,7 @@ import com.flit.app.ui.theme.FlitTheme
 fun SectionHeader(
     title: String,
     modifier: Modifier = Modifier,
-    fontSize: androidx.compose.ui.unit.TextUnit = 12.sp,
+    fontSize: TextUnit = 12.sp,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     val colors = FlitTheme.colors
