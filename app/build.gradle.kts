@@ -5,7 +5,6 @@ import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
@@ -131,9 +130,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -179,13 +175,13 @@ val jacocoExclusions = listOf(
     "**/data/worker/**"
 )
 
-val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/devDebug") {
     include("com/flit/app/domain/usecase/**")
     include("com/flit/app/presentation/**/*ViewModel*.class")
     exclude(jacocoExclusions)
 }
 
-val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
+val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/devDebug/classes") {
     include("com/flit/app/domain/usecase/**")
     include("com/flit/app/presentation/**/*ViewModel*.class")
     exclude(jacocoExclusions)
@@ -198,7 +194,7 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testDevDebugUnitTest")
 
     reports {
         xml.required.set(true)
@@ -210,21 +206,21 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     sourceDirectories.setFrom(files("src/main/java"))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
-            include("jacoco/testDebugUnitTest.exec")
-            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+            include("jacoco/testDevDebugUnitTest.exec")
+            include("outputs/unit_test_code_coverage/devDebugUnitTest/testDevDebugUnitTest.exec")
         }
     )
 }
 
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testDevDebugUnitTest")
 
     classDirectories.setFrom(files(debugKotlinClasses, debugJavaClasses))
     sourceDirectories.setFrom(files("src/main/java"))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
-            include("jacoco/testDebugUnitTest.exec")
-            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+            include("jacoco/testDevDebugUnitTest.exec")
+            include("outputs/unit_test_code_coverage/devDebugUnitTest/testDevDebugUnitTest.exec")
         }
     )
 
@@ -241,7 +237,7 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 }
 
 tasks.named("check") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testDevDebugUnitTest")
     dependsOn("jacocoTestReport")
     if (coverageGateEnabled) {
         dependsOn("jacocoTestCoverageVerification")
