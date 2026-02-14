@@ -48,6 +48,7 @@ Docs/
 | `ux-writing-audit.md` | UX 라이팅 감사 — P0 8건 반영 완료, P1 16건, P2 17건 | v1.1 | PRD v10.0, design-guide v1.1 | 2026-02-12 |
 | `brand-identity.md` | 브랜드 아이덴티티 — 브랜드 에센스, 로고 확정, 앱 아이콘, 스플래시, 워드마크, 에셋 패키지 | v2.2 | PRD v10.0, philosophy_principles v2.0 | 2026-02-14 |
 | `design-presentation-template.md` | 디자인 프레젠테이션 HTML 템플릿 — 카드/그리드/배지/시나리오 양식 | v1.0 | design-guide v2.0 | 2026-02-13 |
+| `play-store-listing.md` | Play Store 리스팅 준비 — 앱 정보, 설명, 에셋, 체크리스트 | v1.0 | PRD v10.0, brand-identity v2.2 | 2026-02-14 |
 
 ### plan/
 
@@ -119,6 +120,7 @@ Docs/
 
 | 일시 | 문서 | 변경 내용 |
 |------|------|-----------|
+| 2026-02-14 | `specs/play-store-listing.md` | v1.0 작성 — 앱 정보, 스토어 설명, 에셋 목록, 등급 가이드, 릴리스 체크리스트 |
 | 2026-02-14 | `specs/brand-identity.md` | v2.0→v2.2: 테마별 동적 아이콘 스펙 반영, Section 9 구현 현황 완료, 에셋 패키지 생성 |
 | 2026-02-14 | `plan/ui-review-plan.md` | UI 스크린샷 기반 검토안 v1.0 작성 — P0 2건, P1 3건, P2 5건, P3 4건, 코드 검증 3건 |
 | 2026-02-12 | `INDEX.md` | 문서 정리: 아카이브 9건, 삭제 3건, 누락 6건 등록, 디렉토리 구조 갱신 |
