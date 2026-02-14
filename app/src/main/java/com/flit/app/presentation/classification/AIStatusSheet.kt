@@ -37,11 +37,12 @@ fun AIStatusSheet(
     val uiState by viewModel.uiState.collectAsState()
     val colors = FlitTheme.colors
 
-    // 반투명 배경 오버레이
+    // 반투명 배경 오버레이 (네비게이션 바 포함 전체 화면)
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(colors.text.copy(alpha = 0.5f))
+            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0))
+            .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -164,7 +165,7 @@ private fun StatusSheetHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
     ) {
@@ -172,29 +173,28 @@ private fun StatusSheetHeader(
             Text(
                 text = "AI 분류 현황",
                 color = colors.text,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 17.sp,
+                fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = "24시간 이내 분류된 항목",
                 color = colors.textMuted,
-                fontSize = 13.sp
+                fontSize = 12.sp
             )
         }
 
-        // 전체 확인 버튼 — 리플 복원, 최소 터치 타겟 48dp 확보
+        // 전체 확인 버튼 — 최소 터치 타겟 36dp
         if (count > 0) {
             Text(
                 text = "전체 확인",
                 color = colors.text,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable { onConfirmAll() }
-                    .defaultMinSize(minHeight = 48.dp)
-                    .padding(horizontal = 12.dp, vertical = 14.dp)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
             )
         }
     }
@@ -215,7 +215,7 @@ private fun ClassificationItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 14.dp),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -230,7 +230,7 @@ private fun ClassificationItem(
         Text(
             text = capture.aiTitle ?: capture.originalText.take(30),
             color = colors.text,
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -241,17 +241,16 @@ private fun ClassificationItem(
         Text(
             text = getRelativeTime(capture.createdAt),
             color = colors.textMuted,
-            fontSize = 13.sp
+            fontSize = 12.sp
         )
 
-        // 확인 버튼 — 리플 복원, 최소 터치 타겟 48dp 확보
+        // 확인 버튼 — 최소 터치 타겟 36dp
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.accentBg)
                 .clickable { onConfirm() }
-                .defaultMinSize(minHeight = 48.dp)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
