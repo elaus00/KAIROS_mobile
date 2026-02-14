@@ -1,6 +1,8 @@
 package com.flit.app.presentation.calendar.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -24,11 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +59,7 @@ import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -119,13 +122,17 @@ private fun DraggableTaskList(
 ) {
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
+    val scope = rememberCoroutineScope()
+    val cardShape = RoundedCornerShape(12.dp)
 
     // 드래그 상태 관리
     val currentList = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
-    var draggingIndex by remember { mutableIntStateOf(-1) }
+    var draggingTodoId by remember { mutableStateOf<String?>(null) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
     // 가변 높이 대응: 아이템별 높이 Map
     val itemHeights = remember { mutableStateMapOf<String, Float>() }
+    // 카드 간 위치 변경 시 부드러운 전환 애니메이션용 offset
+    val placementAnimations = remember { mutableMapOf<String, Animatable<Float, AnimationVector1D>>() }
     val spacingPx = with(density) { 6.dp.toPx() }
 
     Column(
@@ -134,29 +141,33 @@ private fun DraggableTaskList(
             .padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        currentList.forEachIndexed { index, task ->
+        currentList.forEach { task ->
             key(task.todoId) {
-                val isDragging = draggingIndex == index
+                val isDragging = draggingTodoId == task.todoId
+                val placementAnim = remember(task.todoId) { Animatable(0f) }
+                placementAnimations[task.todoId] = placementAnim
 
                 Box(
                     modifier = Modifier
                         .zIndex(if (isDragging) 1f else 0f)
+                        .clip(cardShape)
                         .onSizeChanged { size ->
                             itemHeights[task.todoId] = size.height.toFloat()
                         }
                         .graphicsLayer {
+                            shape = cardShape
+                            clip = false
                             if (isDragging) {
                                 translationY = dragOffsetY
-                                shadowElevation = 8f
-                                scaleX = 1.03f
-                                scaleY = 1.03f
-                                alpha = 0.92f
+                                shadowElevation = 0f
+                            } else {
+                                translationY = placementAnim.value
+                                shadowElevation = 0f
                             }
                         }
                 ) {
                     SwipeableCard(
-                        onDismiss = { onTaskDelete(task.captureId) },
-                        enableSwipe = !isDragging
+                        onDismiss = { onTaskDelete(task.captureId) }
                     ) {
                         TaskItemWithDragHandle(
                             task = task,
@@ -167,28 +178,60 @@ private fun DraggableTaskList(
                             onDeadlineEdit = onDeadlineEdit,
                             onDragStart = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                draggingIndex = index
-                                dragOffsetY = 0f
                             },
-                            onDrag = { deltaY ->
+                            onDrag = drag@{ deltaY ->
+                                val currentIndex = currentList.indexOfFirst { it.todoId == task.todoId }
+                                if (currentIndex < 0) return@drag
+
+                                // 실제 이동이 시작될 때만 드래그 상태로 진입 (롱프레스 플래시 방지)
+                                if (draggingTodoId == null) {
+                                    draggingTodoId = task.todoId
+                                    dragOffsetY = 0f
+                                }
+
                                 dragOffsetY += deltaY
                                 // 가변 높이 기반 슬롯 계산
                                 val avgHeight = if (itemHeights.isNotEmpty()) {
                                     itemHeights.values.average().toFloat()
                                 } else 60f
                                 val slotHeight = avgHeight + spacingPx
-                                val targetIndex = (index + (dragOffsetY / slotHeight).roundToInt())
+                                val targetIndex = (currentIndex + (dragOffsetY / slotHeight).roundToInt())
                                     .coerceIn(0, currentList.size - 1)
-                                if (targetIndex != index && targetIndex != draggingIndex) {
-                                    currentList.add(targetIndex, currentList.removeAt(draggingIndex))
-                                    draggingIndex = targetIndex
-                                    dragOffsetY = 0f
+                                if (targetIndex != currentIndex) {
+                                    val movedSlots = targetIndex - currentIndex
+                                    val oldIndexById = currentList
+                                        .mapIndexed { idx, item -> item.todoId to idx }
+                                        .toMap()
+                                    currentList.add(targetIndex, currentList.removeAt(currentIndex))
+                                    val newIndexById = currentList
+                                        .mapIndexed { idx, item -> item.todoId to idx }
+                                        .toMap()
+                                    oldIndexById.forEach { (id, oldIndex) ->
+                                        if (id == task.todoId) return@forEach
+                                        val newIndex = newIndexById[id] ?: return@forEach
+                                        if (oldIndex != newIndex) {
+                                            val deltaY = (oldIndex - newIndex) * slotHeight
+                                            val anim = placementAnimations[id] ?: return@forEach
+                                            scope.launch {
+                                                anim.snapTo(deltaY)
+                                                anim.animateTo(
+                                                    targetValue = 0f,
+                                                    animationSpec = tween(durationMillis = 350)
+                                                )
+                                            }
+                                        }
+                                    }
+                                    // 슬롯 이동만큼 오프셋을 차감해 드래그 연속성을 유지
+                                    dragOffsetY -= movedSlots * slotHeight
                                 }
                             },
                             onDragEnd = {
-                                draggingIndex = -1
+                                val didDrag = draggingTodoId != null
+                                draggingTodoId = null
                                 dragOffsetY = 0f
-                                onReorder(currentList.map { it.todoId })
+                                if (didDrag) {
+                                    onReorder(currentList.map { it.todoId })
+                                }
                             }
                         )
                     }
@@ -288,7 +331,7 @@ private fun TaskItemWithDragHandle(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 TaskCheckbox(
-                    isChecked = false,
+                    isChecked = task.isCompleted,
                     onToggle = onToggleComplete
                 )
             }

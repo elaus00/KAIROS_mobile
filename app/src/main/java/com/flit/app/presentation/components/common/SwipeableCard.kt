@@ -42,6 +42,7 @@ fun SwipeableCard(
     content: @Composable () -> Unit
 ) {
     val colors = FlitTheme.colors
+    val cardShape = RoundedCornerShape(12.dp)
 
     if (enableSwipe) {
         val density = LocalDensity.current
@@ -49,11 +50,12 @@ fun SwipeableCard(
         val scope = rememberCoroutineScope()
         val offsetX = remember { Animatable(0f) }
 
-        Box(modifier = modifier.clip(RoundedCornerShape(12.dp))) {
+        Box(modifier = modifier.clip(cardShape)) {
             // 배경: 삭제 버튼
             Box(
                 modifier = Modifier
                     .matchParentSize()
+                    .clip(cardShape)
                     .background(colors.danger),
                 contentAlignment = Alignment.CenterEnd
             ) {
@@ -91,6 +93,7 @@ fun SwipeableCard(
             // 전경: 콘텐츠 (offset 연동)
             Box(
                 modifier = Modifier
+                    .clip(cardShape)
                     .offset { IntOffset(offsetX.value.roundToInt(), 0) }
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(

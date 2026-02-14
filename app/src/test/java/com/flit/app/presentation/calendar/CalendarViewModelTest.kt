@@ -305,6 +305,37 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun `toggleTaskComplete_updates_ui_immediately`() = runTest {
+        // Given
+        val todo = TestFixtures.todo(id = "todo-1", captureId = "cap-1", isCompleted = false)
+        val capture = TestFixtures.capture(id = "cap-1", aiTitle = "즉시 반영 확인")
+        every { scheduleRepository.getSchedulesByDate(any(), any()) } returns flowOf(emptyList())
+        every { scheduleRepository.getDatesWithSchedules(any(), any()) } returns flowOf(emptyList())
+        every { todoRepository.getActiveTodos() } returns flowOf(listOf(todo))
+        every { todoRepository.getCompletedTodos() } returns flowOf(emptyList())
+        coEvery { captureRepository.getCaptureById("cap-1") } returns capture
+        coEvery { toggleTodoCompletion(any()) } just runs
+
+        val viewModel = CalendarViewModel(
+            application, scheduleRepository, todoRepository, captureRepository,
+            calendarRepository, toggleTodoCompletion,
+            reorderTodo, approveSuggestion
+        )
+        advanceUntilIdle()
+        assertFalse(viewModel.uiState.value.tasks.first().isCompleted)
+
+        // When: 체크 이벤트 발생 직후
+        viewModel.onEvent(CalendarEvent.ToggleTaskComplete("todo-1"))
+
+        // Then: DB 반영 전에 UI 상태가 먼저 변경됨
+        assertTrue(viewModel.uiState.value.tasks.first().isCompleted)
+        coVerify(exactly = 0) { toggleTodoCompletion(any()) }
+
+        advanceUntilIdle()
+        coVerify(exactly = 1) { toggleTodoCompletion("todo-1") }
+    }
+
+    @Test
     fun `delete_emits_event`() = runTest {
         // Given
         coEvery { captureRepository.softDelete(any()) } just runs
