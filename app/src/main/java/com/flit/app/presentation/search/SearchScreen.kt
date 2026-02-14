@@ -36,6 +36,7 @@ import com.flit.app.domain.model.SemanticSearchResult
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FilterChipRow
 import com.flit.app.presentation.components.common.FlitChip
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.ui.theme.FlitTheme
 
 /**
@@ -96,7 +97,11 @@ fun SearchContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = colors.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                FlitSnackbar(snackbarData = data)
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

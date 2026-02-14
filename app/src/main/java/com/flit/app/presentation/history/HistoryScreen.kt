@@ -28,6 +28,7 @@ import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.domain.model.Capture
 import com.flit.app.domain.model.ClassifiedType
 import com.flit.app.presentation.components.common.FlitChip
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.presentation.components.common.SwipeableCard
 import com.flit.app.presentation.history.components.HistoryItem
 import com.flit.app.ui.theme.FlitTheme
@@ -131,7 +132,11 @@ fun HistoryContent(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                FlitSnackbar(snackbarData = data)
+            }
+        },
         containerColor = colors.background
     ) { paddingValues ->
         Column(

@@ -44,6 +44,7 @@ import com.flit.app.domain.model.Folder
 import com.flit.app.domain.model.FolderType
 import com.flit.app.domain.model.NoteDetail
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.ui.theme.FlitTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -191,12 +192,7 @@ fun NoteDetailContent(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = colors.card,
-                    contentColor = colors.text,
-                    actionColor = colors.accent
-                )
+                FlitSnackbar(snackbarData = data)
             }
         },
         containerColor = colors.background,

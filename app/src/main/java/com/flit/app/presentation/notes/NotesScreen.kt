@@ -60,6 +60,7 @@ import com.flit.app.domain.model.NoteSubType
 import com.flit.app.domain.model.NoteViewType
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FlitChip
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.ui.theme.FlitTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -251,7 +252,8 @@ internal fun NotesContentInternal(
             hostState = snackbarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
+            snackbar = { data -> FlitSnackbar(snackbarData = data) }
         )
     }
 

@@ -22,7 +22,7 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_widget_edit"
             android:contentDescription="캡처 입력"
-            android:tint="#6750A4" />
+            android:tint="?android:attr/textColorPrimary" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -42,5 +42,5 @@
         android:text="오늘 3개"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:textColor="#6750A4" />
+        android:textColor="?android:attr/textColorPrimary" />
 </LinearLayout>

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.flit.app.domain.model.LocalCalendar
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.presentation.components.common.SectionHeader
 import com.flit.app.presentation.settings.components.NavigationSettingItem
 import com.flit.app.presentation.settings.components.SettingsCard
@@ -90,7 +91,11 @@ fun CalendarSettingsContent(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                FlitSnackbar(snackbarData = data)
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {

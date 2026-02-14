@@ -36,6 +36,7 @@ import com.flit.app.domain.model.SubscriptionTier
 import com.flit.app.domain.model.ThemePreference
 import com.flit.app.presentation.components.common.SectionHeader
 import com.flit.app.presentation.components.common.AppFontScaleProvider
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.presentation.settings.components.NavigationSettingItem
 import com.flit.app.presentation.settings.components.SettingsCard
 import com.flit.app.presentation.settings.components.SettingsDivider
@@ -151,7 +152,11 @@ fun SettingsContent(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                FlitSnackbar(snackbarData = data)
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -593,4 +598,3 @@ private fun ThemeOptionItem(
         }
     }
 }
-
