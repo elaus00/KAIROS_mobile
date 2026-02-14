@@ -1,17 +1,14 @@
 /* ==========================================================================
    Flit. Docs — 디자인 가이드 기반 커스텀 테마
-   색상: 모노크롬 (유채색은 danger/success/warning만)
-   폰트: Sora (브랜드), 시스템 산세리프 (본문)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;480;500;600&display=swap');
 
-/* --- 부드러운 스크롤 ------------------------------------------------------ */
 html {
   scroll-behavior: smooth;
 }
 
-/* --- CSS 변수 (Flit 디자인 토큰) ----------------------------------------- */
+/* --- CSS 변수 ------------------------------------------------------------ */
 
 [data-md-color-scheme="default"] {
   --md-primary-fg-color: #111111;
@@ -20,7 +17,6 @@ html {
   --md-default-fg-color: #111111;
   --md-default-bg-color: #FAFAFA;
 
-  --flit-bg: #FAFAFA;
   --flit-card: #FFFFFF;
   --flit-border: #E5E5E5;
   --flit-text: #111111;
@@ -30,7 +26,6 @@ html {
   --flit-chip-bg: #F0F0F0;
   --flit-accent-bg: #F5F5F5;
   --flit-sidebar-bg: #F7F7F7;
-  --flit-icon: #555555;
 }
 
 [data-md-color-scheme="slate"] {
@@ -41,7 +36,6 @@ html {
   --md-default-bg-color: #0A0A0A;
   --md-default-fg-color--light: #888888;
 
-  --flit-bg: #0A0A0A;
   --flit-card: #1A1A1A;
   --flit-border: #2A2A2A;
   --flit-text: rgba(255, 255, 255, 0.8);
@@ -51,14 +45,12 @@ html {
   --flit-chip-bg: #2A2A2A;
   --flit-accent-bg: #252525;
   --flit-sidebar-bg: #141414;
-  --flit-icon: #AAAAAA;
 }
 
 /* --- 전역 타이포그래피 ---------------------------------------------------- */
 
 body {
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .md-typeset {
@@ -66,10 +58,7 @@ body {
   line-height: 1.7;
 }
 
-.md-typeset h1,
-.md-typeset h2,
-.md-typeset h3,
-.md-typeset h4 {
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4 {
   font-family: 'Sora', sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -80,14 +69,14 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* --- 1. 헤더 — 상단 고정 해제 + 아이콘 색상 수정 ------------------------- */
+/* --- 헤더 ---------------------------------------------------------------- */
 
+/* 상단 고정 해제 */
 .md-header {
-  position: relative;
-  background-color: var(--flit-card);
-  box-shadow: 0 1px 0 var(--flit-border);
-  /* 핵심: 헤더 내부에서 --md-primary-bg-color를 텍스트색으로 재정의
-     → Material이 아이콘/제목에 이 변수를 사용하므로 색상이 올바르게 표시됨 */
+  position: relative !important;
+  background-color: var(--flit-card) !important;
+  box-shadow: 0 1px 0 var(--flit-border) !important;
+  /* Material이 아이콘/텍스트에 이 변수를 사용 → 텍스트색으로 재정의 */
   --md-primary-bg-color: var(--flit-text);
 }
 
@@ -107,19 +96,18 @@ body {
 
 /* --- 왼쪽 사이드바 -------------------------------------------------------- */
 
-/* 4. "Flit. Docs" 사이트 제목 — transparent 방지 */
+/* "Flit. Docs" 사이트 제목 숨김 — 헤더에만 표시 */
 .md-sidebar--primary .md-nav__title {
-  background: var(--md-default-bg-color);
-  box-shadow: 0 0 0.4rem 0.4rem var(--md-default-bg-color);
+  display: none !important;
 }
 
 /* 섹션 레이블 (제품 방향, 인사이트, ...) */
 .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link {
   font-family: 'Sora', sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.7rem !important;
   font-weight: 600;
   color: var(--flit-text);
-  padding: 0.6rem 0.6rem 0.3rem;
+  padding: 0.6rem 0.6rem 0.3rem !important;
   margin-top: 0.8rem;
   border-bottom: 1px solid var(--flit-divider);
 }
@@ -128,11 +116,11 @@ body {
   margin-top: 0;
 }
 
-/* 하위 문서 링크 */
+/* 하위 문서 링크 — 들여쓰기 완전 제거 */
 .md-nav--primary .md-nav--nested .md-nav__link {
-  font-size: 0.64rem;
+  font-size: 0.64rem !important;
   color: var(--flit-text-secondary);
-  padding-left: 0.6rem;
+  padding-left: 0.6rem !important;
 }
 
 .md-nav--primary .md-nav--nested .md-nav__link:hover,
@@ -140,8 +128,15 @@ body {
   color: var(--flit-text);
 }
 
+/* 들여쓰기 완전 제거: 모든 레벨의 중첩 리스트 */
+.md-nav--primary .md-nav__list .md-nav__list {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
 .md-nav--primary .md-nav--nested {
-  margin-left: 0;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 }
 
 /* --- 오른쪽 사이드바: TOC ------------------------------------------------- */
@@ -150,7 +145,6 @@ body {
   padding-right: 0.6rem;
 }
 
-/* TOC 컨테이너 */
 .md-sidebar--secondary .md-nav--secondary {
   background: var(--flit-sidebar-bg);
   border-radius: 12px;
@@ -158,26 +152,26 @@ body {
   border: 1px solid var(--flit-border);
 }
 
-/* 2. "목차" 타이틀 — 글씨 키우고 여백 추가 */
+/* "목차" 타이틀 */
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {
   font-family: 'Sora', sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.68rem !important;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--flit-text-muted);
-  background: var(--flit-sidebar-bg);
-  box-shadow: 0 0 0.4rem 0.4rem var(--flit-sidebar-bg);
-  padding: 0 0.4rem 0.6rem;
+  background: var(--flit-sidebar-bg) !important;
+  box-shadow: 0 0 0.4rem 0.4rem var(--flit-sidebar-bg) !important;
+  padding: 0 0.4rem 0.6rem !important;
   margin-bottom: 0.6rem;
   border-bottom: 1px solid var(--flit-divider);
 }
 
-/* 2. TOC 링크 — 글씨 키우고 여백 추가 */
+/* TOC 링크 */
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
-  font-size: 0.7rem;
+  font-size: 0.7rem !important;
   color: var(--flit-text-secondary);
-  padding: 0.35rem 0.4rem;
+  padding: 0.35rem 0.4rem !important;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link:hover,
@@ -185,7 +179,7 @@ body {
   color: var(--flit-text);
 }
 
-/* --- 본문 콘텐츠 --------------------------------------------------------- */
+/* --- 본문 ---------------------------------------------------------------- */
 
 .md-content {
   max-width: 52rem;
