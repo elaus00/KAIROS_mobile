@@ -10,16 +10,19 @@ theme:
   palette:
     - scheme: slate
       primary: black
-      accent: deep purple
+      accent: black
       toggle:
         icon: material/brightness-4
         name: 라이트 모드로 전환
     - scheme: default
       primary: white
-      accent: deep purple
+      accent: black
       toggle:
         icon: material/brightness-7
         name: 다크 모드로 전환
+  font:
+    text: Inter
+    code: JetBrains Mono
   features:
     - navigation.sections
     - navigation.expand
@@ -27,6 +30,9 @@ theme:
     - search.highlight
     - search.suggest
     - content.code.copy
+
+extra_css:
+  - stylesheets/flit.css
 
 plugins:
   - search:
