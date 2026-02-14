@@ -81,6 +81,7 @@ Docs/
 | `material-design-audit.md` | Material Design 커스텀 현황 점검 — High 10건, Medium 10건 | 2026-02-08 |
 | `qa-retrospective.md` | QA 회고 리포트 — 51건 이슈 분석, 반복 패턴 5가지, 핵심 교훈 5가지 | 2026-02-14 |
 | `qa-retrospective.csv` | QA 회고 구조화 데이터 — 51건 CSV (Notion/스프레드시트 import용) | 2026-02-14 |
+| `2026-02-15_android-ml-performance-benchmark.md` | 안드로이드 ML 성능 벤치마크 조사 — TFLite/ML Kit/MediaPipe 성능 비교, NPU vs GPU vs CPU, Flit 적용 시나리오 | 2026-02-15 |
 
 ### design/
 
@@ -122,6 +123,7 @@ Docs/
 
 | 일시 | 문서 | 변경 내용 |
 |------|------|-----------|
+| 2026-02-15 | `analysis/2026-02-15_android-ml-performance-benchmark.md` | 안드로이드 ML 성능 벤치마크 조사 v1.0 — TFLite/ML Kit/MediaPipe 성능 비교, NPU 25배 속도 개선, Flit 하이브리드 전략 권장 |
 | 2026-02-14 | `analysis/qa-retrospective.md` | QA 회고 리포트 v1.0 — 51건 이슈 분석, 카테고리 분류, 반복 패턴/근본 원인/교훈 도출 |
 | 2026-02-14 | `analysis/qa-retrospective.csv` | QA 회고 구조화 데이터 — 51건 CSV |
 | 2026-02-14 | `specs/play-store-listing.md` | v1.0 작성 — 앱 정보, 스토어 설명, 에셋 목록, 등급 가이드, 릴리스 체크리스트 |
