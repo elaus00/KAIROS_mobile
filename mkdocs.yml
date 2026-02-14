@@ -47,7 +47,6 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - 홈: index.md
   - 제품 방향:
       - PRD: direction/flit_prd_v10.md
       - 철학 및 원칙: direction/philosophy_principles.md

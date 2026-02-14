@@ -128,14 +128,18 @@ body {
   color: var(--flit-text);
 }
 
-/* 들여쓰기 완전 제거: 모든 레벨의 중첩 리스트 */
-.md-nav--primary .md-nav__list .md-nav__list {
-  margin-left: 0 !important;
+/* 들여쓰기 완전 제거: 모든 레벨 */
+.md-nav--primary .md-nav__list {
   padding-left: 0 !important;
+  margin-left: 0 !important;
 }
 
 .md-nav--primary .md-nav--nested {
   margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.md-nav--primary .md-nav__item {
   padding-left: 0 !important;
 }
 
@@ -171,7 +175,7 @@ body {
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
   font-size: 0.7rem !important;
   color: var(--flit-text-secondary);
-  padding: 0.35rem 0.4rem !important;
+  padding: 0.2rem 0.4rem !important;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link:hover,
