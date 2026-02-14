@@ -50,7 +50,7 @@ fun SwipeableCard(
         val scope = rememberCoroutineScope()
         val offsetX = remember { Animatable(0f) }
 
-        Box(modifier = modifier.clip(cardShape)) {
+        Box(modifier = modifier) { // clip 제거: 내부 Box들이 이미 클리핑 처리
             // 배경: 삭제 버튼
             Box(
                 modifier = Modifier
