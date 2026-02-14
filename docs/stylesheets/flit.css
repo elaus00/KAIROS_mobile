@@ -123,13 +123,18 @@ body {
   display: none !important;
 }
 
+/* 모바일/데스크톱 공통: 첫 글자 잘림 방지를 위한 좌측 거터 */
+.md-sidebar--primary .md-sidebar__inner {
+  padding-left: 0.35rem;
+}
+
 /* 섹션 레이블 */
 .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link {
   font-family: var(--flit-font);
   font-size: 13px !important;
   font-weight: 600;
   color: var(--flit-text);
-  padding: 0.6rem 0.6rem 0.3rem 0.9rem !important;
+  padding: 0.6rem 0.6rem 0.3rem 0.75rem !important;
   margin-top: 0.8rem;
   border-bottom: 1px solid var(--flit-divider);
 }
@@ -143,8 +148,7 @@ body {
   font-family: var(--flit-font);
   font-size: 13px !important;
   color: var(--flit-text-secondary);
-  padding-left: 0.9rem !important;
-  overflow: visible;
+  padding-left: 0.75rem !important;
 }
 
 .md-nav--primary .md-nav--nested .md-nav__link:hover,
@@ -164,13 +168,18 @@ body {
 }
 
 .md-nav--primary .md-nav__item {
-  padding-left: 0.2rem !important;
+  padding-left: 0.1rem !important;
 }
 
 /* --- 오른쪽 사이드바: TOC ------------------------------------------------- */
 
 .md-sidebar--secondary .md-sidebar__inner {
-  padding-right: 0.6rem;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.md-sidebar--secondary .md-sidebar__scrollwrap {
+  padding-right: 0;
 }
 
 .md-sidebar--secondary .md-nav--secondary {
@@ -178,7 +187,7 @@ body {
   border-radius: 8px;
   padding: 0.8rem;
   border: 1px solid var(--flit-border);
-  text-align: right;
+  margin-left: auto;
 }
 
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {
@@ -193,7 +202,6 @@ body {
   padding: 0 0.4rem 0.4rem !important;
   margin-bottom: 0.4rem;
   border-bottom: 1px solid var(--flit-divider);
-  text-align: right;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
@@ -201,7 +209,6 @@ body {
   font-size: 13px !important;
   color: var(--flit-text-secondary);
   padding: 0.15rem 0.4rem !important;
-  text-align: right;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link:hover,
@@ -212,12 +219,11 @@ body {
 /* --- 본문 ---------------------------------------------------------------- */
 
 .md-content {
-  max-width: 700px;
+  max-width: 680px;
 }
 
-.md-main__inner {
-  margin-left: 0.4rem;
-  margin-right: 0.4rem;
+.md-grid {
+  max-width: 76rem;
 }
 
 .md-typeset code {
