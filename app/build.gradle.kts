@@ -96,33 +96,23 @@ android {
         }
     }
 
-    // 불필요한 variant 필터링 (devDebug, stagingRelease, productionRelease, productionBenchmark만 활성화)
+    // 불필요한 variant 제거: devRelease, stagingDebug, productionDebug
     androidComponents {
         beforeVariants { variantBuilder ->
             val flavor = variantBuilder.productFlavors.firstOrNull()?.second
             val buildType = variantBuilder.buildType
 
-            // 비활성화할 조합
             variantBuilder.enable = when {
-                flavor == "dev" && buildType == "release" -> false          // devRelease 비활성화
-                flavor == "dev" && buildType == "benchmark" -> false        // devBenchmark 비활성화
-                flavor == "staging" && buildType == "debug" -> false        // stagingDebug 비활성화
-                flavor == "staging" && buildType == "benchmark" -> false    // stagingBenchmark 비활성화
-                flavor == "production" && buildType == "debug" -> false     // productionDebug 비활성화
-                else -> true  // 나머지는 활성화 (devDebug, stagingRelease, productionRelease, productionBenchmark)
+                flavor == "dev" && buildType == "release" -> false       // devRelease 제거
+                flavor == "staging" && buildType == "debug" -> false     // stagingDebug 제거
+                flavor == "production" && buildType == "debug" -> false  // productionDebug 제거
+                else -> true  // 나머지는 모두 활성화 (자동 생성 포함)
             }
         }
     }
 
     buildTypes {
         debug {
-            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
-        }
-        create("benchmark") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-            signingConfig = signingConfigs.getByName("debug")
-            isDebuggable = false
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
         }
         release {
