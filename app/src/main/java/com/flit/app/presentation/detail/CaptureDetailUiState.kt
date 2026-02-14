@@ -26,9 +26,5 @@ data class CaptureDetailUiState(
     /** 공유용 텍스트 (한 번 소비 후 null 초기화) */
     val shareText: String? = null,
     /** AI 자동 생성 태그 목록 */
-    val tags: List<String> = emptyList(),
-    /** 본문 글씨 크기 (설정에서 가져옴) */
-    val bodyFontSize: Int = 15,
-    /** 본문 줄 높이 (설정에서 가져옴) */
-    val bodyLineHeight: Int = 22
+    val tags: List<String> = emptyList()
 )
