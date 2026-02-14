@@ -38,6 +38,36 @@ presentation/ → domain/ → data/ (단방향 의존)
 ./gradlew :app:testDebugUnitTest --tests "com.flit.app.screenshot.*" -Proborazzi.test.record  # 골든 이미지 기록
 ```
 
+## Branch Strategy
+
+서버(KAIROS_Server)와 동일한 3단계 브랜치 전략 사용:
+
+### 브랜치 구조
+- `feature/*`: 기능 개발 (로컬에서만 작업)
+- `develop`: 개발 환경 배포 브랜치
+- `release/*`: 스테이징 환경 배포 브랜치 (QA/내부 테스트)
+- `master`: 프로덕션 환경 배포 브랜치 (Play Store 배포)
+
+### 배포 흐름
+1. **개발**: `feature/*` → `develop` (PR) → 내부 테스트 빌드
+2. **스테이징**: `develop` → `release/vX.Y.Z` (PR) → QA 테스트 빌드
+3. **프로덕션**: `release/vX.Y.Z` → `master` (PR) → Play Store 배포
+
+### 서버와의 브랜치 동기화
+- 모바일과 서버는 **동일한 브랜치 이름**을 사용하여 환경별 API 엔드포인트 매칭
+- `develop` 브랜치: 서버 Development 환경 (`kairos-flit-server-dev`)과 연동
+- `release/*` 브랜치: 서버 Staging 환경 (`kairos-flit-server-staging`)과 연동
+- `master` 브랜치: 서버 Production 환경 (`kairos-flit-server`)과 연동
+
+### 환경별 API 엔드포인트 (예시)
+| 브랜치 | 서버 환경 | API Base URL |
+|--------|----------|--------------|
+| develop | Development | `https://kairos-flit-server-dev-HASH.run.app` |
+| release/* | Staging | `https://kairos-flit-server-staging-HASH.run.app` |
+| master | Production | `https://kairos-flit-server-HASH.run.app` |
+
+**참고**: API Base URL은 빌드 설정 또는 환경 변수로 관리
+
 ## Code Style
 
 - 주석: 한글 필수
