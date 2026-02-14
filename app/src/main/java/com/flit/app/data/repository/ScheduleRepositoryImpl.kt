@@ -35,6 +35,10 @@ class ScheduleRepositoryImpl @Inject constructor(
             .map { entities -> entities.map { scheduleMapper.toDomain(it) } }
     }
 
+    override suspend fun getAllSchedulesForSync(): List<Schedule> {
+        return scheduleDao.getAllForSync().map(scheduleMapper::toDomain)
+    }
+
     override fun getDatesWithSchedules(rangeStartMs: Long, rangeEndMs: Long): Flow<List<Long>> {
         return scheduleDao.getDatesWithSchedules(rangeStartMs, rangeEndMs)
     }

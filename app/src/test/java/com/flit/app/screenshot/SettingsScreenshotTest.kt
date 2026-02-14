@@ -39,13 +39,11 @@ class SettingsScreenshotTest {
                     onNavigateToCalendarSettings = {},
                     onNavigateToAiSettings = {},
                     onSetTheme = {},
-                    onSetCaptureFontSize = {},
+                    onSetFontSizePreference = {},
                     onSetNoteViewType = {},
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onExportCaptureImages = {},
-                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }
@@ -78,13 +76,11 @@ class SettingsScreenshotTest {
                     onNavigateToCalendarSettings = {},
                     onNavigateToAiSettings = {},
                     onSetTheme = {},
-                    onSetCaptureFontSize = {},
+                    onSetFontSizePreference = {},
                     onSetNoteViewType = {},
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onExportCaptureImages = {},
-                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }
@@ -109,13 +105,11 @@ class SettingsScreenshotTest {
                     onNavigateToCalendarSettings = {},
                     onNavigateToAiSettings = {},
                     onSetTheme = {},
-                    onSetCaptureFontSize = {},
+                    onSetFontSizePreference = {},
                     onSetNoteViewType = {},
                     onToggleCalendar = {},
                     onRequestCalendarPermission = {},
                     onLogout = {},
-                    onExportCaptureImages = {},
-                    onDismissExportResult = {},
                     onDismissCalendarAuthMessage = {}
                 )
             }

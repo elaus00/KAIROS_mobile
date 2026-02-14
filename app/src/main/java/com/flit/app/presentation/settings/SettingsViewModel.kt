@@ -1,19 +1,23 @@
 package com.flit.app.presentation.settings
 
-import android.content.ContentValues
 import android.content.Context
+import android.content.ContentValues
+import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.ThemePreference
+import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.CalendarRepository
+import com.flit.app.domain.repository.ImageRepository
+import com.flit.app.domain.repository.ScheduleRepository
 import com.flit.app.domain.repository.SubscriptionRepository
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.model.NoteViewType
+import com.flit.app.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import com.flit.app.domain.usecase.settings.GetCalendarSettingsUseCase
 import com.flit.app.domain.usecase.settings.PreferenceKeys
 import com.flit.app.domain.usecase.settings.SetCalendarSettingsUseCase
@@ -37,8 +41,11 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val userPreferenceRepository: UserPreferenceRepository,
     private val calendarRepository: CalendarRepository,
+    private val imageRepository: ImageRepository,
+    private val scheduleRepository: ScheduleRepository,
     private val getCalendarSettingsUseCase: GetCalendarSettingsUseCase,
     private val setCalendarSettingsUseCase: SetCalendarSettingsUseCase,
+    private val syncScheduleToCalendarUseCase: SyncScheduleToCalendarUseCase,
     private val authRepository: AuthRepository,
     private val subscriptionRepository: SubscriptionRepository
 ) : ViewModel() {
@@ -51,7 +58,7 @@ class SettingsViewModel @Inject constructor(
         loadCalendarSettings()
         refreshCalendarPermissionState()
         loadAccountInfo()
-        loadCaptureFontSize()
+        loadFontSizePreference()
         loadNoteViewType()
     }
 
@@ -86,11 +93,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /** 캡처 글씨 크기 로드 */
-    private fun loadCaptureFontSize() {
+    /** 앱 글씨 크기 로드 */
+    private fun loadFontSizePreference() {
         viewModelScope.launch {
-            val size = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
-            _uiState.update { it.copy(captureFontSize = size) }
+            val size = userPreferenceRepository.getString(
+                PreferenceKeys.KEY_CAPTURE_FONT_SIZE,
+                FontSizePreference.MEDIUM.name
+            )
+            _uiState.update { it.copy(fontSizePreference = FontSizePreference.fromString(size)) }
         }
     }
 
@@ -138,6 +148,7 @@ class SettingsViewModel @Inject constructor(
                     calendarAuthMessage = "캘린더 권한이 허용되었습니다."
                 )
             }
+            syncExistingSchedulesToCalendar()
         }
     }
 
@@ -160,11 +171,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    /** 캡처 글씨 크기 변경 */
-    fun setCaptureFontSize(size: String) {
+    /** 앱 글씨 크기 변경 */
+    fun setFontSizePreference(size: FontSizePreference) {
         viewModelScope.launch {
-            userPreferenceRepository.setString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, size)
-            _uiState.update { it.copy(captureFontSize = size) }
+            userPreferenceRepository.setString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, size.name)
+            _uiState.update { it.copy(fontSizePreference = size) }
         }
     }
 
@@ -211,6 +222,20 @@ class SettingsViewModel @Inject constructor(
                     isCalendarPermissionGranted = calendarRepository.isCalendarPermissionGranted()
                 )
             }
+            if (enabled) {
+                syncExistingSchedulesToCalendar()
+            }
+        }
+    }
+
+    private suspend fun syncExistingSchedulesToCalendar() {
+        val targets = scheduleRepository.getAllSchedulesForSync().filter { schedule ->
+            schedule.calendarSyncStatus == CalendarSyncStatus.NOT_LINKED ||
+                schedule.calendarSyncStatus == CalendarSyncStatus.SYNC_FAILED ||
+                schedule.calendarSyncStatus == CalendarSyncStatus.SUGGESTION_PENDING
+        }
+        targets.forEach { schedule ->
+            runCatching { syncScheduleToCalendarUseCase(schedule.id) }
         }
     }
 
@@ -227,12 +252,38 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(calendarAuthMessage = message) }
     }
 
+    fun dismissImportResult() {
+        _uiState.update { it.copy(importResult = null) }
+    }
+
+    fun importCaptureImage(sourceUri: Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isImporting = true, importResult = null) }
+            try {
+                imageRepository.saveImage(sourceUri)
+                _uiState.update {
+                    it.copy(
+                        isImporting = false,
+                        importResult = "이미지 업로드 완료 (캡처 저장소)"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isImporting = false,
+                        importResult = "실패: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
     /** 내보내기 결과 메시지 닫기 */
     fun dismissExportResult() {
         _uiState.update { it.copy(exportResult = null) }
     }
 
-    /** 캡처 이미지를 Downloads/Flit/으로 내보내기 */
+    /** 캡처 이미지를 Pictures/Flit/으로 내보내기 */
     fun exportCaptureImages() {
         viewModelScope.launch {
             _uiState.update { it.copy(isExporting = true, exportResult = null) }
@@ -270,7 +321,7 @@ class SettingsViewModel @Inject constructor(
                         put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
                         put(MediaStore.Images.Media.MIME_TYPE, mimeType)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            put(MediaStore.Images.Media.RELATIVE_PATH, "Download/Flit")
+                            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Flit")
                             put(MediaStore.Images.Media.IS_PENDING, 1)
                         }
                     }
@@ -298,7 +349,7 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isExporting = false,
-                        exportResult = "${exportedCount}장 내보냄 → Downloads/Flit/"
+                        exportResult = "${exportedCount}장 내보냄 → Pictures/Flit/"
                     )
                 }
             } catch (e: Exception) {
@@ -308,4 +359,5 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
 }

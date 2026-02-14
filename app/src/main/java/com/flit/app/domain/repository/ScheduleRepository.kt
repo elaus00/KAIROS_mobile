@@ -20,6 +20,9 @@ interface ScheduleRepository {
     /** 특정 날짜의 일정 조회 (start_time 기준) */
     fun getSchedulesByDate(dateStartMs: Long, dateEndMs: Long): Flow<List<Schedule>>
 
+    /** 캘린더 동기화 재평가용 전체 일정 조회 */
+    suspend fun getAllSchedulesForSync(): List<Schedule>
+
     /** 일정이 있는 날짜 목록 조회 (캘린더 도트 표시용) */
     fun getDatesWithSchedules(rangeStartMs: Long, rangeEndMs: Long): Flow<List<Long>>
 

@@ -60,7 +60,8 @@ fun SettingsScreen(
     onNavigateToSubscription: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToCalendarSettings: () -> Unit = {},
-    onNavigateToAiSettings: () -> Unit = {}
+    onNavigateToAiSettings: () -> Unit = {},
+    onNavigateToCaptureImageExport: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -70,6 +71,11 @@ fun SettingsScreen(
         val readGranted = result[Manifest.permission.READ_CALENDAR] == true
         val writeGranted = result[Manifest.permission.WRITE_CALENDAR] == true
         viewModel.onCalendarPermissionResult(readGranted && writeGranted)
+    }
+    val imageImportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.importCaptureImage(it) }
     }
 
     LaunchedEffect(Unit) {
@@ -87,7 +93,7 @@ fun SettingsScreen(
         onNavigateToCalendarSettings = onNavigateToCalendarSettings,
         onNavigateToAiSettings = onNavigateToAiSettings,
         onSetTheme = viewModel::setTheme,
-        onSetCaptureFontSize = viewModel::setCaptureFontSize,
+        onSetFontSizePreference = viewModel::setFontSizePreference,
         onSetNoteViewType = viewModel::setNoteViewType,
         onToggleCalendar = viewModel::toggleCalendar,
         onRequestCalendarPermission = {
@@ -99,8 +105,9 @@ fun SettingsScreen(
             )
         },
         onLogout = viewModel::logout,
-        onExportCaptureImages = viewModel::exportCaptureImages,
-        onDismissExportResult = viewModel::dismissExportResult,
+        onImportCaptureImage = { imageImportLauncher.launch("image/*") },
+        onDismissImportResult = viewModel::dismissImportResult,
+        onNavigateToCaptureImageExport = onNavigateToCaptureImageExport,
         onDismissCalendarAuthMessage = viewModel::dismissCalendarAuthMessage
     )
 }
@@ -122,13 +129,14 @@ fun SettingsContent(
     onNavigateToCalendarSettings: () -> Unit,
     onNavigateToAiSettings: () -> Unit,
     onSetTheme: (ThemePreference) -> Unit,
-    onSetCaptureFontSize: (String) -> Unit,
+    onSetFontSizePreference: (FontSizePreference) -> Unit,
     onSetNoteViewType: (String) -> Unit,
     onToggleCalendar: (Boolean) -> Unit,
     onRequestCalendarPermission: () -> Unit,
     onLogout: () -> Unit,
-    onExportCaptureImages: () -> Unit = {},
-    onDismissExportResult: () -> Unit = {},
+    onImportCaptureImage: () -> Unit = {},
+    onDismissImportResult: () -> Unit = {},
+    onNavigateToCaptureImageExport: () -> Unit = {},
     onDismissCalendarAuthMessage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -244,24 +252,24 @@ fun SettingsContent(
 
                 ThemeOptionItem(
                     title = "작게",
-                    isSelected = uiState.captureFontSize == FontSizePreference.SMALL.name,
-                    onClick = { onSetCaptureFontSize(FontSizePreference.SMALL.name) }
+                    isSelected = uiState.fontSizePreference == FontSizePreference.SMALL,
+                    onClick = { onSetFontSizePreference(FontSizePreference.SMALL) }
                 )
 
                 SettingsDivider()
 
                 ThemeOptionItem(
                     title = "보통",
-                    isSelected = uiState.captureFontSize == FontSizePreference.MEDIUM.name,
-                    onClick = { onSetCaptureFontSize(FontSizePreference.MEDIUM.name) }
+                    isSelected = uiState.fontSizePreference == FontSizePreference.MEDIUM,
+                    onClick = { onSetFontSizePreference(FontSizePreference.MEDIUM) }
                 )
 
                 SettingsDivider()
 
                 ThemeOptionItem(
                     title = "크게",
-                    isSelected = uiState.captureFontSize == FontSizePreference.LARGE.name,
-                    onClick = { onSetCaptureFontSize(FontSizePreference.LARGE.name) }
+                    isSelected = uiState.fontSizePreference == FontSizePreference.LARGE,
+                    onClick = { onSetFontSizePreference(FontSizePreference.LARGE) }
                 )
 
             }
@@ -434,7 +442,55 @@ fun SettingsContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 48.dp)
-                            .clickable(enabled = !uiState.isExporting) { onExportCaptureImages() }
+                            .clickable(enabled = !uiState.isImporting) { onImportCaptureImage() }
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "이미지 업로드",
+                                    color = colors.text,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "갤러리 이미지를 캡처 저장소로 가져오기",
+                                    color = colors.textMuted,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            if (uiState.isImporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = colors.textMuted
+                                )
+                            }
+                        }
+
+                        if (uiState.importResult != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = uiState.importResult,
+                                color = if (uiState.importResult.startsWith("실패")) colors.danger else colors.success,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    SettingsDivider()
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clickable { onNavigateToCaptureImageExport() }
                             .padding(horizontal = 16.dp, vertical = 14.dp)
                     ) {
                         Row(
@@ -451,29 +507,11 @@ fun SettingsContent(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "캡처 이미지를 Downloads/Flit/으로 복사",
+                                    text = "업로드 이미지 목록에서 이름 지정 후 내보내기",
                                     color = colors.textMuted,
                                     fontSize = 13.sp
                                 )
                             }
-
-                            if (uiState.isExporting) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp,
-                                    color = colors.textMuted
-                                )
-                            }
-                        }
-
-                        // 결과 표시
-                        if (uiState.exportResult != null) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = uiState.exportResult,
-                                color = if (uiState.exportResult.startsWith("실패")) colors.danger else colors.success,
-                                fontSize = 12.sp
-                            )
                         }
                     }
                 }
@@ -537,13 +575,14 @@ private fun SettingsContentPreview() {
             onNavigateToCalendarSettings = {},
             onNavigateToAiSettings = {},
             onSetTheme = {},
-            onSetCaptureFontSize = {},
+            onSetFontSizePreference = {},
             onSetNoteViewType = {},
             onToggleCalendar = {},
             onRequestCalendarPermission = {},
             onLogout = {},
-            onExportCaptureImages = {},
-            onDismissExportResult = {},
+            onImportCaptureImage = {},
+            onDismissImportResult = {},
+            onNavigateToCaptureImageExport = {},
             onDismissCalendarAuthMessage = {}
         )
     }

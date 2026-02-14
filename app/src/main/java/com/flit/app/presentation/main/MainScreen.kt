@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -64,8 +65,12 @@ fun MainScreen(
     onNavigateToNoteDetail: (String) -> Unit = {},
     onNavigateToTrash: () -> Unit = {},
     onNavigateToReorganize: () -> Unit = {},
-    captureViewModel: CaptureViewModel = hiltViewModel()
+    captureViewModel: CaptureViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val mainUiState by mainViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // 오프라인 상태 관찰
     val context = LocalContext.current
     var isOffline by remember { mutableStateOf(false) }
@@ -89,9 +94,23 @@ fun MainScreen(
         onDispose { connectivityManager.unregisterNetworkCallback(callback) }
     }
 
+    LaunchedEffect(Unit) {
+        mainViewModel.events.collect { event ->
+            when (event) {
+                is MainUiEvent.ShowMessage -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+        }
+    }
+
     MainContent(
         initialTab = initialTab,
         isOffline = isOffline,
+        isSyncing = mainUiState.isSyncing,
         autoFocusCapture = autoFocusCapture,
         pendingTab = pendingTab,
         onPendingTabHandled = onPendingTabHandled,
@@ -101,7 +120,8 @@ fun MainScreen(
         onNavigateToNoteDetail = onNavigateToNoteDetail,
         onNavigateToTrash = onNavigateToTrash,
         onNavigateToReorganize = onNavigateToReorganize,
-        onRefreshSync = { /* TODO: ViewModel의 수동 동기화 함수 호출 */ },
+        onRefreshSync = mainViewModel::retryServerSync,
+        snackbarHostState = snackbarHostState,
         captureViewModel = captureViewModel
     )
 }
@@ -115,6 +135,7 @@ fun MainScreen(
 fun MainContent(
     initialTab: FlitTab,
     isOffline: Boolean,
+    isSyncing: Boolean,
     autoFocusCapture: Boolean,
     pendingTab: String? = null,
     onPendingTabHandled: () -> Unit = {},
@@ -125,12 +146,12 @@ fun MainContent(
     onNavigateToTrash: () -> Unit,
     onNavigateToReorganize: () -> Unit,
     onRefreshSync: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     captureViewModel: CaptureViewModel? = null,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
     val colors = FlitTheme.colors
-    val snackbarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -216,6 +237,7 @@ fun MainContent(
                     )
                     IconButton(
                         onClick = onRefreshSync,
+                        enabled = !isSyncing,
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -270,6 +292,7 @@ private fun MainContentPreview() {
         MainContent(
             initialTab = FlitTab.HOME,
             isOffline = false,
+            isSyncing = false,
             autoFocusCapture = false,
             pendingTab = null,
             onPendingTabHandled = {},
@@ -279,7 +302,8 @@ private fun MainContentPreview() {
             onNavigateToNoteDetail = {},
             onNavigateToTrash = {},
             onNavigateToReorganize = {},
-            onRefreshSync = {}
+            onRefreshSync = {},
+            snackbarHostState = SnackbarHostState()
         )
     }
 }

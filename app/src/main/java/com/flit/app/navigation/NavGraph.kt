@@ -37,6 +37,7 @@ import com.flit.app.presentation.settings.TermsOfServiceScreen
 import com.flit.app.presentation.settings.ai.AiClassificationSettingsScreen
 import com.flit.app.presentation.settings.analytics.AnalyticsDashboardScreen
 import com.flit.app.presentation.settings.calendar.CalendarSettingsScreen
+import com.flit.app.presentation.settings.debug.CaptureImageExportScreen
 import com.flit.app.presentation.subscription.SubscriptionScreen
 import com.flit.app.presentation.trash.TrashScreen
 
@@ -67,6 +68,7 @@ object NavRoutes {
     const val ANALYTICS = "analytics"
     const val CALENDAR_SETTINGS = "calendar-settings"
     const val AI_CLASSIFICATION_SETTINGS = "ai-classification-settings"
+    const val CAPTURE_IMAGE_EXPORT = "capture-image-export"
 
     /**
      * CaptureDetailScreen 라우트 생성
@@ -218,6 +220,9 @@ fun FlitNavGraph(
                 },
                 onNavigateToAiSettings = {
                     navController.navigate(NavRoutes.AI_CLASSIFICATION_SETTINGS)
+                },
+                onNavigateToCaptureImageExport = {
+                    navController.navigate(NavRoutes.CAPTURE_IMAGE_EXPORT)
                 }
             )
         }
@@ -375,6 +380,29 @@ fun FlitNavGraph(
                 onNavigateToSubscription = {
                     navController.navigate(NavRoutes.SUBSCRIPTION)
                 }
+            )
+        }
+
+        // 캡처 이미지 내보내기 화면 (CAPTURE_IMAGE_EXPORT) - 수평 슬라이드 전환
+        composable(
+            route = NavRoutes.CAPTURE_IMAGE_EXPORT,
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffsetX = { it / 3 }
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = { fadeOut(animationSpec = tween(200)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffsetX = { it / 3 }
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            CaptureImageExportScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

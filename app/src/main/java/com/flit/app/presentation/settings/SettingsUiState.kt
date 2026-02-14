@@ -23,6 +23,8 @@ data class SettingsUiState(
     // 이미지 내보내기 상태
     val isExporting: Boolean = false,
     val exportResult: String? = null,
+    val isImporting: Boolean = false,
+    val importResult: String? = null,
 
     val calendarAuthMessage: String? = null,
 
@@ -31,8 +33,8 @@ data class SettingsUiState(
     val subscriptionTier: SubscriptionTier = SubscriptionTier.FREE,
     val features: SubscriptionFeatures = SubscriptionFeatures(),
 
-    // 캡처 글씨 크기 (SMALL / MEDIUM / LARGE)
-    val captureFontSize: String = FontSizePreference.MEDIUM.name,
+    // 앱 글씨 크기 (SMALL / MEDIUM / LARGE)
+    val fontSizePreference: FontSizePreference = FontSizePreference.MEDIUM,
 
     // 노트 보기 유형 (LIST / GRID / COMPACT)
     val noteViewType: String = "LIST"
