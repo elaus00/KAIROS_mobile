@@ -31,6 +31,8 @@ import com.flit.app.presentation.widget.WidgetUpdateHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import com.flit.app.data.remote.dto.v2.OcrRequest
+import com.google.gson.JsonParseException
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -51,6 +53,11 @@ class ClassifyCaptureWorker @AssistedInject constructor(
     private val buildModificationHistoryUseCase: BuildModificationHistoryUseCase,
     private val checkFeatureUseCase: CheckFeatureUseCase
 ) : CoroutineWorker(context, params) {
+    private class NonRetryableClassificationException(
+        message: String,
+        cause: Throwable? = null
+    ) : RuntimeException(message, cause)
+
     companion object {
         private const val TAG = "ClassifyCaptureWorker"
         private const val WORK_NAME = "classify_capture"
@@ -133,8 +140,17 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                             textToClassify = ocrResponse.text
                             Log.d(TAG, "OCR 완료: $captureId (${textToClassify.length}자)")
                         } catch (e: Exception) {
-                            Log.w(TAG, "OCR 실패, 원본 텍스트로 분류: ${e.message}")
+                            throw NonRetryableClassificationException(
+                                "OCR 실패 + 원본 텍스트 없음: $captureId",
+                                e
+                            )
                         }
+                    }
+
+                    if (textToClassify.isBlank()) {
+                        throw NonRetryableClassificationException(
+                            "분류할 텍스트가 비어 있습니다: $captureId"
+                        )
                     }
 
                     // API 호출
@@ -170,19 +186,32 @@ class ClassifyCaptureWorker @AssistedInject constructor(
                     successCount++
                     Log.d(TAG, "분류 성공: $captureId → ${classification.type}")
                 } catch (e: ApiException) {
-                    if (e.isRetryable) {
+                    if (shouldRetry(e)) {
                         handleRetry(item.id, item.retryCount, item.maxRetries)
                     } else {
                         syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
                     }
                     failCount++
                     Log.w(TAG, "API 응답 실패: code=${e.errorCode}, ${e.message}")
+                } catch (e: Exception) {
+                    if (shouldRetry(e)) {
+                        handleRetry(item.id, item.retryCount, item.maxRetries)
+                        Log.w(TAG, "재시도 대상 오류: ${item.payload}, ${e.message}")
+                    } else {
+                        syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
+                        Log.w(TAG, "비재시도 오류로 FAILED 처리: ${item.payload}, ${e.message}")
+                    }
+                    failCount++
                 } finally {
                     Trace.endSection()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "분류 처리 실패: ${item.payload}", e)
-                handleRetry(item.id, item.retryCount, item.maxRetries)
+                if (shouldRetry(e)) {
+                    handleRetry(item.id, item.retryCount, item.maxRetries)
+                } else {
+                    syncQueueRepository.updateStatus(item.id, SyncQueueStatus.FAILED)
+                }
                 failCount++
             }
         }
@@ -212,6 +241,17 @@ class ClassifyCaptureWorker @AssistedInject constructor(
             val nextRetryAt = System.currentTimeMillis() + delayMs
             syncQueueRepository.incrementRetry(itemId, nextRetryAt)
             Log.d(TAG, "재시도 예약: $itemId, ${retryCount + 1}/$maxRetries, ${delayMs}ms 후")
+        }
+    }
+
+    private fun shouldRetry(error: Throwable): Boolean {
+        return when (error) {
+            is NonRetryableClassificationException -> false
+            is JsonParseException -> false
+            is IllegalArgumentException -> false
+            is ApiException -> error.isRetryable
+            is IOException -> true
+            else -> false
         }
     }
 

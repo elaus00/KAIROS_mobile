@@ -18,6 +18,7 @@ import com.flit.app.data.repository.SyncRepositoryImpl
 import com.flit.app.data.repository.TagRepositoryImpl
 import com.flit.app.data.repository.TodoRepositoryImpl
 import com.flit.app.data.repository.UserPreferenceRepositoryImpl
+import com.flit.app.data.repository.RoomTransactionRunner
 import com.flit.app.domain.repository.AuthRepository
 import com.flit.app.domain.repository.AnalyticsRepository
 import com.flit.app.domain.repository.NoteAiRepository
@@ -35,6 +36,7 @@ import com.flit.app.domain.repository.SyncRepository
 import com.flit.app.domain.repository.SyncQueueRepository
 import com.flit.app.domain.repository.TagRepository
 import com.flit.app.domain.repository.TodoRepository
+import com.flit.app.domain.repository.TransactionRunner
 import com.flit.app.domain.repository.UserPreferenceRepository
 import dagger.Binds
 import dagger.Module
@@ -156,4 +158,10 @@ abstract class RepositoryModule {
     abstract fun bindNoteAiRepository(
         impl: NoteAiRepositoryImpl
     ): NoteAiRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTransactionRunner(
+        impl: RoomTransactionRunner
+    ): TransactionRunner
 }

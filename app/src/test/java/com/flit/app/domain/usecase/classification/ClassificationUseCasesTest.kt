@@ -22,6 +22,7 @@ import com.flit.app.domain.repository.NoteRepository
 import com.flit.app.domain.repository.ScheduleRepository
 import com.flit.app.domain.repository.TagRepository
 import com.flit.app.domain.repository.TodoRepository
+import com.flit.app.domain.repository.TransactionRunner
 import com.flit.app.domain.usecase.analytics.TrackEventUseCase
 import com.flit.app.domain.usecase.calendar.SyncScheduleToCalendarUseCase
 import io.mockk.coEvery
@@ -284,6 +285,7 @@ class ClassificationUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val transactionRunner = mockk<TransactionRunner>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
@@ -293,6 +295,7 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
+            transactionRunner,
             trackEventUseCase,
             syncScheduleToCalendarUseCase
         )
@@ -325,6 +328,9 @@ class ClassificationUseCasesTest {
         coEvery { tagRepository.getOrCreate("urgent") } returns Tag(id = "t2", name = "urgent")
         coEvery { tagRepository.linkTagToCapture(any(), any()) } just runs
         coEvery { todoRepository.createTodo(any()) } just runs
+        coEvery { transactionRunner.runInTransaction(any()) } coAnswers {
+            firstArg<suspend () -> Unit>().invoke()
+        }
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         useCase("cap-1", classification)
@@ -358,6 +364,7 @@ class ClassificationUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val transactionRunner = mockk<TransactionRunner>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
@@ -367,6 +374,7 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
+            transactionRunner,
             trackEventUseCase,
             syncScheduleToCalendarUseCase
         )
@@ -386,6 +394,9 @@ class ClassificationUseCasesTest {
         coEvery { captureRepository.updateClassification(any(), any(), any(), any(), any()) } just runs
         coEvery { extractedRepository.replaceForCapture(any(), any()) } just runs
         coEvery { scheduleRepository.createSchedule(any()) } just runs
+        coEvery { transactionRunner.runInTransaction(any()) } coAnswers {
+            firstArg<suspend () -> Unit>().invoke()
+        }
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         useCase("cap-1", classification)
@@ -410,6 +421,7 @@ class ClassificationUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val transactionRunner = mockk<TransactionRunner>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
@@ -419,6 +431,7 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
+            transactionRunner,
             trackEventUseCase,
             syncScheduleToCalendarUseCase
         )
@@ -439,6 +452,9 @@ class ClassificationUseCasesTest {
         coEvery { captureRepository.updateClassification(any(), any(), any(), any(), any()) } just runs
         coEvery { extractedRepository.replaceForCapture(any(), any()) } just runs
         coEvery { noteRepository.createNote(any()) } just runs
+        coEvery { transactionRunner.runInTransaction(any()) } coAnswers {
+            firstArg<suspend () -> Unit>().invoke()
+        }
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         useCase("cap-b", bookmarkClassification)
@@ -464,6 +480,7 @@ class ClassificationUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val transactionRunner = mockk<TransactionRunner>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
@@ -473,6 +490,7 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
+            transactionRunner,
             trackEventUseCase,
             syncScheduleToCalendarUseCase
         )
@@ -506,6 +524,9 @@ class ClassificationUseCasesTest {
         coEvery { extractedRepository.replaceForCapture(any(), any()) } just runs
         coEvery { todoRepository.createTodo(any()) } just runs
         coEvery { scheduleRepository.createSchedule(any()) } just runs
+        coEvery { transactionRunner.runInTransaction(any()) } coAnswers {
+            firstArg<suspend () -> Unit>().invoke()
+        }
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         useCase("cap-1", classification)
@@ -533,6 +554,9 @@ class ClassificationUseCasesTest {
             captureRepository.updateClassification(any(), any(), any(), any(), any())
         }
 
+        // 부모 캡처 추출 엔티티 저장 호출
+        coVerify(exactly = 1) { extractedRepository.replaceForCapture("cap-1", emptyList()) }
+
         // 파생 엔티티 생성: TODO 1개 + SCHEDULE 1개
         coVerify(exactly = 1) { todoRepository.createTodo(match { it.deadline == 5000L }) }
         coVerify(exactly = 1) {
@@ -558,6 +582,7 @@ class ClassificationUseCasesTest {
         val scheduleRepository = mockk<ScheduleRepository>()
         val noteRepository = mockk<NoteRepository>()
         val tagRepository = mockk<TagRepository>()
+        val transactionRunner = mockk<TransactionRunner>()
         val trackEventUseCase = mockk<TrackEventUseCase>()
         val syncScheduleToCalendarUseCase = mockk<SyncScheduleToCalendarUseCase>(relaxed = true)
         val useCase = ProcessClassificationResultUseCase(
@@ -567,6 +592,7 @@ class ClassificationUseCasesTest {
             scheduleRepository,
             noteRepository,
             tagRepository,
+            transactionRunner,
             trackEventUseCase,
             syncScheduleToCalendarUseCase
         )
@@ -579,6 +605,9 @@ class ClassificationUseCasesTest {
 
         coEvery { captureRepository.updateClassification(any(), any(), any(), any(), any()) } just runs
         coEvery { extractedRepository.replaceForCapture(any(), any()) } just runs
+        coEvery { transactionRunner.runInTransaction(any()) } coAnswers {
+            firstArg<suspend () -> Unit>().invoke()
+        }
         coEvery { trackEventUseCase(any(), any()) } just runs
 
         useCase("cap-1", classification)
