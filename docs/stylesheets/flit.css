@@ -1,8 +1,12 @@
 /* ==========================================================================
-   Flit. Docs — 디자인 가이드 기반 커스텀 테마
+   Flit. Docs — privacy-policy 스타일 기반 커스텀 테마
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;480;500;600&display=swap');
+/* 시스템 폰트 스택 (웹폰트 로드 없음 — mkdocs.yml font: false) */
+:root {
+  --flit-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --flit-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+}
 
 html {
   scroll-behavior: smooth;
@@ -20,9 +24,9 @@ html {
   --flit-card: #FFFFFF;
   --flit-border: #E5E5E5;
   --flit-text: #111111;
-  --flit-text-secondary: #888888;
+  --flit-text-secondary: #737373;
   --flit-text-muted: #737373;
-  --flit-divider: #E0E0E0;
+  --flit-divider: #E5E5E5;
   --flit-chip-bg: #F0F0F0;
   --flit-accent-bg: #F5F5F5;
   --flit-sidebar-bg: #F7F7F7;
@@ -34,7 +38,7 @@ html {
   --md-accent-fg-color: rgba(255, 255, 255, 0.8);
   --md-default-fg-color: rgba(255, 255, 255, 0.8);
   --md-default-bg-color: #0A0A0A;
-  --md-default-fg-color--light: #888888;
+  --md-default-fg-color--light: #737373;
 
   --flit-card: #1A1A1A;
   --flit-border: #2A2A2A;
@@ -50,40 +54,58 @@ html {
 /* --- 전역 타이포그래피 ---------------------------------------------------- */
 
 body {
+  font-family: var(--flit-font);
   -webkit-font-smoothing: antialiased;
 }
 
 .md-typeset {
-  font-size: 0.82rem;
+  font-family: var(--flit-font);
+  font-size: 14px;
   line-height: 1.7;
 }
 
-.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4 {
-  font-family: 'Sora', sans-serif;
+.md-typeset h1 {
+  font-family: var(--flit-font);
+  font-size: 24px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
-.md-typeset h1 {
-  font-weight: 480;
-  letter-spacing: 0.02em;
+.md-typeset h2 {
+  font-family: var(--flit-font);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-top: 28px;
+}
+
+.md-typeset h3 {
+  font-family: var(--flit-font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.md-typeset h4 {
+  font-family: var(--flit-font);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 /* --- 헤더 ---------------------------------------------------------------- */
 
-/* 상단 고정 해제 */
 .md-header {
   position: relative !important;
   background-color: var(--flit-card) !important;
   box-shadow: 0 1px 0 var(--flit-border) !important;
-  /* Material이 아이콘/텍스트에 이 변수를 사용 → 텍스트색으로 재정의 */
   --md-primary-bg-color: var(--flit-text);
 }
 
 .md-header__title {
-  font-family: 'Sora', sans-serif;
-  font-weight: 480;
-  letter-spacing: 0.02em;
+  font-family: var(--flit-font);
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .md-header .md-header__button:hover {
@@ -91,20 +113,20 @@ body {
 }
 
 .md-search__input {
+  font-family: var(--flit-font);
   color: var(--flit-text);
 }
 
 /* --- 왼쪽 사이드바 -------------------------------------------------------- */
 
-/* "Flit. Docs" 사이트 제목 숨김 — 헤더에만 표시 */
 .md-sidebar--primary .md-nav__title {
   display: none !important;
 }
 
-/* 섹션 레이블 (제품 방향, 인사이트, ...) */
+/* 섹션 레이블 */
 .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link {
-  font-family: 'Sora', sans-serif;
-  font-size: 0.7rem !important;
+  font-family: var(--flit-font);
+  font-size: 13px !important;
   font-weight: 600;
   color: var(--flit-text);
   padding: 0.6rem 0.6rem 0.3rem !important;
@@ -116,9 +138,10 @@ body {
   margin-top: 0;
 }
 
-/* 하위 문서 링크 — 들여쓰기 완전 제거 */
+/* 하위 문서 링크 */
 .md-nav--primary .md-nav--nested .md-nav__link {
-  font-size: 0.64rem !important;
+  font-family: var(--flit-font);
+  font-size: 13px !important;
   color: var(--flit-text-secondary);
   padding-left: 0.6rem !important;
 }
@@ -128,7 +151,7 @@ body {
   color: var(--flit-text);
 }
 
-/* 들여쓰기 완전 제거: 모든 레벨 */
+/* 들여쓰기 완전 제거 */
 .md-nav--primary .md-nav__list {
   padding-left: 0 !important;
   margin-left: 0 !important;
@@ -151,31 +174,30 @@ body {
 
 .md-sidebar--secondary .md-nav--secondary {
   background: var(--flit-sidebar-bg);
-  border-radius: 12px;
-  padding: 1rem 0.8rem;
+  border-radius: 8px;
+  padding: 0.8rem;
   border: 1px solid var(--flit-border);
 }
 
-/* "목차" 타이틀 */
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {
-  font-family: 'Sora', sans-serif;
-  font-size: 0.68rem !important;
+  font-family: var(--flit-font);
+  font-size: 13px !important;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--flit-text-muted);
   background: var(--flit-sidebar-bg) !important;
   box-shadow: 0 0 0.4rem 0.4rem var(--flit-sidebar-bg) !important;
-  padding: 0 0.4rem 0.6rem !important;
-  margin-bottom: 0.6rem;
+  padding: 0 0.4rem 0.4rem !important;
+  margin-bottom: 0.4rem;
   border-bottom: 1px solid var(--flit-divider);
 }
 
-/* TOC 링크 */
 .md-sidebar--secondary .md-nav--secondary .md-nav__link {
-  font-size: 0.7rem !important;
+  font-family: var(--flit-font);
+  font-size: 13px !important;
   color: var(--flit-text-secondary);
-  padding: 0.2rem 0.4rem !important;
+  padding: 0.15rem 0.4rem !important;
 }
 
 .md-sidebar--secondary .md-nav--secondary .md-nav__link:hover,
@@ -186,13 +208,14 @@ body {
 /* --- 본문 ---------------------------------------------------------------- */
 
 .md-content {
-  max-width: 52rem;
+  max-width: 640px;
 }
 
 .md-typeset code {
+  font-family: var(--flit-font-mono);
   background: var(--flit-chip-bg);
   border-radius: 4px;
-  font-size: 0.82em;
+  font-size: 13px;
   padding: 0.1em 0.4em;
 }
 
@@ -201,19 +224,23 @@ body {
   border: 1px solid var(--flit-border);
 }
 
+.md-typeset pre code {
+  font-family: var(--flit-font-mono);
+  font-size: 13px;
+}
+
 .md-typeset table:not([class]) {
   border: 1px solid var(--flit-border);
   border-radius: 8px;
   overflow: hidden;
-  font-size: 0.78rem;
+  font-size: 13px;
 }
 
 .md-typeset table:not([class]) th {
   background: var(--flit-accent-bg);
-  font-family: 'Sora', sans-serif;
-  font-weight: 500;
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
+  font-family: var(--flit-font);
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .md-typeset hr {
@@ -229,6 +256,16 @@ body {
 
 .md-typeset a:hover {
   text-decoration-color: var(--flit-text);
+}
+
+/* 리스트 — privacy-policy 스타일 */
+.md-typeset ul {
+  list-style: disc;
+}
+
+.md-typeset li {
+  font-size: 14px;
+  margin-bottom: 6px;
 }
 
 .md-typeset .admonition,

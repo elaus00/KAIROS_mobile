@@ -7,9 +7,7 @@ repo_name: elaus00/Flit
 theme:
   name: material
   language: ko
-  font:
-    text: Inter
-    code: JetBrains Mono
+  font: false
   palette:
     - scheme: slate
       primary: black
