@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 << 'EOF'\nimport json, sys\ndata = json.load(sys.stdin)\npath = data.get('tool_input', {}).get('file_path', '')\nsensitive_files = ['local.properties', '.env', 'google-services.json', 'keystore', '.jks']\nif any(s in path for s in sensitive_files):\n    print(f'Error: Cannot edit sensitive file: {path}', file=sys.stderr)\n    sys.exit(2)\nEOF"
+            "command": "python3 .claude/hooks/check-sensitive-files.py"
           }
         ]
       }
@@ -20,16 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | while read file_path; do if [ -n \"$file_path\" ] && echo \"$file_path\" | grep -qE '\\.kt$'; then if command -v ktlint &> /dev/null; then ktlint -F \"$file_path\" 2>/dev/null || true; fi; fi; done"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 << 'PYEOF'\nimport json, sys, subprocess, os\ndata = json.load(sys.stdin)\npath = data.get(\"tool_input\", {}).get(\"file_path\", \"\")\nif path.endswith(\".kt\"):\n    print(\"🔨 Kotlin 빌드 검증 중...\")\n    os.chdir(\"/Users/elaus/AndroidStudioProjects/Flit\")\n    result = subprocess.run([\"./gradlew\", \":app:compileDebugKotlin\", \"--quiet\"], capture_output=True, text=True, timeout=120)\n    if result.returncode != 0:\n        print(\"❌ 빌드 실패:\")\n        print(result.stderr[:1000] if result.stderr else result.stdout[:1000])\n    else:\n        print(\"✅ 빌드 성공\")\nPYEOF",
+            "command": "python3 .claude/hooks/verify-kotlin-build.py",
             "timeout": 180,
             "statusMessage": "Kotlin 빌드 검증 중..."
           }
