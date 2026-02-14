@@ -52,8 +52,8 @@ class LegalDocumentScreenshotTest {
         composeTestRule.captureScreenshot("legal_privacy_policy.png") {
             LegalDocumentScreen(
                 title = "개인정보 처리방침",
-                draftVersion = "1.0.0",
-                updatedAt = "2026-02-13",
+                version = "1.0",
+                effectiveDate = "2026-02-14",
                 sections = sampleSections,
                 onNavigateBack = {}
             )
@@ -65,8 +65,8 @@ class LegalDocumentScreenshotTest {
         composeTestRule.captureScreenshot("legal_terms_of_service.png") {
             LegalDocumentScreen(
                 title = "서비스 이용약관",
-                draftVersion = "1.0.0",
-                updatedAt = "2026-02-13",
+                version = "1.0",
+                effectiveDate = "2026-02-14",
                 sections = listOf(
                     LegalDocumentSection(
                         title = "서비스 이용",
@@ -95,8 +95,8 @@ class LegalDocumentScreenshotTest {
         composeTestRule.captureScreenshot("legal_long_content.png") {
             LegalDocumentScreen(
                 title = "개인정보 처리방침",
-                draftVersion = "1.0.0",
-                updatedAt = "2026-02-13",
+                version = "1.0",
+                effectiveDate = "2026-02-14",
                 sections = sampleSections + listOf(
                     LegalDocumentSection(
                         title = "개인정보의 제3자 제공",

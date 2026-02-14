@@ -8,8 +8,8 @@ fun TermsOfServiceScreen(
 ) {
     LegalDocumentScreen(
         title = "이용약관",
-        draftVersion = "0.1",
-        updatedAt = "2026-02-12",
+        version = "1.0",
+        effectiveDate = "2026-02-14",
         sections = termsOfServiceSections,
         onNavigateBack = onNavigateBack
     )
@@ -19,8 +19,7 @@ private val termsOfServiceSections = listOf(
     LegalDocumentSection(
         title = "목적",
         bullets = listOf(
-            "본 약관은 Flit 앱(이하 \"서비스\")의 이용 조건과 운영 기준을 정하는 것을 목적으로 합니다.",
-            "본 문서는 정식 공표 전 운영 초안이며, 정식 버전 배포 시 갱신될 수 있습니다."
+            "본 약관은 Flit.(이하 \"서비스\")의 이용 조건과 운영 기준을 정하는 것을 목적으로 합니다."
         )
     ),
     LegalDocumentSection(
@@ -64,22 +63,21 @@ private val termsOfServiceSections = listOf(
     LegalDocumentSection(
         title = "면책",
         bullets = listOf(
-            "회사는 천재지변, 불가항력, 이용자 귀책, 제3자 서비스 장애로 인한 손해에 대해 책임이 제한될 수 있습니다.",
+            "천재지변, 불가항력, 이용자 귀책, 제3자 서비스 장애로 인한 손해에 대해 책임이 제한될 수 있습니다.",
             "이용자가 서비스에 저장한 정보의 백업 및 관리 책임은 이용자에게 있습니다."
         )
     ),
     LegalDocumentSection(
         title = "약관 변경",
         bullets = listOf(
-            "회사는 관련 법령 및 서비스 정책 변경에 따라 약관을 수정할 수 있습니다.",
-            "중요 변경은 앱 내 고지 후 적용하며, 계속 이용 시 변경 약관에 동의한 것으로 봅니다."
+            "관련 법령 및 서비스 정책 변경에 따라 약관을 수정할 수 있습니다.",
+            "중요 변경은 앱 내 고지 후 7일 이후 적용되며, 계속 이용 시 변경 약관에 동의한 것으로 봅니다."
         )
     ),
     LegalDocumentSection(
         title = "문의처",
         bullets = listOf(
-            "서비스 이용 문의: elaus.dev@gmail.com",
-            "개인정보 관련 문의: elaus.dev@gmail.com"
+            "서비스 이용 및 개인정보 관련 문의: elaus.dev@gmail.com"
         )
     )
 )

@@ -34,8 +34,8 @@ data class LegalDocumentSection(
 @Composable
 fun LegalDocumentScreen(
     title: String,
-    draftVersion: String,
-    updatedAt: String,
+    version: String,
+    effectiveDate: String,
     sections: List<LegalDocumentSection>,
     onNavigateBack: () -> Unit = {}
 ) {
@@ -76,38 +76,19 @@ fun LegalDocumentScreen(
                 .background(colors.background)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            Surface(
-                color = colors.card,
-                shape = RoundedCornerShape(12.dp),
-                tonalElevation = 0.dp,
-                shadowElevation = 0.dp
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "초안 문서",
-                        color = colors.text,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "버전 $draftVersion · 최종 수정 $updatedAt",
-                        color = colors.textMuted,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = "본 문서는 Flit 앱 현재 구현 기준의 운영 초안이며, 법률 자문을 대체하지 않습니다.",
-                        color = colors.textSecondary,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 6.dp)
-                    )
-                }
-            }
+            Text(
+                text = "시행일: $effectiveDate · 버전 $version",
+                color = colors.textMuted,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
             sections.forEachIndexed { index, section ->
                 Text(
                     text = "${index + 1}. ${section.title}",
                     color = colors.text,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(top = if (index == 0) 0.dp else 20.dp, bottom = 8.dp)
                 )
 
                 section.bullets.forEach { item ->
@@ -119,17 +100,6 @@ fun LegalDocumentScreen(
                     )
                 }
             }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(top = 16.dp, bottom = 12.dp),
-                color = colors.borderLight
-            )
-
-            Text(
-                text = "문서 기준: PRD v10.1, 기능명세 v2.4, 데이터모델 v2.3, 앱 구현(설정/인증/동기화/분석/캘린더) 기준",
-                color = colors.textMuted,
-                style = MaterialTheme.typography.bodySmall
-            )
         }
     }
     }
