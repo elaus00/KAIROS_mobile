@@ -56,7 +56,7 @@ import java.util.Locale
 /**
  * 할 일 홈 화면 위젯 (Glance)
  * - 오늘 마감 할 일 표시 (완료 포함, 미완료 우선)
- * - 헤더에 오늘 날짜 + 바로가기 버튼
+ * - 헤더에 오늘 날짜 표시
  * - 체크 토글: 완료 아이콘 + 취소선, 미완료 빈 원
  * - 앱 테마 설정(SYSTEM/LIGHT/DARK) 반영
  */
@@ -141,56 +141,56 @@ private fun TodoContent(
 ) {
     val colors = widgetColors(isDark)
 
-    Column(
+    Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(colors.background)
             .cornerRadius(16.dp)
-            .padding(16.dp)
+            .clickable(
+                onClick = actionStartActivity<MainActivity>(
+                    parameters = actionParametersOf(
+                        ActionParameters.Key<String>("navigate_to_tab") to "calendar"
+                    )
+                )
+            )
     ) {
-        // 헤더: 제목 + 날짜 + 바로가기
-        Row(
-            modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = GlanceModifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text(
-                text = "오늘 할 일",
-                style = TextStyle(
-                    fontSize = 20.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.onBackground
-                )
-            )
-            Spacer(modifier = GlanceModifier.width(8.dp))
-            Text(
-                text = todayLabel,
-                style = TextStyle(
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = colors.onSurfaceVariant
-                )
-            )
-            Spacer(modifier = GlanceModifier.defaultWeight())
-            // 바로가기 버튼 (우측 상단)
-            Text(
-                text = "바로가기",
-                style = TextStyle(
-                    fontSize = 12.5.sp,
-                    color = colors.primary
-                ),
-                modifier = GlanceModifier
-                    .padding(vertical = 4.dp)
-                    .clickable(onClick = actionStartActivity<MainActivity>())
-            )
-        }
-
-        // 할 일 리스트 또는 빈 상태
-        if (items.isEmpty()) {
-            Box(
-                modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
-                contentAlignment = Alignment.Center
+            // 헤더: 제목 + 날짜
+            Row(
+                modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
+                    text = "오늘 할 일",
+                    style = TextStyle(
+                        fontSize = 20.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.onBackground
+                    )
+                )
+                Spacer(modifier = GlanceModifier.width(8.dp))
+                Text(
+                    text = todayLabel,
+                    style = TextStyle(
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = colors.onSurfaceVariant
+                    )
+                )
+                Spacer(modifier = GlanceModifier.defaultWeight())
+            }
+
+            // 할 일 리스트 또는 빈 상태
+            if (items.isEmpty()) {
+                Box(
+                    modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
                         text = "할 일을 모두 완료했어요!",
                         style = TextStyle(
                             fontSize = 16.5.sp,
@@ -199,30 +199,31 @@ private fun TodoContent(
                     )
                 }
             } else {
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            LazyColumn(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                items(items, itemId = { it.todoId.hashCode().toLong() }) { item ->
-                    TodoItemRow(
-                        item = item,
-                        timeFormat = timeFormat,
-                        colors = colors
-                    )
-                }
-                // 오버플로우 표시
-                if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
-                    val overflow = totalCount - TodoGlanceWidget.DISPLAY_LIMIT
-                    item(itemId = -1L) {
-                        Box(
-                            modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+${overflow}개 더 있음",
-                                style = TextStyle(
-                                    fontSize = 12.5.sp,
-                                    color = colors.onSurfaceVariant
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                LazyColumn(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
+                    items(items, itemId = { it.todoId.hashCode().toLong() }) { item ->
+                        TodoItemRow(
+                            item = item,
+                            timeFormat = timeFormat,
+                            colors = colors
+                        )
+                    }
+                    // 오버플로우 표시
+                    if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
+                        val overflow = totalCount - TodoGlanceWidget.DISPLAY_LIMIT
+                        item(itemId = -1L) {
+                            Box(
+                                modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "+${overflow}개 더 있음",
+                                    style = TextStyle(
+                                        fontSize = 12.5.sp,
+                                        color = colors.onSurfaceVariant
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }

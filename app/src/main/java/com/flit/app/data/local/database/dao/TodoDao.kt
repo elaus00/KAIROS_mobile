@@ -164,7 +164,7 @@ interface TodoDao {
         INNER JOIN captures c ON t.capture_id = c.id
         WHERE c.is_deleted = 0 AND c.is_trashed = 0
         AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
-        ORDER BY t.is_completed ASC, t.deadline ASC, t.sort_order ASC
+        ORDER BY t.deadline ASC, t.sort_order ASC
         LIMIT 5
     """)
     suspend fun getTodayTodosForWidget(todayEndMs: Long?): List<TodoWithCaptureRow>

@@ -50,6 +50,9 @@ class MainActivity : ComponentActivity() {
     /** 위젯에서 할 일 탭 시 상세 화면으로 이동할 captureId */
     private val pendingCaptureId = mutableStateOf<String?>(null)
 
+    /** 위젯에서 특정 탭으로 이동할 때 사용 */
+    private val pendingTab = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -58,6 +61,7 @@ class MainActivity : ComponentActivity() {
             // 위젯 딥링크 처리
             autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
             pendingCaptureId.value = intent?.getStringExtra("navigate_to_capture_id")
+            pendingTab.value = intent?.getStringExtra("navigate_to_tab")
 
             // 공유 인텐트 처리 (텍스트 캡처 저장 + 토스트)
             handleShareIntent(intent)
@@ -94,7 +98,9 @@ class MainActivity : ComponentActivity() {
                                 startDestination = destination,
                                 autoFocusCapture = autoFocusCapture.value,
                                 pendingCaptureId = pendingCaptureId.value,
-                                onPendingCaptureHandled = { pendingCaptureId.value = null }
+                                onPendingCaptureHandled = { pendingCaptureId.value = null },
+                                pendingTab = pendingTab.value,
+                                onPendingTabHandled = { pendingTab.value = null }
                             )
                         }
                     }
@@ -108,6 +114,7 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         autoFocusCapture.value = intent?.getBooleanExtra("from_widget", false) == true
         pendingCaptureId.value = intent.getStringExtra("navigate_to_capture_id")
+        pendingTab.value = intent.getStringExtra("navigate_to_tab")
         handleShareIntent(intent)
     }
 

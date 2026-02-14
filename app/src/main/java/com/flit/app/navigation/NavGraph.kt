@@ -96,7 +96,9 @@ fun FlitNavGraph(
     startDestination: String = NavRoutes.HOME,
     autoFocusCapture: Boolean = false,
     pendingCaptureId: String? = null,
-    onPendingCaptureHandled: () -> Unit = {}
+    onPendingCaptureHandled: () -> Unit = {},
+    pendingTab: String? = null,
+    onPendingTabHandled: () -> Unit = {}
 ) {
     // 위젯에서 할 일 항목 탭 시 상세 화면으로 이동
     LaunchedEffect(pendingCaptureId) {
@@ -152,8 +154,10 @@ fun FlitNavGraph(
             popExitTransition = { ExitTransition.None }
         ) {
             MainScreen(
-                initialTab = FlitTab.HOME,
+                initialTab = if (pendingTab == "calendar") FlitTab.CALENDAR else FlitTab.HOME,
                 autoFocusCapture = autoFocusCapture,
+                pendingTab = pendingTab,
+                onPendingTabHandled = onPendingTabHandled,
                 onNavigateToCapture = navigateToDetail,
                 onNavigateToSearch = navigateToSearch,
                 onNavigateToSettings = {

@@ -38,6 +38,7 @@ import com.flit.app.presentation.capture.CaptureContent
 import com.flit.app.presentation.capture.CaptureScreen
 import com.flit.app.presentation.capture.CaptureViewModel
 import com.flit.app.presentation.components.common.FlitBottomNav
+import com.flit.app.presentation.components.common.FlitSnackbar
 import com.flit.app.presentation.components.common.FlitTab
 import com.flit.app.presentation.notes.NotesContent
 import com.flit.app.ui.theme.FlitTheme
@@ -54,6 +55,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     initialTab: FlitTab = FlitTab.HOME,
     autoFocusCapture: Boolean = false,
+    pendingTab: String? = null,
+    onPendingTabHandled: () -> Unit = {},
     onNavigateToCapture: (String) -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -90,6 +93,8 @@ fun MainScreen(
         initialTab = initialTab,
         isOffline = isOffline,
         autoFocusCapture = autoFocusCapture,
+        pendingTab = pendingTab,
+        onPendingTabHandled = onPendingTabHandled,
         onNavigateToSearch = onNavigateToSearch,
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToHistory = onNavigateToHistory,
@@ -111,6 +116,8 @@ fun MainContent(
     initialTab: FlitTab,
     isOffline: Boolean,
     autoFocusCapture: Boolean,
+    pendingTab: String? = null,
+    onPendingTabHandled: () -> Unit = {},
     onNavigateToSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -149,8 +156,25 @@ fun MainContent(
             }
     }
 
+    // 위젯에서 특정 탭 요청 시 이동
+    LaunchedEffect(pendingTab) {
+        pendingTab?.let { tab ->
+            val targetIndex = when (tab) {
+                "calendar" -> FlitTab.entries.indexOf(FlitTab.CALENDAR)
+                "notes" -> FlitTab.entries.indexOf(FlitTab.NOTES)
+                else -> null
+            }
+            targetIndex?.let { pagerState.animateScrollToPage(it) }
+            onPendingTabHandled()
+        }
+    }
+
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                FlitSnackbar(snackbarData = data)
+            }
+        },
         bottomBar = {
             FlitBottomNav(
                 selectedTab = currentTab,
@@ -247,6 +271,8 @@ private fun MainContentPreview() {
             initialTab = FlitTab.HOME,
             isOffline = false,
             autoFocusCapture = false,
+            pendingTab = null,
+            onPendingTabHandled = {},
             onNavigateToSearch = {},
             onNavigateToSettings = {},
             onNavigateToHistory = {},
