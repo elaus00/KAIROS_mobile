@@ -79,6 +79,8 @@ Docs/
 |------|------|------|
 | `ui-improvement-report.md` | UI 디자이너 관점 개선 보고서 — P0/P1/P2 23개 항목 | 2026-02-08 |
 | `material-design-audit.md` | Material Design 커스텀 현황 점검 — High 10건, Medium 10건 | 2026-02-08 |
+| `qa-retrospective.md` | QA 회고 리포트 — 51건 이슈 분석, 반복 패턴 5가지, 핵심 교훈 5가지 | 2026-02-14 |
+| `qa-retrospective.csv` | QA 회고 구조화 데이터 — 51건 CSV (Notion/스프레드시트 import용) | 2026-02-14 |
 
 ### design/
 
@@ -120,6 +122,8 @@ Docs/
 
 | 일시 | 문서 | 변경 내용 |
 |------|------|-----------|
+| 2026-02-14 | `analysis/qa-retrospective.md` | QA 회고 리포트 v1.0 — 51건 이슈 분석, 카테고리 분류, 반복 패턴/근본 원인/교훈 도출 |
+| 2026-02-14 | `analysis/qa-retrospective.csv` | QA 회고 구조화 데이터 — 51건 CSV |
 | 2026-02-14 | `specs/play-store-listing.md` | v1.0 작성 — 앱 정보, 스토어 설명, 에셋 목록, 등급 가이드, 릴리스 체크리스트 |
 | 2026-02-14 | `specs/brand-identity.md` | v2.0→v2.2: 테마별 동적 아이콘 스펙 반영, Section 9 구현 현황 완료, 에셋 패키지 생성 |
 | 2026-02-14 | `plan/ui-review-plan.md` | UI 스크린샷 기반 검토안 v1.0 작성 — P0 2건, P1 3건, P2 5건, P3 4건, 코드 검증 3건 |
