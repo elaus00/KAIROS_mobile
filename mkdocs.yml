@@ -7,6 +7,9 @@ repo_name: elaus00/Flit
 theme:
   name: material
   language: ko
+  font:
+    text: Inter
+    code: JetBrains Mono
   palette:
     - scheme: slate
       primary: black
@@ -20,12 +23,8 @@ theme:
       toggle:
         icon: material/brightness-7
         name: 다크 모드로 전환
-  font:
-    text: Inter
-    code: JetBrains Mono
   features:
     - navigation.sections
-    - navigation.expand
     - navigation.top
     - search.highlight
     - search.suggest
@@ -52,47 +51,23 @@ nav:
   - 제품 방향:
       - PRD: direction/flit_prd_v10.md
       - 철학 및 원칙: direction/philosophy_principles.md
-  - 명세서:
-      - 기능명세서: specs/functional_spec.md
-      - 데이터모델: specs/data_model_spec.md
-      - API 명세서: specs/api_spec.md
-      - 디자인 가이드: specs/design-guide.md
-      - UX 라이팅 감사: specs/ux-writing-audit.md
       - 브랜드 아이덴티티: specs/brand-identity.md
-      - 프레젠테이션 템플릿: specs/design-presentation-template.md
-      - Play Store 리스팅: specs/play-store-listing.md
-  - 개발 계획:
-      - UI 검토안: plan/ui-review-plan.md
-      - Phase 4 실시간 인식: plan/phase4/realtime_recognition_plan.md
-  - 인사이트:
+  - 가이드:
+      - 디자인 가이드: specs/design-guide.md
       - 아키텍처 컨벤션: insights/architecture_conventions.md
+  - 인사이트:
       - 버그 수정 회고: insights/2026-02-07_bugfix-retrospective.md
       - 레거시 코드 교훈: insights/2026-02-07_legacy-audit-lessons.md
       - 멀티 에이전트: insights/2026-02-07_multi-agent-insights.md
-      - Bash 권한 패턴: insights/2026-02-13_bash-permission-patterns.md
       - 리브랜딩 교훈: insights/2026-02-13_rebrand-lessons.md
       - State Hoisting: insights/2026-02-13_state-hoisting-refactor.md
       - Roborazzi 함정: insights/2026-02-14_roborazzi-robolectric-pitfalls.md
+      - Bash 권한 패턴: insights/2026-02-13_bash-permission-patterns.md
   - 분석:
       - UI 개선 보고서: analysis/ui-improvement-report.md
       - Material Design 점검: analysis/material-design-audit.md
       - QA 회고: analysis/qa-retrospective.md
   - 성능:
       - 가이드: performance/README.md
-      - PR 리포트 템플릿: performance/pr_report_template.md
-      - 성능 로그 템플릿: performance/performance_log_template.md
       - 성능 로그: performance/performance_log.md
       - 벤치마크 노트: performance/2026-02-12_benchmark_apm_workflow_notes.md
-  - 아카이브:
-      - Phase 2 리뷰 체크리스트: archive/plan/phase2/review_checklist_template.md
-      - Phase 2 테스트 계획: archive/plan/phase2/test_plan_viewmodel_worker_template.md
-      - Phase 2a 구현 보고서: archive/plan/phase2a/implementation_report.md
-      - Phase 2a QA 계획: archive/plan/phase2a/qa_plan.md
-      - Phase 2b 구현 계획: archive/plan/phase2b/implementation_plan.md
-      - Phase 2b 구현 보고서: archive/plan/phase2b/implementation_report.md
-      - Phase 3 서버 연동: archive/plan/phase3/server_integration_plan.md
-      - 앱 철학 논의: archive/discussion/2026-02-05_app_philosophy.md
-      - 프라이버시 논의: archive/discussion/2026-02-05_privacy_and_sync.md
-  - 문서 관리:
-      - 문서 인덱스: doc-index.md
-      - 로드맵: ROADMAP.md
