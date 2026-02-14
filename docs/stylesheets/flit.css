@@ -219,11 +219,34 @@ body {
 /* --- 본문 ---------------------------------------------------------------- */
 
 .md-content {
-  max-width: 680px;
+  max-width: 720px;
 }
 
 .md-grid {
-  max-width: 76rem;
+  max-width: 86rem;
+}
+
+@media screen and (min-width: 76.25em) {
+  /* 큰 화면에서 전체 좌우 여백을 조금 줄이고 레이아웃 폭을 확장 */
+  .md-grid {
+    max-width: none;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+
+  .md-main__inner {
+    margin: 0;
+  }
+
+  .md-sidebar--primary {
+    left: 0.8rem;
+  }
+
+  /* TOC 섹션 자체를 우측 끝 기준으로 배치 */
+  .md-sidebar--secondary {
+    right: 0.8rem;
+    margin-right: 0 !important;
+  }
 }
 
 .md-typeset code {
