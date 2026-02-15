@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.flit.app.BuildConfig
 import com.flit.app.presentation.components.common.AppFontScaleProvider
 import com.flit.app.presentation.components.common.FlitWordmark

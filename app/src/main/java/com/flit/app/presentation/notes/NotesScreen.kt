@@ -5,7 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,9 +27,9 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.automirrored.outlined.StickyNote2
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.FolderOpen
-import androidx.compose.material.icons.outlined.StickyNote2
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -53,7 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.flit.app.domain.model.Folder
 import com.flit.app.domain.model.FolderType
 import com.flit.app.domain.model.NoteSubType
@@ -396,7 +396,7 @@ private fun FolderFilterChips(
 
     // overscroll 효과 비활성화로 스크롤 범위 초과 방지
     CompositionLocalProvider(
-        LocalOverscrollConfiguration provides null
+        LocalOverscrollFactory provides null
     ) {
         Row(
             modifier = Modifier
@@ -1013,7 +1013,7 @@ private fun EmptyNotesView(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                imageVector = Icons.Outlined.StickyNote2,
+                imageVector = Icons.AutoMirrored.Outlined.StickyNote2,
                 contentDescription = null,
                 tint = colors.textMuted,
                 modifier = Modifier.size(48.dp)
