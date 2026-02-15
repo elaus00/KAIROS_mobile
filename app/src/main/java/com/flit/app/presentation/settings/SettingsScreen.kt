@@ -42,7 +42,7 @@ import com.flit.app.ui.theme.FlitTheme
 
 /**
  * SettingsScreen
- * 설정 화면 — 화면(테마+글씨크기), 캘린더 토글, AI 분류 진입, 계정, 정보
+ * 설정 화면 — 계정, AI 분류, 캘린더 연동, 화면(테마+글씨크기), 정보
  * 캘린더 세부 설정과 AI 분류 설정은 각각의 세부 화면으로 분리됨
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -197,6 +197,111 @@ fun SettingsContent(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 계정 섹션
+            SectionHeader(
+                title = "계정",
+                fontSize = 12.sp
+            )
+
+            SettingsCard {
+                if (uiState.user != null) {
+                    // 로그인 상태: 이메일 + 로그아웃
+                    NavigationSettingItem(
+                        title = uiState.user!!.email,
+                        showArrow = false,
+                        onClick = { }
+                    )
+                    SettingsDivider()
+                    NavigationSettingItem(
+                        title = "로그아웃",
+                        showArrow = false,
+                        onClick = { showLogoutDialog = true }
+                    )
+                } else {
+                    // 미로그인 상태
+                    NavigationSettingItem(
+                        title = "로그인",
+                        onClick = onNavigateToLogin
+                    )
+                }
+                SettingsDivider()
+                NavigationSettingItem(
+                    title = "구독 관리",
+                    onClick = onNavigateToSubscription
+                )
+                SettingsDivider()
+                NavigationSettingItem(
+                    title = "사용 분석",
+                    description = "캡처 통계 및 분류 현황",
+                    onClick = {
+                        if (isPremiumSubscriber) {
+                            onNavigateToAnalytics()
+                        } else {
+                            premiumGateFeatureName = "사용 분석"
+                            showPremiumGateSheet = true
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // AI 분류 섹션 — 세부 화면으로 진입하는 단일 항목
+            SectionHeader(
+                title = "AI 분류",
+                fontSize = 12.sp
+            )
+
+            SettingsCard {
+                NavigationSettingItem(
+                    title = "AI 분류 설정",
+                    onClick = {
+                        if (isPremiumSubscriber) {
+                            onNavigateToAiSettings()
+                        } else {
+                            premiumGateFeatureName = "AI 분류 설정"
+                            showPremiumGateSheet = true
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 캘린더 섹션 — 토글만 남기고 세부 설정은 세부 화면으로 분리
+            SectionHeader(
+                title = "캘린더 연동",
+                fontSize = 12.sp
+            )
+
+            SettingsCard {
+                ToggleSettingItem(
+                    title = "캘린더 연동",
+                    description = if (!uiState.isCalendarPermissionGranted) "활성화하면 캘린더 권한을 요청합니다"
+                        else "일정을 기기 캘린더에 동기화",
+                    isChecked = uiState.isCalendarEnabled,
+                    onToggle = { enabled ->
+                        if (enabled && !uiState.isCalendarPermissionGranted) {
+                            onRequestCalendarPermission()
+                        } else {
+                            onToggleCalendar(enabled)
+                        }
+                    }
+                )
+
+                // 캘린더 연동이 켜져 있을 때만 세부 설정 진입점 표시
+                if (uiState.isCalendarPermissionGranted && uiState.isCalendarEnabled) {
+                    SettingsDivider()
+
+                    NavigationSettingItem(
+                        title = "캘린더 설정",
+                        onClick = onNavigateToCalendarSettings
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // 화면 섹션 (테마 + 글씨 크기 통합)
             SectionHeader(
                 title = "화면",
@@ -268,111 +373,6 @@ fun SettingsContent(
                     onClick = { onSetFontSizePreference(FontSizePreference.LARGE) }
                 )
 
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 캘린더 섹션 — 토글만 남기고 세부 설정은 세부 화면으로 분리
-            SectionHeader(
-                title = "캘린더 연동",
-                fontSize = 12.sp
-            )
-
-            SettingsCard {
-                ToggleSettingItem(
-                    title = "캘린더 연동",
-                    description = if (!uiState.isCalendarPermissionGranted) "활성화하면 캘린더 권한을 요청합니다"
-                        else "일정을 기기 캘린더에 동기화",
-                    isChecked = uiState.isCalendarEnabled,
-                    onToggle = { enabled ->
-                        if (enabled && !uiState.isCalendarPermissionGranted) {
-                            onRequestCalendarPermission()
-                        } else {
-                            onToggleCalendar(enabled)
-                        }
-                    }
-                )
-
-                // 캘린더 연동이 켜져 있을 때만 세부 설정 진입점 표시
-                if (uiState.isCalendarPermissionGranted && uiState.isCalendarEnabled) {
-                    SettingsDivider()
-
-                    NavigationSettingItem(
-                        title = "캘린더 설정",
-                        onClick = onNavigateToCalendarSettings
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // AI 분류 섹션 — 세부 화면으로 진입하는 단일 항목
-            SectionHeader(
-                title = "AI 분류",
-                fontSize = 12.sp
-            )
-
-            SettingsCard {
-                NavigationSettingItem(
-                    title = "AI 분류 설정",
-                    onClick = {
-                        if (isPremiumSubscriber) {
-                            onNavigateToAiSettings()
-                        } else {
-                            premiumGateFeatureName = "AI 분류 설정"
-                            showPremiumGateSheet = true
-                        }
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 계정 섹션
-            SectionHeader(
-                title = "계정",
-                fontSize = 12.sp
-            )
-
-            SettingsCard {
-                if (uiState.user != null) {
-                    // 로그인 상태: 이메일 + 로그아웃
-                    NavigationSettingItem(
-                        title = uiState.user!!.email,
-                        showArrow = false,
-                        onClick = { }
-                    )
-                    SettingsDivider()
-                    NavigationSettingItem(
-                        title = "로그아웃",
-                        showArrow = false,
-                        onClick = { showLogoutDialog = true }
-                    )
-                } else {
-                    // 미로그인 상태
-                    NavigationSettingItem(
-                        title = "로그인",
-                        onClick = onNavigateToLogin
-                    )
-                }
-                SettingsDivider()
-                NavigationSettingItem(
-                    title = "구독 관리",
-                    onClick = onNavigateToSubscription
-                )
-                SettingsDivider()
-                NavigationSettingItem(
-                    title = "사용 분석",
-                    description = "캡처 통계 및 분류 현황",
-                    onClick = {
-                        if (isPremiumSubscriber) {
-                            onNavigateToAnalytics()
-                        } else {
-                            premiumGateFeatureName = "사용 분석"
-                            showPremiumGateSheet = true
-                        }
-                    }
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))

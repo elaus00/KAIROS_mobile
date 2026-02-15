@@ -32,7 +32,7 @@ fun FlitSnackbar(
     Box(
         modifier = modifier
             .padding(horizontal = 20.dp)
-            .shadow(elevation = 12.dp, shape = shape)
+            .shadow(elevation = 4.dp, shape = shape)
             .clip(shape)
             .background(colors.card)
             .border(1.dp, colors.border, shape)

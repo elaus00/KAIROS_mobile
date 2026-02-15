@@ -22,6 +22,12 @@
 
         <!-- 내부 저장소 파일 제외 (캡처 이미지 등) -->
         <exclude domain="file" path="."/>
+
+        <!-- 앱 루트 디렉토리 제외 (no_backup, 키 파일 등) -->
+        <exclude domain="root" path="."/>
+
+        <!-- 외부 저장소 앱 전용 디렉토리 제외 -->
+        <exclude domain="external" path="."/>
     </cloud-backup>
 
     <!-- 디바이스 전송: 기기 간 직접 전송 (Android 12+ Smart Switch 등) -->
@@ -39,5 +45,11 @@
 
         <!-- 내부 저장소 파일 제외 (캡처 이미지 등) -->
         <exclude domain="file" path="."/>
+
+        <!-- 앱 루트 디렉토리 제외 (no_backup, 키 파일 등) -->
+        <exclude domain="root" path="."/>
+
+        <!-- 외부 저장소 앱 전용 디렉토리 제외 -->
+        <exclude domain="external" path="."/>
     </device-transfer>
 </data-extraction-rules>

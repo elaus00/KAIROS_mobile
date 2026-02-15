@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -205,11 +204,6 @@ fun CaptureContent(
             ) {
                 val captureFontSize = 20.sp
                 val captureLineHeight = 34.sp
-                val placeholderAlpha by animateFloatAsState(
-                    targetValue = if (uiState.inputText.isEmpty()) 1f else 0f,
-                    animationSpec = tween(200),
-                    label = "placeholderAlpha"
-                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -235,23 +229,6 @@ fun CaptureContent(
                                 trim = LineHeightStyle.Trim.None
                             )
                         ),
-                        placeholder = {
-                            Text(
-                                text = "떠오르는 생각을 자유롭게...",
-                                style = TextStyle(
-                                    fontFamily = FlitWritingFontFamily,
-                                    color = colors.placeholder.copy(alpha = placeholderAlpha),
-                                    fontSize = captureFontSize,
-                                    lineHeight = captureLineHeight,
-                                    letterSpacing = 0.3.sp,
-                                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                                    lineHeightStyle = LineHeightStyle(
-                                        alignment = LineHeightStyle.Alignment.Top,
-                                        trim = LineHeightStyle.Trim.None
-                                    )
-                                )
-                            )
-                        },
                         singleLine = false,
                         colors = TextFieldDefaults.colors(
                             focusedTextColor = colors.text,
@@ -262,9 +239,7 @@ fun CaptureContent(
                             cursorColor = colors.accent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                            focusedPlaceholderColor = colors.placeholder,
-                            unfocusedPlaceholderColor = colors.placeholder
+                            disabledIndicatorColor = Color.Transparent
                         )
                     )
                 }
