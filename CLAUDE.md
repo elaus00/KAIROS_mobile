@@ -244,19 +244,5 @@ Docs/
 4. Claude: git diff 확인 → 컴파일 체크 → 품질 검증 → 보고
 ```
 
-## Claude 설정 작업 필수 참조
-
-스킬, 커맨드, 에이전트, 훅, MCP 서버 등 Claude Code 설정 관련 작업 시 반드시 `plugin-dev` 플러그인의 해당 스킬을 참조해야 한다:
-
-| 작업 유형 | 참조 스킬 |
-|---|---|
-| 플러그인 구조/매니페스트 | `/plugin-dev:plugin-structure` |
-| 스킬 생성/수정 | `/plugin-dev:skill-development` |
-| 슬래시 커맨드 생성/수정 | `/plugin-dev:command-development` |
-| 에이전트 생성/수정 | `/plugin-dev:agent-development` |
-| 훅 생성/수정 | `/plugin-dev:hook-development` |
-| MCP 서버 통합 | `/plugin-dev:mcp-integration` |
-| 플러그인 설정 관리 | `/plugin-dev:plugin-settings` |
-
 ## 주의사항
 - 새로운 에이전트를 구축할때에는 Sonnet 모델을 사용할 것
