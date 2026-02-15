@@ -4,6 +4,7 @@
 /.idea/
 .DS_Store
 .claude/.direct-impl
+/.gcloud-tmp
 /build
 **/build/
 /captures
