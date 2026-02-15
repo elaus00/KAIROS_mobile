@@ -255,7 +255,7 @@ class HistoryViewModel @Inject constructor(
                     offset = page * PAGE_SIZE,
                     limit = PAGE_SIZE
                 ).collect { captures ->
-                    val hasMore = pageSnapshots[highestPageRequested]?.size ?: 0 >= PAGE_SIZE
+                    val hasMore = captures.size >= PAGE_SIZE
                     applyPageResult(page, captures, hasMore)
                 }
             } catch (e: Exception) {
