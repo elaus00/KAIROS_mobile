@@ -8,6 +8,7 @@ import com.flit.app.data.remote.dto.v2.AuthGoogleRequest
 import com.flit.app.data.remote.dto.v2.AuthRefreshRequest
 import com.flit.app.data.remote.dto.v2.AuthResponse
 import com.flit.app.data.remote.dto.v2.ClassifyBatchRequest
+import com.flit.app.data.remote.dto.v2.FcmTokenRequest
 import com.flit.app.data.remote.dto.v2.ClassifyBatchResponse
 import com.flit.app.data.remote.dto.v2.ClassifyRequest
 import com.flit.app.data.remote.dto.v2.ClassifyResponse
@@ -116,4 +117,10 @@ interface FlitApi {
     /** 이미지 OCR */
     @POST("ocr/extract")
     suspend fun ocr(@Body request: OcrRequest): Response<ApiEnvelope<OcrResponse>>
+
+    // --- FCM ---
+
+    /** FCM 토큰 등록 (서버 구현 후 호출 예정) */
+    @POST("devices/fcm-token")
+    suspend fun registerFcmToken(@Body request: FcmTokenRequest): Response<ApiEnvelope<Unit>>
 }

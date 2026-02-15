@@ -88,6 +88,15 @@
                 android:resource="@xml/todo_widget_info" />
         </receiver>
 
+        <!-- FCM 메시지 수신 서비스 -->
+        <service
+            android:name=".data.notification.FlitMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- WorkManager initialization -->
         <provider
             android:name="androidx.startup.InitializationProvider"

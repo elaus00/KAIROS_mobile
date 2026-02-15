@@ -20,11 +20,17 @@ import javax.inject.Singleton
  */
 @Singleton
 class NotificationHelper @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : CalendarNotifier {
     companion object {
         /** 일정 관련 알림 채널 */
         const val CHANNEL_CALENDAR = "flit_calendar"
+
+        /** 일정 제안 푸시 알림 채널 */
+        const val CHANNEL_SCHEDULE_SUGGESTION = "flit_schedule_suggestion"
+
+        /** 일반 푸시 알림 채널 */
+        const val CHANNEL_GENERAL = "flit_general"
 
         private var notificationId = 100
     }
@@ -45,7 +51,27 @@ class NotificationHelper @Inject constructor(
                 description = "일정 추가 확인 및 제안 알림"
             }
 
+            // 일정 제안 푸시 알림 채널
+            val scheduleSuggestionChannel = NotificationChannel(
+                CHANNEL_SCHEDULE_SUGGESTION,
+                "일정 제안",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "서버에서 감지한 일정 추가/제안 푸시 알림"
+            }
+
+            // 일반 푸시 알림 채널
+            val generalChannel = NotificationChannel(
+                CHANNEL_GENERAL,
+                "일반 알림",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "일반 푸시 알림"
+            }
+
             manager.createNotificationChannel(calendarChannel)
+            manager.createNotificationChannel(scheduleSuggestionChannel)
+            manager.createNotificationChannel(generalChannel)
         }
     }
 
@@ -101,5 +127,36 @@ class NotificationHelper @Inject constructor(
 
     override fun notifyAutoSync(scheduleTitle: String) {
         showCalendarAutoSyncNotification(scheduleTitle)
+    }
+
+    /**
+     * FCM 푸시 알림 표시
+     * 서버에서 수신한 메시지 데이터를 기반으로 알림을 빌드한다.
+     */
+    fun showFcmNotification(title: String, body: String, channelId: String) {
+        val resolvedChannel = when (channelId) {
+            CHANNEL_SCHEDULE_SUGGESTION, CHANNEL_GENERAL, CHANNEL_CALENDAR -> channelId
+            else -> CHANNEL_GENERAL
+        }
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, resolvedChannel)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.notify(notificationId++, notification)
     }
 }

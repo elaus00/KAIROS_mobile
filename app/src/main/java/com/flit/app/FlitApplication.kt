@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.flit.app.data.debug.MockDataInitializer
+import com.flit.app.data.notification.FcmTokenManager
 import com.flit.app.data.notification.NotificationHelper
 import com.flit.app.data.worker.AutoGroupWorker
 import com.flit.app.data.worker.InboxClassifyWorker
@@ -33,13 +33,13 @@ class FlitApplication : Application(), Configuration.Provider {
     lateinit var workManager: WorkManager
 
     @Inject
-    lateinit var mockDataInitializer: MockDataInitializer
-
-    @Inject
     lateinit var syncQueueRepository: SyncQueueRepository
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
+
+    @Inject
+    lateinit var fcmTokenManager: FcmTokenManager
 
     // Application 레벨 CoroutineScope
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -51,22 +51,17 @@ class FlitApplication : Application(), Configuration.Provider {
         // 알림 채널 생성
         notificationHelper.createNotificationChannels()
 
+        // FCM 토큰 획득 및 저장
+        applicationScope.launch {
+            fcmTokenManager.fetchAndSaveToken()
+        }
+
         // WorkManager 초기화는 Configuration.Provider로 처리됨
 
         // 앱 시작 시 PROCESSING 상태를 PENDING으로 리셋 (비정상 종료 복구)
         applicationScope.launch {
             syncQueueRepository.resetProcessingToPending()
             Log.d(TAG, "SyncQueue PROCESSING → PENDING 리셋 완료")
-        }
-
-        // Mock/Benchmark 데이터 초기화
-        if (BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "benchmark") {
-            applicationScope.launch {
-                mockDataInitializer.initializeMockData()
-                if (BuildConfig.BUILD_TYPE == "benchmark") {
-                    mockDataInitializer.initializeBenchmarkData()
-                }
-            }
         }
 
         // 15분 주기 TEMP 재분류 Worker 등록
