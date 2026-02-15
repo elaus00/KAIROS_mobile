@@ -90,7 +90,6 @@ class CalendarViewModel @Inject constructor(
             is CalendarEvent.DismissEditSchedule -> dismissEditSchedule()
             is CalendarEvent.ReorderSchedules -> reorderSchedules(event.scheduleIds)
             is CalendarEvent.NavigateWeek -> navigateWeek(event.referenceDate)
-            is CalendarEvent.ToggleShowCompleted -> toggleShowCompleted()
         }
     }
 
@@ -142,13 +141,6 @@ class CalendarViewModel @Inject constructor(
      */
     private fun toggleMonthExpand() {
         _uiState.update { it.copy(isMonthExpanded = !it.isMonthExpanded) }
-    }
-
-    /**
-     * 완료된 할 일 표시/숨기기 토글
-     */
-    private fun toggleShowCompleted() {
-        _uiState.update { it.copy(showCompleted = !it.showCompleted) }
     }
 
     /**
