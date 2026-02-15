@@ -1,0 +1,3852 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/direction/flit_prd_v10/">
+      
+      
+      
+        <link rel="next" href="../philosophy_principles/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>PRD - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flit-prd" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PRD
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0a-2026-02-12-addendum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.A 2026-02-12 Addendum (우선 적용)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 문제 정의
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 문제 정의">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 핵심 문제 — 기록되지 않는 생각
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 왜 기록되지 않는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 기존 솔루션의 한계
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 제품 비전
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 제품 비전">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 한 줄 요약
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-just-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 핵심 철학: Just Capture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 설계 판단 기준
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 타겟 사용자
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 타겟 사용자">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 A: 민수 (28, 직장인)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 B: 서연 (24, 대학원생)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 C: 준혁 (31, 프리랜서 개발자)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secondary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 기능 요구사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 기능 요구사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 캡처 (Capture)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 AI 자동 분류
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 비기능적 요구사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 비기능적 요구사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 데이터 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 오프라인 지원
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 성능
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 보안 및 프라이버시
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 에러 처리
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 접근성 (최소 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 앱 크기 및 리소스
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#58-temp-inbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 TEMP 상태 및 Inbox 설계 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 분류 품질 관측
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 비즈니스 모델
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 비즈니스 모델">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 기본 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-phase-3a3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 구독 기능 (Phase 3a~3b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 성공 지표
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Phase 로드맵
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Phase 로드맵">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 구분 기준
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2a: 코어 루프 완성
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2b: 사용성 확장 (최소 출시 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3a: 서비스 지속 가능성 확보
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3b-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3b: 고급 AI 및 외부 확장
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        장기 로드맵
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 리스크 &amp; 미결 사항
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 문서 체계
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 변경 이력
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 레퍼런스
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0a-2026-02-12-addendum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.A 2026-02-12 Addendum (우선 적용)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 문제 정의
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 문제 정의">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 핵심 문제 — 기록되지 않는 생각
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 왜 기록되지 않는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 기존 솔루션의 한계
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 제품 비전
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 제품 비전">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 한 줄 요약
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-just-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 핵심 철학: Just Capture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 설계 판단 기준
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 타겟 사용자
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 타겟 사용자">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 A: 민수 (28, 직장인)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 B: 서연 (24, 대학원생)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페르소나 C: 준혁 (31, 프리랜서 개발자)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secondary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 기능 요구사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 기능 요구사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 캡처 (Capture)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 AI 자동 분류
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 비기능적 요구사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 비기능적 요구사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 데이터 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 오프라인 지원
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 성능
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 보안 및 프라이버시
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 에러 처리
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 접근성 (최소 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 앱 크기 및 리소스
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#58-temp-inbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 TEMP 상태 및 Inbox 설계 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 분류 품질 관측
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 비즈니스 모델
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 비즈니스 모델">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 기본 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-phase-3a3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 구독 기능 (Phase 3a~3b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 성공 지표
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Phase 로드맵
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Phase 로드맵">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 구분 기준
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2a: 코어 루프 완성
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2b: 사용성 확장 (최소 출시 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3a: 서비스 지속 가능성 확보
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3b-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3b: 고급 AI 및 외부 확장
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        장기 로드맵
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 리스크 &amp; 미결 사항
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 문서 체계
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 변경 이력
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 레퍼런스
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flit-prd">Flit. — 제품 기획안 (PRD)<a class="headerlink" href="#flit-prd" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Version</strong>: 10.1
+<strong>작성일</strong>: 2026-02-12
+<strong>플랫폼</strong>: Android (Kotlin, Jetpack Compose)
+</p>
+</blockquote>
+<hr />
+<h2 id="0a-2026-02-12-addendum">0.A 2026-02-12 Addendum (우선 적용)<a class="headerlink" href="#0a-2026-02-12-addendum" title="Permanent link">&para;</a></h2>
+<p>본 PRD의 기존 Google Calendar/OAuth 중심 문맥은 아래 기준으로 대체 적용한다.</p>
+<ol>
+<li>캘린더 연동</li>
+<li>기존: Google OAuth + 서버 프록시 기반</li>
+<li>
+<p>현재(Android): CalendarProvider 기반 로컬 캘린더 연동</p>
+</li>
+<li>
+<p>로그인</p>
+</li>
+<li>기존 표현: Google OAuth 일반 표현</li>
+<li>
+<p>현재 구현: Google Sign-In(ID Token) -&gt; 서버 <code>/auth/google</code> -&gt; JWT</p>
+</li>
+<li>
+<p>로그아웃 정책</p>
+</li>
+<li>기존: 로컬 데이터 초기화 가능 전제</li>
+<li>
+<p>현재: 인증 토큰만 제거, 로컬 데이터 유지</p>
+</li>
+<li>
+<p>일정 동기화</p>
+</li>
+<li>기존: 양방향 Google Calendar 동기화 중심</li>
+<li>현재(Android): 로컬 캘린더 쓰기 중심 + <code>/sync/*</code> 기반 데이터 동기화로 확장</li>
+</ol>
+<h2 id="1">1. 문제 정의<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<h3 id="11">1.1 핵심 문제 — 기록되지 않는 생각<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<p>투두앱을 깔았다 지웠다를 반복하는 직장인, 메모가 쌓여 기록을 포기한 대학원생, 떠오른 생각을 30초 안에 외부화하지 않으면 잃어버리는 사람 — 이들이 공통으로 겪는 문제가 있다. 떠오른 생각이 기록되지 않고 사라진다는 것이다.</p>
+<p>사람들은 하루에도 수많은 생각을 한다. 그중 일부는 기록할 가치가 있지만, 대부분은 기록되지 않고 사라진다. 기록되지 않는 이유는 생각의 가치가 없어서가 아니라, <strong>기록하고 관리하는 과정이 부담</strong>이기 때문이다. 실제로 스마트폰 사용자 중 전용 메모·캘린더 앱을 사용하는 비율은 12.7%에 불과하다 [1]. 도구가 없어서가 아니라, 기존 도구의 기록·정리 과정이 충분히 쉽지 않기 때문이다.</p>
+<h3 id="12">1.2 왜 기록되지 않는가<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<p>기록이 안 되는 근본 원인은 두 가지다.</p>
+<p><strong>분류 판단의 피로</strong></p>
+<p>생각이 떠오를 때마다 "이건 할 일인가, 일정인가, 아이디어인가?"를 판단해야 하고, 판단한 뒤에는 해당 유형에 맞는 도구를 선택해야 한다. 이 <strong>분류 판단 자체가 기록의 첫 번째 허들</strong>이다.</p>
+<p>특히 유형 간 경계가 모호한 경우가 많다. "금요일까지 보고서 제출"은 할 일인가, 일정인가? "다음 주 미팅에서 이 안건 제기"는 메모인가, 할 일인가? 이러한 모호함은 판단 에너지를 소모하게 만든다.</p>
+<p>여기에 더해, <strong>분류의 기준은 사람마다 다르다.</strong> 같은 텍스트를 누군가는 할 일로, 누군가는 메모로, 또 누군가는 일정으로 인식한다. 즉, 분류 판단의 피로는 분류가 어려워서 생기는 것일 뿐 아니라, <strong>정답이 하나가 아니기 때문에</strong> 생기는 것이기도 하다.</p>
+<p><strong>정리 부채의 누적</strong></p>
+<p>기록은 했지만 정리는 하지 못한 상태가 지속되면 두 가지 경로로 문제가 발생한다.</p>
+<table>
+<thead>
+<tr>
+<th>경로</th>
+<th>문제</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기록 포기</td>
+<td>정리 부담이 기록 행위 자체를 억제</td>
+<td>생각이 유실됨</td>
+</tr>
+<tr>
+<td>정리 부채</td>
+<td>기록은 하지만 정리가 누적 과제로 남음</td>
+<td>기록의 가치를 회수하지 못함</td>
+</tr>
+</tbody>
+</table>
+<p>이미 정리되지 않은 메모가 수십 개 쌓여 있으면, 거기에 또 하나를 추가하는 것 자체가 부담이다. "어차피 또 안 정리할 텐데"라는 생각이 기록 행위를 막는다. 정리되지 않은 메모가 쌓이면서 생기는 만성적 피로감과 부채감이 결국 기록 자체를 포기하게 만드는 악순환이 만들어진다.</p>
+<p>이 악순환은 개별 사용자 수준을 넘어 시장 수준에서도 관찰된다. 한때 2.5억 등록 사용자를 보유했던 Evernote는 다운로드가 82% 감소하며 구조적 쇠퇴에 접어들었다 [2]. 정리되지 않는 메모 시스템이 결국 도구 자체의 포기로 이어진다는 것을 보여주는 사례다.</p>
+<h3 id="13">1.3 기존 솔루션의 한계<a class="headerlink" href="#13" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>도구 유형</th>
+<th>한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>투두 앱</td>
+<td>할 일을 추가하려면 앱 진입 → 추가 버튼 → 제목 입력 → 태그 선택 → 마감일 설정이라는 다단계 과정이 필요하다. 5,000만 사용자를 보유한 Todoist조차 자연어 입력으로 마찰을 줄였지만, "이것이 할 일인지 메모인지 일정인지"는 여전히 사용자가 판단해야 한다 [3]. 완료 처리도 귀찮아 방치된다.</td>
+</tr>
+<tr>
+<td>메모 앱</td>
+<td>정리되지 않은 메모가 쌓이면서 기록 자체를 억제한다. Google Keep은 "디지털 정크 서랍"이라는 평가가 반복되며, 50개 라벨 제한의 플랫 구조는 노트가 많아질수록 정리가 불가능해진다 [4]. 피로감을 감수하고 기록을 계속해도 정리 부채는 누적된다.</td>
+</tr>
+<tr>
+<td>캘린더 앱</td>
+<td>일정 정보는 대화(카톡, 문자 등)에서 발생하는 경우가 많지만, 캘린더에 반영하려면 별도로 앱을 열고 수동으로 입력해야 한다.</td>
+</tr>
+<tr>
+<td>도구 간 분산</td>
+<td>여러 앱에 흩어진 정보가 어디에 있는지 기억하지 못한다. 사용자의 28%가 복수 앱 관리로 인한 피로를 겪고 있으며 [5], 북마크도 여러 곳에 저장해놓고 결국 보지 않는다.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2">2. 제품 비전<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<h3 id="21">2.1 한 줄 요약<a class="headerlink" href="#21" title="Permanent link">&para;</a></h3>
+<p><strong>"떠오른 순간, 바로 던지면 끝"</strong></p>
+<p>Flit.은 떠오르는 생각을 즉시 기록하면, AI가 자동으로 일정·할 일·아이디어·노트로 분류하여 정리해주는 개인 생산성 앱이다.</p>
+<h3 id="22-just-capture">2.2 핵심 철학: Just Capture<a class="headerlink" href="#22-just-capture" title="Permanent link">&para;</a></h3>
+<p>Flit.의 경쟁자는 다른 메모앱이 아니다. <strong>"나중에 적어야지" 하다가 잊어버리는 것</strong>, 그리고 <strong>"또 정리 안 할 텐데" 하면서 기록을 포기하는 것</strong>이다.</p>
+<p>Flit.은 기록과 정리 사이의 연결고리를 끊는다. 사용자는 기록만 하면 된다. 정리는 AI가 한다. Flit.의 목표는 더 나은 기록 도구가 아니라, <strong>기록을 포기하지 않게 만드는 시스템</strong>이다. 정리 부채가 쌓이지 않으면 포기 신호가 발생하지 않고, 기록은 계속된다.</p>
+<table>
+<thead>
+<tr>
+<th>원칙</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Just Capture</strong></td>
+<td>앱 실행 → 즉시 입력. 어디에 적을지 고민할 필요 없이, 그냥 적으면 된다</td>
+</tr>
+<tr>
+<td><strong>Auto Organize</strong></td>
+<td>분류·태깅·목적지 결정은 AI가 처리한다. 정리되지 않은 메모가 쌓이지 않는다</td>
+</tr>
+<tr>
+<td><strong>Straight to Action</strong></td>
+<td>일정은 캘린더로, 할 일은 투두로 자동 연결된다. 기록에서 행동까지의 거리를 없앤다</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23">2.3 설계 판단 기준<a class="headerlink" href="#23" title="Permanent link">&para;</a></h3>
+<p>기능을 추가하거나 UI를 변경할 때 아래 질문에 하나라도 Yes이면 재고한다.</p>
+<table>
+<thead>
+<tr>
+<th>기준</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Friction</td>
+<td>이것이 기록까지의 단계를 늘리는가?</td>
+</tr>
+<tr>
+<td>Choice</td>
+<td>사용자에게 선택을 강요하는가?</td>
+</tr>
+<tr>
+<td>Burden</td>
+<td>정리 부담을 사용자에게 전가하는가?</td>
+</tr>
+<tr>
+<td>Flow</td>
+<td>핵심 루프(기록 → 정리 → 실행)를 방해하는가?</td>
+</tr>
+<tr>
+<td>Necessity</td>
+<td>이것 없이도 앱이 동작하는가?</td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>AI 분류 품질을 비용 절감이나 편의를 위해 타협하는가?</td>
+</tr>
+</tbody>
+</table>
+<p>설계 판단 기준의 구체적 적용 방법과 사례는 <strong>철학 및 원칙 가이드</strong>에서 다룬다.</p>
+<hr />
+<h2 id="3">3. 타겟 사용자<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<h3 id="a-28">페르소나 A: 민수 (28, 직장인)<a class="headerlink" href="#a-28" title="Permanent link">&para;</a></h3>
+<p>투두앱 3개를 깔았다 지웠다를 반복. 카톡 약속을 캘린더에 안 옮겨서 더블부킹 경험 있음.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>타겟 유형</td>
+<td>투두앱을 방치하게 된 사람 / 대화 속 일정을 캘린더에 안 옮기는 사람</td>
+</tr>
+<tr>
+<td>핵심 Pain Point</td>
+<td>기록 도구 간 전환 비용, 일정 누락</td>
+</tr>
+<tr>
+<td>앱 진입 목적</td>
+<td>카톡에서 약속 텍스트를 공유 → 일정 자동 등록 / 떠오른 할 일을 빠르게 던져놓기</td>
+</tr>
+<tr>
+<td>주요 사용 기능</td>
+<td>캡처, 공유 인텐트, 일정 관리 (로컬 캘린더 연동), 할 일 관리, 위젯</td>
+</tr>
+</tbody>
+</table>
+<h3 id="b-24">페르소나 B: 서연 (24, 대학원생)<a class="headerlink" href="#b-24" title="Permanent link">&para;</a></h3>
+<p>연구 아이디어가 떠오르면 바로 적어야 하는데, 메모앱 열 때마다 정리 안 된 노트가 보여서 스트레스. 정리는 주말에 몰아서 하려고 하지만 실제로는 안 함.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>타겟 유형</td>
+<td>정리 안 된 메모가 쌓여 기록 자체가 부담인 사람 / 정리 부채가 누적된 사람</td>
+</tr>
+<tr>
+<td>핵심 Pain Point</td>
+<td>정리 부채 누적, 기록 가치 미회수</td>
+</tr>
+<tr>
+<td>앱 진입 목적</td>
+<td>아이디어가 떠오르면 분류 고민 없이 바로 기록 / 나중에 노트를 검색해서 활용</td>
+</tr>
+<tr>
+<td>주요 사용 기능</td>
+<td>캡처, AI 자동 분류, 노트, 검색</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c-31">페르소나 C: 준혁 (31, 프리랜서 개발자)<a class="headerlink" href="#c-31" title="Permanent link">&para;</a></h3>
+<p>ADHD 진단. 하나의 작업에 과몰입(hyperfocus)하다가 갑자기 다른 생각이 끼어들면 원래 하던 맥락을 통째로 잃어버린다. 머릿속에 떠오른 것을 즉시 외부화하지 않으면 30초 안에 사라지는데, 외부화하려고 다른 앱을 여는 순간 "여기에 적을까, 저기에 적을까"를 고민하는 사이에 원래 생각을 잊는다.</p>
+<p>투두앱을 쓸 때 가장 큰 문제는 시간 인지의 왜곡(time blindness)이다. 마감일을 설정해도 "아직 여유 있겠지"라는 감각이 실제 남은 시간과 심하게 괴리되어, 마감 직전까지 착수하지 못한다.</p>
+<p>기록 도구가 여러 개 있으면 더 힘들다. 어떤 건 Google Keep에, 어떤 건 메모에, 어떤 건 노션에 적어놓고 나중에 어디에 적었는지 기억하지 못한다. "하나의 진입점"이 존재하지 않는 것 자체가 기록 행위의 마찰이 된다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>타겟 유형</td>
+<td>주의력 관리에 어려움을 느끼는 사람 / 작업 기억 용량이 제한적이어서 즉시 외부화가 필요한 사람</td>
+</tr>
+<tr>
+<td>핵심 Pain Point</td>
+<td>(1) 생각이 떠오른 즉시 외부화하지 않으면 유실됨 (작업 기억 한계), (2) "어느 앱에 적지?"를 고민하는 순간 과제 전환 비용이 발생하여 원래 생각을 잃음, (3) 마감일의 자기 관리가 어려움 (실행 기능 결함, 시간 인지 왜곡)</td>
+</tr>
+<tr>
+<td>앱 진입 목적</td>
+<td>생각이 떠오르는 즉시 한 곳에 던져놓기 / AI가 마감일을 대신 판단해주길 기대</td>
+</tr>
+<tr>
+<td>주요 사용 기능</td>
+<td>캡처 (입력창 즉시 접근), 위젯 (입력/할 일), AI 자동 분류, AI 마감일 제안</td>
+</tr>
+</tbody>
+</table>
+<h3 id="secondary">Secondary<a class="headerlink" href="#secondary" title="Permanent link">&para;</a></h3>
+<p>여러 생산성 도구를 사용하며 정보가 흩어져 있고, 이를 하나의 입구로 통합하고 싶은 사람.</p>
+<hr />
+<h2 id="4">4. 기능 요구사항<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="41-capture">4.1 캡처 (Capture)<a class="headerlink" href="#41-capture" title="Permanent link">&para;</a></h3>
+<p>사용자가 떠오른 생각을 최소한의 단계로 기록하는 기능. 앱 진입 시 입력창이 즉시 접근 가능한 위치에 고정되며, 전송 즉시 로컬 저장 및 완료 피드백이 제공된다. 사용자에게 유형 선택을 요구하지 않는다.</p>
+<p><strong>입력 방식:</strong></p>
+<table>
+<thead>
+<tr>
+<th>방식</th>
+<th>설명</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>텍스트 직접 입력</td>
+<td>앱 내 입력창에서 직접 작성</td>
+<td>1</td>
+</tr>
+<tr>
+<td>이미지 첨부</td>
+<td>갤러리 또는 카메라에서 이미지를 선택하여 텍스트와 함께 전송</td>
+<td>2a</td>
+</tr>
+</tbody>
+</table>
+<p><strong>세부 기능:</strong></p>
+<table>
+<thead>
+<tr>
+<th>이름</th>
+<th>설명</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>즉시 입력</td>
+<td>앱 진입 시 별도 네비게이션 없이 입력창에 접근</td>
+<td>1</td>
+</tr>
+<tr>
+<td>로컬 우선 저장</td>
+<td>전송 즉시 로컬 DB에 저장, 네트워크 상태와 무관</td>
+<td>1</td>
+</tr>
+<tr>
+<td>완료 피드백</td>
+<td>저장 완료 시 시각적 피드백 (앱 내 알림)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>임시 저장</td>
+<td>입력 중 앱 이탈 시 텍스트 자동 저장, 재진입 시 복원</td>
+<td>1</td>
+</tr>
+<tr>
+<td>삭제 실행 취소</td>
+<td>삭제 후 Snackbar로 "실행 취소" 옵션 제공 (3초), 이후 휴지통으로 이동</td>
+<td>1</td>
+</tr>
+<tr>
+<td>휴지통</td>
+<td>삭제된 항목을 30일간 보관, 복원 가능. 30일 경과 시 영구 삭제</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>이미지 첨부</td>
+<td>갤러리 또는 카메라에서 이미지 선택하여 캡처에 포함</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>멀티 인텐트 분할</td>
+<td>하나의 캡처에 여러 의도가 포함된 경우 AI가 자동 분할하여 별도 캡처 생성 (parent_capture_id 참조)</td>
+<td>2b</td>
+</tr>
+<tr>
+<td>외부 공유</td>
+<td>캡처 내용을 외부 앱으로 공유 (Intent.ACTION_SEND)</td>
+<td>3b</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-ai">4.2 AI 자동 분류<a class="headerlink" href="#42-ai" title="Permanent link">&para;</a></h3>
+<p>캡처된 내용을 AI가 분석하여 유형과 목적지를 자동으로 결정하는 기능. 사용자 개입 없이 백그라운드에서 처리된다.</p>
+<p><strong>분류 유형:</strong></p>
+<p>내부적으로 3개 최상위 유형(SCHEDULE, TODO, NOTES)과 임시 상태(TEMP)를 사용한다. 사용자에게는 4개 유형(일정, 할 일, 노트, 아이디어)으로 표시되며, 내부 구조와 표시 구조는 분리된다.</p>
+<table>
+<thead>
+<tr>
+<th>내부 유형 (classified_type)</th>
+<th>서브 유형 (note_sub_type)</th>
+<th>사용자 표시</th>
+<th>목적지</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SCHEDULE</td>
+<td>—</td>
+<td>일정</td>
+<td>캘린더 탭 → 로컬 캘린더(CalendarProvider) 동기화</td>
+</tr>
+<tr>
+<td>TODO</td>
+<td>—</td>
+<td>할 일</td>
+<td>캘린더 탭 할 일 섹션</td>
+</tr>
+<tr>
+<td>NOTES</td>
+<td>IDEA</td>
+<td>아이디어</td>
+<td>노트 / Ideas 폴더</td>
+</tr>
+<tr>
+<td>NOTES</td>
+<td>INBOX</td>
+<td>노트</td>
+<td>노트 / Inbox 폴더</td>
+</tr>
+<tr>
+<td>NOTES</td>
+<td>BOOKMARK</td>
+<td>(노트)</td>
+<td>장기 로드맵 (북마크 기능 확장 시 활성화)</td>
+</tr>
+<tr>
+<td>TEMP</td>
+<td>—</td>
+<td>—</td>
+<td>미분류 임시 상태 (재분류 대기)</td>
+</tr>
+</tbody>
+</table>
+<p>TEMP는 미분류 상태를 나타내는 임시 상태이며, 네트워크 미연결, AI 분류 실패, 텍스트 없이 이미지만 첨부된 경우 TEMP로 저장된다. AI가 주기적으로 재분류를 시도하여 적절한 유형으로 이동시킨다. 주기적 재분류는 WorkManager 기반으로 동작하며, 네트워크 복구 시에도 자동으로 TEMP 항목의 분류를 재시도한다.</p>
+<p><strong>AI 분류 출력:</strong></p>
+<p>AI는 분류 시 유형 판별과 함께 다음 항목을 생성한다.</p>
+<table>
+<thead>
+<tr>
+<th>출력</th>
+<th>설명</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>유형</td>
+<td>SCHEDULE / TODO / NOTES</td>
+<td>필수</td>
+</tr>
+<tr>
+<td>서브 유형</td>
+<td>NOTES인 경우: INBOX / IDEA / BOOKMARK</td>
+<td>NOTES일 때 필수</td>
+</tr>
+<tr>
+<td>신뢰도</td>
+<td>High / Medium / Low</td>
+<td>일정 자동 추가 안전장치에 활용</td>
+</tr>
+<tr>
+<td>AI 제목</td>
+<td>원문 기반 요약 제목 (최대 30자)</td>
+<td>리스트 가독성 확보</td>
+</tr>
+<tr>
+<td>태그</td>
+<td>내용 기반 자동 태그</td>
+<td>검색·필터링에 활용</td>
+</tr>
+<tr>
+<td>핵심 엔티티</td>
+<td>사람, 장소, 날짜, 금액 등</td>
+<td>검색 키워드로 활용</td>
+</tr>
+</tbody>
+</table>
+<p>AI 제목은 캡처 원문이 길거나 대화체인 경우 리스트에서의 스캔 가능성을 위해 생성된다. 캡처 원문이 짧고 명확한 경우(예: "우유 사기")에는 원문을 그대로 제목으로 사용한다. AI 제목이 생성된 경우에도 <strong>원본 텍스트는 항상 보존</strong>되며, 상세 보기에서 확인할 수 있다.</p>
+<p><strong>비기록성 입력 처리:</strong></p>
+<p>캡처는 "저장"의 영역이며, AI 대화 기능으로 확장하지 않는다. 질문형이나 대화형 입력("오늘 날씨 뭐야?", "좋은 카페 추천해줘")은 "확인할 것" 성격의 할 일로 분류하여 행동/기록으로 환원한다.</p>
+<table>
+<thead>
+<tr>
+<th>입력 예시</th>
+<th>분류 결과</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"오늘 날씨 뭐야?"</td>
+<td>할 일 (확인) / 마감: 오늘</td>
+<td>질문을 행동 항목으로 전환</td>
+</tr>
+<tr>
+<td>"좋은 카페 추천해줘"</td>
+<td>할 일 (알아볼 것)</td>
+<td>조사 필요 항목으로 전환</td>
+</tr>
+<tr>
+<td>"내일 발표 준비해야지"</td>
+<td>할 일 / 마감: 내일</td>
+<td>일반적 할 일 분류</td>
+</tr>
+</tbody>
+</table>
+<p><strong>분류 결과 확인:</strong></p>
+<p>분류 결과는 AI 분류 현황 화면에서 일괄 확인할 수 있다 (4.3 참조). 사용자는 분류를 사후에 수정할 수 있으며, 수정 시 드롭다운에 4개 옵션(일정 / 할 일 / 노트 / 아이디어)이 표시된다.</p>
+<p><strong>분류 수정 시 파생 객체 처리:</strong></p>
+<p>사용자가 분류를 변경하면, 이전 분류에 의해 생성된 파생 객체(캘린더 이벤트, 투두 등)는 자동으로 삭제 또는 전환된다. 분류 수정 후 파생 객체가 불일치 상태로 남아 사용자가 직접 정리해야 하는 상황을 만들지 않는다.</p>
+<table>
+<thead>
+<tr>
+<th>변경 방향</th>
+<th>파생 객체 처리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정 → 할 일</td>
+<td>캘린더 이벤트 삭제 + 투두 생성</td>
+</tr>
+<tr>
+<td>일정 → 노트/아이디어</td>
+<td>캘린더 이벤트 삭제 + 노트 생성</td>
+</tr>
+<tr>
+<td>할 일 → 일정</td>
+<td>투두 삭제 + 캘린더 이벤트 생성 (신뢰도 기반 처리 적용)</td>
+</tr>
+<tr>
+<td>할 일 → 노트/아이디어</td>
+<td>투두 삭제 + 노트 생성</td>
+</tr>
+<tr>
+<td>노트/아이디어 → 일정</td>
+<td>노트 삭제 + 캘린더 이벤트 생성 (신뢰도 기반 처리 적용)</td>
+</tr>
+<tr>
+<td>노트/아이디어 → 할 일</td>
+<td>노트 삭제 + 투두 생성</td>
+</tr>
+<tr>
+<td>노트 ↔ 아이디어</td>
+<td>note_sub_type만 변경 (INBOX ↔ IDEA), folder_id 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p>파생 객체 처리의 세부 동작(삭제 확인 여부, 외부 캘린더 이벤트 삭제 타이밍 등)은 기능 명세서에서 정의한다.</p>
+<p><strong>분류 기준 개인화:</strong></p>
+<p>AI 분류는 범용적 기준으로 동작하지만, 분류의 기준은 사람마다 다르다. 동일한 텍스트를 어떤 사용자는 할 일로, 다른 사용자는 메모로 인식할 수 있다. 이 문제를 완화하기 위해 다음 수단을 제공한다.</p>
+<table>
+<thead>
+<tr>
+<th>수단</th>
+<th>설명</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사후 수정</td>
+<td>분류 결과를 사용자가 직접 변경</td>
+<td>1</td>
+</tr>
+<tr>
+<td>분류 수정 로깅</td>
+<td>사용자의 분류 수정 이력을 기록</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>수정 이력 기반 학습</td>
+<td>사용자의 분류 수정 패턴을 반영하여 분류 정확도 향상 (2b 초안, 3b 고도화)</td>
+<td>2b~3b</td>
+</tr>
+<tr>
+<td>분류 프리셋</td>
+<td>사전 정의된 분류 성향 프로필 제공 (예: "할 일 중심", "메모 중심")</td>
+<td>3a (구독)</td>
+</tr>
+<tr>
+<td>사용자 지시 (Instruction)</td>
+<td>사용자가 자연어로 분류 규칙을 직접 설정</td>
+<td>3a (구독)</td>
+</tr>
+</tbody>
+</table>
+<p>분류 정확도가 사용자의 기대와 부합하는지 여부는 핵심 리스크이며, 유저 테스트를 통해 지속적으로 검증한다 (8. 리스크 &amp; 미결 사항 참조).</p>
+<p><strong>세부 기능:</strong></p>
+<table>
+<thead>
+<tr>
+<th>이름</th>
+<th>설명</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>자동 유형 판별</td>
+<td>캡처 내용을 분석하여 SCHEDULE / TODO / NOTES 중 하나로 분류. NOTES의 경우 서브 유형(IDEA / INBOX / BOOKMARK) 추가 판별</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 제목 생성</td>
+<td>캡처 원문 기반 요약 제목 생성. 원본 텍스트는 항상 보존</td>
+<td>1</td>
+</tr>
+<tr>
+<td>자동 태깅</td>
+<td>내용에 기반한 태그 자동 부여 (사용자 수정 가능)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>핵심 엔티티 추출</td>
+<td>사람, 장소, 날짜, 금액 등 핵심 개체 추출</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 분류 현황</td>
+<td>분류 완료된 항목을 전용 화면에서 일괄 확인/수정 (알림 벨 → 바텀시트)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>사후 수정</td>
+<td>사용자가 분류 결과를 직접 변경 (4개 옵션 드롭다운)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>파생 객체 자동 처리</td>
+<td>분류 변경 시 이전 파생 객체 자동 삭제/전환</td>
+<td>1</td>
+</tr>
+<tr>
+<td>비기록성 입력 처리</td>
+<td>질문형/대화형 입력을 행동 항목(할 일)으로 환원</td>
+<td>1</td>
+</tr>
+<tr>
+<td>TEMP 폴백</td>
+<td>미분류/오프라인 캡처는 TEMP 상태로 저장</td>
+<td>1</td>
+</tr>
+<tr>
+<td>TEMP 주기적 재분류</td>
+<td>TEMP 잔류 항목에 대해 AI가 주기적으로 재분류 시도</td>
+<td>1</td>
+</tr>
+<tr>
+<td>분류 수정 로깅</td>
+<td>사용자의 분류 수정 이력을 기록</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>멀티 인텐트 분할</td>
+<td>여러 의도가 포함된 캡처를 AI가 자동 분할</td>
+<td>2b</td>
+</tr>
+<tr>
+<td>수정 이력 기반 학습</td>
+<td>수정 패턴을 반영하여 분류 정확도 향상 (2b 초안, 3b 고도화)</td>
+<td>2b~3b</td>
+</tr>
+<tr>
+<td>분류 프리셋</td>
+<td>사전 정의된 분류 성향 프로필 선택</td>
+<td>3a (구독)</td>
+</tr>
+<tr>
+<td>사용자 지시 (Instruction)</td>
+<td>자연어로 분류 규칙 직접 설정</td>
+<td>3a (구독)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5">5. 비기능적 요구사항<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<h3 id="51">5.1 데이터 원칙<a class="headerlink" href="#51" title="Permanent link">&para;</a></h3>
+<p>모든 콘텐츠 데이터(캡처, 노트, 일정, 할 일)는 로컬 우선(local-first)으로 저장한다. 캡처는 네트워크 상태와 무관하게 항상 즉시 성공해야 한다. 서버는 AI 처리(분류, 요약)와 계정·과금 데이터만 담당한다.</p>
+<h3 id="52">5.2 오프라인 지원<a class="headerlink" href="#52" title="Permanent link">&para;</a></h3>
+<p>네트워크가 없는 상태에서도 캡처, 조회, 삭제가 가능해야 한다. AI 분류가 필요한 캡처는 TEMP 상태로 저장되며, 네트워크 복구 시 자동으로 분류 처리된다. 오프라인 상태에서의 사용자 경험 저하를 최소화하되, 오프라인에서 불가능한 기능(AI 분류, 서버 동기화)은 명확히 표시한다.</p>
+<h3 id="53">5.3 성능<a class="headerlink" href="#53" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>목표</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처 → 로컬 저장 체감 시간</td>
+<td>1초 미만</td>
+<td>1</td>
+</tr>
+<tr>
+<td>앱 cold start → 입력 가능</td>
+<td>2초 미만</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 분류 완료 (네트워크 정상)</td>
+<td>5초 미만</td>
+<td>1</td>
+</tr>
+<tr>
+<td>목록 스크롤</td>
+<td>60fps 유지 (100개 항목 기준)</td>
+<td>2a</td>
+</tr>
+</tbody>
+</table>
+<h3 id="54">5.4 보안 및 프라이버시<a class="headerlink" href="#54" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>요구사항</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>데이터 전송</td>
+<td>모든 서버 통신은 HTTPS(TLS 1.2 이상) 사용</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 처리 데이터</td>
+<td>분류를 위해 서버로 전송된 사용자 콘텐츠는 처리 완료 후 서버에서 삭제</td>
+<td>1</td>
+</tr>
+<tr>
+<td>임시 저장 암호화</td>
+<td>임시 저장 시 EncryptedSharedPreferences 사용</td>
+<td>3b</td>
+</tr>
+<tr>
+<td>로컬 저장</td>
+<td>기기 내 데이터는 Android Keystore 기반 암호화 적용</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>인증 정보</td>
+<td>JWT/Refresh 토큰은 EncryptedSharedPreferences에 저장</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>개인정보 고지</td>
+<td>수집 항목, 활용 목적, 제3자 제공 여부를 개인정보 처리방침에 명시</td>
+<td>1</td>
+</tr>
+<tr>
+<td>데이터 삭제</td>
+<td>사용자 요청 시 서버 내 모든 관련 데이터 삭제 가능</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>데이터 내보내기</td>
+<td>사용자 요청 시 로컬 데이터 내보내기 (JSON 또는 CSV)</td>
+<td>3a</td>
+</tr>
+</tbody>
+</table>
+<h3 id="55">5.5 에러 처리<a class="headerlink" href="#55" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>처리 방식</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>네트워크 오류 (캡처 시)</td>
+<td>TEMP 상태로 저장 후 큐잉, 복구 시 자동 재시도</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 분류 실패</td>
+<td>TEMP 상태로 저장, 주기적 재분류 시도</td>
+<td>1</td>
+</tr>
+<tr>
+<td>AI 분류 타임아웃</td>
+<td>5초 초과 시 TEMP 상태로 저장, 백그라운드 재시도</td>
+<td>1</td>
+</tr>
+<tr>
+<td>캘린더 쓰기 오류</td>
+<td>일정 쓰기 실패 시 로컬 재시도 큐 처리. 실패 횟수 3회 초과 시 사용자 알림</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>서버 장애</td>
+<td>AI 기능 일시 중단, 캡처·조회·삭제는 로컬에서 정상 동작</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="56">5.6 접근성 (최소 기준)<a class="headerlink" href="#56" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>요구사항</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>터치 타겟</td>
+<td>최소 48x48dp (Material Design 기준)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>색상 대비</td>
+<td>텍스트/배경 대비 4.5:1 이상</td>
+<td>1</td>
+</tr>
+<tr>
+<td>다크 모드</td>
+<td>라이트/다크 모드 전환 지원</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>스크린 리더, TalkBack 등 전면적 접근성 지원은 현재 범위에서 제외하며, 후속 검토 대상이다 (8. 리스크 &amp; 미결 사항 참조).</p>
+<h3 id="57">5.7 앱 크기 및 리소스<a class="headerlink" href="#57" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>목표</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APK 크기</td>
+<td>50MB 미만 (Phase 1 기준)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>백그라운드 배터리 소모</td>
+<td>WorkManager로 제한, 상시 백그라운드 서비스 사용 금지</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="58-temp-inbox">5.8 TEMP 상태 및 Inbox 설계 원칙<a class="headerlink" href="#58-temp-inbox" title="Permanent link">&para;</a></h3>
+<p>TEMP는 AI 미분류 항목의 임시 상태이며, 노트 탭 내 Inbox 폴더에 표시된다. TEMP 상태 자체가 "처리해야 할 대기열"로 인식되면 정리 부채의 원인이 되므로, 다음 원칙을 적용한다.</p>
+<table>
+<thead>
+<tr>
+<th>원칙</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>비전면 배치</td>
+<td>Inbox는 메인 네비게이션에 전면 노출하지 않는다. 노트 섹션 내부에 위치한다</td>
+</tr>
+<tr>
+<td>비침습적 알림</td>
+<td>잔류 항목이 있을 때 "N개 항목이 분류 대기 중" 수준의 부드러운 nudging만 제공한다. 강제적 처리를 유도하지 않는다</td>
+</tr>
+<tr>
+<td>AI 자동 해소</td>
+<td>AI 주기적 재분류가 TEMP 항목을 자동으로 분류하는 것이 기본 동작이다. 사용자가 Inbox를 직접 관리해야 하는 빈도를 최소화한다</td>
+</tr>
+<tr>
+<td>TEMP ≠ 분류 유형</td>
+<td>TEMP는 사용자에게 별도 분류 칩으로 표시하지 않는다. 분류 대기 상태임을 나타내는 내부 상태이다</td>
+</tr>
+</tbody>
+</table>
+<h3 id="59">5.9 분류 품질 관측<a class="headerlink" href="#59" title="Permanent link">&para;</a></h3>
+<p>AI 분류 품질은 서비스 신뢰의 핵심 요소이며, 출시 시점부터 관측 인프라를 구축한다. 정답 데이터 없이도 프록시 지표로 분류 품질을 측정할 수 있다.</p>
+<p><strong>최소 관측 지표 (Phase 2a부터 수집):</strong></p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>측정 방법</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 수정률</td>
+<td>수정 건수 / 전체 분류 건수</td>
+<td>AI 분류 품질의 핵심 대리 지표</td>
+</tr>
+<tr>
+<td>수정까지 걸린 시간</td>
+<td>분류 완료 → 수정 실행 간 시간</td>
+<td>오분류 인지 속도</td>
+</tr>
+<tr>
+<td>일정 제안 승인율</td>
+<td>승인 / (승인 + 거부 + 무시)</td>
+<td>캘린더 안전장치 정합성</td>
+</tr>
+<tr>
+<td>일정 자동 추가 후 삭제 비율</td>
+<td>자동 추가 후 사용자 삭제 건수 / 자동 추가 건수</td>
+<td>High confidence 임계값 적정성</td>
+</tr>
+<tr>
+<td>TEMP 잔류 시간</td>
+<td>TEMP 진입 → 재분류/수동 이동까지 시간</td>
+<td>미분류 처리 효율</td>
+</tr>
+</tbody>
+</table>
+<p><strong>확장 관측 지표 (Phase 2b부터 수집):</strong></p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>측정 방법</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처 후 재열람률</td>
+<td>캡처 후 해당 항목 재조회 비율</td>
+<td>기록 가치 회수 시그널</td>
+</tr>
+<tr>
+<td>투두 완료율</td>
+<td>완료 / 생성</td>
+<td>행동 전환 시그널</td>
+</tr>
+<tr>
+<td>검색 성공률</td>
+<td>검색 후 항목 클릭 비율</td>
+<td>회수 인프라 품질</td>
+</tr>
+</tbody>
+</table>
+<p>이 지표들은 리스크 #1(AI 분류 정확도)의 판단 근거이자, 수정 이력 기반 학습(Phase 2b 초안)의 효과 측정 수단이다.</p>
+<hr />
+<h2 id="6">6. 비즈니스 모델<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<h3 id="61">6.1 기본 원칙<a class="headerlink" href="#61" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>원칙</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>무료 사용자 AI</td>
+<td>전체 AI 기능(분류, 태깅, 마감일 제안 등)을 무료로 제공. 제한 없음</td>
+</tr>
+<tr>
+<td>비용 관리</td>
+<td>초기에는 Gemini 월 $10 예산 + 무료 모델 활용. 유저 당 비용을 데이터로 추적하여 의사결정</td>
+</tr>
+<tr>
+<td>분류 품질 최우선</td>
+<td>AI 모델 선정 시 분류 품질이 최우선이며, 비용 절감을 위해 품질을 타협하지 않는다. 분류 품질 저하는 서비스 신뢰 훼손으로 직결된다</td>
+</tr>
+<tr>
+<td>구독 대상</td>
+<td>고도화 기능 (분류 프리셋, 사용자 지시, AI 통합 그룹화, 이미지 분석, OCR, 고급 통계 등)</td>
+</tr>
+<tr>
+<td>핵심 원칙</td>
+<td>기본 경험(캡처 → 분류 → 관리)은 무료로 완전해야 한다. 과금이 핵심 경험을 훼손하지 않는다</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-phase-3a3b">6.2 구독 기능 (Phase 3a~3b)<a class="headerlink" href="#62-phase-3a3b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>설명</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 프리셋</td>
+<td>사전 정의된 분류 성향 프로필</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>사용자 지시 (Instruction)</td>
+<td>자연어로 분류 규칙 직접 설정</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>AI 통합 그룹화</td>
+<td>NOTE와 IDEA를 횡단 분석하여 의미 기반 그룹 구조 제안</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>이미지 분석</td>
+<td>이미지 내용 기반 분류 (무제한)</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>AI 시맨틱 검색</td>
+<td>의미 기반 노트 검색</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>OCR</td>
+<td>이미지 텍스트 추출 기능</td>
+<td>3b</td>
+</tr>
+<tr>
+<td>고급 통계</td>
+<td>캡처 패턴, 분류 분포, 사용 트렌드 등 심화 분석</td>
+<td>3b</td>
+</tr>
+</tbody>
+</table>
+<p>구체적인 과금 기준(월 요금, 기능 목록)은 Phase 3a 진입 시 별도 문서로 정의한다.</p>
+<h3 id="63">6.3 성공 지표<a class="headerlink" href="#63" title="Permanent link">&para;</a></h3>
+<p><strong>핵심 가설:</strong></p>
+<table>
+<thead>
+<tr>
+<th>가설</th>
+<th>검증 대상</th>
+<th>핵심 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>가설 1: 마찰 감소</td>
+<td>캡처 빈도가 증가한다</td>
+<td>Just Capture가 기록 행위의 허들을 실제로 낮추는가?</td>
+</tr>
+<tr>
+<td>가설 2: 정리 부채 해결</td>
+<td>기록이 회수/행동으로 이어진다</td>
+<td>Auto Organize가 기록의 가치를 실제로 회수하게 만드는가?</td>
+</tr>
+</tbody>
+</table>
+<p><strong>1차 성공 (출시/운영 경험):</strong></p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>기준</th>
+<th>대응 가설</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Play Store 출시 완료</td>
+<td>출시 여부</td>
+<td>—</td>
+</tr>
+<tr>
+<td>외부 유저 확보</td>
+<td>본인 제외 10명 이상</td>
+<td>—</td>
+</tr>
+<tr>
+<td>최소 리텐션 시그널</td>
+<td>출시 후 4주간 주 1회 이상 캡처하는 유저 존재 여부</td>
+<td>가설 1</td>
+</tr>
+<tr>
+<td>일일/주간 캡처 수</td>
+<td>추적 시작 (기준 미정)</td>
+<td>가설 1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2차 성공 (제품 가치 검증):</strong></p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>기준</th>
+<th>대응 가설</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>유료 구독 전환</td>
+<td>1건 이상 발생</td>
+<td>—</td>
+</tr>
+<tr>
+<td>구독 유지율</td>
+<td>추적 시작</td>
+<td>—</td>
+</tr>
+<tr>
+<td>캡처 후 재열람/검색률</td>
+<td>추적 시작 (기준 미정)</td>
+<td>가설 2</td>
+</tr>
+<tr>
+<td>투두 완료율</td>
+<td>추적 시작 (기준 미정)</td>
+<td>가설 2</td>
+</tr>
+<tr>
+<td>일정 제안 승인율</td>
+<td>추적 시작 (기준 미정)</td>
+<td>가설 2</td>
+</tr>
+</tbody>
+</table>
+<p>1차 지표는 "사람들이 실제로 쓰는가"를, 2차 지표는 "쓴 것이 가치로 돌아오는가"를 검증한다. 세부 수치 기준은 출시 후 운영 데이터를 바탕으로 보완한다.</p>
+<hr />
+<h2 id="7-phase">7. Phase 로드맵<a class="headerlink" href="#7-phase" title="Permanent link">&para;</a></h2>
+<h3 id="phase">Phase 구분 기준<a class="headerlink" href="#phase" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기준</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1</td>
+<td>제품의 핵심 가설을 검증할 수 있는 최소 단위</td>
+</tr>
+<tr>
+<td>Phase 2a</td>
+<td>핵심 루프를 일상적으로 사용 가능한 수준으로 완성</td>
+</tr>
+<tr>
+<td>Phase 2b</td>
+<td>사용성을 확장하고 부가 가치를 추가. <strong>최소 출시 기준</strong></td>
+</tr>
+<tr>
+<td>Phase 3a</td>
+<td>서비스 지속 가능성 확보. 인증·과금 도입, AI 개인화</td>
+</tr>
+<tr>
+<td>Phase 3b</td>
+<td>고급 AI 기능 및 외부 확장</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-1-mvp">Phase 1: MVP<a class="headerlink" href="#phase-1-mvp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처</td>
+<td>텍스트 입력, 로컬 우선 저장, 완료 피드백, 임시 저장, 삭제 실행 취소 (3초 Snackbar)</td>
+</tr>
+<tr>
+<td>AI 자동 분류</td>
+<td>자동 유형 판별 (SCHEDULE/TODO/NOTES/TEMP), AI 제목 생성, 자동 태깅, 핵심 엔티티 추출, 분류 결과 표시 (4개 칩), 사후 수정, 파생 객체 자동 처리, 비기록성 입력 처리, TEMP 폴백, TEMP 주기적 재분류</td>
+</tr>
+<tr>
+<td>홈 화면</td>
+<td>캡처 전용 화면 (입력창), 날짜 표시, 상단 바 (🕐히스토리 + 🔔알림 + ⚙️설정), 전체 히스토리</td>
+</tr>
+<tr>
+<td>AI 분류 현황</td>
+<td>🔔 → 전용 화면, 24시간 내 분류 항목 일괄 표시, 확인/수정, 미확인 뱃지</td>
+</tr>
+<tr>
+<td>공유 인텐트</td>
+<td>텍스트 수신, 미지원 형식 처리</td>
+</tr>
+<tr>
+<td>캘린더 탭</td>
+<td>일정 목록 조회, 할 일 목록 조회 (전체), 삭제, 삭제 실행 취소</td>
+</tr>
+<tr>
+<td>할 일 관리</td>
+<td>할 일 자동 생성, 목록 조회, 삭제, 삭제 실행 취소, 완료 처리</td>
+</tr>
+<tr>
+<td>노트</td>
+<td>자동 분류 저장 (Inbox/아이디어/일반 노트), 목록 조회, 삭제, 삭제 실행 취소, 캡처 검색</td>
+</tr>
+<tr>
+<td>알림</td>
+<td>캡처 완료 피드백, AI 분류 현황 (🔔 뱃지 + 전용 화면), 오프라인 상태 표시 (앱 내)</td>
+</tr>
+<tr>
+<td>온보딩</td>
+<td>앱 소개 화면, 첫 캡처 유도, AI 분류 안내</td>
+</tr>
+<tr>
+<td>설정</td>
+<td>다크 모드, 개인정보 처리방침, 이용약관, 앱 버전</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-2a">Phase 2a: 코어 루프 완성<a class="headerlink" href="#phase-2a" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처</td>
+<td>이미지 첨부, 휴지통 이동 (30일 보존 후 자동 영구 삭제)</td>
+</tr>
+<tr>
+<td>공유 인텐트</td>
+<td>이미지 수신, 복합 콘텐츠, 일정 자동 추가 (신뢰도 기반)</td>
+</tr>
+<tr>
+<td>캘린더 탭</td>
+<td>주간/월간 뷰, 로컬 캘린더(CalendarProvider) 동기화 (신뢰도 기반 조건부 쓰기), 일정 상세 보기, 일정 추가 모드 설정, 통합 뷰 (주간 캘린더 + 일정 + 할 일)</td>
+</tr>
+<tr>
+<td>할 일 관리</td>
+<td>완료 항목 보기, AI 마감일 제안, 순서 변경</td>
+</tr>
+<tr>
+<td>위젯</td>
+<td>입력 위젯</td>
+</tr>
+<tr>
+<td>알림</td>
+<td>일정 추가/제안 푸시</td>
+</tr>
+<tr>
+<td>AI 분류</td>
+<td>분류 수정 로깅</td>
+</tr>
+<tr>
+<td>관측</td>
+<td>분류 품질 최소 관측 지표 수집 시작</td>
+</tr>
+<tr>
+<td>온보딩</td>
+<td>캘린더 권한 요청</td>
+</tr>
+<tr>
+<td>설정</td>
+<td>캘린더 연동(권한/대상 캘린더 선택), 일정 추가 모드, 알림 설정</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-2b">Phase 2b: 사용성 확장 (최소 출시 기준)<a class="headerlink" href="#phase-2b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI 분류</td>
+<td>멀티 인텐트 캡처 분할, 수정 이력 기반 학습(초안)</td>
+</tr>
+<tr>
+<td>노트</td>
+<td>상세 보기, 편집, 폴더 관리 CRUD (생성/이름 변경/삭제/순서 변경/노트 이동)</td>
+</tr>
+<tr>
+<td>위젯</td>
+<td>할 일 위젯</td>
+</tr>
+<tr>
+<td>관측</td>
+<td>확장 관측 지표 수집 시작</td>
+</tr>
+<tr>
+<td>온보딩</td>
+<td>위젯 가이드</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-3a">Phase 3a: 서비스 지속 가능성 확보<a class="headerlink" href="#phase-3a" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사용자 인증</td>
+<td>Google Sign-In(ID Token) + 서버 JWT 인증</td>
+</tr>
+<tr>
+<td>구독 모델</td>
+<td>과금 기준 적용, 구독 현황 표시</td>
+</tr>
+<tr>
+<td>일정 관리</td>
+<td>로컬 캘린더(CalendarProvider) 동기화, 입력 소스별 캘린더 차등 제안</td>
+</tr>
+<tr>
+<td>노트</td>
+<td>AI 통합 그룹화 (구독), AI 시맨틱 검색 (구독)</td>
+</tr>
+<tr>
+<td>AI 분류</td>
+<td>분류 프리셋 (구독), 사용자 지시 (구독)</td>
+</tr>
+<tr>
+<td>온보딩</td>
+<td>AI 기능 상세 설명, AI 기능 on/off 설정</td>
+</tr>
+<tr>
+<td>설정</td>
+<td>AI 설정 전체, 구독 현황, 로그아웃</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-3b-ai">Phase 3b: 고급 AI 및 외부 확장<a class="headerlink" href="#phase-3b-ai" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처</td>
+<td>외부 공유 (캡처 내용을 외부 앱으로 공유)</td>
+</tr>
+<tr>
+<td>일정 관리</td>
+<td>기기 캘린더 앱에서 보기 버튼</td>
+</tr>
+<tr>
+<td>보안</td>
+<td>임시 저장 암호화 (EncryptedSharedPreferences)</td>
+</tr>
+<tr>
+<td>구독 기능</td>
+<td>OCR (이미지 텍스트 추출), 고급 통계</td>
+</tr>
+<tr>
+<td>AI 분류</td>
+<td>수정 이력 기반 학습 고도화 (개인화 품질 최적화)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_1">장기 로드맵<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>Phase 3b 이후 제품 방향성을 나타내는 항목. 구현 순서나 시점은 미정이며, 서비스 운영 데이터와 사용자 피드백에 따라 우선순위를 결정한다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>북마크</td>
+<td>외부 앱에서 URL 공유 시 AI가 페이지를 요약하여 저장. NOTES &gt; BOOKMARK 하위 유형으로 분류. URL 자동 저장, AI 요약 생성 (제목·요약문·핵심 포인트·태그), 북마크 목록 조회 및 상세 보기</td>
+</tr>
+<tr>
+<td>공유 인텐트 URL 수신</td>
+<td>공유된 URL을 북마크로 저장하고 AI 요약 처리</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8">8. 리스크 &amp; 미결 사항<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>항목</th>
+<th>설명</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>AI 분류 정확도 및 개인차</td>
+<td>분류 기준은 사람마다 다르며, AI의 범용 분류가 모든 사용자에게 부합하지 않을 수 있음. 출시 후 수정률을 추적하며, 수정률 임계치 초과 시 개인화 수단 도입 일정을 앞당김. 유저 테스트 문서 참조</td>
+<td>핵심 리스크</td>
+</tr>
+<tr>
+<td>2</td>
+<td>일정 자동 추가 오분류</td>
+<td>신뢰도(Confidence) 기반 조건부 처리로 대응 (4.5 참조). 기본값은 "제안" 모드. 신뢰도 임계값의 적정 수준은 유저 테스트를 통해 검증 예정</td>
+<td>대응 중</td>
+</tr>
+<tr>
+<td>3</td>
+<td>캡처 입력의 AI 처리 범위</td>
+<td>캡처는 "저장"의 영역이며, AI 대화 기능으로 확장하지 않는다. 질문형/대화형 입력은 "확인할 것" 성격의 할 일로 분류하여 행동/기록으로 환원한다 (4.2 비기록성 입력 처리 참조)</td>
+<td>방침 확정</td>
+</tr>
+<tr>
+<td>4</td>
+<td>외부 서비스 동기화 확장</td>
+<td>Obsidian 등 외부 도구 연동 가능성. 추후 동기화 아키텍처 설계 시 별도 논의</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>5</td>
+<td>데이터 동기화 및 마이그레이션</td>
+<td>크로스 디바이스 동기화, 외부 도구 데이터 임포트, 웹/PC 확장 시 콘텐츠의 서버 저장 및 동기화 설계 필요</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>6</td>
+<td>성공 지표 세부 운영</td>
+<td>핵심 가설(마찰 감소, 정리 부채 해결)과 지표 프레임은 설정됨. 세부 수치 기준은 출시 후 운영 데이터를 바탕으로 보완</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>7</td>
+<td>로컬 캘린더 연동 상태 일관성</td>
+<td>권한 변경/대상 캘린더 변경/수동 삭제 시 앱 상태와 캘린더 상태 간 불일치 가능성. 재동기화 정책 고도화 필요 (Phase 3a)</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>8</td>
+<td>전면적 접근성 지원</td>
+<td>스크린 리더, TalkBack 등 접근성 전면 지원 여부. Phase 3b 이후 별도 검토</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>9</td>
+<td>다국어(i18n)</td>
+<td>영어 등 다국어 지원 여부. 구조적 준비(리소스 분리)는 Phase 1에서 고려하되, 실제 번역 적용은 별도 논의</td>
+<td>미결</td>
+</tr>
+<tr>
+<td>10</td>
+<td>분석 및 로깅</td>
+<td>분류 품질 관측 지표(5.9)를 Phase 2a부터 수집하기 위한 이벤트 로깅 체계를 사전 설계해야 함. 로깅 스키마 및 분석 파이프라인은 Phase 2a 착수 전 확정</td>
+<td>대응 중</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9">9. 문서 체계<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>문서</th>
+<th>범위</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PRD (본 문서)</strong></td>
+<td>문제 정의, 비전, 타겟 사용자, 기능 요구사항, 비기능적 요구사항, 로드맵</td>
+<td>v10.0</td>
+</tr>
+<tr>
+<td><strong>철학 및 원칙 가이드</strong></td>
+<td>철학 → 설계 원칙 → 디자인 가이드라인</td>
+<td>v1.0</td>
+</tr>
+<tr>
+<td><strong>유저 테스트 문서</strong></td>
+<td>검증 항목, 테스트 시나리오, 가설</td>
+<td>v2.0</td>
+</tr>
+<tr>
+<td><strong>리서치 리포트</strong></td>
+<td>시장 조사, 경쟁 환경 분석, 한국 시장 분석</td>
+<td>v1.0</td>
+</tr>
+<tr>
+<td><strong>리서치 핵심 인사이트</strong></td>
+<td>리서치 리포트의 핵심 인사이트 요약 및 PRD 근거자료 매핑</td>
+<td>v1.0</td>
+</tr>
+<tr>
+<td><strong>사용자 시나리오</strong></td>
+<td>구체적 사용 상황 및 앱 동작 흐름</td>
+<td>v1.1</td>
+</tr>
+<tr>
+<td><strong>기능 명세서</strong></td>
+<td>각 기능의 동작 규칙, 상태 전이, 엣지 케이스</td>
+<td>v2.4</td>
+</tr>
+<tr>
+<td><strong>화면별 동작 명세</strong></td>
+<td>화면 상태, 인터랙션, UI 스펙</td>
+<td>작성 예정</td>
+</tr>
+<tr>
+<td><strong>API 명세</strong></td>
+<td>엔드포인트, 요청/응답, 에러 코드</td>
+<td>v2.6</td>
+</tr>
+<tr>
+<td><strong>데이터 모델 명세</strong></td>
+<td>스키마, 관계, 상태 머신</td>
+<td>v2.3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10">10. 변경 이력<a class="headerlink" href="#10" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>버전</th>
+<th>날짜</th>
+<th>주요 변경 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2025-01-21</td>
+<td>초기 작성. Obsidian + Todoist + Google Calendar 외부 연동 기반 구조</td>
+</tr>
+<tr>
+<td>2.0</td>
+<td>2025-01-28</td>
+<td>Todoist 제거 → 내부 투두 도입, Google Calendar 연동 축소, 음성 입력 삭제, 알림 추가, 서버/프론트 역할 분리</td>
+</tr>
+<tr>
+<td>3.0</td>
+<td>2025-01-28</td>
+<td>UI/UX 반복 개선 (3열 그리드, 하단 입력창, 다크모드, 노트 편집 페이지), IA·화면정의서 분리</td>
+</tr>
+<tr>
+<td>4.0</td>
+<td>2025-01-28</td>
+<td>PRD·화면정의서·IA 3개 문서 체계 확립, 북마크 관리·노트 보기 방식·Obsidian 미연동 시 자체 DB 등 기능 추가</td>
+</tr>
+<tr>
+<td>5.0</td>
+<td>2026-02-04</td>
+<td>Android 네이티브(Kotlin) 피벗, "Just Capture" 철학 정립, Experience Design Guide·사용자 시나리오 분리, Phase 재구성</td>
+</tr>
+<tr>
+<td>5.1</td>
+<td>2026-02-04</td>
+<td>기능 범위 정제 (음성 입력·Obsidian 연동 제거), 할 일 관리 상세화 (AI 마감일 제안, 우선순위), 캘린더 동기화 방식 확정 (Room DB 캐시 + 단방향 쓰기)</td>
+</tr>
+<tr>
+<td>5.2</td>
+<td>2026-02-05</td>
+<td>Experience Design Guide v1.0 완성, 사용자 시나리오 v1.1 검증 항목 분리</td>
+</tr>
+<tr>
+<td>6.0</td>
+<td>2026-02-05</td>
+<td>기능 구조 가이드 기반 PRD 전면 재구성. FR/NFR 분리, 서버 아키텍처를 PRD에서 제외, 기능별 Phase 태깅</td>
+</tr>
+<tr>
+<td>6.1</td>
+<td>2026-02-05</td>
+<td>페르소나 재구성 (Pain Point·기능 매핑 추가), Phase 1을 코어 루프로 축소 (공유 인텐트·Calendar 동기화 등 Phase 2로 이동), 유저 테스트 문서 신규 생성</td>
+</tr>
+<tr>
+<td>7.0</td>
+<td>2026-02-06</td>
+<td>(1) 1.4 문제 정의에서 솔루션 서술 제거, 분류 기준 개인차 문제 명시, (2) AI 분류 개인화 수단 추가 (사후 수정 학습, 프리셋, 사용자 지시), (3) 페르소나 C ADHD 특성 기반 재작성, (4) NFR 확장, (5) Phase 2·3 목표 명시 및 Phase 구분 기준 추가, (6) 변경 이력 섹션 신설, (7) 미결 사항 추가</td>
+</tr>
+<tr>
+<td>8.0</td>
+<td>2026-02-06</td>
+<td>(1) 문제 정의 구조 재편 — 핵심 문제 → 원인 → 기존 솔루션 한계 순서, (2) Phase 2a/2b 분할, (3) 홈 화면 섹션 신설 — 최근 캡처 피드 + 전체 히스토리, (4) 미분류 → Inbox 자동 저장, (5) Snackbar 스타일 삭제 실행 취소 추가, (6) 임시 저장 기능 추가, (7) 할 일 완료 처리 Phase 1로 이동, (8) 노트 폴더 구조 재설계 — AI 자동 그룹화 + 재정리 기능, (9) 보기 방식 PRD에서 제거, (10) 비즈니스 모델 섹션 신설, (11) 분류 커스터마이징(프리셋, 사용자 지시)을 구독 기능으로 위치, (12) Phase 목표 서술 제거</td>
+</tr>
+<tr>
+<td>9.0</td>
+<td>2026-02-06</td>
+<td>(1) 문제 정의 근거 보강 — 리서치 데이터 기반 정량적 근거 추가, (2) 우선순위 재배치 — 공유 인텐트 텍스트 수신 Phase 1, 이미지 첨부 Phase 2a, 입력 위젯 Phase 2a, (3) 캡처 검색 Phase 1 신규 추가, (4) AI 분류 안내 온보딩 Phase 1 추가, (5) Inbox 주기적 AI 재분류 메커니즘 추가, (6) 노트 재정리를 Phase 3 구독으로 이동, (7) 북마크를 장기 로드맵으로 이동 — 분류 유형 5→4개로 축소, (8) 장기 로드맵 섹션 신설, (9) 성공 지표 섹션 추가, (10) 리스크 #5 데이터 마이그레이션 통합, (11) Phase 2b에 "최소 출시 기준" 명시, (12) 문서 체계에 리서치 문서 추가</td>
+</tr>
+<tr>
+<td>9.1</td>
+<td>2026-02-06</td>
+<td>(1) 제품 비전 보강 — "기록을 포기하지 않게 만드는 시스템" 목표 명시, (2) 일정 자동 추가 안전장치 — 신뢰도(Confidence) 기반 조건부 처리 도입, 기본값 "제안" 모드, (3) 비기록성 입력 처리 방침 확정 — 질문형 입력을 행동 항목으로 환원, 리스크 #3 방침 확정, (4) 리스크 #2 업데이트 — 신뢰도 기반 대응 반영, (5) 레퍼런스 섹션 추가 — 본문 인용 데이터의 출처 명시, (6) 알림 유형 세분화 — 일정 제안 푸시 추가, (7) 설정에 일정 추가 모드 항목 추가</td>
+</tr>
+<tr>
+<td>9.2</td>
+<td>2026-02-06</td>
+<td>(1) 설계 판단 기준에 Quality 추가 — AI 분류 품질 타협 금지, (2) AI 분류 출력 스펙 신설 — AI 제목 생성·핵심 엔티티 추출·신뢰도 포함, 원본 텍스트 보존 원칙 명시, (3) 분류 수정 시 파생 객체 자동 처리 원칙 및 전환 매트릭스 추가 (4.2), (4) 비즈니스 모델에 분류 품질 최우선 원칙 추가 (6.1), (5) 성공 지표 재구성 — 핵심 가설(마찰 감소/정리 부채 해결) 프레임워크 도입, 1차/2차 성공 지표에 회수·행동 지표 추가, (6) NFR에 Inbox 설계 원칙 추가 (5.8), (7) NFR에 분류 품질 관측 섹션 추가 (5.9) — 최소/확장 관측 지표 정의, Phase 2a부터 수집, (8) 리스크 #10 상태 "대응 중"으로 변경, (9) 할 일 속성에 원본 텍스트 추가, (10) Phase 1·2a 범위에 신규 기능 반영</td>
+</tr>
+<tr>
+<td>10.0</td>
+<td>2026-02-06</td>
+<td>(1) 홈 화면 전면 변경 — 캡처 전용 화면으로 전환, 피드 제거, 상단 바에 🕐히스토리 + 🔔알림(뱃지) 배치, 날짜 표시 추가, (2) 분류 체계 전면 변경 — 내부 유형 SCHEDULE/TODO/NOTES/TEMP 4개, IDEA·NOTE는 NOTES 하위 유형(note_sub_type), 사용자 표시 4개(일정/할 일/노트/아이디어), TEMP는 칩 미표시, (3) AI 분류 현황 화면 신설 (4.3.1) — 🔔 탭 → 전용 화면, 24시간 내 분류 일괄 표시, 확인/수정 + 미확인 뱃지, (4) 탭 이름 "플래너" → "캘린더" 변경, 캘린더 탭 통합 뷰 (주간 캘린더 + 일정 + 할 일 단일 화면), (5) 기능 추가 — 휴지통 30일 보존(2a), 멀티 인텐트 분할(2b), 폴더 CRUD(2b), 입력 소스별 캘린더 차등 제안(3a), 외부 공유(3b), 임시 저장 암호화(3b), (6) 기능 삭제 — AI 우선순위, 마감 임박 시각적 강조, 캡처 기반 상태 업데이트, 마감 임박 푸시 알림, (7) 노트 재정리 → AI 통합 그룹화로 변경, (8) Phase 3 → 3a/3b 분할 (3a: 인증/구독, 3b: 고급 AI/외부 확장), (9) 구독 기능에 OCR·고급 통계 추가, (10) Snackbar 5초 → 3초, (11) 검색 접근점을 노트 탭으로 이동, (12) 전체 히스토리 접근점을 홈 상단 🕐 아이콘으로 변경, (13) Google Calendar에서 보기 버튼 Phase 3b 배정, (14) 캘린더 탭 할 일 표시 범위를 전체 할 일로 확정, (15) 용어 변경: Inbox → TEMP (내부), 플래너 → 캘린더 (전체), (16) 페르소나 C 주요 사용 기능에서 AI 우선순위·마감 임박 알림 제거</td>
+</tr>
+<tr>
+<td>10.1</td>
+<td>2026-02-12</td>
+<td>CalendarProvider 전환 및 인증/동기화 문맥 정렬. (1) Android 캘린더 연동을 Google OAuth/서버 프록시에서 로컬 CalendarProvider로 전환, (2) 로그인 문구를 Google Sign-In(ID Token)+서버 JWT로 정렬, (3) 로그아웃 시 로컬 데이터 유지 정책 확정, (4) 데이터 동기화 기준을 <code>/sync/*</code>로 명시, (5) PRD-스펙 문서 버전/상태 표 갱신</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11_1">11. 레퍼런스<a class="headerlink" href="#11_1" title="Permanent link">&para;</a></h2>
+<p>본 문서에 인용된 시장 데이터 및 경쟁 분석 수치의 출처. 상세 분석은 리서치 리포트 v1.0 및 리서치 핵심 인사이트 v1.0을 참조한다.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>인용 데이터</th>
+<th>출처</th>
+<th>PRD 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[1]</td>
+<td>전용 메모·캘린더 앱 사용률 12.7%</td>
+<td>WiseApp·Retail, 2025년 11월 한국 스마트폰 사용자 조사</td>
+<td>1.1</td>
+</tr>
+<tr>
+<td>[2]</td>
+<td>Evernote 다운로드 82% 감소, 등록 사용자 2.5억 (피크)</td>
+<td>리서치 리포트 — PART 1, 1A. 주요 플레이어 지표</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td>[3]</td>
+<td>Todoist 5,000만 사용자, 자연어 입력에도 유형 판단은 사용자 몫</td>
+<td>리서치 리포트 — PART 2, 할 일 관리 앱 심층 분석</td>
+<td>1.3</td>
+</tr>
+<tr>
+<td>[4]</td>
+<td>Google Keep "디지털 정크 서랍" 평가, 50개 라벨 제한</td>
+<td>리서치 리포트 — PART 2, 퀵 캡처 도구 심층 분석</td>
+<td>1.3</td>
+</tr>
+<tr>
+<td>[5]</td>
+<td>사용자의 28%가 복수 앱 관리로 인한 피로 호소</td>
+<td>리서치 리포트 — PART 1, 1B. 올인원 통합 플랫폼의 확산</td>
+<td>1.3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Document Version: 10.0 | Last Updated: 2026-02-07</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

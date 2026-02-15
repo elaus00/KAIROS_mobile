@@ -1,0 +1,2120 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/archive/plan/phase2b/implementation_plan/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Phase 2b 구현 계획: 사용성 확장 (최소 출시 기준) - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-2b" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../../../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 2b 구현 계획: 사용성 확장 (최소 출시 기준)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 개요
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 현재 상태 확인
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 서브페이즈 구성 (9단계)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 서브페이즈 구성 (9단계)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2b-0-db-v13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-0: DB v13 스키마 + 전 레이어 기반 코드
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-1: 멀티 인텐트 분할
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-2: 노트 상세 보기/편집
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-3: 폴더 이름 검증 강화
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-4: 히스토리 필터링
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-5: 검색 필터 확장
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-6-4x2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-6: 할 일 위젯 (4x2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-7: 확장 관측 지표
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b-8: 테스트 + 통합 검증
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 서브페이즈 의존성
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 멀티 에이전트 전략 (4인 팀)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 멀티 에이전트 전략 (4인 팀)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wave-1-2b-0-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 1: 2b-0 (단독, data 에이전트)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-2-2b-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 2: 최대 병렬 (2b-0 완료 후)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 3: 후반 작업
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        공유 파일 규칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 예상 규모
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 검증 방법
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 주의사항
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="phase-2b">Phase 2b 구현 계획: 사용성 확장 (최소 출시 기준)<a class="headerlink" href="#phase-2b" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>작성일</strong>: 2026-02-07
+<strong>브랜치</strong>: <code>feature/phase2</code>
+<strong>상태</strong>: 계획 수립 완료
+<strong>선행 조건</strong>: Phase 2a 완료 (81개 파일, 96개 유닛 테스트 통과)</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 개요<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>Phase 2b는 멀티 인텐트 분할, 노트 편집, 할일 위젯, 히스토리/검색 필터, 관측 지표 확장을 구현하여 최소 출시 기준을 달성하는 단계이다.</p>
+<hr />
+<h2 id="2">2. 현재 상태 확인<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>상태</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CaptureSource.SPLIT</code></td>
+<td>✅ 존재</td>
+<td>도메인 모델에 이미 정의됨</td>
+</tr>
+<tr>
+<td><code>CaptureEntity.parent_capture_id</code></td>
+<td>❌ 미존재</td>
+<td>2b-0에서 추가</td>
+</tr>
+<tr>
+<td><code>NoteEntity.body</code></td>
+<td>❌ 미존재</td>
+<td>2b-0에서 추가</td>
+</tr>
+<tr>
+<td><code>Capture.parentCaptureId</code> / <code>Note.body</code> 도메인 모델</td>
+<td>❌ 미존재</td>
+<td>2b-0에서 추가</td>
+</tr>
+<tr>
+<td><code>Classification.splitItems</code> / <code>ClassifyResponse.splitItems</code></td>
+<td>❌ 미존재</td>
+<td>2b-0에서 추가</td>
+</tr>
+<tr>
+<td><code>FolderRepositoryImpl.deleteFolder</code> Inbox 이동</td>
+<td>✅ 구현됨</td>
+<td>트랜잭션 처리 완료</td>
+</tr>
+<tr>
+<td><code>CreateFolderUseCase</code> 이름 최대 길이 검증</td>
+<td>❌ 미검증</td>
+<td>2b-3에서 추가 (30자)</td>
+</tr>
+<tr>
+<td>위젯 기반</td>
+<td>RemoteViews</td>
+<td><code>CaptureWidgetProvider</code>는 Glance 아님</td>
+</tr>
+<tr>
+<td>FTS 검색</td>
+<td>FTS4 MATCH + captures JOIN</td>
+<td>필터 없음</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-9">3. 서브페이즈 구성 (9단계)<a class="headerlink" href="#3-9" title="Permanent link">&para;</a></h2>
+<h3 id="2b-0-db-v13">2b-0: DB v13 스키마 + 전 레이어 기반 코드<a class="headerlink" href="#2b-0-db-v13" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: Entity/Model/Mapper/DTO에 새 필드 추가</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/local/database/FlitDatabase.kt</code></td>
+<td>수정</td>
+<td>version 12→13</td>
+</tr>
+<tr>
+<td><code>data/local/database/entities/CaptureEntity.kt</code></td>
+<td>수정</td>
+<td><code>parent_capture_id</code> (String?) + Index 추가</td>
+</tr>
+<tr>
+<td><code>data/local/database/entities/NoteEntity.kt</code></td>
+<td>수정</td>
+<td><code>body</code> (String?) 추가</td>
+</tr>
+<tr>
+<td><code>domain/model/Capture.kt</code></td>
+<td>수정</td>
+<td><code>parentCaptureId: String? = null</code> 추가</td>
+</tr>
+<tr>
+<td><code>domain/model/Note.kt</code></td>
+<td>수정</td>
+<td><code>body: String? = null</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/mapper/CaptureMapper.kt</code></td>
+<td>수정</td>
+<td><code>parentCaptureId</code> 매핑</td>
+</tr>
+<tr>
+<td><code>data/mapper/NoteMapper.kt</code></td>
+<td>수정</td>
+<td><code>body</code> 매핑</td>
+</tr>
+<tr>
+<td><code>domain/model/Classification.kt</code></td>
+<td>수정</td>
+<td><code>splitItems: List&lt;SplitItem&gt;? = null</code> 추가</td>
+</tr>
+<tr>
+<td><code>domain/model/SplitItem.kt</code></td>
+<td>신규</td>
+<td>분할 아이템 도메인 모델</td>
+</tr>
+<tr>
+<td><code>data/remote/dto/v2/ClassifyResponse.kt</code></td>
+<td>수정</td>
+<td><code>splitItems: List&lt;SplitItemDto&gt;?</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/remote/dto/v2/SplitItemDto.kt</code></td>
+<td>신규</td>
+<td>분할 DTO</td>
+</tr>
+<tr>
+<td><code>data/debug/MockDataInitializer.kt</code></td>
+<td>수정</td>
+<td>새 필드 반영</td>
+</tr>
+<tr>
+<td><code>test/util/TestFixtures.kt</code></td>
+<td>수정</td>
+<td>새 필드 반영</td>
+</tr>
+</tbody>
+</table>
+<p><strong>검증</strong>: <code>compileDebugKotlin</code> 통과 + 기존 96개 테스트 통과</p>
+<hr />
+<h3 id="2b-1">2b-1: 멀티 인텐트 분할<a class="headerlink" href="#2b-1" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: AI 분류 시 다중 의도 감지 → 개별 Capture 생성</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/remote/api/MockFlitApi.kt</code></td>
+<td>수정</td>
+<td>"~하고", "~그리고" 패턴 감지 → <code>splitItems</code> 응답 생성</td>
+</tr>
+<tr>
+<td><code>data/local/database/dao/CaptureDao.kt</code></td>
+<td>수정</td>
+<td><code>getByParentCaptureId(parentId)</code> 쿼리 추가</td>
+</tr>
+<tr>
+<td><code>domain/repository/CaptureRepository.kt</code></td>
+<td>수정</td>
+<td><code>getChildCaptures(parentId)</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/repository/CaptureRepositoryImpl.kt</code></td>
+<td>수정</td>
+<td>위 메서드 구현</td>
+</tr>
+<tr>
+<td><code>domain/usecase/classification/ProcessClassificationResultUseCase.kt</code></td>
+<td>수정</td>
+<td>splitItems 존재 시 자식 Capture 생성 로직 추가</td>
+</tr>
+<tr>
+<td><code>data/worker/ClassifyCaptureWorker.kt</code></td>
+<td>수정</td>
+<td>splitItems 응답 파싱 후 ProcessClassificationResult에 전달</td>
+</tr>
+</tbody>
+</table>
+<p><strong>핵심 로직</strong> (ProcessClassificationResultUseCase):
+<div class="highlight"><pre><span></span><code>if (classification.splitItems != null) {
+    for (splitItem in classification.splitItems) {
+        1. 새 Capture 생성 (source=SPLIT, parentCaptureId=captureId)
+        2. invoke(newCaptureId, splitItemClassification) // 재귀적 파생 엔티티 생성
+    }
+}
+</code></pre></div></p>
+<p><strong>검증</strong>: split 패턴 입력 → 자식 Capture 생성 확인, 단일 의도 입력 → 기존 동작 유지</p>
+<hr />
+<h3 id="2b-2">2b-2: 노트 상세 보기/편집<a class="headerlink" href="#2b-2" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: NoteDetailScreen 신규 화면 — 제목/본문/태그/폴더 편집</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/local/database/dao/NoteDao.kt</code></td>
+<td>수정</td>
+<td><code>NoteWithCaptureRow</code>에 <code>body</code> 필드 추가, <code>updateBody()</code> 쿼리 추가</td>
+</tr>
+<tr>
+<td><code>domain/repository/NoteRepository.kt</code></td>
+<td>수정</td>
+<td><code>getNoteDetail(noteId)</code>, <code>updateNoteBody(noteId, body)</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/repository/NoteRepositoryImpl.kt</code></td>
+<td>수정</td>
+<td>위 메서드 구현</td>
+</tr>
+<tr>
+<td><code>domain/usecase/note/GetNoteDetailUseCase.kt</code></td>
+<td>신규</td>
+<td>노트 + 캡처 + 태그 조합 조회</td>
+</tr>
+<tr>
+<td><code>domain/usecase/note/UpdateNoteUseCase.kt</code></td>
+<td>신규</td>
+<td>제목(ai_title), 본문(body), 태그, 폴더 업데이트</td>
+</tr>
+<tr>
+<td><code>presentation/notes/detail/NoteDetailUiState.kt</code></td>
+<td>신규</td>
+<td>UI 상태 정의</td>
+</tr>
+<tr>
+<td><code>presentation/notes/detail/NoteDetailViewModel.kt</code></td>
+<td>신규</td>
+<td>편집 상태 추적, 저장, 변경 감지</td>
+</tr>
+<tr>
+<td><code>presentation/notes/detail/NoteDetailScreen.kt</code></td>
+<td>신규</td>
+<td>Compose UI (제목/본문/태그/분류/폴더/원본/날짜)</td>
+</tr>
+<tr>
+<td><code>navigation/NavGraph.kt</code></td>
+<td>수정</td>
+<td><code>NOTE_DETAIL</code> route 추가</td>
+</tr>
+<tr>
+<td><code>presentation/notes/NotesScreen.kt</code></td>
+<td>수정</td>
+<td>노트 아이템 탭 → NoteDetail 네비게이션</td>
+</tr>
+</tbody>
+</table>
+<p><strong>UI 구성</strong>:
+- TopBar: ← / 삭제 / [저장] (변경사항 있을 때만 활성화)
+- 제목 (편집 가능 TextField)
+- 분류 칩 + 태그 (편집 가능)
+- 본문 (편집 가능 TextField, body가 null이면 original_text 표시)
+- 원본 텍스트 (접힘 가능, 읽기 전용)
+- 소속 폴더 (탭 → 폴더 선택 바텀시트)
+- 작성 날짜</p>
+<p><strong>검증</strong>: 편집→저장→DB 반영, 변경사항 있을 때 뒤로가기 시 확인 다이얼로그</p>
+<hr />
+<h3 id="2b-3">2b-3: 폴더 이름 검증 강화<a class="headerlink" href="#2b-3" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 폴더 이름 최대 30자 제한 추가</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>domain/usecase/folder/CreateFolderUseCase.kt</code></td>
+<td>수정</td>
+<td><code>require(name.length &lt;= 30)</code> 추가</td>
+</tr>
+<tr>
+<td><code>domain/usecase/folder/RenameFolderUseCase.kt</code></td>
+<td>수정</td>
+<td><code>require(newName.length &lt;= 30)</code> 추가</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>폴더 삭제 시 Inbox 이동은 <code>FolderRepositoryImpl.deleteFolder</code>에 이미 구현됨.
+폴더 이동은 2b-2 NoteDetailScreen에서 구현.</p>
+</blockquote>
+<p><strong>검증</strong>: 31자 이름 입력 시 에러, 기존 폴더 테스트 통과</p>
+<hr />
+<h3 id="2b-4">2b-4: 히스토리 필터링<a class="headerlink" href="#2b-4" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 분류 유형 칩 + 날짜 범위 필터</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/local/database/dao/CaptureDao.kt</code></td>
+<td>수정</td>
+<td><code>getFilteredCapturesPaged(type?, startDate?, endDate?, limit, offset)</code> 추가</td>
+</tr>
+<tr>
+<td><code>domain/repository/CaptureRepository.kt</code></td>
+<td>수정</td>
+<td><code>getFilteredCaptures(...)</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/repository/CaptureRepositoryImpl.kt</code></td>
+<td>수정</td>
+<td>필터 쿼리 구현</td>
+</tr>
+<tr>
+<td><code>domain/usecase/capture/GetFilteredCapturesUseCase.kt</code></td>
+<td>신규</td>
+<td>필터 파라미터 기반 캡처 조회</td>
+</tr>
+<tr>
+<td><code>presentation/history/HistoryUiState.kt</code></td>
+<td>수정</td>
+<td><code>selectedType</code>, <code>startDate</code>, <code>endDate</code> 필드 추가</td>
+</tr>
+<tr>
+<td><code>presentation/history/HistoryViewModel.kt</code></td>
+<td>수정</td>
+<td>필터 핸들러, 필터 적용 시 <code>getFilteredCapturesUseCase</code> 사용</td>
+</tr>
+<tr>
+<td><code>presentation/history/HistoryScreen.kt</code></td>
+<td>수정</td>
+<td>필터 칩 행 + 날짜 범위 UI 추가</td>
+</tr>
+<tr>
+<td><code>presentation/components/common/FilterChipRow.kt</code></td>
+<td>신규</td>
+<td>재사용 가능한 분류 유형 칩 컴포넌트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>DAO 쿼리 전략</strong>: nullable 파라미터 조건부 쿼리 사용
+<div class="highlight"><pre><span></span><code><span class="k">WHERE</span><span class="w"> </span><span class="n">is_deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">is_trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="k">type</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">classified_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="k">type</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="n">startDate</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="p">:</span><span class="n">startDate</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="n">endDate</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">:</span><span class="n">endDate</span><span class="p">)</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="p">:</span><span class="k">limit</span><span class="w"> </span><span class="k">OFFSET</span><span class="w"> </span><span class="p">:</span><span class="k">offset</span>
+</code></pre></div></p>
+<p><strong>검증</strong>: 필터 조합 → 올바른 결과, 초기화 → 전체 표시</p>
+<hr />
+<h3 id="2b-5">2b-5: 검색 필터 확장<a class="headerlink" href="#2b-5" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 검색 결과에 분류 유형 + 날짜 범위 필터</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/local/database/dao/CaptureSearchDao.kt</code></td>
+<td>수정</td>
+<td><code>searchFiltered(query, type?, startDate?, endDate?)</code> 추가</td>
+</tr>
+<tr>
+<td><code>domain/repository/CaptureRepository.kt</code></td>
+<td>수정</td>
+<td><code>searchCapturesFiltered(...)</code> 추가</td>
+</tr>
+<tr>
+<td><code>data/repository/CaptureRepositoryImpl.kt</code></td>
+<td>수정</td>
+<td>필터 FTS 검색 구현</td>
+</tr>
+<tr>
+<td><code>domain/usecase/search/SearchCapturesUseCase.kt</code></td>
+<td>수정</td>
+<td>필터 파라미터 추가 (기본값 null)</td>
+</tr>
+<tr>
+<td><code>presentation/search/SearchUiState.kt</code></td>
+<td>수정</td>
+<td><code>selectedType</code>, <code>startDate</code>, <code>endDate</code> 추가</td>
+</tr>
+<tr>
+<td><code>presentation/search/SearchViewModel.kt</code></td>
+<td>수정</td>
+<td>필터 핸들러, 필터 적용 검색</td>
+</tr>
+<tr>
+<td><code>presentation/search/SearchScreen.kt</code></td>
+<td>수정</td>
+<td>FilterChipRow 재사용, 날짜 범위 UI</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FTS 필터 쿼리</strong>:
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">captures</span><span class="w"> </span><span class="k">c</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">capture_search</span><span class="w"> </span><span class="n">cs</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs</span><span class="p">.</span><span class="n">capture_id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">capture_search</span><span class="w"> </span><span class="k">MATCH</span><span class="w"> </span><span class="p">:</span><span class="n">query</span>
+<span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">is_deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">is_trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="k">type</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">classified_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="k">type</span><span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="n">startDate</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">created_at</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="p">:</span><span class="n">startDate</span><span class="p">)</span>
+<span class="k">AND</span><span class="w"> </span><span class="p">(:</span><span class="n">endDate</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">created_at</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">:</span><span class="n">endDate</span><span class="p">)</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="p">:</span><span class="k">limit</span>
+</code></pre></div></p>
+<p><strong>검증</strong>: FTS 검색 + 필터 조합 동작 확인</p>
+<hr />
+<h3 id="2b-6-4x2">2b-6: 할 일 위젯 (4x2)<a class="headerlink" href="#2b-6-4x2" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 오늘 마감 할일 표시 + 체크박스 완료 처리</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/local/database/dao/TodoDao.kt</code></td>
+<td>수정</td>
+<td><code>getTodayIncompleteTodos(todayEndMs)</code> 쿼리 추가</td>
+</tr>
+<tr>
+<td><code>presentation/widget/TodoWidgetProvider.kt</code></td>
+<td>신규</td>
+<td>AppWidgetProvider + RemoteViewsService</td>
+</tr>
+<tr>
+<td><code>res/layout/widget_todo.xml</code></td>
+<td>신규</td>
+<td>위젯 레이아웃 (제목 + ListView + 앱열기 버튼)</td>
+</tr>
+<tr>
+<td><code>res/layout/widget_todo_item.xml</code></td>
+<td>신규</td>
+<td>리스트 아이템 (체크박스 + 제목 + 마감시간)</td>
+</tr>
+<tr>
+<td><code>res/xml/widget_todo_info.xml</code></td>
+<td>신규</td>
+<td>위젯 메타데이터 (4x2 최소 크기)</td>
+</tr>
+<tr>
+<td><code>AndroidManifest.xml</code></td>
+<td>수정</td>
+<td>TodoWidgetProvider + Service + BroadcastReceiver 등록</td>
+</tr>
+</tbody>
+</table>
+<p><strong>핵심 동작</strong>:
+- <code>TodoWidgetProvider.onUpdate()</code> → Room에서 오늘 마감 할일 조회 → RemoteViews 업데이트
+- 체크박스 클릭 → BroadcastReceiver → <code>TodoDao.toggleCompletion()</code> → 위젯 갱신
+- "앱 열기" → MainActivity 진입</p>
+<p><strong>검증</strong>: 위젯 배치 → 오늘 할일 표시, 체크박스 탭 → 완료 처리 + 목록 갱신</p>
+<hr />
+<h3 id="2b-7">2b-7: 확장 관측 지표<a class="headerlink" href="#2b-7" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 4개 신규 분석 이벤트 발행</p>
+<table>
+<thead>
+<tr>
+<th>이벤트</th>
+<th>발행 위치</th>
+<th>event_data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capture_revisited</code></td>
+<td><code>CaptureDetailViewModel.init</code>, <code>NoteDetailViewModel.init</code></td>
+<td><code>time_since_creation_ms</code>, <code>access_method</code></td>
+</tr>
+<tr>
+<td><code>todo_completed</code></td>
+<td><code>ToggleTodoCompletionUseCase</code> (완료 시)</td>
+<td><code>time_since_creation_ms</code></td>
+</tr>
+<tr>
+<td><code>search_performed</code></td>
+<td><code>SearchViewModel.executeSearch</code></td>
+<td><code>result_count</code>, <code>result_clicked</code></td>
+</tr>
+<tr>
+<td><code>split_capture_created</code></td>
+<td><code>ProcessClassificationResultUseCase</code> (split 시)</td>
+<td><code>parent_capture_id</code>, <code>split_count</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>presentation/detail/CaptureDetailViewModel.kt</code></td>
+<td>수정</td>
+<td><code>capture_revisited</code> 이벤트</td>
+</tr>
+<tr>
+<td><code>presentation/notes/detail/NoteDetailViewModel.kt</code></td>
+<td>수정</td>
+<td><code>capture_revisited</code> 이벤트</td>
+</tr>
+<tr>
+<td><code>domain/usecase/todo/ToggleTodoCompletionUseCase.kt</code></td>
+<td>수정</td>
+<td>완료 시 <code>todo_completed</code> 이벤트</td>
+</tr>
+<tr>
+<td><code>presentation/search/SearchViewModel.kt</code></td>
+<td>수정</td>
+<td><code>search_performed</code> 이벤트</td>
+</tr>
+<tr>
+<td><code>domain/usecase/classification/ProcessClassificationResultUseCase.kt</code></td>
+<td>수정</td>
+<td>split 시 <code>split_capture_created</code> 이벤트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>검증</strong>: 각 이벤트 트리거 → <code>analytics_events</code> 테이블 기록 확인</p>
+<hr />
+<h3 id="2b-8">2b-8: 테스트 + 통합 검증<a class="headerlink" href="#2b-8" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 신규/변경 UseCase 및 ViewModel 테스트 추가</p>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>변경</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test/.../NoteDetailViewModelTest.kt</code></td>
+<td>신규</td>
+<td>편집/저장/분류변경/폴더이동 테스트</td>
+</tr>
+<tr>
+<td><code>test/.../HistoryViewModelTest.kt</code></td>
+<td>수정</td>
+<td>필터 기능 테스트</td>
+</tr>
+<tr>
+<td><code>test/.../SearchViewModelTest.kt</code></td>
+<td>수정</td>
+<td>필터 기능 테스트</td>
+</tr>
+<tr>
+<td><code>test/.../CaptureUseCasesTest.kt</code></td>
+<td>수정</td>
+<td>split 처리 테스트</td>
+</tr>
+<tr>
+<td><code>test/.../FolderUseCasesTest.kt</code></td>
+<td>수정</td>
+<td>이름 길이 검증 테스트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>검증</strong>: <code>./gradlew testDebugUnitTest</code> 전체 통과 + <code>compileDebugKotlin</code> 통과</p>
+<hr />
+<h2 id="4">4. 서브페이즈 의존성<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>2b-0 (DB 기반)
+ ├→ 2b-1 (멀티 인텐트)
+ ├→ 2b-2 (노트 편집) → 2b-3 (폴더 검증)
+ ├→ 2b-4 (히스토리 필터) → 2b-5 (검색 필터, FilterChipRow 재사용)
+ └→ 2b-6 (할일 위젯)
+
+2b-1 + 2b-2 + 2b-5 → 2b-7 (관측 지표)
+전체 → 2b-8 (테스트)
+</code></pre></div>
+<hr />
+<h2 id="5-4">5. 멀티 에이전트 전략 (4인 팀)<a class="headerlink" href="#5-4" title="Permanent link">&para;</a></h2>
+<h3 id="wave-1-2b-0-data">Wave 1: 2b-0 (단독, data 에이전트)<a class="headerlink" href="#wave-1-2b-0-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Entity/Model/Mapper/DTO 변경 → 컴파일 확인</li>
+</ul>
+<h3 id="wave-2-2b-0">Wave 2: 최대 병렬 (2b-0 완료 후)<a class="headerlink" href="#wave-2-2b-0" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>data</strong>: 2b-1 (멀티 인텐트 — MockAPI, DAO, Repository, ProcessClassificationResult)</li>
+<li><strong>domain</strong>: 2b-2 + 2b-3 (노트 편집 — UseCase + ViewModel + Screen)</li>
+<li><strong>ui</strong>: 2b-4 + 2b-6 (히스토리 필터 + 할일 위젯)</li>
+<li><strong>qa</strong>: TestFixtures 업데이트 + 기존 테스트 호환성 확인</li>
+</ul>
+<h3 id="wave-3">Wave 3: 후반 작업<a class="headerlink" href="#wave-3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ui</strong>: 2b-5 (검색 필터 — FilterChipRow 재사용)</li>
+<li><strong>data + domain</strong>: 2b-7 (관측 지표 — 각 이벤트 발행 코드)</li>
+<li><strong>qa</strong>: 2b-8 (전체 테스트)</li>
+</ul>
+<h3 id="_1">공유 파일 규칙<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>담당</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NavGraph.kt</code></td>
+<td>domain 에이전트 (NOTE_DETAIL route)</td>
+</tr>
+<tr>
+<td><code>FlitDatabase.kt</code></td>
+<td>data 에이전트 (version 변경)</td>
+</tr>
+<tr>
+<td><code>CaptureDao.kt</code></td>
+<td>data 에이전트 (filter + childCaptures 쿼리)</td>
+</tr>
+<tr>
+<td><code>CaptureRepository.kt</code></td>
+<td>data 에이전트 (인터페이스 확장)</td>
+</tr>
+<tr>
+<td><code>TestFixtures.kt</code></td>
+<td>qa 에이전트</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6">6. 예상 규모<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>신규</th>
+<th>수정</th>
+<th>합계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data</td>
+<td>2</td>
+<td>~12</td>
+<td>~14</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>~4</td>
+<td>~8</td>
+<td>~12</td>
+</tr>
+<tr>
+<td>Presentation</td>
+<td>~7</td>
+<td>~8</td>
+<td>~15</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td>~4</td>
+<td>~1</td>
+<td>~5</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>~1</td>
+<td>~5</td>
+<td>~6</td>
+</tr>
+<tr>
+<td><strong>합계</strong></td>
+<td><strong>~18</strong></td>
+<td><strong>~34</strong></td>
+<td><strong>~52</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7">7. 검증 방법<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>단위 검증</strong>: 각 서브페이즈 완료 시 <code>./gradlew :app:compileDebugKotlin</code></li>
+<li><strong>테스트</strong>: 최종 <code>./gradlew testDebugUnitTest</code> 전체 통과</li>
+<li><strong>수동 검증</strong>: 에뮬레이터에서 주요 시나리오 확인</li>
+<li>멀티 인텐트 분할: "보고서 쓰고 저녁 예약" 입력 → 2개 캡처 생성</li>
+<li>노트 편집: 노트 탭 → 상세 → 본문 편집 → 저장</li>
+<li>할일 위젯: 홈 화면 위젯 추가 → 체크박스 탭</li>
+<li>히스토리 필터: 유형 칩 + 날짜 필터 조합</li>
+<li>검색 필터: FTS 검색 + 필터 조합</li>
+</ol>
+<hr />
+<h2 id="8">8. 주의사항<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Destructive Migration 유지 (프로덕션 배포 전 Migration 코드 별도 작성)</li>
+<li><code>ProcessClassificationResultUseCase</code> 수정 시 기존 단일 의도 경로 깨지지 않도록 <code>splitItems == null</code> 분기 필수</li>
+<li>FTS 필터 쿼리에서 <code>is_trashed = 0</code> 조건 추가 필수 (현재 <code>search()</code> 메서드에 누락되어 있음)</li>
+<li>주석/문서는 한글 필수</li>
+<li>에이전트 타입: Sonnet 모델 사용</li>
+</ul>
+<hr />
+<p><em>Phase 2b 완료 후 → Phase 3 서버 연동 (Mock 삭제 → 실제 API 연결 → 통합 테스트)</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

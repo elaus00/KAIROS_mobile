@@ -1,0 +1,2612 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/archive/plan/phase2a/qa_plan/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Phase 1 + 2a QA 계획서 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-1-2a-qa" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../../../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 1 + 2a QA 계획서
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. QA 목표
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. QA 영역 개요
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-a-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. [A] 테스트 커버리지 갭 보충 (P0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. [A] 테스트 커버리지 갭 보충 (P0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-1-viewmodel-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A-1. 테스트 없는 ViewModel (2건)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-2-usecase-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A-2. 테스트 없는 UseCase — 실제 로직 보유 (5건)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-b-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. [B] 핵심 플로우 검증 (P0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. [B] 핵심 플로우 검증 (P0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-1. 캡처 → 분류 → 파생 엔티티 파이프라인
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-2. 분류 변경 캐스케이드
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-3-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-3. 3단계 삭제 모델
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-4-google-calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-4. Google Calendar 동기화 상태 머신
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-5-fts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-5. FTS 검색
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-6. 이미지 첨부
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-c-worker-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. [C] Worker &amp; 백그라운드 작업 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. [C] Worker &amp; 백그라운드 작업 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c-1-reclassifytempworker-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C-1. ReclassifyTempWorker (15분 주기)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-2-trashcleanupworker-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C-2. TrashCleanupWorker (1일 주기)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-3-analyticsbatchworker-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C-3. AnalyticsBatchWorker (1시간 주기)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-4-calendarsyncworker-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C-4. CalendarSyncWorker (1시간 주기)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-5-syncqueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C-5. SyncQueue 지수 백오프
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-d-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. [D] 화면별 기능 검증 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. [D] 화면별 기능 검증 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#d-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-1. 홈(캡처) 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-2-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-2. AI 분류 확인 시트
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-3. 캘린더 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-4. 노트 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-5. 노트 상세 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-6. 캡처 상세 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-7. 히스토리 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-8. 검색 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-9. 휴지통 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-10. 설정 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D-11. 온보딩 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-e-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. [E] 에러/엣지 케이스 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. [E] 에러/엣지 케이스 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E-1. 네트워크 실패
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E-2. 데이터 정합성
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E-3. 경계값
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-4-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E-4. UI 상태 복원
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E-5. 위젯
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-f-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. [F] 아키텍처 이슈 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. [F] 아키텍처 이슈 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#f-1-updatenoteusecase-capturedao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F-1. UpdateNoteUseCase의 CaptureDao 직접 주입
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-2-deletecalendarevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F-2. deleteCalendarEvent 미연결
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-3-google-oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F-3. Google OAuth 미완성
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 기존 테스트 현황
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 기존 테스트 현황">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#112-passed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        유닛 테스트 (112개 PASSED)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 품질 평가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. QA 실행 계획
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. QA 실행 계획">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1단계: 테스트 보충 (A 영역)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2단계: 핵심 플로우 수동 검증 (B 영역)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3단계: 화면별 + 엣지 케이스 (C/D/E 영역)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-f" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4단계: 아키텍처 이슈 수정 (F 영역)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록: 관련 문서
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="phase-1-2a-qa">Phase 1 + 2a QA 계획서<a class="headerlink" href="#phase-1-2a-qa" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>버전</strong>: v1.0
+<strong>작성일</strong>: 2026-02-09
+<strong>대상 범위</strong>: Phase 1 (MVP) + Phase 2a (코어 루프 완성)
+<strong>기준 브랜치</strong>: <code>phase2-qa1</code>
+<strong>현재 테스트</strong>: 112개 유닛 테스트 PASSED</p>
+</blockquote>
+<hr />
+<h2 id="1-qa">1. QA 목표<a class="headerlink" href="#1-qa" title="Permanent link">&para;</a></h2>
+<p>Phase 1 + 2a에서 구현된 모든 기능이 기능명세서(v2.3) 기준으로 정상 동작하는지 검증한다.</p>
+<p><strong>범위 제외</strong>: Phase 2b 이후 구현 예정 기능 (멀티인텐트 분할, 히스토리/검색 필터 강화, 할일 위젯 4×2 등)</p>
+<hr />
+<h2 id="2-qa">2. QA 영역 개요<a class="headerlink" href="#2-qa" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>영역</th>
+<th style="text-align: center;">우선순위</th>
+<th style="text-align: center;">항목 수</th>
+<th style="text-align: center;">상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>테스트 커버리지 갭 보충</td>
+<td style="text-align: center;">P0</td>
+<td style="text-align: center;">7건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+<tr>
+<td>B</td>
+<td>핵심 플로우 검증</td>
+<td style="text-align: center;">P0</td>
+<td style="text-align: center;">6건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Worker &amp; 백그라운드 작업</td>
+<td style="text-align: center;">P1</td>
+<td style="text-align: center;">5건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+<tr>
+<td>D</td>
+<td>화면별 기능 검증</td>
+<td style="text-align: center;">P1</td>
+<td style="text-align: center;">11건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+<tr>
+<td>E</td>
+<td>에러/엣지 케이스</td>
+<td style="text-align: center;">P2</td>
+<td style="text-align: center;">5건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+<tr>
+<td>F</td>
+<td>아키텍처 이슈</td>
+<td style="text-align: center;">P2</td>
+<td style="text-align: center;">3건</td>
+<td style="text-align: center;">미착수</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-a-p0">3. [A] 테스트 커버리지 갭 보충 (P0)<a class="headerlink" href="#3-a-p0" title="Permanent link">&para;</a></h2>
+<h3 id="a-1-viewmodel-2">A-1. 테스트 없는 ViewModel (2건)<a class="headerlink" href="#a-1-viewmodel-2" title="Permanent link">&para;</a></h3>
+<p>현재 9개 ViewModel 중 2개에 테스트가 없다.</p>
+<table>
+<thead>
+<tr>
+<th>ViewModel</th>
+<th>담당 화면</th>
+<th>핵심 검증 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TrashViewModel</code></td>
+<td>휴지통</td>
+<td>restoreItem, deleteItem, emptyTrash, 초기 로딩</td>
+</tr>
+<tr>
+<td><code>AIStatusSheetViewModel</code></td>
+<td>AI 분류 확인 시트</td>
+<td>confirmClassification, changeClassification, confirmAll, 24시간 내 미확인 로딩</td>
+</tr>
+</tbody>
+</table>
+<p><strong>검증 기준</strong>: 각 ViewModel의 모든 public 메서드에 대해 happy path + 에러 케이스 테스트 존재</p>
+<h3 id="a-2-usecase-5">A-2. 테스트 없는 UseCase — 실제 로직 보유 (5건)<a class="headerlink" href="#a-2-usecase-5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>UseCase</th>
+<th>로직 요약</th>
+<th>핵심 검증 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ToggleTodoCompletionUseCase</code></td>
+<td>완료 전환 시 타임스탬프 계산 + 이벤트 추적</td>
+<td>incomplete→complete 시 이벤트 발행, complete→incomplete 시 이벤트 미발행</td>
+</tr>
+<tr>
+<td><code>ReorderTodoUseCase</code></td>
+<td>리스트 순회 + sortOrder 업데이트</td>
+<td>3개 항목 순서 변경 → 각각 올바른 sortOrder + SortSource.USER</td>
+</tr>
+<tr>
+<td><code>EmptyTrashUseCase</code></td>
+<td>전체 휴지통 하드 삭제</td>
+<td>휴지통 5개 → 5회 HardDeleteCaptureUseCase 호출</td>
+</tr>
+<tr>
+<td><code>ApproveCalendarSuggestionUseCase</code></td>
+<td>schedule + capture 조회 → 동기화</td>
+<td>startTime 존재 시 syncToCalendar 호출, startTime 없으면 에러</td>
+</tr>
+<tr>
+<td><code>SetCalendarSettingsUseCase</code></td>
+<td>모드 유효성 검증</td>
+<td>"auto"/"suggest" 정상, 잘못된 값 거부</td>
+</tr>
+</tbody>
+</table>
+<p><strong>검증 기준</strong>: 각 UseCase의 분기 로직별 최소 1개 테스트</p>
+<hr />
+<h2 id="4-b-p0">4. [B] 핵심 플로우 검증 (P0)<a class="headerlink" href="#4-b-p0" title="Permanent link">&para;</a></h2>
+<h3 id="b-1">B-1. 캡처 → 분류 → 파생 엔티티 파이프라인<a class="headerlink" href="#b-1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 단계:
+1. 텍스트 입력 → 전송 → TEMP 캡처 저장 확인
+2. SyncQueue에 CLASSIFY 작업 enqueue 확인
+3. ClassifyCaptureWorker 트리거 → API 호출 (Mock)
+4. 분류 결과 반영: classifiedType, aiTitle, confidence 업데이트
+5. 파생 엔티티 자동 생성 (TODO→Todo, SCHEDULE→Schedule, NOTES→Note)
+6. FTS 인덱스 동기화 (CaptureSearchFts 업데이트)
+7. 태그/엔티티 추출 결과 저장
+</code></pre></div>
+<p><strong>합격 기준</strong>: 캡처 전송 후 분류 결과가 올바른 파생 엔티티를 생성하고, FTS 검색에 노출됨</p>
+<h3 id="b-2">B-2. 분류 변경 캐스케이드<a class="headerlink" href="#b-2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+1. Schedule → Todo: 캘린더 이벤트 삭제 → Todo 생성 → ClassificationLog 기록
+2. Todo → Schedule: Todo 삭제 → Schedule 생성 → 캘린더 동기화 트리거
+3. Notes → Todo: Note 삭제 → Todo 생성
+4. Notes → Schedule: Note 삭제 → Schedule 생성
+5. Todo → Notes: Todo 삭제 → Note 생성 (INBOX 폴더)
+6. Schedule → Notes: Schedule 삭제 → Note 생성 (INBOX 폴더)
+7. 아무 타입 → TEMP: 기존 파생 삭제, 새 파생 미생성
+8. Note ↔ Idea: note_sub_type 스왑 + folder_id 변경 (파생 삭제/재생성 없음)
+</code></pre></div>
+<p><strong>합격 기준</strong>: 분류 변경 후 이전 파생 엔티티가 완전 삭제되고, 새 파생 엔티티가 올바르게 생성됨. @Transaction으로 원자적 실행.</p>
+<h3 id="b-3-3">B-3. 3단계 삭제 모델<a class="headerlink" href="#b-3-3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+1. 소프트 삭제: isDeleted=true 설정 → UI에서 즉시 제거
+2. Undo (3초 이내): isDeleted=false 복원 → UI에 다시 표시
+3. 휴지통 이동: isTrashed=true, trashedAt 기록
+4. 휴지통 복원: isTrashed=false, trashedAt 초기화
+5. 영구 삭제: capture + todo/schedule/note/tag/image 모두 삭제
+6. 휴지통 비우기: 모든 휴지통 항목 영구 삭제
+7. 자동 정리: 30일 초과 항목 TrashCleanupWorker가 삭제
+</code></pre></div>
+<p><strong>합격 기준</strong>: 각 단계에서 데이터 상태가 올바르고, 삭제 시 파생 엔티티와 이미지까지 완전 정리됨</p>
+<h3 id="b-4-google-calendar">B-4. Google Calendar 동기화 상태 머신<a class="headerlink" href="#b-4-google-calendar" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+1. 캘린더 비활성 → 동기화 시도 안함 (NOT_LINKED 유지)
+2. 자동 모드 + HIGH confidence → SYNCED (알림: 자동 추가)
+3. 자동 모드 + LOW confidence → SUGGESTION_PENDING (알림: 제안)
+4. 제안 모드 → 항상 SUGGESTION_PENDING
+5. SUGGESTION_PENDING → 승인 → SYNCED
+6. SUGGESTION_PENDING → 거부 → REJECTED
+7. 동기화 API 실패 → SYNC_FAILED
+8. SYNC_FAILED → CalendarSyncWorker 재시도 → 성공 시 SYNCED
+9. startTime 없는 일정 → 동기화 건너뜀
+</code></pre></div>
+<p><strong>합격 기준</strong>: 모든 상태 전이가 기능명세서의 상태 머신과 일치</p>
+<h3 id="b-5-fts">B-5. FTS 검색<a class="headerlink" href="#b-5-fts" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+1. 제목으로 검색 → 결과 반환
+2. 태그로 검색 → 결과 반환
+3. 원본 텍스트로 검색 → 결과 반환
+4. 빈 검색어 → 빈 결과 (쿼리 미실행)
+5. 캡처 수정 후 → FTS 인덱스 갱신 → 수정된 내용으로 검색 가능
+6. 캡처 삭제 후 → 검색 결과에서 제외
+</code></pre></div>
+<p><strong>합격 기준</strong>: FTS 인덱스가 캡처 생명주기와 동기화되어 있고, 검색 결과가 정확함</p>
+<h3 id="b-6">B-6. 이미지 첨부<a class="headerlink" href="#b-6" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+1. 갤러리에서 이미지 선택 → URI 저장 → 캡처에 연결
+2. 이미지 미리보기 표시 → 제거 버튼 동작
+3. 이미지 첨부 캡처 전송 → 내부 저장소에 파일 복사
+4. 캡처 영구 삭제 시 → 이미지 파일도 삭제
+5. 이미지만 첨부 (텍스트 없음) → TEMP 분류로 저장
+</code></pre></div>
+<p><strong>합격 기준</strong>: 이미지가 내부 저장소에 안전하게 저장되고, 캡처 삭제 시 함께 정리됨</p>
+<hr />
+<h2 id="5-c-worker-p1">5. [C] Worker &amp; 백그라운드 작업 (P1)<a class="headerlink" href="#5-c-worker-p1" title="Permanent link">&para;</a></h2>
+<h3 id="c-1-reclassifytempworker-15">C-1. ReclassifyTempWorker (15분 주기)<a class="headerlink" href="#c-1-reclassifytempworker-15" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 항목:
+- TEMP 캡처 존재 시 → /classify/batch API 호출
+- 분류 결과 → 각 캡처에 ProcessClassificationResultUseCase 적용
+- TEMP 캡처 없으면 → 조기 반환 (API 미호출)
+- 네트워크 연결 필요 (Constraints.CONNECTED)
+</code></pre></div>
+<h3 id="c-2-trashcleanupworker-1">C-2. TrashCleanupWorker (1일 주기)<a class="headerlink" href="#c-2-trashcleanupworker-1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 항목:
+- 30일 초과 휴지통 항목 → HardDeleteCaptureUseCase로 삭제
+- 30일 이내 항목 → 유지
+- 빈 휴지통 → 조기 반환
+</code></pre></div>
+<h3 id="c-3-analyticsbatchworker-1">C-3. AnalyticsBatchWorker (1시간 주기)<a class="headerlink" href="#c-3-analyticsbatchworker-1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 항목:
+- 미전송 이벤트 100개씩 배치 → /analytics/events POST
+- 전송 성공 → markSynced 처리
+- 7일 이상 오래된 이벤트 → deleteOld
+- 미전송 이벤트 없으면 → 조기 반환
+</code></pre></div>
+<h3 id="c-4-calendarsyncworker-1">C-4. CalendarSyncWorker (1시간 주기)<a class="headerlink" href="#c-4-calendarsyncworker-1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 항목:
+- SYNC_FAILED 상태 일정 조회 → 재시도
+- 재시도 성공 → SYNCED로 업데이트
+- 재시도 실패 → SYNC_FAILED 유지
+</code></pre></div>
+<h3 id="c-5-syncqueue">C-5. SyncQueue 지수 백오프<a class="headerlink" href="#c-5-syncqueue" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 항목:
+- 1차 실패: 5초 후 재시도
+- 2차 실패: 15초 후 재시도
+- 3차 실패: 45초 후 재시도 → 이후 FAILED
+- 앱 킬 시 PROCESSING → PENDING 리셋 (resetProcessingToPending)
+</code></pre></div>
+<hr />
+<h2 id="6-d-p1">6. [D] 화면별 기능 검증 (P1)<a class="headerlink" href="#6-d-p1" title="Permanent link">&para;</a></h2>
+<h3 id="d-1">D-1. 홈(캡처) 화면<a class="headerlink" href="#d-1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>텍스트 입력</td>
+<td>타이핑 → 실시간 반영, 5000자 제한</td>
+</tr>
+<tr>
+<td>이미지 첨부</td>
+<td>갤러리 선택 → 미리보기 표시 → 제거 가능</td>
+</tr>
+<tr>
+<td>전송</td>
+<td>텍스트 또는 이미지 있으면 활성화, 로딩 상태, 성공 시 초기화</td>
+</tr>
+<tr>
+<td>드래프트</td>
+<td>앱 백그라운드 시 자동 저장, 복귀 시 복원</td>
+</tr>
+<tr>
+<td>알림 벨</td>
+<td>미확인 분류 개수 배지, 탭 시 AI 상태 시트 열림</td>
+</tr>
+<tr>
+<td>상단 아이콘</td>
+<td>히스토리/설정 네비게이션</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-2-ai">D-2. AI 분류 확인 시트<a class="headerlink" href="#d-2-ai" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>로딩</td>
+<td>24시간 이내 미확인 캡처 목록</td>
+</tr>
+<tr>
+<td>개별 확인</td>
+<td>분류 승인 → isConfirmed=true</td>
+</tr>
+<tr>
+<td>분류 변경</td>
+<td>타입 드롭다운 → ChangeClassificationUseCase</td>
+</tr>
+<tr>
+<td>전체 확인</td>
+<td>confirmAll → 모든 미확인 일괄 승인</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-3">D-3. 캘린더 화면<a class="headerlink" href="#d-3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>월/주 전환</td>
+<td>확장 토글 → 레이아웃 변경</td>
+</tr>
+<tr>
+<td>날짜 선택</td>
+<td>탭 → 해당 날짜 일정/할일 로딩</td>
+</tr>
+<tr>
+<td>월 네비게이션</td>
+<td>스와이프 → 이전/다음 달</td>
+</tr>
+<tr>
+<td>일정 목록</td>
+<td>ScheduleTimeline에 시간순 표시</td>
+</tr>
+<tr>
+<td>할일 목록</td>
+<td>TaskList에 체크박스 + 마감일 표시</td>
+</tr>
+<tr>
+<td>할일 체크</td>
+<td>즉시 UI 반영 + 지연된 DB 업데이트</td>
+</tr>
+<tr>
+<td>동기화 승인/거부</td>
+<td>SUGGESTION_PENDING 일정에 버튼 표시, 동작 확인</td>
+</tr>
+<tr>
+<td>스와이프 삭제</td>
+<td>SwipeableCard → 소프트 삭제 + Snackbar undo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-4">D-4. 노트 화면<a class="headerlink" href="#d-4" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>폴더 필터 칩</td>
+<td>"전체" + 시스템 폴더 + 사용자 폴더 표시</td>
+</tr>
+<tr>
+<td>필터 전환</td>
+<td>칩 탭 → 캐시된 목록에서 필터링 (재쿼리 없음)</td>
+</tr>
+<tr>
+<td>폴더 생성</td>
+<td>+ 버튼 → 다이얼로그 → 이름 입력 → 생성</td>
+</tr>
+<tr>
+<td>폴더 이름변경</td>
+<td>사용자 폴더 롱프레스 → 이름변경 다이얼로그</td>
+</tr>
+<tr>
+<td>폴더 삭제</td>
+<td>사용자 폴더 롱프레스 → 삭제 → 하위 노트 이동 처리</td>
+</tr>
+<tr>
+<td>노트 클릭</td>
+<td>노트 상세 화면 네비게이션</td>
+</tr>
+<tr>
+<td>빈 상태</td>
+<td>폴더 필터별 + 전체 빈 상태 메시지</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-5">D-5. 노트 상세 화면<a class="headerlink" href="#d-5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>로딩</td>
+<td>noteId로 노트 + 캡처 정보 로드</td>
+</tr>
+<tr>
+<td>제목 편집</td>
+<td>타이핑 → hasChanges=true → 저장 버튼 표시</td>
+</tr>
+<tr>
+<td>본문 편집</td>
+<td>타이핑 → hasChanges=true → 저장 버튼 표시</td>
+</tr>
+<tr>
+<td>폴더 변경</td>
+<td>드롭다운 → 폴더 선택 → hasChanges=true</td>
+</tr>
+<tr>
+<td>저장</td>
+<td>변경 내용 persist → 로딩 상태 → 성공</td>
+</tr>
+<tr>
+<td>이미지 표시</td>
+<td>imageUri 있으면 이미지 표시</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-6">D-6. 캡처 상세 화면<a class="headerlink" href="#d-6" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 칩</td>
+<td>4개 (할일/일정/노트/아이디어) 표시, 현재 타입 선택됨</td>
+</tr>
+<tr>
+<td>분류 변경</td>
+<td>칩 탭 → ChangeClassificationUseCase → 캐스케이드</td>
+</tr>
+<tr>
+<td>캘린더 동기화</td>
+<td>SUGGESTION_PENDING 시 승인/거부 버튼</td>
+</tr>
+<tr>
+<td>원본 텍스트</td>
+<td>읽기 전용 표시</td>
+</tr>
+<tr>
+<td>이미지</td>
+<td>imageUri 있으면 표시</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-7">D-7. 히스토리 화면<a class="headerlink" href="#d-7" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>무한 스크롤</td>
+<td>20개 페이징, 끝 근처 스크롤 시 loadMore</td>
+</tr>
+<tr>
+<td>타입 필터</td>
+<td>전체/일정/할일/노트 칩</td>
+</tr>
+<tr>
+<td>날짜 필터</td>
+<td>전체/오늘/이번주/이번달 칩</td>
+</tr>
+<tr>
+<td>스와이프 삭제</td>
+<td>SwipeableCard → 소프트 삭제 + Snackbar undo</td>
+</tr>
+<tr>
+<td>인라인 분류 변경</td>
+<td>드롭다운 → changeClassification</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-8">D-8. 검색 화면<a class="headerlink" href="#d-8" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>자동 포커스</td>
+<td>화면 진입 시 입력창 포커스</td>
+</tr>
+<tr>
+<td>실시간 검색</td>
+<td>타이핑 → 즉시 결과 갱신</td>
+</tr>
+<tr>
+<td>타입 필터</td>
+<td>FilterChipRow로 타입 필터링</td>
+</tr>
+<tr>
+<td>결과 클릭</td>
+<td>캡처 상세 네비게이션</td>
+</tr>
+<tr>
+<td>빈 상태</td>
+<td>검색 전 / 결과 없음 구분 메시지</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-9">D-9. 휴지통 화면<a class="headerlink" href="#d-9" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>목록</td>
+<td>휴지통 항목 + 삭제 시점 표시</td>
+</tr>
+<tr>
+<td>복원</td>
+<td>개별 복원 → isTrashed=false</td>
+</tr>
+<tr>
+<td>영구 삭제</td>
+<td>개별 하드 삭제 (파생 + 이미지 포함)</td>
+</tr>
+<tr>
+<td>전체 비우기</td>
+<td>확인 다이얼로그 → 전체 하드 삭제</td>
+</tr>
+<tr>
+<td>빈 상태</td>
+<td>"휴지통이 비어 있습니다"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-10">D-10. 설정 화면<a class="headerlink" href="#d-10" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>테마</td>
+<td>시스템/라이트/다크 라디오 선택 → 즉시 반영</td>
+</tr>
+<tr>
+<td>캘린더 토글</td>
+<td>활성화/비활성화 → UserPreference 저장</td>
+</tr>
+<tr>
+<td>캘린더 모드</td>
+<td>자동/제안 선택 → 동작 방식 변경</td>
+</tr>
+<tr>
+<td>알림 토글</td>
+<td>활성화/비활성화</td>
+</tr>
+<tr>
+<td>법적 문서</td>
+<td>개인정보처리방침/이용약관 WebView</td>
+</tr>
+<tr>
+<td>앱 버전</td>
+<td>올바른 버전 번호 표시</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-11">D-11. 온보딩 화면<a class="headerlink" href="#d-11" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>페이지 네비게이션</td>
+<td>4페이지 HorizontalPager + 페이지 인디케이터</td>
+</tr>
+<tr>
+<td>건너뛰기</td>
+<td>텍스트 탭 → 홈 화면 이동</td>
+</tr>
+<tr>
+<td>첫 캡처</td>
+<td>4페이지에서 텍스트 입력 → 전송 → 홈 이동</td>
+</tr>
+<tr>
+<td>Google 연결</td>
+<td>3페이지 연결 버튼 (현재 구현 연기 상태 — UI만 확인)</td>
+</tr>
+<tr>
+<td>완료 표시</td>
+<td>onboardingCompleted=true → 재방문 시 건너뜀</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-e-p2">7. [E] 에러/엣지 케이스 (P2)<a class="headerlink" href="#7-e-p2" title="Permanent link">&para;</a></h2>
+<h3 id="e-1">E-1. 네트워크 실패<a class="headerlink" href="#e-1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+- 분류 API 실패 → TEMP 유지, SyncQueue 재시도
+- 캘린더 동기화 실패 → SYNC_FAILED, 에러 메시지 표시
+- Analytics 전송 실패 → 로컬 보관, 다음 배치에서 재시도
+</code></pre></div>
+<h3 id="e-2">E-2. 데이터 정합성<a class="headerlink" href="#e-2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+- 분류 변경 중 앱 킬 → @Transaction 롤백 확인
+- SyncQueue PROCESSING 중 앱 킬 → 재시작 시 PENDING 리셋
+- 폴더 삭제 시 해당 폴더 노트 → 받은함(Inbox)으로 이동
+- 동시에 같은 캡처 분류 변경 시도 → 데이터 무결성 유지
+</code></pre></div>
+<h3 id="e-3">E-3. 경계값<a class="headerlink" href="#e-3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+- 텍스트 5000자 정확히 입력 → 저장 성공
+- 텍스트 5001자 입력 시도 → 차단
+- 빈 텍스트 + 빈 이미지 → 전송 버튼 비활성화
+- 폴더명 30자 → 생성 성공
+- 폴더명 31자 → 생성 거부
+- 중복 폴더명 → 생성 거부
+- 빈 폴더명 → 생성 거부
+</code></pre></div>
+<h3 id="e-4-ui">E-4. UI 상태 복원<a class="headerlink" href="#e-4-ui" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+- 화면 회전 → ViewModel 상태 유지
+- 백그라운드 → 포그라운드 → 드래프트 복원
+- 메모리 부족으로 프로세스 종료 → 재시작 시 정상 동작
+</code></pre></div>
+<h3 id="e-5">E-5. 위젯<a class="headerlink" href="#e-5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>검증 시나리오:
+- 캡처 위젯 탭 → 앱 열림 + 홈 탭 포커스
+- 위젯에서 from_widget=true 인텐트 전달 확인
+- 앱 미실행 상태에서 위젯 탭 → 정상 앱 시작
+</code></pre></div>
+<hr />
+<h2 id="8-f-p2">8. [F] 아키텍처 이슈 (P2)<a class="headerlink" href="#8-f-p2" title="Permanent link">&para;</a></h2>
+<h3 id="f-1-updatenoteusecase-capturedao">F-1. UpdateNoteUseCase의 CaptureDao 직접 주입<a class="headerlink" href="#f-1-updatenoteusecase-capturedao" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>현상</strong>: <code>UpdateNoteUseCase</code>가 <code>CaptureDao</code>를 직접 주입하여 제목 업데이트 수행</li>
+<li><strong>문제</strong>: Domain → Data 계층 직접 의존, Repository 패턴 우회</li>
+<li><strong>권장</strong>: <code>CaptureRepository</code>를 통한 title 업데이트 메서드 추가</li>
+</ul>
+<h3 id="f-2-deletecalendarevent">F-2. deleteCalendarEvent 미연결<a class="headerlink" href="#f-2-deletecalendarevent" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>현상</strong>: <code>FlitApi</code>에 <code>deleteCalendarEvent</code> 엔드포인트 정의됨</li>
+<li><strong>문제</strong>: Repository에서 해당 API를 호출하는 메서드가 불명확</li>
+<li><strong>권장</strong>: 캘린더 이벤트 삭제 플로우 추적 → 누락 시 연결</li>
+</ul>
+<h3 id="f-3-google-oauth">F-3. Google OAuth 미완성<a class="headerlink" href="#f-3-google-oauth" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>현상</strong>: <code>OnboardingViewModel.connectGoogle()</code> 메서드 존재하나 실제 OAuth 플로우 미구현</li>
+<li><strong>문제</strong>: 온보딩 3페이지 "Google 캘린더 연결" 버튼이 동작하지 않음</li>
+<li><strong>현재 상태</strong>: 설정 화면의 디버그 도구로 수동 토큰 입력 가능 (DEBUG 빌드)</li>
+<li><strong>권장</strong>: Phase 3 서버 연동 시 구현 예정 — 현재는 UI만 존재함을 문서화</li>
+</ul>
+<hr />
+<h2 id="9">9. 기존 테스트 현황<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<h3 id="112-passed">유닛 테스트 (112개 PASSED)<a class="headerlink" href="#112-passed" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>카테고리</th>
+<th>파일</th>
+<th>테스트 대상</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UseCase</strong></td>
+<td><code>CaptureUseCasesTest.kt</code></td>
+<td>SubmitCapture, HardDeleteCapture</td>
+</tr>
+<tr>
+<td><strong>UseCase</strong></td>
+<td><code>ClassificationUseCasesTest.kt</code></td>
+<td>ProcessClassification, ChangeClassification, ConfirmClassification, GetUnconfirmed</td>
+</tr>
+<tr>
+<td><strong>UseCase</strong></td>
+<td><code>SyncScheduleToCalendarUseCaseTest.kt</code></td>
+<td>캘린더 동기화 상태 머신</td>
+</tr>
+<tr>
+<td><strong>UseCase</strong></td>
+<td><code>FolderUseCasesTest.kt</code></td>
+<td>CreateFolder, RenameFolder</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>CaptureViewModelTest.kt</code></td>
+<td>캡처 입력/전송/드래프트</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>CalendarViewModelTest.kt</code></td>
+<td>날짜 선택/일정 로딩/동기화</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>NotesViewModelTest.kt</code></td>
+<td>폴더 필터/CRUD</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>NoteDetailViewModelTest.kt</code></td>
+<td>노트 상세 로딩/편집/저장</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>CaptureDetailViewModelTest.kt</code></td>
+<td>분류 변경/동기화 UI</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>HistoryViewModelTest.kt</code></td>
+<td>페이징/필터/삭제</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>SearchViewModelTest.kt</code></td>
+<td>실시간 검색/타입 필터</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>OnboardingViewModelTest.kt</code></td>
+<td>온보딩 플로우</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td><code>SettingsViewModelTest.kt</code></td>
+<td>테마/캘린더/알림 설정</td>
+</tr>
+<tr>
+<td><strong>유틸</strong></td>
+<td><code>MainDispatcherRule.kt</code></td>
+<td>코루틴 테스트 디스패처</td>
+</tr>
+<tr>
+<td><strong>유틸</strong></td>
+<td><code>TestFixtures.kt</code></td>
+<td>8개 도메인 모델 팩토리</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_1">테스트 품질 평가<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th style="text-align: center;">등급</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>도메인 로직 (분류/동기화)</td>
+<td style="text-align: center;">A+</td>
+<td>분기 커버리지 높음, 멀티인텐트 시나리오 포함</td>
+</tr>
+<tr>
+<td>ViewModel happy path</td>
+<td style="text-align: center;">B+</td>
+<td>초기 로딩/기본 동작 검증</td>
+</tr>
+<tr>
+<td>에러 시나리오</td>
+<td style="text-align: center;">D</td>
+<td>네트워크 실패/null 반환 테스트 거의 없음</td>
+</tr>
+<tr>
+<td>통합 테스트</td>
+<td style="text-align: center;">N/A</td>
+<td>Room/Worker 통합 테스트 없음 (계획 외)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-qa">10. QA 실행 계획<a class="headerlink" href="#10-qa" title="Permanent link">&para;</a></h2>
+<h3 id="1-a">1단계: 테스트 보충 (A 영역)<a class="headerlink" href="#1-a" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. TrashViewModel 테스트 작성
+   → verify: 모든 public 메서드 커버
+2. AIStatusSheetViewModel 테스트 작성
+   → verify: confirm/change/confirmAll 커버
+3. ToggleTodoCompletionUseCase 테스트 작성
+   → verify: 타임스탬프 계산 + 이벤트 분기
+4. ReorderTodoUseCase 테스트 작성
+   → verify: sortOrder 할당 + SortSource
+5. EmptyTrashUseCase 테스트 작성
+   → verify: N건 일괄 삭제 오케스트레이션
+6. ApproveCalendarSuggestionUseCase 테스트 작성
+   → verify: startTime 유무 분기
+7. SetCalendarSettingsUseCase 테스트 작성
+   → verify: 모드 유효성 검증
+</code></pre></div>
+<h3 id="2-b">2단계: 핵심 플로우 수동 검증 (B 영역)<a class="headerlink" href="#2-b" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. 캡처→분류 E2E 플로우
+   → verify: TEMP→분류 완료→파생 엔티티 존재
+2. 분류 변경 8가지 시나리오
+   → verify: 이전 파생 삭제 + 새 파생 생성
+3. 삭제 3단계 전체 플로우
+   → verify: soft→trash→hard 데이터 상태
+4. 캘린더 동기화 9가지 상태 전이
+   → verify: 상태 머신 일치
+5. FTS 검색 + 인덱스 동기화
+   → verify: CRUD 후 검색 결과 정확
+6. 이미지 첨부 + 삭제 시 정리
+   → verify: 내부 저장소 파일 라이프사이클
+</code></pre></div>
+<h3 id="3-cde">3단계: 화면별 + 엣지 케이스 (C/D/E 영역)<a class="headerlink" href="#3-cde" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. 각 화면별 체크리스트 수동 검증
+2. Worker 동작 검증 (로그 확인)
+3. 에러/경계값 시나리오 검증
+</code></pre></div>
+<h3 id="4-f">4단계: 아키텍처 이슈 수정 (F 영역)<a class="headerlink" href="#4-f" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. UpdateNoteUseCase DAO 직접 주입 → Repository 경유로 리팩터링
+2. deleteCalendarEvent 연결 여부 확인 + 필요 시 연결
+3. OAuth 미완성 상태 문서화
+</code></pre></div>
+<hr />
+<h2 id="_2">부록: 관련 문서<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>문서</th>
+<th>경로</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기능명세서 v2.3</td>
+<td><code>docs/specs/functional_spec.md</code></td>
+</tr>
+<tr>
+<td>데이터모델 명세서 v2.0</td>
+<td><code>docs/specs/data_model_spec.md</code></td>
+</tr>
+<tr>
+<td>API 명세서 v2.4</td>
+<td><code>docs/specs/api_spec.md</code></td>
+</tr>
+<tr>
+<td>디자인 가이드 v1.0</td>
+<td><code>docs/specs/design-guide.md</code></td>
+</tr>
+<tr>
+<td>UX 라이팅 감사 v1.0</td>
+<td><code>docs/specs/ux-writing-audit.md</code></td>
+</tr>
+<tr>
+<td>Phase 2a 구현 보고서</td>
+<td><code>docs/plan/phase2a/implementation_report.md</code></td>
+</tr>
+<tr>
+<td>UI 개선 보고서</td>
+<td><code>docs/analysis/ui-improvement-report.md</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

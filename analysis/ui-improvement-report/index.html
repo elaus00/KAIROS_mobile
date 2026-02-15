@@ -1,0 +1,3139 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/analysis/ui-improvement-report/">
+      
+      
+        <link rel="prev" href="../../insights/2026-02-13_bash-permission-patterns/">
+      
+      
+        <link rel="next" href="../material-design-audit/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>UI 개선 보고서 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flit-mobile-ui" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              UI 개선 보고서
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 시각적 일관성 문제
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 시각적 일관성 문제">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. 화면 제목 스타일 불일치 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-chip-radius-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. 칩(Chip) 컴포넌트 radius 불일치 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-border-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. 카드/컨테이너 border 사용 불일치 (P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 타이포그래피 시스템 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 타이포그래피 시스템 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1-typography" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. Typography 정의 미비
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 인터랙션 및 피드백
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 인터랙션 및 피드백">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-ripple-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. 리플(Ripple) 효과 비활성화 패턴 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. 터치 타겟 크기 미달 (P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. 화면 전환 애니메이션 부재 (P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-empty-state-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 빈 상태(Empty State) 처리 일관성 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 빈 상태(Empty State) 처리 일관성 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. 빈 상태 표현 비교
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 다크모드 세부 조정 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 다크모드 세부 조정 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. 하드코딩된 색상
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2-elevationshadow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. 다크모드에서 elevation/shadow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 레이아웃 및 간격 일관성 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 레이아웃 및 간격 일관성 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. 수평 패딩 불일치
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. 리스트 아이템 간격
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-information-hierarchy-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 정보 계층(Information Hierarchy) (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 정보 계층(Information Hierarchy) (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-capturecontent-cta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. CaptureContent 빈 상태 시 CTA 부재
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2-calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-2. Calendar 화면 정보 밀도
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 에러 상태 처리 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. 에러 상태 처리 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. 네트워크 오류 피드백
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2-capturedetailscreennotedetailscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. CaptureDetailScreen/NoteDetailScreen 에러 표시
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-accessibility-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 접근성(Accessibility) (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 접근성(Accessibility) (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-1-contentdescription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-1. contentDescription 누락
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-2. 색상 대비 확인
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 모션 및 상태 변화 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 모션 및 상태 변화 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#10-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-1. 리스트 아이템 추가/삭제 애니메이션
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-2-calendarcard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-2. CalendarCard 주간/월간 전환
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-3-swipeablecard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-3. SwipeableCard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 화면별 세부 리뷰
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 화면별 세부 리뷰">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-1-capturecontent-home-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-1. CaptureContent (Home) - 핵심 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-2-notescontent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-2. NotesContent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-3-calendarcontent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-3. CalendarContent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-4-settingsscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-4. SettingsScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-5-onboardingscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-5. OnboardingScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-6-trashscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-6. TrashScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-7-searchscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-7. SearchScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-8-aistatussheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-8. AIStatusSheet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 위젯 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. 위젯 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12-1-capturewidgetprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12-1. CaptureWidgetProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        우선순위별 요약
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="우선순위별 요약">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p0-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P0 (즉시 수정 - 사용자 경험/안전 직결)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 (다음 스프린트)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2 (향후 개선)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록: 잘 구현된 점
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 시각적 일관성 문제
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 시각적 일관성 문제">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. 화면 제목 스타일 불일치 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-chip-radius-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. 칩(Chip) 컴포넌트 radius 불일치 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-border-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. 카드/컨테이너 border 사용 불일치 (P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 타이포그래피 시스템 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 타이포그래피 시스템 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1-typography" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. Typography 정의 미비
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 인터랙션 및 피드백
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 인터랙션 및 피드백">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-ripple-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. 리플(Ripple) 효과 비활성화 패턴 (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. 터치 타겟 크기 미달 (P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. 화면 전환 애니메이션 부재 (P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-empty-state-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 빈 상태(Empty State) 처리 일관성 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 빈 상태(Empty State) 처리 일관성 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. 빈 상태 표현 비교
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 다크모드 세부 조정 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 다크모드 세부 조정 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. 하드코딩된 색상
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2-elevationshadow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. 다크모드에서 elevation/shadow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 레이아웃 및 간격 일관성 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 레이아웃 및 간격 일관성 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. 수평 패딩 불일치
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. 리스트 아이템 간격
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-information-hierarchy-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 정보 계층(Information Hierarchy) (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 정보 계층(Information Hierarchy) (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-capturecontent-cta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. CaptureContent 빈 상태 시 CTA 부재
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2-calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-2. Calendar 화면 정보 밀도
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 에러 상태 처리 (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. 에러 상태 처리 (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. 네트워크 오류 피드백
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2-capturedetailscreennotedetailscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. CaptureDetailScreen/NoteDetailScreen 에러 표시
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-accessibility-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 접근성(Accessibility) (P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 접근성(Accessibility) (P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-1-contentdescription" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-1. contentDescription 누락
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-2. 색상 대비 확인
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 모션 및 상태 변화 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 모션 및 상태 변화 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#10-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-1. 리스트 아이템 추가/삭제 애니메이션
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-2-calendarcard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-2. CalendarCard 주간/월간 전환
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-3-swipeablecard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10-3. SwipeableCard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 화면별 세부 리뷰
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 화면별 세부 리뷰">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-1-capturecontent-home-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-1. CaptureContent (Home) - 핵심 화면
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-2-notescontent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-2. NotesContent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-3-calendarcontent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-3. CalendarContent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-4-settingsscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-4. SettingsScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-5-onboardingscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-5. OnboardingScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-6-trashscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-6. TrashScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-7-searchscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-7. SearchScreen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-8-aistatussheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-8. AIStatusSheet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 위젯 (P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. 위젯 (P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12-1-capturewidgetprovider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12-1. CaptureWidgetProvider
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        우선순위별 요약
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="우선순위별 요약">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p0-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P0 (즉시 수정 - 사용자 경험/안전 직결)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 (다음 스프린트)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2 (향후 개선)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록: 잘 구현된 점
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flit-mobile-ui">Flit. Mobile UI 개선 보고서<a class="headerlink" href="#flit-mobile-ui" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>작성일: 2026-02-08
+범위: presentation/ 전체 화면 및 컴포넌트 (48개 파일)
+기준: UI 디자이너 관점 코드 레벨 리뷰</p>
+</blockquote>
+<hr />
+<h2 id="_1">요약<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Flit. Mobile은 미니멀 모노크롬 디자인 시스템(FlitTheme)을 잘 구축하고 있으며, "Just Capture" 철학에 충실한 홈 화면 UX가 돋보인다. 다만 화면 간 일관성, 접근성, 인터랙션 피드백, 빈 상태 처리, 다크모드 세부 조정에서 개선 여지가 있다. 아래에서 화면별/카테고리별로 우선순위와 함께 정리한다.</p>
+<hr />
+<h2 id="1">1. 시각적 일관성 문제<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<h3 id="1-1-p1">1-1. 화면 제목 스타일 불일치 (P1)<a class="headerlink" href="#1-1-p1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>화면</th>
+<th>제목</th>
+<th>fontSize</th>
+<th>fontWeight</th>
+<th>padding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CaptureContent (Home)</td>
+<td>"Flit."</td>
+<td>24.sp</td>
+<td>SemiBold</td>
+<td>h:20, v:16</td>
+</tr>
+<tr>
+<td>CalendarContent</td>
+<td>"Calendar"</td>
+<td>24.sp</td>
+<td>SemiBold</td>
+<td>h:20, v:16</td>
+</tr>
+<tr>
+<td>NotesContent</td>
+<td>"Notes"</td>
+<td>24.sp</td>
+<td>SemiBold</td>
+<td><strong>h:16, v:12</strong></td>
+</tr>
+<tr>
+<td>HistoryScreen</td>
+<td>"전체 기록"</td>
+<td><strong>20.sp</strong></td>
+<td>SemiBold</td>
+<td>h:16, v:16</td>
+</tr>
+<tr>
+<td>TrashScreen</td>
+<td>"휴지통"</td>
+<td><strong>20.sp</strong></td>
+<td>SemiBold</td>
+<td>h:16, v:16</td>
+</tr>
+<tr>
+<td>SettingsScreen (TopAppBar)</td>
+<td>"Settings"</td>
+<td><strong>20.sp</strong></td>
+<td>SemiBold</td>
+<td>TopAppBar 기본</td>
+</tr>
+<tr>
+<td>CaptureDetailScreen (TopAppBar)</td>
+<td>동적</td>
+<td><strong>18.sp</strong></td>
+<td>SemiBold</td>
+<td>TopAppBar 기본</td>
+</tr>
+<tr>
+<td>NoteDetailScreen (TopAppBar)</td>
+<td>"노트"</td>
+<td><strong>18.sp</strong></td>
+<td>SemiBold</td>
+<td>TopAppBar 기본</td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: 메인 3탭(Home/Calendar/Notes) 중 Notes의 padding이 다름(h:16 vs h:20). 서브 화면(History/Trash)은 20.sp로 메인 탭(24.sp)과 다르지만, 서브화면이므로 의도적일 수 있다.</p>
+<p><strong>권장 개선안</strong>:
+- Notes 헤더의 horizontal padding을 20.dp로 통일 (메인 3탭 기준)
+- 서브 화면 제목을 20.sp로 통일한 것은 적절하나, vertical padding도 16.dp로 통일 권장</p>
+<h3 id="1-2-chip-radius-p1">1-2. 칩(Chip) 컴포넌트 radius 불일치 (P1)<a class="headerlink" href="#1-2-chip-radius-p1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>사용처</th>
+<th>코너 반경</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FlitChip (공통)</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>ClassificationDropdown 칩</td>
+<td><strong>16.dp</strong></td>
+</tr>
+<tr>
+<td>OnboardingScreen ClassificationChip</td>
+<td><strong>16.dp</strong></td>
+</tr>
+<tr>
+<td>CaptureDetailScreen ClassificationChip</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>NoteDetailScreen ClassificationChip</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>SearchResultItem 분류 태그</td>
+<td><strong>4.dp</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: 동일 역할의 칩이 3가지 다른 radius(4/8/16dp)를 사용한다. ClassificationDropdown의 16.dp는 pill 형태를 의도한 것으로 보이나 다른 분류 칩(8.dp)과 불일치한다.</p>
+<p><strong>권장 개선안</strong>:
+- 인터랙티브 칩: 8.dp (FlitChip 기준으로 통일)
+- 비인터랙티브 태그(검색 결과 등): 4.dp는 너무 각져 보이므로 6.dp로 조정
+- ClassificationDropdown도 8.dp로 통일 (또는 의도적 pill이면 별도 디자인 토큰으로 분리)</p>
+<h3 id="1-3-border-p2">1-3. 카드/컨테이너 border 사용 불일치 (P2)<a class="headerlink" href="#1-3-border-p2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>화면</th>
+<th>border 사용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SettingsCard</td>
+<td>0.5.dp, borderLight</td>
+</tr>
+<tr>
+<td>CalendarCard</td>
+<td>1.dp, border</td>
+</tr>
+<tr>
+<td>ScheduleCard</td>
+<td>1.dp, border</td>
+</tr>
+<tr>
+<td>TaskItem</td>
+<td>1.dp, border</td>
+</tr>
+<tr>
+<td>CaptureDetail 원문 박스</td>
+<td>1.dp, border</td>
+</tr>
+<tr>
+<td>NoteDetail 원본텍스트 박스</td>
+<td>1.dp, border</td>
+</tr>
+<tr>
+<td>HistoryItem</td>
+<td>없음 (background만)</td>
+</tr>
+<tr>
+<td>SearchResultItem</td>
+<td>없음 (background만)</td>
+</tr>
+<tr>
+<td>TrashItem (Card)</td>
+<td>없음 (CardDefaults)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: 같은 역할의 리스트 아이템인데 HistoryItem/SearchResult에는 border가 없고 TaskItem에는 있다.</p>
+<p><strong>권장 개선안</strong>: 카드형 리스트 아이템에 대해 border 유/무를 통일. 미니멀 디자인 기조에서는 border 없이 elevation 또는 background 색상 차이만으로 구분하는 것이 더 깔끔하다.</p>
+<hr />
+<h2 id="2-p1">2. 타이포그래피 시스템 (P1)<a class="headerlink" href="#2-p1" title="Permanent link">&para;</a></h2>
+<h3 id="2-1-typography">2-1. Typography 정의 미비<a class="headerlink" href="#2-1-typography" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: <code>Type.kt</code>에 <code>bodyLarge</code>만 정의되어 있고 나머지는 주석 처리. 화면별로 fontSize/fontWeight를 직접 하드코딩하고 있어, 화면 전체의 타이포그래피 일관성을 시스템적으로 보장하기 어렵다.</p>
+<p><strong>실제 사용 패턴 분석</strong>:
+- 화면 제목: 24.sp SemiBold (또는 20.sp)
+- 섹션 레이블: 12.sp SemiBold (SectionHeader 등)
+- 리스트 아이템 제목: 14~15.sp Medium
+- 본문: 15~16.sp Normal
+- 보조 텍스트: 13.sp
+- 캡션/태그: 11~12.sp
+- 뱃지: 10.sp</p>
+<p><strong>권장 개선안</strong>: Material3 Typography를 확장하여 디자인 토큰화.
+<div class="highlight"><pre><span></span><code>headlineLarge = 24.sp SemiBold  (메인 탭 제목)
+headlineSmall = 20.sp SemiBold  (서브 화면 제목)
+titleMedium   = 15.sp Medium    (리스트 아이템 제목)
+bodyLarge     = 16.sp Normal    (입력 필드, 온보딩 설명)
+bodyMedium    = 14.sp Normal    (카드 본문)
+bodySmall     = 13.sp Normal    (보조 텍스트, 설명)
+labelLarge    = 13.sp Medium    (칩, 버튼)
+labelMedium   = 12.sp SemiBold  (섹션 레이블)
+labelSmall    = 11.sp Medium    (태그, 캡션)
+</code></pre></div></p>
+<hr />
+<h2 id="3">3. 인터랙션 및 피드백<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<h3 id="3-1-ripple-p1">3-1. 리플(Ripple) 효과 비활성화 패턴 (P1)<a class="headerlink" href="#3-1-ripple-p1" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 대부분의 아이콘 버튼과 텍스트 버튼이 <code>indication = null</code>로 리플 효과를 명시적으로 제거하고 있다.</p>
+<p><strong>해당 위치</strong>:
+- CaptureTopBar: 벨/히스토리/설정 아이콘 (3곳)
+- TrashTopBar: 뒤로 가기, 비우기 (2곳)
+- HistoryTopBar: 뒤로 가기 (1곳)
+- OnboardingScreen: 건너뛰기, 다음/시작 버튼, Google 연결 버튼 (3곳)
+- FlitBottomNav: 전체 탭 아이템 (1곳)
+- CalendarCard: 날짜 셀, 토글 버튼 (2곳)
+- AIStatusSheet: 전체 확인, 확인 버튼, 배경 (3곳)
+- CaptureToolBar: 전송 버튼 (1곳)</p>
+<p><strong>문제점</strong>: 터치 피드백이 없으면 사용자가 탭이 인식되었는지 알 수 없다. 특히 네비게이션 탭, 뒤로 가기, 전송 같은 핵심 액션에서 피드백이 없는 것은 UX 품질 저하.</p>
+<p><strong>권장 개선안</strong>:
+- 아이콘 버튼은 <code>IconButton</code>으로 래핑하여 기본 리플 + 48dp 터치 타겟 확보
+- 텍스트 버튼은 <code>TextButton</code> 사용 검토
+- 커스텀 버튼(전송, 온보딩 다음)은 최소한 <code>indication = rememberRipple(bounded = true)</code> 적용
+- 달력 날짜 셀은 리플 없이 색상 변화 애니메이션으로 피드백 제공 (현재 적절)</p>
+<h3 id="3-2-p0">3-2. 터치 타겟 크기 미달 (P0)<a class="headerlink" href="#3-2-p0" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 여러 인터랙티브 요소가 최소 터치 타겟 48dp를 미달한다.</p>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>실제 크기</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CaptureTopBar 아이콘들</td>
+<td>24.dp</td>
+<td>padding 없이 size만 지정</td>
+</tr>
+<tr>
+<td>TrashTopBar 뒤로 가기</td>
+<td>24.dp</td>
+<td>padding 없이 직접 clickable</td>
+</tr>
+<tr>
+<td>HistoryTopBar 뒤로 가기</td>
+<td>24.dp</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>ScheduleCard 삭제 아이콘</td>
+<td>18.dp</td>
+<td>매우 작음</td>
+</tr>
+<tr>
+<td>CalendarCard 토글 아이콘</td>
+<td>18.dp</td>
+<td>부모 Row clickable로 커버</td>
+</tr>
+<tr>
+<td>SearchScreen 지우기 버튼</td>
+<td>20.dp (IconButton 안)</td>
+<td>IconButton 내부라 48dp 확보됨</td>
+</tr>
+<tr>
+<td>이미지 제거 버튼</td>
+<td>20.dp</td>
+<td>padding 2.dp만</td>
+</tr>
+<tr>
+<td>TaskCheckbox</td>
+<td>22.dp</td>
+<td>최소 기준 미달</td>
+</tr>
+<tr>
+<td>폴더 추가 버튼</td>
+<td>32.dp</td>
+<td>최소 기준 미달</td>
+</tr>
+</tbody>
+</table>
+<p><strong>권장 개선안</strong>:
+- 단독 아이콘은 <code>IconButton</code> (기본 48dp 터치 영역)으로 감싸거나
+- <code>Modifier.padding(12.dp)</code> 추가로 48dp 이상 확보
+- ScheduleCard 삭제 아이콘: 18dp + padding으로 최소 48dp 확보 필수
+- TaskCheckbox: 22dp는 너무 작음, 최소 24dp + padding으로 48dp 확보
+- 이미지 제거 버튼: 터치 영역이 20dp로 실수 탭 유발 가능</p>
+<h3 id="3-3-p2">3-3. 화면 전환 애니메이션 부재 (P2)<a class="headerlink" href="#3-3-p2" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: NavGraph에서 화면 전환 시 별도 애니메이션이 설정되지 않은 것으로 보인다. HorizontalPager(메인 3탭)는 자연스러운 스와이프 전환이 있지만, 서브 화면(Settings, History, Trash, Search 등) 진입/퇴장 시 default composable 전환.</p>
+<p><strong>권장 개선안</strong>:
+- 서브 화면 진입: slideInHorizontally + fadeIn
+- 서브 화면 퇴장: slideOutHorizontally + fadeOut
+- 바텀시트(AIStatusSheet): 이미 오버레이로 구현되어 있으나, slideIn/slideOut 애니메이션 추가 권장</p>
+<hr />
+<h2 id="4-empty-state-p1">4. 빈 상태(Empty State) 처리 일관성 (P1)<a class="headerlink" href="#4-empty-state-p1" title="Permanent link">&para;</a></h2>
+<h3 id="4-1">4-1. 빈 상태 표현 비교<a class="headerlink" href="#4-1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>화면</th>
+<th>아이콘</th>
+<th>주 텍스트</th>
+<th>보조 텍스트</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NotesContent (빈 상태)</td>
+<td>StickyNote2 (48dp)</td>
+<td>"아직 노트가 없습니다"</td>
+<td>"캡처한 내용 중..."</td>
+</tr>
+<tr>
+<td>SearchScreen (초기)</td>
+<td>Search (48dp)</td>
+<td>"캡처를 검색하세요"</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>SearchScreen (결과 없음)</td>
+<td>없음</td>
+<td>"결과 없음"</td>
+<td>"다른 키워드로..."</td>
+</tr>
+<tr>
+<td>HistoryScreen (빈)</td>
+<td>없음</td>
+<td>"기록이 없습니다"</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>TrashScreen (빈)</td>
+<td>없음</td>
+<td>"휴지통이 비어 있습니다"</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>CalendarScreen 일정 없음</td>
+<td>없음</td>
+<td>"일정이 없습니다"</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>CalendarScreen 할일 없음</td>
+<td>없음</td>
+<td>"할 일이 없습니다"</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>AIStatusSheet (빈)</td>
+<td>없음</td>
+<td>"미확인 분류가 없습니다"</td>
+<td>없음</td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: NotesContent만 아이콘+주 텍스트+보조 텍스트 3레벨 구조이고, 나머지는 텍스트만.</p>
+<p><strong>권장 개선안</strong>:
+- 모든 빈 상태에 아이콘(48dp, textMuted) + 주 텍스트(15.sp) + 보조 텍스트(13.sp) 3레벨 통일
+- <code>EmptyStateView</code> 공통 컴포넌트로 추출 (icon, title, subtitle 파라미터)
+- CTA 버튼 추가 검토: TrashScreen "비어 있음" → 안내만, CalendarScreen → "캡처에서 일정을 입력해보세요" 유도</p>
+<hr />
+<h2 id="5-p1">5. 다크모드 세부 조정 (P1)<a class="headerlink" href="#5-p1" title="Permanent link">&para;</a></h2>
+<h3 id="5-1">5-1. 하드코딩된 색상<a class="headerlink" href="#5-1" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 일부 색상이 FlitTheme을 사용하지 않고 하드코딩되어 있어 다크모드에서 부자연스러울 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>하드코딩 색상</th>
+<th>문제점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CaptureDetailScreen CalendarSyncSection</td>
+<td><code>Color(0xFF4CAF50)</code>, <code>Color(0xFFFFA726)</code>, <code>Color(0xFFEF5350)</code></td>
+<td>FlitTheme.success/warning/danger와 불일치</td>
+</tr>
+<tr>
+<td>ScheduleTimeline SyncStatusBadge</td>
+<td><code>Color(0xFF4CAF50)</code>, <code>Color(0xFFFFA726)</code>, <code>Color(0xFFEF5350)</code></td>
+<td>동일</td>
+</tr>
+<tr>
+<td>OnboardingPageGoogle "연결됨"</td>
+<td><code>Color(0xFF4CAF50)</code></td>
+<td>동일</td>
+</tr>
+</tbody>
+</table>
+<p><strong>권장 개선안</strong>:
+- <code>FlitColors</code>에 이미 <code>success</code>, <code>warning</code>, <code>danger</code> 토큰이 정의되어 있으므로 이를 사용
+- <code>Color(0xFF4CAF50)</code> -&gt; <code>colors.success</code> (단, FlitLight.success = 0xFF10B981로 값이 다르므로, 의도적으로 다른 녹색이면 <code>calendarSynced</code> 같은 별도 토큰 추가)
+- <code>Color(0xFFFFA726)</code> -&gt; <code>colors.warning</code> (값은 같은 계열이지만 정확한 코드가 다름: 0xFFF59E0B)</p>
+<h3 id="5-2-elevationshadow">5-2. 다크모드에서 elevation/shadow<a class="headerlink" href="#5-2-elevationshadow" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: <code>FlitBottomNav</code>에 <code>shadow(elevation = 16.dp)</code> 적용. 다크모드에서 shadow는 거의 보이지 않으며, 대신 border나 surface tint로 깊이감을 표현해야 한다.</p>
+<p><strong>권장 개선안</strong>: 다크모드에서는 border(1.dp, borderLight) 추가 또는 surface elevation 컬러로 분리</p>
+<hr />
+<h2 id="6-p1">6. 레이아웃 및 간격 일관성 (P1)<a class="headerlink" href="#6-p1" title="Permanent link">&para;</a></h2>
+<h3 id="6-1">6-1. 수평 패딩 불일치<a class="headerlink" href="#6-1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>화면</th>
+<th>콘텐츠 horizontal padding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CaptureContent</td>
+<td>20.dp (텍스트 입력), 16.dp (하단 툴바)</td>
+</tr>
+<tr>
+<td>CalendarContent</td>
+<td>20.dp</td>
+</tr>
+<tr>
+<td>NotesContent</td>
+<td>16.dp (헤더), 16.dp (리스트)</td>
+</tr>
+<tr>
+<td>HistoryScreen</td>
+<td>16.dp</td>
+</tr>
+<tr>
+<td>TrashScreen</td>
+<td>16.dp</td>
+</tr>
+<tr>
+<td>SearchScreen</td>
+<td>8.dp (헤더), 16.dp (리스트)</td>
+</tr>
+<tr>
+<td>SettingsScreen</td>
+<td>16.dp (카드), 20.dp (SectionHeader)</td>
+</tr>
+<tr>
+<td>CaptureDetailScreen</td>
+<td>20.dp</td>
+</tr>
+<tr>
+<td>NoteDetailScreen</td>
+<td>20.dp</td>
+</tr>
+</tbody>
+</table>
+<p><strong>권장 개선안</strong>:
+- 메인 콘텐츠 영역: 20.dp 통일 (현재 CalendarContent, CaptureDetail, NoteDetail에서 사용)
+- 리스트 아이템: 16.dp contentPadding (현재 적절)
+- 또는 디자인 토큰으로 <code>ScreenHorizontalPadding = 20.dp</code>, <code>ListContentPadding = 16.dp</code> 정의</p>
+<h3 id="6-2">6-2. 리스트 아이템 간격<a class="headerlink" href="#6-2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>리스트</th>
+<th>verticalArrangement.spacedBy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NotesContent</td>
+<td>2.dp</td>
+</tr>
+<tr>
+<td>HistoryScreen</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>TrashScreen</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>SearchScreen</td>
+<td>8.dp</td>
+</tr>
+<tr>
+<td>AIStatusSheet</td>
+<td>0.dp</td>
+</tr>
+<tr>
+<td>CalendarScreen TaskList</td>
+<td>8.dp</td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: NotesContent만 2.dp로 매우 촘촘함. 노트 리스트는 divider로 구분하므로 의도적이나, 다른 리스트와 패턴이 상이하다.</p>
+<p><strong>권장 개선안</strong>: 카드형 리스트는 8.dp, divider형 리스트는 0~2.dp로 패턴 2가지로 정리 (현재 적절하나 문서화 필요)</p>
+<hr />
+<h2 id="7-information-hierarchy-p2">7. 정보 계층(Information Hierarchy) (P2)<a class="headerlink" href="#7-information-hierarchy-p2" title="Permanent link">&para;</a></h2>
+<h3 id="7-1-capturecontent-cta">7-1. CaptureContent 빈 상태 시 CTA 부재<a class="headerlink" href="#7-1-capturecontent-cta" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 홈 화면(CaptureContent)에서 캡처가 없을 때 특별한 빈 상태 UI가 없다. placeholder 텍스트("떠오르는 생각을 캡처하세요...")가 존재하지만, 최초 사용자에게는 추가 안내가 필요할 수 있다.</p>
+<p><strong>권장 개선안</strong>: "Just Capture" 철학에 따르면 현재 미니멀한 접근이 적절하다. 단, 온보딩 완료 후 최초 홈 진입 시 간단한 힌트 애니메이션(입력창 강조 등) 추가 고려.</p>
+<h3 id="7-2-calendar">7-2. Calendar 화면 정보 밀도<a class="headerlink" href="#7-2-calendar" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: Calendar 화면에 "일정" 섹션과 "할 일" 섹션이 세로로 나열. 일정이 많을 경우 할 일 섹션이 스크롤 아래로 밀린다.</p>
+<p><strong>권장 개선안</strong>: 현재 구조가 적절하나, 각 섹션의 접힘/펼침(collapsible) 기능 추가 고려 (Phase 2b 이후)</p>
+<hr />
+<h2 id="8-p1">8. 에러 상태 처리 (P1)<a class="headerlink" href="#8-p1" title="Permanent link">&para;</a></h2>
+<h3 id="8-1">8-1. 네트워크 오류 피드백<a class="headerlink" href="#8-1" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 에러는 Snackbar로만 처리 (CaptureContent, HistoryScreen, TrashScreen, SearchScreen). Snackbar는 일시적이므로 사용자가 놓칠 수 있다.</p>
+<p><strong>권장 개선안</strong>:
+- 네트워크 의존 화면(캡처 전송 실패)에서는 인라인 에러 메시지 표시 고려
+- Snackbar + 재시도 액션 조합은 현재 잘 되어 있음 (HistoryScreen 삭제 → "실행 취소")</p>
+<h3 id="8-2-capturedetailscreennotedetailscreen">8-2. CaptureDetailScreen/NoteDetailScreen 에러 표시<a class="headerlink" href="#8-2-capturedetailscreennotedetailscreen" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: 로딩 실패 시 화면 중앙에 에러 텍스트만 표시. "뒤로 가기" 외에 사용자가 취할 수 있는 액션이 없다.</p>
+<p><strong>권장 개선안</strong>: "다시 시도" 버튼 추가</p>
+<hr />
+<h2 id="9-accessibility-p1">9. 접근성(Accessibility) (P1)<a class="headerlink" href="#9-accessibility-p1" title="Permanent link">&para;</a></h2>
+<h3 id="9-1-contentdescription">9-1. contentDescription 누락<a class="headerlink" href="#9-1-contentdescription" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>요소</th>
+<th>contentDescription</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NotesContent FolderFilterChips 폴더칩</td>
+<td>FlitChip</td>
+<td>없음 (텍스트로 유추 가능하나 명시 권장)</td>
+</tr>
+<tr>
+<td>CalendarCard 날짜 셀</td>
+<td>Box + Text</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>OnboardingBottomBar 인디케이터</td>
+<td>Box</td>
+<td>없음</td>
+</tr>
+<tr>
+<td>TaskCheckbox</td>
+<td>Box</td>
+<td>없음 (semantics 필요)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>권장 개선안</strong>:
+- TaskCheckbox: <code>Modifier.semantics { role = Role.Checkbox; stateDescription = if (isChecked) "완료됨" else "미완료" }</code> 추가
+- 날짜 셀: <code>Modifier.semantics { contentDescription = "${date.monthValue}월 ${date.dayOfMonth}일" }</code> 추가</p>
+<h3 id="9-2">9-2. 색상 대비 확인<a class="headerlink" href="#9-2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>조합</th>
+<th>전경색</th>
+<th>배경색</th>
+<th>대비비 (약)</th>
+<th>WCAG AA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>textMuted on background (Light)</td>
+<td>#AAAAAA on #FAFAFA</td>
+<td>~2.3:1</td>
+<td>미달</td>
+<td></td>
+</tr>
+<tr>
+<td>textMuted on card (Light)</td>
+<td>#AAAAAA on #FFFFFF</td>
+<td>~2.3:1</td>
+<td>미달</td>
+<td></td>
+</tr>
+<tr>
+<td>placeholder on background (Light)</td>
+<td>#CCCCCC on #FAFAFA</td>
+<td>~1.6:1</td>
+<td>미달</td>
+<td></td>
+</tr>
+<tr>
+<td>chipText on chipBg (Light)</td>
+<td>#666666 on #F0F0F0</td>
+<td>~4.5:1</td>
+<td>충족</td>
+<td></td>
+</tr>
+<tr>
+<td>textSecondary on background (Light)</td>
+<td>#888888 on #FAFAFA</td>
+<td>~3.5:1</td>
+<td>미달 (AA 4.5:1)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>현재 상태</strong>: textMuted(#AAAAAA)와 placeholder(#CCCCCC)는 WCAG AA(4.5:1) 기준을 미달한다. 이는 미니멀 디자인에서 흔하지만, 접근성 면에서 개선 필요.</p>
+<p><strong>권장 개선안</strong>:
+- textMuted를 #999999 이하로 조정 (약 3:1, 대형 텍스트용)
+- placeholder를 #AAAAAA 이하로 조정
+- 비핵심 정보(날짜, 시간 보조 텍스트)에만 textMuted 사용 제한</p>
+<hr />
+<h2 id="10-p2">10. 모션 및 상태 변화 (P2)<a class="headerlink" href="#10-p2" title="Permanent link">&para;</a></h2>
+<h3 id="10-1">10-1. 리스트 아이템 추가/삭제 애니메이션<a class="headerlink" href="#10-1" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: LazyColumn에서 아이템 추가/삭제 시 별도 animateItem 설정 없음.</p>
+<p><strong>권장 개선안</strong>: <code>Modifier.animateItem()</code> 추가 (Compose 1.7+에서 지원)</p>
+<h3 id="10-2-calendarcard">10-2. CalendarCard 주간/월간 전환<a class="headerlink" href="#10-2-calendarcard" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: AnimatedContent로 fadeIn/fadeOut + SizeTransform 적용됨. 잘 구현되어 있음.</p>
+<h3 id="10-3-swipeablecard">10-3. SwipeableCard<a class="headerlink" href="#10-3-swipeablecard" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: SwipeToDismissBox 사용, 배경색 및 아이콘 스케일 애니메이션 적용됨. 적절하게 구현됨.</p>
+<hr />
+<h2 id="11">11. 화면별 세부 리뷰<a class="headerlink" href="#11" title="Permanent link">&para;</a></h2>
+<h3 id="11-1-capturecontent-home-">11-1. CaptureContent (Home) - 핵심 화면<a class="headerlink" href="#11-1-capturecontent-home-" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- "Just Capture" 철학에 충실: 전체 화면이 입력 영역
+- 전송 버튼의 활성/비활성 시각적 구분 명확
+- 이미지 미리보기 + 제거 버튼 배치 적절
+- 임시 저장(saveDraft) 라이프사이클 연동</p>
+<p><strong>개선 필요</strong>:
+- [P0] 상단 바 아이콘(벨/히스토리/설정) 터치 타겟 24dp 미달
+- [P1] 이미지 첨부 아이콘(Icons.Outlined.Image) 터치 타겟 24dp, 독립 clickable에 리플 없음
+- [P2] 날짜 표시(DateDisplay)가 화면 상단에 고정인데, 긴 텍스트 입력 시 스크롤과 함께 사라지지 않음 (현재 구조에서는 OK)</p>
+<h3 id="11-2-notescontent">11-2. NotesContent<a class="headerlink" href="#11-2-notescontent" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- 폴더 필터 칩이 수평 스크롤로 자연스러움
+- 사용자 폴더 롱프레스 컨텍스트 메뉴 잘 구현
+- 빈 상태 뷰가 필터 유무에 따라 다른 메시지 표시</p>
+<p><strong>개선 필요</strong>:
+- [P1] NoteListItem divider가 아이템 내부에 있어 마지막 아이템에도 divider 표시됨 -&gt; items의 마지막 아이템은 divider 생략 또는 <code>LazyColumn</code>의 <code>divider</code> 패턴 사용
+- [P1] 노트 리스트 아이템에 카드 배경이 없어서 클릭 영역 인지가 어려움 (현재 clip(12.dp) + clickable만)</p>
+<h3 id="11-3-calendarcontent">11-3. CalendarContent<a class="headerlink" href="#11-3-calendarcontent" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- CalendarCard 주간/월간 전환이 스와이프 제스처 + 버튼 토글 두 가지로 제공
+- ScheduleTimeline 타임라인 UI가 시각적으로 잘 구성됨
+- SyncStatusBadge 색상 코딩이 직관적
+- Snackbar "실행 취소" 패턴 잘 적용</p>
+<p><strong>개선 필요</strong>:
+- [P0] ScheduleCard 삭제 아이콘 18dp - 매우 작은 터치 타겟
+- [P1] CalendarCard의 좌우 스와이프(달 변경)가 월간 뷰에서만 작동하는데, 사용자가 이를 발견하기 어려움 - 달 변경 화살표 버튼 추가 고려
+- [P2] 일요일이 빨간색이 아닌 기본 색상 (미니멀 디자인 의도일 수 있음)</p>
+<h3 id="11-4-settingsscreen">11-4. SettingsScreen<a class="headerlink" href="#11-4-settingsscreen" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- SettingsCard 컴포넌트로 그룹핑이 잘 되어 있음
+- SectionHeader 재사용
+- Switch 커스텀 색상 적용</p>
+<p><strong>개선 필요</strong>:
+- [P1] Google Calendar 섹션에 개발자용 디버그 항목("OAuth code 교환", "토큰 직접 저장", "이벤트 조회 테스트")이 일반 사용자에게 노출됨 -&gt; DEBUG 빌드에서만 표시하거나 "개발자 도구" 섹션으로 이동
+- [P1] "개발자 도구" 섹션이 일반 사용자에게도 보임 -&gt; 숨김 처리 (7회 탭 등)</p>
+<h3 id="11-5-onboardingscreen">11-5. OnboardingScreen<a class="headerlink" href="#11-5-onboardingscreen" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- 4페이지 구성이 적절 (소개 → AI 분류 → Google Calendar → 첫 캡처)
+- 페이지 인디케이터 애니메이션 (활성 페이지 width 24dp vs 8dp)
+- "건너뛰기" 텍스트가 비간섭적</p>
+<p><strong>개선 필요</strong>:
+- [P1] Google Calendar 연결 페이지에서 "연결됨" 상태 배경이 하드코딩(Color(0xFF4CAF50))
+- [P2] 온보딩 1,2페이지에 일러스트 대신 텍스트만 사용 -&gt; 향후 일러스트/로티 애니메이션 추가 고려</p>
+<h3 id="11-6-trashscreen">11-6. TrashScreen<a class="headerlink" href="#11-6-trashscreen" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- 복원/삭제 버튼 레이아웃 명확
+- "비우기" 텍스트 버튼이 항목 존재 시에만 표시</p>
+<p><strong>개선 필요</strong>:
+- [P0] "비우기"(전체 삭제)에 확인 다이얼로그 없음 -&gt; 위험한 동작이므로 반드시 확인 필요
+- [P1] "완전 삭제" 버튼에 확인 다이얼로그 없음 -&gt; 비가역 동작이므로 확인 필요
+- [P1] 빈 상태 뷰에 아이콘 없음</p>
+<h3 id="11-7-searchscreen">11-7. SearchScreen<a class="headerlink" href="#11-7-searchscreen" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- 자동 포커스로 즉시 입력 가능
+- FilterChipRow 재사용
+- 초기/결과없음/결과있음 3가지 상태 구분</p>
+<p><strong>개선 필요</strong>:
+- [P2] 검색 결과 아이템이 카드 형태이나, HistoryItem과 스타일이 다름 (SearchResult는 Row, History는 Column)</p>
+<h3 id="11-8-aistatussheet">11-8. AIStatusSheet<a class="headerlink" href="#11-8-aistatussheet" title="Permanent link">&para;</a></h3>
+<p><strong>잘 된 점</strong>:
+- 오버레이 배경 반투명 처리
+- 확인 버튼, 전체 확인, 분류 변경 드롭다운 등 필요 액션 제공
+- heightIn(max=400.dp)로 과도한 확장 방지</p>
+<p><strong>개선 필요</strong>:
+- [P2] 진입/퇴장 애니메이션 없음 -&gt; slideInVertically(from top) 추가 권장</p>
+<hr />
+<h2 id="12-p2">12. 위젯 (P2)<a class="headerlink" href="#12-p2" title="Permanent link">&para;</a></h2>
+<h3 id="12-1-capturewidgetprovider">12-1. CaptureWidgetProvider<a class="headerlink" href="#12-1-capturewidgetprovider" title="Permanent link">&para;</a></h3>
+<p><strong>현재 상태</strong>: RemoteViews 기반 전통 위젯. 단순히 앱을 여는 용도. Glance AppWidget이 아닌 XML 레이아웃 사용.</p>
+<p><strong>권장 개선안</strong>: Phase 2a에서 Glance 위젯이 계획된 것으로 보이나, 현재 CaptureWidgetProvider는 전통 AppWidgetProvider. Glance로 마이그레이션하면 테마 일관성 향상.</p>
+<hr />
+<h2 id="_2">우선순위별 요약<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="p0-">P0 (즉시 수정 - 사용자 경험/안전 직결)<a class="headerlink" href="#p0-" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>터치 타겟 크기 미달</strong> - CaptureTopBar 아이콘, ScheduleCard 삭제, TaskCheckbox, 이미지 제거 버튼</li>
+<li><strong>TrashScreen "비우기" 확인 다이얼로그 누락</strong> - 비가역 대량 삭제 동작</li>
+</ol>
+<h3 id="p1">P1 (다음 스프린트)<a class="headerlink" href="#p1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>화면 제목 스타일/패딩 통일 (Notes 헤더 padding)</li>
+<li>칩 cornerRadius 통일</li>
+<li>Typography 시스템 정의 (Type.kt 확장)</li>
+<li>리플 효과 복원 (핵심 액션 버튼)</li>
+<li>빈 상태 뷰 통일 (공통 EmptyStateView 컴포넌트)</li>
+<li>하드코딩 색상 -&gt; FlitTheme 토큰 사용</li>
+<li>SettingsScreen 개발자 항목 숨김 처리</li>
+<li>에러 상태에 "다시 시도" 액션 추가</li>
+<li>접근성: contentDescription, semantics 보완</li>
+<li>색상 대비 개선 (textMuted, placeholder)</li>
+<li>NoteListItem 마지막 divider 제거</li>
+<li>TrashScreen "완전 삭제" 확인 다이얼로그</li>
+<li>Calendar 월간뷰 달 변경 UI 힌트</li>
+</ol>
+<h3 id="p2">P2 (향후 개선)<a class="headerlink" href="#p2" title="Permanent link">&para;</a></h3>
+<ol>
+<li>화면 전환 애니메이션 추가</li>
+<li>카드 border 사용 통일</li>
+<li>수평 패딩 디자인 토큰 정의</li>
+<li>리스트 아이템 추가/삭제 애니메이션</li>
+<li>AIStatusSheet 진입/퇴장 애니메이션</li>
+<li>다크모드 BottomNav shadow 처리</li>
+<li>온보딩 일러스트 추가</li>
+<li>Glance 위젯 마이그레이션</li>
+</ol>
+<hr />
+<h2 id="_3">부록: 잘 구현된 점<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>디자인 시스템</strong>: FlitColors + CompositionLocal 기반 커스텀 색상 시스템이 체계적</li>
+<li><strong>다크모드</strong>: 라이트/다크 팔레트가 완전히 분리되어 있고, 대부분의 UI가 FlitTheme.colors 사용</li>
+<li><strong>"Just Capture" 철학</strong>: 홈 화면이 전체 화면 입력 영역으로, 캡처까지의 단계가 최소</li>
+<li><strong>스와이프 삭제</strong>: SwipeToDismissBox + Snackbar 실행 취소 패턴이 일관되게 적용</li>
+<li><strong>CalendarCard</strong>: 주간/월간 전환, 스와이프 제스처, 날짜 선택 애니메이션이 잘 구현됨</li>
+<li><strong>분류 변경</strong>: ClassificationDropdown이 재사용 가능한 컴포넌트로 잘 분리됨</li>
+<li><strong>3단계 삭제</strong>: SoftDelete -&gt; Trash -&gt; HardDelete 모델이 UI에 잘 반영됨</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

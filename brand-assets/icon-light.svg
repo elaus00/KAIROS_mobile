@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flit. 앱 아이콘 — 라이트 (Play Store 기본) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108">
+  <!-- 배경 -->
+  <rect width="108" height="108" fill="#FFFFFF"/>
+  <!-- F 글리프 -->
+  <path fill="#111111" d="M41,38 H59 V42 H46 V52 H58 V56 H46 V70 H41 Z"/>
+  <!-- 채움 도트 -->
+  <path fill="#111111" d="M60,66.5 A3.5,3.5,0,0,1,67,66.5 A3.5,3.5,0,0,1,60,66.5 Z"/>
+</svg>

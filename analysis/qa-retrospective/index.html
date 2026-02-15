@@ -1,0 +1,2127 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/analysis/qa-retrospective/">
+      
+      
+        <link rel="prev" href="../material-design-audit/">
+      
+      
+        <link rel="next" href="../../performance/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>QA 회고 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flit-qa" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              QA 회고
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 카테고리별 분포
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-top-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 반복 패턴 Top 5
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 반복 패턴 Top 5">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 캘린더 관련 — 8회 반복 (최다)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 네비게이션 바 — 5회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 할일 체크박스 — 3회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 글씨 크기 설정 — 2회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 위젯 키보드 가림 — 2회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. QA 밀도 타임라인
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. QA 밀도 타임라인">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        피크 분석
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 근본 원인 분류
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 근본 원인 분류">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-02-08-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 디자인 가이드 부재 (02-08 이전) → 17건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ui-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 복합 UI의 점진적 구현 → 8건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 전역 기능의 부분 적용 → 4건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 리브랜딩 수동 치환 → 4건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-phase-1-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Phase 1 셸 구현 → 5건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 핵심 교훈 5가지
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 핵심 교훈 5가지">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 1: 디자인 시스템은 첫 번째 커밋 전에 수립하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 2: 복잡한 인터랙션 UI는 한 번에 완성하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 3: 전역 기능은 전역으로 검증하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 4: 대규모 치환은 자동화 + 검증이 필수다
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 5: 미구현 기능은 비활성화하거나 명시하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 해결 현황 요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록: 데이터 소스
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 카테고리별 분포
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-top-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 반복 패턴 Top 5
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 반복 패턴 Top 5">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 캘린더 관련 — 8회 반복 (최다)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 네비게이션 바 — 5회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 할일 체크박스 — 3회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 글씨 크기 설정 — 2회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 위젯 키보드 가림 — 2회 반복
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-qa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. QA 밀도 타임라인
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. QA 밀도 타임라인">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        피크 분석
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 근본 원인 분류
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 근본 원인 분류">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-02-08-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 디자인 가이드 부재 (02-08 이전) → 17건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ui-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 복합 UI의 점진적 구현 → 8건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 전역 기능의 부분 적용 → 4건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 리브랜딩 수동 치환 → 4건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-phase-1-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Phase 1 셸 구현 → 5건 유발
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 핵심 교훈 5가지
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 핵심 교훈 5가지">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 1: 디자인 시스템은 첫 번째 커밋 전에 수립하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 2: 복잡한 인터랙션 UI는 한 번에 완성하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 3: 전역 기능은 전역으로 검증하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 4: 대규모 치환은 자동화 + 검증이 필수다
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        교훈 5: 미구현 기능은 비활성화하거나 명시하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 해결 현황 요약
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록: 데이터 소스
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flit-qa">Flit. QA 회고 리포트<a class="headerlink" href="#flit-qa" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>기간</strong>: 2025-01-23 ~ 2025-02-14 (23일)
+<strong>세션</strong>: 169개 / <strong>메시지</strong>: 660개 / <strong>QA 항목</strong>: 51건
+<strong>데이터</strong>: <code>qa-retrospective.csv</code> (구조화 데이터)</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 요약<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>23일간의 개발 과정에서 사용자가 지적한 QA 이슈 51건을 분석했다. 순수 구현 요청, 도구 질문, 문서 작업, Claude Code 자체 이슈는 제외하고, <strong>"잘못됐다", "안 된다", "고쳐라", "수정해"</strong> 등 문제 지적만 추출했다.</p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>전체 QA 건수</td>
+<td>51</td>
+</tr>
+<tr>
+<td>해결 완료</td>
+<td>50 (98%)</td>
+</tr>
+<tr>
+<td>미해결 (최신)</td>
+<td>1 (#17)</td>
+</tr>
+<tr>
+<td>재지적 (반복)</td>
+<td>19건 (37%)</td>
+</tr>
+<tr>
+<td>QA 피크일</td>
+<td>02-08 (7건), 02-12 (9건)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2">2. 카테고리별 분포<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>UI/UX 레이아웃·디자인  ████████████████░  17건 (33%)
+기능 미작동·버그        ███████████░░░░░░  11건 (22%)
+빌드·컴파일 에러        ███████░░░░░░░░░░   7건 (14%)
+리브랜딩 잔재           ████░░░░░░░░░░░░░   4건  (8%)
+디자인 가이드 미준수     ████░░░░░░░░░░░░░   4건  (8%)
+위젯 관련              ███░░░░░░░░░░░░░░░   3건  (6%)
+환경·인프라             ███░░░░░░░░░░░░░░░   3건  (6%)
+설정·글씨 크기          ██░░░░░░░░░░░░░░░░   2건  (4%)
+</code></pre></div>
+<p><strong>UI/UX가 전체의 1/3을 차지</strong> — 기능이 동작해도 디자인 품질 미달로 재작업 발생.</p>
+<hr />
+<h2 id="3-top-5">3. 반복 패턴 Top 5<a class="headerlink" href="#3-top-5" title="Permanent link">&para;</a></h2>
+<p>같은 이슈가 여러 번 지적된 패턴을 분석했다. 반복 지적은 <strong>첫 수정이 불완전하거나, 근본 원인을 해결하지 않았을 때</strong> 발생한다.</p>
+<h3 id="31-8">3.1 캘린더 관련 — 8회 반복 (최다)<a class="headerlink" href="#31-8" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>세부 이슈</th>
+<th>반복 횟수</th>
+<th>관련 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>패딩 불일치</td>
+<td>3회</td>
+<td>#1, #3, #10</td>
+</tr>
+<tr>
+<td>스와이프 미작동</td>
+<td>2회</td>
+<td>#24, #25</td>
+</tr>
+<tr>
+<td>헤더/주차 표시</td>
+<td>2회</td>
+<td>#3, #4</td>
+</tr>
+<tr>
+<td>상단 고정 스크롤</td>
+<td>2회</td>
+<td>#3, #27</td>
+</tr>
+</tbody>
+</table>
+<p><strong>근본 원인</strong>: 캘린더는 주간/월간 뷰 전환, 스와이프 제스처, 날짜 선택 등 복합 인터랙션이 결합된 UI. 초기 설계 시 이 복잡도를 과소평가하여 부분 수정이 반복됨.</p>
+<p><strong>교훈</strong>: 복잡한 인터랙션 UI는 <strong>구현 전 상태 다이어그램과 제스처 매핑</strong>을 정의하고, 한 번에 완성도 높게 구현해야 한다.</p>
+<h3 id="32-5">3.2 네비게이션 바 — 5회 반복<a class="headerlink" href="#32-5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>세부 이슈</th>
+<th>관련 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>버튼 미작동</td>
+<td>#18, #19</td>
+</tr>
+<tr>
+<td>아이콘 크기/영역</td>
+<td>#7</td>
+</tr>
+<tr>
+<td>폭 너무 큼</td>
+<td>#14</td>
+</tr>
+<tr>
+<td>스크린샷 미표시</td>
+<td>#40</td>
+</tr>
+</tbody>
+</table>
+<p><strong>근본 원인</strong>: Phase 1에서 네비게이션 UI 셸만 배치하고 라우팅 미연결. 이후 점진적 수정마다 새로운 문제 발견.</p>
+<h3 id="33-3">3.3 할일 체크박스 — 3회 반복<a class="headerlink" href="#33-3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>세부 이슈</th>
+<th>관련 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>체크 시 카드 사라짐</td>
+<td>#5, #23, #25</td>
+</tr>
+<tr>
+<td>위젯에서도 동일</td>
+<td>#38</td>
+</tr>
+</tbody>
+</table>
+<p><strong>근본 원인</strong>: 체크 상태 변경 → 필터가 즉시 완료 항목을 제거. "완료 시 취소선 + 지연 제거" 대신 "즉시 목록에서 삭제"로 구현.</p>
+<h3 id="34-2">3.4 글씨 크기 설정 — 2회 반복<a class="headerlink" href="#34-2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>세부 이슈</th>
+<th>관련 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>설정해도 안 바뀜</td>
+<td>#29</td>
+</tr>
+<tr>
+<td>재지적</td>
+<td>#30</td>
+</tr>
+</tbody>
+</table>
+<p><strong>근본 원인</strong>: 설정값 저장은 구현했으나, <code>CompositionLocal</code>을 통한 Typography 동적 전파가 일부 화면에만 적용.</p>
+<h3 id="35-2">3.5 위젯 키보드 가림 — 2회 반복<a class="headerlink" href="#35-2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>세부 이슈</th>
+<th>관련 항목</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처 위젯 입력창 가림</td>
+<td>#38, #39</td>
+</tr>
+</tbody>
+</table>
+<p><strong>근본 원인</strong>: Glance 위젯은 일반 Compose와 달리 <code>WindowInsets.ime</code> 패딩을 자동 처리하지 않음.</p>
+<hr />
+<h2 id="4-qa">4. QA 밀도 타임라인<a class="headerlink" href="#4-qa" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>01-23  ██           2건  초기 프로젝트 세팅 — 빌드 에러
+01-26  █████        5건  첫 사용 테스트 — 네비게이션/기능 미작동 집중 발견
+01-27  ██           2건  추가 버그 발견
+01-29  ██           2건  에러 + 디자인 철학 점검 요청
+       ─── 1주 공백 ───
+02-07  ██           2건  재구현 후 점검
+02-08  ███████      7건  📍 캘린더 집중 QA — 단일 최다
+02-09  █            1건  서버 연동
+02-10  ████         4건  타이포/글씨크기/분류 속도
+02-11  ████         4건  네비바/애니메이션/SDK 에러
+02-12  █████████    9건  📍 최대 피크 — 위젯+설정+리브랜딩+하드코딩
+02-13  █████        5건  리브랜딩 잔재 + 오프라인 오탐
+02-14  █████        5건  스플래시/스와이프/Play Store/캡처화면
+</code></pre></div>
+<h3 id="_1">피크 분석<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>02-08 (7건)</strong>: 캘린더 UI 완성 직후 집중 QA. 복합 인터랙션 이슈 한꺼번에 노출.</li>
+<li><strong>02-12 (9건)</strong>: 위젯 Glance 전환, 설정 화면 개편, 리브랜딩 잔재 — 대규모 변경 3건이 동시에 QA 대상.</li>
+</ul>
+<p><strong>패턴</strong>: 대규모 변경 직후 24시간 내에 QA 집중도가 급격히 상승한다.</p>
+<hr />
+<h2 id="5">5. 근본 원인 분류<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p>51건의 근본 원인을 역추적하면 <strong>5가지 구조적 원인</strong>으로 수렴한다:</p>
+<h3 id="51-02-08-17">5.1 디자인 가이드 부재 (02-08 이전) → 17건 유발<a class="headerlink" href="#51-02-08-17" title="Permanent link">&para;</a></h3>
+<p>02-08에 디자인 가이드가 생성되기 전까지 Material Design 기본값을 그대로 사용. 패딩, 타이포, 색상, 애니메이션 모두 사후 수정.</p>
+<ul>
+<li>영향 항목: #1~#14, #49</li>
+<li><strong>이후 개선</strong>: 디자인 가이드 v2.0 수립 + CLAUDE.md 필수 참조 규칙 추가</li>
+</ul>
+<h3 id="52-ui-8">5.2 복합 UI의 점진적 구현 → 8건 유발<a class="headerlink" href="#52-ui-8" title="Permanent link">&para;</a></h3>
+<p>캘린더처럼 상태가 많은 UI를 점진적으로 확장하면 매번 새로운 엣지 케이스 발견.</p>
+<ul>
+<li>영향 항목: #1, #3, #10, #23~#25, #27</li>
+<li><strong>이후 개선</strong>: 상태 다이어그램 기반 설계 도입 필요 (미완)</li>
+</ul>
+<h3 id="53-4">5.3 전역 기능의 부분 적용 → 4건 유발<a class="headerlink" href="#53-4" title="Permanent link">&para;</a></h3>
+<p>글씨 크기, 테마 색상 등 전역으로 작용해야 하는 기능이 일부 화면에만 적용.</p>
+<ul>
+<li>영향 항목: #12, #29, #30</li>
+<li><strong>이후 개선</strong>: CompositionLocal 전파 + Theme 토큰 강제</li>
+</ul>
+<h3 id="54-4">5.4 리브랜딩 수동 치환 → 4건 유발<a class="headerlink" href="#54-4" title="Permanent link">&para;</a></h3>
+<p>KAIROS → Flit 리브랜딩 시 전역 검색 대신 파일별 수동 치환으로 누락 발생.</p>
+<ul>
+<li>영향 항목: #41~#44</li>
+<li><strong>이후 개선</strong>: 체크리스트 기반 전수 검사 + grep 검증</li>
+</ul>
+<h3 id="55-phase-1-5">5.5 Phase 1 셸 구현 → 5건 유발<a class="headerlink" href="#55-phase-1-5" title="Permanent link">&para;</a></h3>
+<p>네비게이션 등 UI 셸만 배치하고 기능 연결을 다음 Phase로 미룬 결과, 사용자가 "눌러도 안 됨"을 경험.</p>
+<ul>
+<li>영향 항목: #18~#20</li>
+<li><strong>이후 개선</strong>: 미구현 화면은 명시적 "준비 중" 표시 또는 네비에서 비활성화</li>
+</ul>
+<hr />
+<h2 id="6-5">6. 핵심 교훈 5가지<a class="headerlink" href="#6-5" title="Permanent link">&para;</a></h2>
+<h3 id="1_1">교훈 1: 디자인 시스템은 첫 번째 커밋 전에 수립하라<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>디자인 가이드 없이 시작한 UI는 <strong>100% 재작업</strong>된다.
+가이드 수립 전(01-23~02-08) QA 17건 vs 수립 후(02-08~02-14) UI QA 8건.</p>
+</blockquote>
+<h3 id="2-ui">교훈 2: 복잡한 인터랙션 UI는 한 번에 완성하라<a class="headerlink" href="#2-ui" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>캘린더 8회 반복 지적의 원인 = 점진적 확장.
+구현 전에 <strong>모든 상태 × 모든 제스처</strong> 매트릭스를 정의해야 한다.</p>
+</blockquote>
+<h3 id="3">교훈 3: 전역 기능은 전역으로 검증하라<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>글씨 크기 설정이 "일부 화면에서만" 적용되면 사용자는 "안 됨"으로 인식.
+전역 기능은 <strong>모든 화면에서 테스트</strong>해야 한다.</p>
+</blockquote>
+<h3 id="4">교훈 4: 대규모 치환은 자동화 + 검증이 필수다<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>리브랜딩 4건의 잔재 = grep으로 30초면 발견 가능했던 이슈.
+<code>grep -r "KAIROS" --include="*.kt" --include="*.xml"</code> 한 줄이면 끝.</p>
+</blockquote>
+<h3 id="5_1">교훈 5: 미구현 기능은 비활성화하거나 명시하라<a class="headerlink" href="#5_1" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>"눌러도 안 됨"은 버그와 구분할 수 없다.
+아직 구현하지 않은 진입점은 <strong>회색 처리 + "준비 중" 라벨</strong> 또는 네비에서 제거.</p>
+</blockquote>
+<hr />
+<h2 id="7">7. 해결 현황 요약<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>카테고리</th>
+<th>건수</th>
+<th>해결</th>
+<th>미해결</th>
+<th>해결률</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI/UX 레이아웃·디자인</td>
+<td>17</td>
+<td>16</td>
+<td>1</td>
+<td>94%</td>
+</tr>
+<tr>
+<td>기능 미작동·버그</td>
+<td>11</td>
+<td>11</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>빌드·컴파일 에러</td>
+<td>7</td>
+<td>7</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>리브랜딩 잔재</td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>디자인 가이드 미준수</td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>위젯 관련</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>환경·인프라</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>설정·글씨 크기</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td><strong>전체</strong></td>
+<td><strong>51</strong></td>
+<td><strong>50</strong></td>
+<td><strong>1</strong></td>
+<td><strong>98%</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>미해결 1건</strong>: #17 (02-14) — 캡처 화면 키보드 유지/간격/로고 이슈 (최신 세션)</p>
+<hr />
+<h2 id="_2">부록: 데이터 소스<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>채팅 히스토리</strong>: <code>~/.claude/history.jsonl</code> (2,720 엔트리, 169 세션)</li>
+<li><strong>분석 대상</strong>: Flit 프로젝트 메시지 660개 중 QA 해당 51건</li>
+<li><strong>대조 자료</strong>: git log 122개 커밋</li>
+<li><strong>구조화 데이터</strong>: <code>qa-retrospective.csv</code> (Notion/스프레드시트 import 가능)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

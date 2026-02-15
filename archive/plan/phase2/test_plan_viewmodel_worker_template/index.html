@@ -1,0 +1,2738 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/archive/plan/phase2/test_plan_viewmodel_worker_template/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>테스트 계획 템플릿: ViewModel & Worker - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#viewmodel-worker" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../../../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              테스트 계획 템플릿: ViewModel &amp; Worker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        개요
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="개요">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        목표
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 전략
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 인프라 (이미 존재)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추가 필요 의존성
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        파일 구조
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-captureviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CaptureViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CaptureViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (11개)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="테스트 케이스 (11개)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        초기화
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        입력
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        제출
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        드래프트
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI 상태 시트
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-calendarviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CalendarViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. CalendarViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (12개)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="테스트 케이스 (12개)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        초기화
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        날짜 선택
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        일정/투두
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        삭제/실행취소
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        에러 처리
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        월 확장
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-notesviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. NotesViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. NotesViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (11개)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="테스트 케이스 (11개)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        초기화 &amp; 폴더 로딩
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        폴더 탐색
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CRUD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다이얼로그
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-historyviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. HistoryViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. HistoryViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (11개)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="테스트 케이스 (11개)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        페이지네이션
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        삭제
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        분류 변경
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-searchviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. SearchViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. SearchViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (5개)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-capturedetailviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CaptureDetailViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. CaptureDetailViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (5개)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-settingsviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. SettingsViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. SettingsViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (3개)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-onboardingviewmodeltest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. OnboardingViewModelTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. OnboardingViewModelTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (6개)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-classifycaptureworkertest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. ClassifyCaptureWorkerTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. ClassifyCaptureWorkerTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (9개)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="테스트 케이스 (9개)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        정상 플로우
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        에러 처리
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        재시도 로직
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        완료 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부분 실패
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-reclassifytempworkertest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. ReclassifyTempWorkerTest
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. ReclassifyTempWorkerTest">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        테스트 케이스 (5개)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        구현 순서
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        검증 명령
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        리스크
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="viewmodel-worker">테스트 계획 템플릿: ViewModel &amp; Worker<a class="headerlink" href="#viewmodel-worker" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Phase 1에서 사용한 테스트 계획 문서를 템플릿으로 전환한 버전. Phase 2 작업 시 범위/케이스를 현재 스펙에 맞게 갱신해서 사용한다.</p>
+<p><strong>Version</strong>: template-1.0
+<strong>작성일</strong>: 2026-02-07
+<strong>기준</strong>: 기능명세서, 데이터모델 명세서, 해당 Phase 구현 계획
+<strong>범위</strong>: ViewModel 8개 + Worker 2개</p>
+</blockquote>
+<hr />
+<h2 id="_1">개요<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="_2">목표<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>Phase 1 MVP의 Presentation/Worker 레이어 테스트 커버리지 확보. UseCase 테스트(100% 완료)와 함께 핵심 비즈니스 로직의 양 끝단을 검증한다.</p>
+<h3 id="_3">테스트 전략<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ViewModel</strong>: UseCase/Repository를 MockK로 대체, StateFlow/SharedFlow 출력을 Turbine으로 검증</li>
+<li><strong>Worker</strong>: Repository/API를 MockK로 대체, doWork() 결과와 부수효과 검증</li>
+<li><strong>기존 컨벤션 준수</strong>: <code>runTest</code>, <code>MainDispatcherRule</code>, <code>coEvery</code>/<code>coVerify</code>, <code>@After unmockkAll()</code></li>
+</ul>
+<h3 id="_4">테스트 인프라 (이미 존재)<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>app/src/test/java/com/flit/app/util/MainDispatcherRule.kt
+</code></pre></div>
+<h3 id="_5">추가 필요 의존성<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// app/build.gradle.kts — 이미 존재하는지 확인 필요</span>
+<span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7+&quot;</span><span class="p">)</span>
+<span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;io.mockk:mockk:1.13+&quot;</span><span class="p">)</span>
+<span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;app.cash.turbine:turbine:1.0+&quot;</span><span class="p">)</span>
+<span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;androidx.work:work-testing:2.9+&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// Worker 테스트용</span>
+</code></pre></div>
+<hr />
+<h2 id="_6">파일 구조<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>app/src/test/java/com/flit/app/
+├── util/
+│   └── MainDispatcherRule.kt          # 기존
+├── domain/usecase/                    # 기존 UseCase 테스트들
+├── presentation/
+│   ├── capture/CaptureViewModelTest.kt
+│   ├── calendar/CalendarViewModelTest.kt
+│   ├── notes/NotesViewModelTest.kt
+│   ├── history/HistoryViewModelTest.kt
+│   ├── search/SearchViewModelTest.kt
+│   ├── detail/CaptureDetailViewModelTest.kt
+│   ├── settings/SettingsViewModelTest.kt
+│   └── onboarding/OnboardingViewModelTest.kt
+└── data/worker/
+    ├── ClassifyCaptureWorkerTest.kt
+    └── ReclassifyTempWorkerTest.kt
+</code></pre></div>
+<hr />
+<h2 id="1-captureviewmodeltest">1. CaptureViewModelTest<a class="headerlink" href="#1-captureviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>SubmitCaptureUseCase</code>, <code>SaveDraftUseCase</code>, <code>GetDraftUseCase</code>, <code>DeleteDraftUseCase</code>, <code>CaptureRepository</code></p>
+<h3 id="11">테스트 케이스 (11개)<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<h4 id="_7">초기화<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_draft_into_input_text</code></td>
+<td>getDraftUseCase가 "임시 텍스트" 반환 → uiState.inputText == "임시 텍스트", characterCount 갱신</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>init_observes_unconfirmed_count_from_repository</code></td>
+<td>captureRepository.getUnconfirmedCount()가 Flow(3) 방출 → uiState.unconfirmedCount == 3</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_8">입력<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td><code>updateInput_updates_text_and_character_count</code></td>
+<td>updateInput("안녕") → inputText == "안녕", characterCount == 2</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>updateInput_enforces_max_character_limit</code></td>
+<td>MAX_LENGTH 초과 입력 → inputText가 MAX_LENGTH로 잘림</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_9">제출<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td><code>submit_rejects_blank_input</code></td>
+<td>inputText가 공백 → submit() 호출 → submitCaptureUseCase 호출 안 됨, errorMessage 설정</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>submit_success_clears_input_and_emits_event</code></td>
+<td>submitCaptureUseCase 정상 → inputText == "", deleteDraftUseCase 호출, events에 SubmitSuccess 방출</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>submit_sets_isSubmitting_during_execution</code></td>
+<td>submit() 실행 중 isSubmitting == true → 완료 후 false</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>submit_handles_exception_with_error_message</code></td>
+<td>submitCaptureUseCase가 예외 → errorMessage 설정, isSubmitting == false</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_10">드래프트<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td><code>saveDraft_saves_current_text</code></td>
+<td>inputText 설정 후 saveDraft() → saveDraftUseCase 호출 확인</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>saveDraft_skips_blank_text</code></td>
+<td>inputText가 공백 → saveDraft() → saveDraftUseCase 호출 안 됨</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ai">AI 상태 시트<a class="headerlink" href="#ai" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td><code>toggleStatusSheet_toggles_visibility</code></td>
+<td>toggleStatusSheet() → isStatusSheetVisible == true → 다시 호출 → false</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-calendarviewmodeltest">2. CalendarViewModelTest<a class="headerlink" href="#2-calendarviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>GetSchedulesByDateUseCase</code>, <code>GetDatesWithSchedulesUseCase</code>, <code>GetActiveTodosUseCase</code>, <code>ToggleTodoCompletionUseCase</code>, <code>SoftDeleteCaptureUseCase</code>, <code>UndoDeleteCaptureUseCase</code>, <code>CaptureRepository</code></p>
+<h3 id="12">테스트 케이스 (12개)<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<h4 id="_11">초기화<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_today_schedules_and_todos</code></td>
+<td>초기화 시 오늘 날짜의 일정 + 할 일 로드 → uiState.schedules, tasks 채워짐</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>init_loads_dates_with_schedules_for_dots</code></td>
+<td>datesWithSchedules에 마커 날짜들 포함</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_12">날짜 선택<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td><code>selectDate_updates_selected_and_reloads_schedules</code></td>
+<td>SelectDate 이벤트 → selectedDate 변경, 해당 날짜 일정 로드</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>changeMonth_updates_current_month</code></td>
+<td>ChangeMonth(+1) → currentMonth 다음 달로 변경</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_13">일정/투두<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td><code>schedules_sorted_by_start_time</code></td>
+<td>여러 일정 반환 → startTime 순으로 정렬 확인</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>schedule_without_matching_capture_uses_empty_title</code></td>
+<td>Capture 못 찾음 → 일정 제목 빈 문자열</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>toggleTaskComplete_calls_usecase_and_reloads</code></td>
+<td>ToggleTaskComplete → toggleTodoCompletion 호출, 투두 목록 리로드</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_14">삭제/실행취소<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td><code>deleteCaptureId_soft_deletes_and_emits_event</code></td>
+<td>DeleteSchedule/DeleteTask → softDeleteCaptureUseCase 호출, DeleteSuccess 이벤트 방출</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>undoDelete_restores_and_emits_event</code></td>
+<td>undoDelete() → undoDeleteCaptureUseCase 호출, UndoSuccess 이벤트, 목록 리로드</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_15">에러 처리<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td><code>schedule_loading_error_sets_error_state</code></td>
+<td>일정 로드 예외 → uiState.error 설정</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>todo_loading_error_caught_silently</code></td>
+<td>투두 로드 예외 → 에러가 UI에 노출 안 됨 (비핵심 스트림)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_16">월 확장<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td><code>toggleMonthExpand_flips_state</code></td>
+<td>ToggleMonthExpand → isMonthExpanded 토글</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-notesviewmodeltest">3. NotesViewModelTest<a class="headerlink" href="#3-notesviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>GetAllFoldersUseCase</code>, <code>CreateFolderUseCase</code>, <code>DeleteFolderUseCase</code>, <code>RenameFolderUseCase</code>, <code>NoteRepository</code></p>
+<h3 id="11_1">테스트 케이스 (11개)<a class="headerlink" href="#11_1" title="Permanent link">&para;</a></h3>
+<h4 id="_17">초기화 &amp; 폴더 로딩<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_folders_with_note_counts</code></td>
+<td>초기화 시 폴더 목록 + 각 폴더 노트 수 로드</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>inbox_hidden_when_note_count_is_zero</code></td>
+<td>Inbox noteCount == 0 → 폴더 목록에서 제외</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>inbox_shown_when_note_count_is_positive</code></td>
+<td>Inbox noteCount &gt; 0 → 폴더 목록에 포함</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>ideas_and_bookmarks_always_visible</code></td>
+<td>noteCount == 0이어도 Ideas, Bookmarks 항상 표시</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_18">폴더 탐색<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td><code>selectFolder_loads_notes_for_folder</code></td>
+<td>SelectFolder → selectedFolder 설정, 해당 폴더 노트 로드</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>backToFolders_clears_selection_and_notes</code></td>
+<td>BackToFolders → selectedFolder null, notes 빈 리스트</td>
+</tr>
+</tbody>
+</table>
+<h4 id="crud">CRUD<a class="headerlink" href="#crud" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td><code>createFolder_success_reloads_folders</code></td>
+<td>CreateFolder 이벤트 → createFolderUseCase 호출, 폴더 목록 리로드</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>createFolder_failure_sets_error</code></td>
+<td>createFolderUseCase 예외 → errorMessage 설정</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>renameFolder_success_reloads_folders</code></td>
+<td>RenameFolder → renameFolderUseCase 호출, 리로드</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>deleteFolder_delegates_and_reloads</code></td>
+<td>DeleteFolder → deleteFolderUseCase 호출, 리로드</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_19">다이얼로그<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td><code>dialog_state_management</code></td>
+<td>ShowCreateDialog → 상태 true, DismissDialog → false</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-historyviewmodeltest">4. HistoryViewModelTest<a class="headerlink" href="#4-historyviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>GetAllCapturesUseCase</code>, <code>SoftDeleteCaptureUseCase</code>, <code>HardDeleteCaptureUseCase</code>, <code>UndoDeleteCaptureUseCase</code>, <code>ChangeClassificationUseCase</code></p>
+<h3 id="11_2">테스트 케이스 (11개)<a class="headerlink" href="#11_2" title="Permanent link">&para;</a></h3>
+<h4 id="_20">페이지네이션<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_first_page</code></td>
+<td>초기화 시 page 0, PAGE_SIZE(20) 로드</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>loadMore_appends_next_page</code></td>
+<td>loadMore() → page 1 로드, 기존 목록에 추가</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>loadMore_sets_hasMore_false_when_last_page_small</code></td>
+<td>마지막 페이지 &lt; PAGE_SIZE → hasMore == false</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>loadMore_prevents_duplicate_requests</code></td>
+<td>이미 로딩 중 → 중복 loadMore() 무시</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>captures_merged_distinct_by_id</code></td>
+<td>중복 ID 필터링 확인</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_21">삭제<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td><code>deleteCaptureById_soft_deletes_and_emits_event</code></td>
+<td>softDeleteCaptureUseCase 호출, DeleteSuccess 이벤트</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>deleteCaptureById_schedules_hard_delete_after_3_seconds</code></td>
+<td>3초 후 hardDeleteCaptureUseCase 호출</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>undoDelete_cancels_hard_delete_and_restores</code></td>
+<td>undoDelete() → 스케줄된 하드삭제 취소, undoDeleteCaptureUseCase 호출, 목록 리로드</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_22">분류 변경<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td><code>changeClassification_delegates_and_reloads</code></td>
+<td>changeClassification() → changeClassificationUseCase 호출, 목록 리로드</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>changeClassification_error_sets_error_message</code></td>
+<td>예외 → errorMessage 설정</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_23">정리<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td><code>onCleared_executes_pending_hard_deletes</code></td>
+<td>ViewModel 정리 시 미완료 하드삭제 즉시 실행 (runBlocking)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-searchviewmodeltest">5. SearchViewModelTest<a class="headerlink" href="#5-searchviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>SearchCapturesUseCase</code></p>
+<h3 id="5">테스트 케이스 (5개)<a class="headerlink" href="#5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>initial_state_is_empty</code></td>
+<td>초기 상태: searchText == "", results 빈 리스트, hasSearched == false</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>search_with_text_returns_results_after_debounce</code></td>
+<td>"검색어" 입력 → 300ms 후 검색 실행 → 결과 반영</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>blank_text_clears_results_and_resets_hasSearched</code></td>
+<td>빈 문자열 입력 → results 빈 리스트, hasSearched == false</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>rapid_typing_debounces_search</code></td>
+<td>빠른 연속 입력 → 마지막 입력만 검색 실행</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>search_error_sets_error_message</code></td>
+<td>searchCapturesUseCase 에러 → errorMessage 설정</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-capturedetailviewmodeltest">6. CaptureDetailViewModelTest<a class="headerlink" href="#6-capturedetailviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>SavedStateHandle</code>, <code>CaptureRepository</code>, <code>ChangeClassificationUseCase</code></p>
+<h3 id="5_1">테스트 케이스 (5개)<a class="headerlink" href="#5_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_capture_by_id_from_saved_state</code></td>
+<td>SavedStateHandle에 captureId → captureRepository.getCaptureById() 호출, uiState 채워짐</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>capture_not_found_sets_error</code></td>
+<td>getCaptureById() null 반환 → errorMessage 설정</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>changeClassification_success_updates_local_state</code></td>
+<td>onChangeClassification(SCHEDULE) → changeClassificationUseCase 호출, uiState.classifiedType 갱신</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>changeClassification_failure_sets_error</code></td>
+<td>예외 → errorMessage 설정</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>dismissError_clears_error_message</code></td>
+<td>dismissError() → errorMessage == null</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-settingsviewmodeltest">7. SettingsViewModelTest<a class="headerlink" href="#7-settingsviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>GetThemePreferenceUseCase</code>, <code>SetThemePreferenceUseCase</code></p>
+<h3 id="3">테스트 케이스 (3개)<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>init_loads_theme_preference</code></td>
+<td>getThemePreferenceUseCase Flow(DARK) → uiState.themePreference == DARK</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>setTheme_delegates_to_usecase</code></td>
+<td>setTheme(LIGHT) → setThemePreferenceUseCase(LIGHT) 호출</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>setTheme_error_sets_error_message</code></td>
+<td>예외 → errorMessage 설정</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-onboardingviewmodeltest">8. OnboardingViewModelTest<a class="headerlink" href="#8-onboardingviewmodeltest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>UserPreferenceRepository</code>, <code>SubmitCaptureUseCase</code></p>
+<h3 id="6">테스트 케이스 (6개)<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>updateInput_updates_text</code></td>
+<td>updateInput("테스트") → uiState.inputText == "테스트"</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>completeOnboarding_submits_capture_and_navigates</code></td>
+<td>텍스트 입력 → completeOnboarding() → submitCaptureUseCase 호출, onboarding_completed 설정, NavigateToHome 이벤트</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>completeOnboarding_blank_text_skips_capture</code></td>
+<td>빈 텍스트 → completeOnboarding() → submitCaptureUseCase 호출 안 됨, 온보딩 완료 처리</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>completeOnboarding_capture_failure_still_completes</code></td>
+<td>submitCaptureUseCase 예외 → 온보딩은 여전히 완료됨 (NavigateToHome 방출)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>skip_completes_without_capture</code></td>
+<td>skip() → submitCaptureUseCase 호출 안 됨, onboarding_completed 설정, NavigateToHome 이벤트</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>isSubmitting_true_during_completion</code></td>
+<td>completeOnboarding() 실행 중 isSubmitting == true → 완료 후 false</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-classifycaptureworkertest">9. ClassifyCaptureWorkerTest<a class="headerlink" href="#9-classifycaptureworkertest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>SyncQueueRepository</code>, <code>CaptureRepository</code>, <code>FlitApi</code>, <code>ClassificationMapper</code>, <code>ProcessClassificationResultUseCase</code></p>
+<blockquote>
+<p>Worker 테스트는 <code>TestListenableWorkerBuilder</code> (work-testing) 또는 직접 doWork() 호출 방식 사용.
+<code>@AssistedInject</code> 때문에 Worker 인스턴스를 직접 생성하거나 TestWorkerBuilder를 활용한다.</p>
+</blockquote>
+<h3 id="9">테스트 케이스 (9개)<a class="headerlink" href="#9" title="Permanent link">&para;</a></h3>
+<h4 id="_24">정상 플로우<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>doWork_processes_pending_items_and_returns_success</code></td>
+<td>PENDING 아이템 2개 → 각각 API 호출 + processClassificationResult + COMPLETED 처리 → Result.success()</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>doWork_no_pending_items_returns_success</code></td>
+<td>PENDING 없음 → API 호출 없음, Result.success()</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>doWork_updates_status_to_processing_before_api_call</code></td>
+<td>API 호출 전 status → PROCESSING 확인</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_25">에러 처리<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td><code>doWork_capture_not_found_marks_completed</code></td>
+<td>captureRepository.getCaptureById() null → 해당 아이템 COMPLETED (스킵), 에러 없이 계속</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>doWork_api_failure_triggers_retry_with_backoff</code></td>
+<td>API 예외 → handleRetry() 호출, retryCount 증가, nextRetryAt 설정</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>doWork_max_retries_exceeded_marks_failed</code></td>
+<td>retryCount &gt;= MAX_RETRY → status FAILED</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_26">재시도 로직<a class="headerlink" href="#_26" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td><code>retry_backoff_5s_15s_45s</code></td>
+<td>retry 0 → 5초, retry 1 → 15초, retry 2 → 45초 (3x 지수 백오프)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_27">완료 정리<a class="headerlink" href="#_27" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td><code>completed_items_deleted_after_processing</code></td>
+<td>COMPLETED 상태 아이템들 syncQueueRepository에서 삭제 확인</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_28">부분 실패<a class="headerlink" href="#_28" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td><code>partial_failure_continues_processing_remaining</code></td>
+<td>첫 번째 아이템 실패 → 두 번째 아이템 정상 처리 (전체 중단 안 됨)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-reclassifytempworkertest">10. ReclassifyTempWorkerTest<a class="headerlink" href="#10-reclassifytempworkertest" title="Permanent link">&para;</a></h2>
+<p><strong>의존성 Mock</strong>: <code>CaptureRepository</code>, <code>SyncQueueRepository</code></p>
+<h3 id="5_2">테스트 케이스 (5개)<a class="headerlink" href="#5_2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>테스트명</th>
+<th>검증 내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>doWork_enqueues_classify_for_all_temp_captures</code></td>
+<td>TEMP 캡처 3개 → SyncQueue에 CLASSIFY 아이템 3개 등록</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>doWork_no_temp_captures_does_nothing</code></td>
+<td>TEMP 없음 → SyncQueue 추가 없음, ClassifyCaptureWorker 미호출</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>doWork_triggers_classify_worker_after_enqueue</code></td>
+<td>아이템 등록 후 ClassifyCaptureWorker.enqueue() 호출 확인</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>doWork_individual_enqueue_failure_continues</code></td>
+<td>하나 실패 → 나머지 계속 처리, Result.success() 반환</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>doWork_returns_success_regardless_of_outcome</code></td>
+<td>성공/실패 무관하게 항상 Result.success()</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_29">구현 순서<a class="headerlink" href="#_29" title="Permanent link">&para;</a></h2>
+<p>순서는 의존성과 복잡도 기반:</p>
+<div class="highlight"><pre><span></span><code>Step 1: SettingsViewModelTest (3개, 가장 단순 → 테스트 인프라 검증)
+  → verify: 컴파일 + 테스트 통과
+
+Step 2: SearchViewModelTest (5개, 디바운스 로직)
+  → verify: 컴파일 + 테스트 통과
+
+Step 3: CaptureDetailViewModelTest (5개, SavedStateHandle 패턴)
+  → verify: 컴파일 + 테스트 통과
+
+Step 4: OnboardingViewModelTest (6개)
+  → verify: 컴파일 + 테스트 통과
+
+Step 5: CaptureViewModelTest (11개, 핵심 캡처 로직)
+  → verify: 컴파일 + 테스트 통과
+
+Step 6: NotesViewModelTest (11개, Inbox 필터링 로직)
+  → verify: 컴파일 + 테스트 통과
+
+Step 7: CalendarViewModelTest (12개, 가장 복잡한 상태 관리)
+  → verify: 컴파일 + 테스트 통과
+
+Step 8: HistoryViewModelTest (11개, 페이지네이션 + 지연 삭제)
+  → verify: 컴파일 + 테스트 통과
+
+Step 9: ClassifyCaptureWorkerTest (9개, 핵심 분류 파이프라인)
+  → verify: 컴파일 + 테스트 통과
+
+Step 10: ReclassifyTempWorkerTest (5개)
+  → verify: 컴파일 + 전체 테스트 통과
+</code></pre></div>
+<p><strong>총 테스트 케이스: 79개</strong> (ViewModel 64개 + Worker 15개)</p>
+<hr />
+<h2 id="_30">검증 명령<a class="headerlink" href="#_30" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># 각 Step 완료 후</span>
+./gradlew<span class="w"> </span>testDebugUnitTest<span class="w"> </span>--tests<span class="w"> </span><span class="s2">&quot;com.flit.app.presentation.*&quot;</span>
+./gradlew<span class="w"> </span>testDebugUnitTest<span class="w"> </span>--tests<span class="w"> </span><span class="s2">&quot;com.flit.app.data.worker.*&quot;</span>
+
+<span class="c1"># 전체</span>
+./gradlew<span class="w"> </span>testDebugUnitTest
+</code></pre></div>
+<hr />
+<h2 id="_31">리스크<a class="headerlink" href="#_31" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>리스크</th>
+<th>심각도</th>
+<th>대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Worker <code>@AssistedInject</code> 테스트 셋업</td>
+<td>MEDIUM</td>
+<td>TestListenableWorkerBuilder 또는 직접 인스턴스 생성</td>
+</tr>
+<tr>
+<td>HistoryViewModel <code>onCleared</code> + <code>runBlocking</code> 테스트</td>
+<td>MEDIUM</td>
+<td>ReflectionUtil 또는 ViewModel.clear() 호출</td>
+</tr>
+<tr>
+<td>CalendarViewModel 날짜 변환 (epochDay)</td>
+<td>LOW</td>
+<td>고정 날짜 사용</td>
+</tr>
+<tr>
+<td>SearchViewModel 디바운스 타이밍</td>
+<td>LOW</td>
+<td><code>advanceTimeBy(300)</code> 사용</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Document Version: 1.0 | Created: 2026-02-07</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

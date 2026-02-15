@@ -1,0 +1,5007 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/specs/functional_spec/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Flit. — 기능명세서 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flit" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Flit. — 기능명세서
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0a-2026-02-12-addendum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.A 2026-02-12 Addendum (우선 적용)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 상태 모델 및 공통 정책
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0. 상태 모델 및 공통 정책">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1 분류 상태 모델
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2 삭제 상태 모델
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3 캘린더 동기화 상태 모델
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4 할 일 상태 모델
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5 재시도/큐잉 정책
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 캡처 (Capture)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 캡처 (Capture)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 텍스트 캡처 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 임시 저장 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 이미지 첨부 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 삭제 및 실행 취소 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 다중 의도 분리 (Phase 2b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. AI 자동 분류
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. AI 자동 분류">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 분류 요청 및 응답 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-ai-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 AI 제목 생성 규칙 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 비기록성 입력 처리 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 분류 수정 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-temp-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Temp 재분류 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-phase-2b-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 수정 이력 기반 학습 (Phase 2b 초안, Phase 3b 고도화)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 분류 프리셋 / 사용자 지시 (Phase 3a, 구독)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 홈 화면
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 홈 화면">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 홈 메인 화면 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-ai-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 AI 분류 현황 시트 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 전체 히스토리 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 공유 인텐트
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 공유 인텐트">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 텍스트 수신 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 이미지 수신 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 캘린더 탭
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 캘린더 탭">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 캘린더 메인 화면 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 주간 캘린더 스트립 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 일정 섹션 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 할 일 섹션 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 일정 상세 보기 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 할 일 상세 보기 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-google-calendar-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 Google Calendar 동기화 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 할 일 관리
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 할 일 관리">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 할 일 목록 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 완료 처리 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-ai-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 AI 마감일 제안 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 노트
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 노트">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 폴더 구조 및 서브 분류 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 노트 폴더 관리 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 노트 메인 화면 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 노트 상세 보기 / 편집 (Phase 2b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 검색 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#76-inbox-ai-phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.6 Inbox AI 자동 분류 (Phase 3a, 구독)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#77-ai-phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.7 AI 통합 그룹화 및 재정리 (Phase 3a, 구독)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 휴지통
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. 휴지통">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 휴지통 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 위젯
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 위젯">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 입력 위젯 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 할 일 위젯 (Phase 2b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 알림
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 알림">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 앱 내 알림 (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 푸시 알림 (Phase 2a+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 온보딩
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 온보딩">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.1 Phase 1 온보딩
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.2 Phase 2a 온보딩
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.3 Phase 2b 온보딩
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 설정
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. 설정">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 설정 구조
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#122" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.2 항목별 세부 요구사항
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.3 구독자 전용 기능 구분
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. 공유하기
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. 공유하기">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#131-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13.1 외부 공유 기능 (Phase 3b)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. 분류 품질 관측
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. 분류 품질 관측">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#141-phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.1 이벤트 수집 (Phase 2a)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#142" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.2 수집 이벤트 유형
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#143" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.3 핵심 관측 대시보드 지표
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록 A. Phase 로드맵 요약
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="부록 A. Phase 로드맵 요약">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2a: 코어 루프 완성
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2b: 사용성 확장 (최소 출시 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3a: 구독 기능
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3b-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3b: 고급 AI 및 외부 확장 (구독)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flit">Flit. — 기능명세서<a class="headerlink" href="#flit" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Version</strong>: 2.4
+<strong>작성일</strong>: 2026-02-12
+<strong>기준</strong>: PRD v10.0, 데이터 모델 명세서 v2.0
+</p>
+</blockquote>
+<hr />
+<h2 id="0a-2026-02-12-addendum">0.A 2026-02-12 Addendum (우선 적용)<a class="headerlink" href="#0a-2026-02-12-addendum" title="Permanent link">&para;</a></h2>
+<p>본 문서의 기존 서술 중 아래 항목은 2026-02-12 구현 기준으로 대체 적용한다.</p>
+<ol>
+<li>캘린더 연동 방식</li>
+<li>기존: Google OAuth + 서버 프록시 기반 Google Calendar API 호출</li>
+<li>
+<p>현재: Android CalendarProvider 기반 로컬 캘린더 연동 (<code>READ_CALENDAR</code>/<code>WRITE_CALENDAR</code>)</p>
+</li>
+<li>
+<p>온보딩/설정 캘린더 UX</p>
+</li>
+<li>기존: Google 연결 버튼(OAuth)</li>
+<li>
+<p>현재: 캘린더 권한 요청 + 연동 캘린더 선택</p>
+</li>
+<li>
+<p>캘린더 동기화 범위</p>
+</li>
+<li>기존: 양방향 동기화 및 원격 읽기 캐시</li>
+<li>
+<p>현재(Android): 로컬 캘린더 쓰기 중심. 원격 pull/merge는 미적용</p>
+</li>
+<li>
+<p>로그아웃 정책</p>
+</li>
+<li>기존: 계정 로그아웃 시 로컬 DB 정리 가능 전제</li>
+<li>
+<p>현재: 인증 토큰만 제거, 로컬 데이터 유지</p>
+</li>
+<li>
+<p>본문의 <code>Google Calendar</code>, <code>Google OAuth</code>, <code>calendar/token*</code>, <code>calendar/events</code> 관련 서술은</p>
+</li>
+<li>iOS/서버 레거시 문맥으로 간주한다.</li>
+<li>Android 클라이언트 동작 기준은 본 Addendum을 우선한다.</li>
+</ol>
+<h2 id="0">0. 상태 모델 및 공통 정책<a class="headerlink" href="#0" title="Permanent link">&para;</a></h2>
+<h3 id="01">0.1 분류 상태 모델<a class="headerlink" href="#01" title="Permanent link">&para;</a></h3>
+<p>캡처된 원본 입력(raw input)은 다음 상태를 거쳐 분류된다.</p>
+<p><strong>최상위 분류 (classified_type):</strong></p>
+<div class="highlight"><pre><span></span><code>TEMP (초기/폴백)
+  → AI 분류 성공 → TODO | SCHEDULE | NOTES
+  → AI 분류 실패/오프라인 → TEMP 유지 (재분류 대기)
+
+TODO ↔ SCHEDULE ↔ NOTES (사용자 수동 수정)
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>상태</th>
+<th>설명</th>
+<th>진입 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TEMP</td>
+<td>미분류 상태. 임시 저장, 오프라인, AI 분류 실패 시</td>
+<td>캡처 직후 기본 상태</td>
+</tr>
+<tr>
+<td>TODO</td>
+<td>할 일</td>
+<td>AI 분류 또는 사용자 수정</td>
+</tr>
+<tr>
+<td>SCHEDULE</td>
+<td>일정</td>
+<td>AI 분류 또는 사용자 수정</td>
+</tr>
+<tr>
+<td>NOTES</td>
+<td>노트 (아이디어 포함)</td>
+<td>AI 분류 또는 사용자 수정</td>
+</tr>
+</tbody>
+</table>
+<p><strong>NOTES 서브 분류 (note_sub_type):</strong></p>
+<p>NOTES로 분류된 항목은 추가로 서브 분류가 적용된다.</p>
+<table>
+<thead>
+<tr>
+<th>서브 분류</th>
+<th>설명</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INBOX</td>
+<td>미분류 노트. 기본 배치</td>
+<td>노트의 기본 서브 분류</td>
+</tr>
+<tr>
+<td>IDEA</td>
+<td>아이디어</td>
+<td>기존 최상위 분류에서 NOTES 하위로 이동</td>
+</tr>
+<tr>
+<td>BOOKMARK</td>
+<td>웹 링크, 외부 인텐트를 통해 전달된 URL</td>
+<td>장기 로드맵 기능 (현재 비활성)</td>
+</tr>
+<tr>
+<td>USER_FOLDER</td>
+<td>사용자 생성 폴더에 배치된 노트</td>
+<td>사용자가 폴더로 이동 시</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>NOTES 분류 시:
+  AI 판단 → IDEA (아이디어성 내용)
+  AI 판단 → BOOKMARK (URL 포함, 장기 로드맵 시 활성화)
+  AI 판단 → INBOX (기본)
+
+사용자 수동 이동 → USER_FOLDER (folder_id 설정)
+</code></pre></div>
+<p><strong>사용자 분류 수정 UI 옵션:</strong></p>
+<p>분류 수정 드롭다운에는 다음 4개 옵션이 표시된다.</p>
+<table>
+<thead>
+<tr>
+<th>UI 표시</th>
+<th>내부 매핑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정</td>
+<td>classified_type = SCHEDULE</td>
+</tr>
+<tr>
+<td>할 일</td>
+<td>classified_type = TODO</td>
+</tr>
+<tr>
+<td>노트</td>
+<td>classified_type = NOTES, note_sub_type = INBOX</td>
+</tr>
+<tr>
+<td>아이디어</td>
+<td>classified_type = NOTES, note_sub_type = IDEA</td>
+</tr>
+</tbody>
+</table>
+<h3 id="02">0.2 삭제 상태 모델<a class="headerlink" href="#02" title="Permanent link">&para;</a></h3>
+<p>모든 캡처 항목의 삭제는 안전망을 거친다.</p>
+<p><strong>Phase 1:</strong></p>
+<div class="highlight"><pre><span></span><code>Active (기본)
+  → 사용자 삭제 동작 → Soft Delete (is_deleted=true, deleted_at=now)
+    → UI에서 즉시 제거 + Snackbar 3초 표시
+      → &quot;실행 취소&quot; 탭 → Active 복원 (is_deleted=false)
+      → Snackbar 만료 → Hard Delete (DB에서 완전 삭제)
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>기간</th>
+<th>사용자 복원</th>
+<th>데이터 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soft Delete</td>
+<td>3초 (Snackbar)</td>
+<td>Snackbar "실행 취소" 탭</td>
+<td>DB 존재, UI 미표시</td>
+</tr>
+<tr>
+<td>Hard Delete</td>
+<td>영구</td>
+<td>불가</td>
+<td>DB 완전 삭제 + 파생 엔티티 삭제</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phase 2a (휴지통 도입):</strong></p>
+<div class="highlight"><pre><span></span><code>Active (기본)
+  → 사용자 삭제 동작 → Soft Delete (is_deleted=true, deleted_at=now)
+    → UI에서 즉시 제거 + Snackbar 3초 표시
+      → &quot;실행 취소&quot; 탭 → Active 복원 (is_deleted=false)
+      → Snackbar 만료 → Trash 이동 (is_trashed=true, trashed_at=now)
+        → 30일 이내 → 사용자 복원 가능 (Active 복원)
+        → 30일 경과 → Hard Delete (DB에서 완전 삭제)
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>기간</th>
+<th>사용자 복원</th>
+<th>데이터 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soft Delete</td>
+<td>3초 (Snackbar)</td>
+<td>Snackbar "실행 취소" 탭</td>
+<td>DB 존재, UI 미표시</td>
+</tr>
+<tr>
+<td>Trash</td>
+<td>30일</td>
+<td>휴지통에서 복원 버튼</td>
+<td>DB 존재, 휴지통에서만 접근</td>
+</tr>
+<tr>
+<td>Hard Delete</td>
+<td>영구</td>
+<td>불가</td>
+<td>DB 완전 삭제 + 파생 엔티티 삭제</td>
+</tr>
+</tbody>
+</table>
+<p><strong>파생 엔티티 처리:</strong> Hard Delete 시 Capture + Todo/Schedule/Note + Tags + Entities 모두 삭제. Schedule이 SYNCED 상태이면 Google Calendar 이벤트 삭제 요청 큐잉.</p>
+<h3 id="03">0.3 캘린더 동기화 상태 모델<a class="headerlink" href="#03" title="Permanent link">&para;</a></h3>
+<p>Google Calendar 연동 시 일정의 동기화 상태.</p>
+<div class="highlight"><pre><span></span><code>NOT_LINKED (Phase 1 기본값)
+  → Google 연동 + confidence=HIGH + 완전자동모드 → SYNCED
+  → Google 연동 + 그 외 → SUGGESTION_PENDING
+
+SUGGESTION_PENDING
+  → 사용자 승인 → SYNCED
+  → 사용자 거부 → REJECTED
+  → 일정 날짜 경과 → EXPIRED
+
+SYNCED
+  → 사용자 실행 취소 → NOT_LINKED (Google 이벤트 삭제)
+  → 분류 변경 → NOT_LINKED (Google 이벤트 삭제 + Schedule 삭제)
+  → Google API 오류 → SYNC_FAILED
+
+SYNC_FAILED
+  → 자동 재시도 성공 → SYNCED
+  → 재시도 3회 실패 → SYNC_FAILED (사용자 알림)
+
+REJECTED (최종 상태)
+EXPIRED (최종 상태)
+</code></pre></div>
+<h3 id="04">0.4 할 일 상태 모델<a class="headerlink" href="#04" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>ACTIVE (is_completed=false)
+  → 사용자 체크 → COMPLETED (is_completed=true, completed_at 기록)
+  → 분류 변경 → DELETED (Todo 레코드 삭제)
+  → 캡처 삭제 → 삭제 상태 모델 따름 (0.2)
+
+COMPLETED
+  → 사용자 체크 해제 → ACTIVE (completed_at 초기화)
+</code></pre></div>
+<h3 id="05">0.5 재시도/큐잉 정책<a class="headerlink" href="#05" title="Permanent link">&para;</a></h3>
+<p>모든 서버 요청은 SyncQueue를 통해 관리된다.</p>
+<p><strong>큐잉 대상 작업:</strong></p>
+<table>
+<thead>
+<tr>
+<th>작업</th>
+<th>트리거</th>
+<th>재시도 정책</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLASSIFY</td>
+<td>캡처 생성 시</td>
+<td>최대 3회, 지수 백오프 (5s → 15s → 45s)</td>
+</tr>
+<tr>
+<td>RECLASSIFY</td>
+<td>Temp 재분류 주기 작업</td>
+<td>최대 3회, 실패 시 다음 주기로 이월</td>
+</tr>
+<tr>
+<td>CALENDAR_CREATE</td>
+<td>일정 동기화 시</td>
+<td>최대 3회, 실패 시 SYNC_FAILED + 사용자 알림</td>
+</tr>
+<tr>
+<td>CALENDAR_DELETE</td>
+<td>일정 삭제/분류 변경 시</td>
+<td>최대 5회, 지수 백오프</td>
+</tr>
+<tr>
+<td>ANALYTICS_BATCH</td>
+<td>분석 이벤트 전송</td>
+<td>최대 3회, 실패 시 다음 배치에 포함</td>
+</tr>
+</tbody>
+</table>
+<p><strong>큐잉 동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>조건</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>네트워크 가용</td>
+<td>즉시 실행</td>
+</tr>
+<tr>
+<td>네트워크 불가</td>
+<td>큐에 PENDING 상태로 저장</td>
+</tr>
+<tr>
+<td>네트워크 복구 시</td>
+<td>PENDING 작업 순차 실행</td>
+</tr>
+<tr>
+<td>재시도 초과 시</td>
+<td>status=FAILED, 사용자 알림 (해당 시)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>큐 상태:</strong></p>
+<div class="highlight"><pre><span></span><code>PENDING → PROCESSING → COMPLETED
+                     → FAILED (재시도 초과)
+PENDING → PROCESSING → PENDING (재시도 대기, next_retry_at 설정)
+</code></pre></div>
+<p><strong>배치 전송 규칙 (Analytics):</strong></p>
+<table>
+<thead>
+<tr>
+<th>조건</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>이벤트 50건 축적</td>
+<td>즉시 전송</td>
+</tr>
+<tr>
+<td>마지막 전송 후 1시간 경과</td>
+<td>잔여 이벤트 전송</td>
+</tr>
+<tr>
+<td>네트워크 복구 시</td>
+<td>미전송 이벤트 전송</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-capture">1. 캡처 (Capture)<a class="headerlink" href="#1-capture" title="Permanent link">&para;</a></h2>
+<h3 id="11-phase-1">1.1 텍스트 캡처 (Phase 1)<a class="headerlink" href="#11-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 사용자가 입력창에 텍스트 입력 후 전송 버튼 탭</p>
+<p><strong>동작 흐름:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+<th>실패 시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>입력 텍스트 검증 (빈 문자열 제외)</td>
+<td>전송 버튼 비활성 유지</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Capture 레코드 로컬 저장 (classified_type=TEMP)</td>
+<td>— (Room 실패는 앱 오류)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>입력창 초기화 + 완료 피드백 표시</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SyncQueue에 CLASSIFY 작업 추가</td>
+<td>큐잉 실패 시 TEMP 유지</td>
+</tr>
+<tr>
+<td>5</td>
+<td>네트워크 가용 시 서버 분류 요청</td>
+<td>오프라인이면 큐 대기</td>
+</tr>
+<tr>
+<td>6</td>
+<td>분류 결과 수신 → Capture 업데이트 + 파생 엔티티 생성</td>
+<td>타임아웃(5초)/에러 시 TEMP 유지</td>
+</tr>
+<tr>
+<td>7</td>
+<td>AI 분류 현황 시트에 신규 항목 추가</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>입력 규칙:</strong></p>
+<table>
+<thead>
+<tr>
+<th>규칙</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>최소 길이</td>
+<td>1자 이상 (공백만은 불가)</td>
+</tr>
+<tr>
+<td>최대 길이</td>
+<td>5,000자 (초과 시 입력 차단 + 카운터 표시)</td>
+</tr>
+<tr>
+<td>줄바꿈</td>
+<td>허용. 여러 줄 입력 시 입력창 높이 최대 4줄까지 확장</td>
+</tr>
+<tr>
+<td>전송 버튼</td>
+<td>텍스트가 1자 이상일 때만 활성화</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12-phase-1">1.2 임시 저장 (Phase 1)<a class="headerlink" href="#12-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 사용자가 입력창에 텍스트 입력 중 앱 이탈 (홈 버튼, 태스크 전환, 앱 종료)</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>이벤트</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>onPause</td>
+<td>입력창 텍스트 + 첨부 이미지 경로를 로컬 임시 저장소에 저장</td>
+</tr>
+<tr>
+<td>onResume</td>
+<td>로컬 임시 저장소에서 텍스트 및 이미지 경로 복원 → 입력창에 표시</td>
+</tr>
+<tr>
+<td>전송 완료</td>
+<td>로컬 임시 저장소 초기화</td>
+</tr>
+</tbody>
+</table>
+<p><strong>저장 대상:</strong> 텍스트 + 이미지 첨부 경로 (Phase 2a부터).</p>
+<p><strong>보안:</strong> 임시 저장 암호화는 Phase 3b에서 EncryptedSharedPreferences로 적용한다.</p>
+<h3 id="13-phase-2a">1.3 이미지 첨부 (Phase 2a)<a class="headerlink" href="#13-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 캡처 입력 중 이미지 첨부 아이콘 탭</p>
+<p><strong>이미지 소스:</strong></p>
+<table>
+<thead>
+<tr>
+<th>소스</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>갤러리</td>
+<td>갤러리 인텐트 → 이미지 선택 → 로컬 복사</td>
+</tr>
+<tr>
+<td>카메라</td>
+<td>카메라 인텐트 → 즉석 촬영 → 로컬 복사</td>
+</tr>
+</tbody>
+</table>
+<p><strong>선택 UI:</strong> 이미지 첨부 아이콘 탭 시 "갤러리에서 선택" / "카메라 촬영" 선택지를 바텀시트로 표시.</p>
+<p><strong>동작:</strong> 이미지 선택/촬영 → 로컬 복사 → image_uri에 경로 저장. 텍스트 없이 이미지만 전송 시 classified_type=TEMP.</p>
+<h3 id="14-phase-1">1.4 삭제 및 실행 취소 (Phase 1)<a class="headerlink" href="#14-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>삭제 트리거:</strong> 리스트에서 스와이프 삭제 또는 상세 보기에서 삭제 버튼</p>
+<p><strong>Phase 1 동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Capture.is_deleted = true, deleted_at = now</td>
+</tr>
+<tr>
+<td>2</td>
+<td>UI에서 즉시 제거</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Snackbar 표시: "삭제됨 · 실행 취소" (3초)</td>
+</tr>
+<tr>
+<td>4a</td>
+<td>"실행 취소" 탭 → is_deleted = false, deleted_at = null → UI 복원</td>
+</tr>
+<tr>
+<td>4b</td>
+<td>Snackbar 만료 → Hard Delete (Capture + 모든 파생 엔티티)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phase 2a 동작 (휴지통 도입):</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Capture.is_deleted = true, deleted_at = now</td>
+</tr>
+<tr>
+<td>2</td>
+<td>UI에서 즉시 제거</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Snackbar 표시: "삭제됨 · 실행 취소" (3초)</td>
+</tr>
+<tr>
+<td>4a</td>
+<td>"실행 취소" 탭 → is_deleted = false, deleted_at = null → UI 복원</td>
+</tr>
+<tr>
+<td>4b</td>
+<td>Snackbar 만료 → 휴지통 이동 (is_trashed=true, trashed_at=now)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>휴지통에서 30일 경과 → Hard Delete (Capture + 모든 파생 엔티티)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>파생 엔티티 처리:</strong> Hard Delete 시 Todo/Schedule/Note 레코드도 함께 삭제. Schedule이 SYNCED 상태이면 Google Calendar 이벤트 삭제 요청 큐잉.</p>
+<h3 id="15-phase-2b">1.5 다중 의도 분리 (Phase 2b)<a class="headerlink" href="#15-phase-2b" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> AI 분류 시 캡처 텍스트에 여러 독립적 의도가 포함된 것으로 판단된 경우</p>
+<p><strong>판단 기준:</strong> AI가 텍스트 내에 2개 이상의 명확히 분리 가능한 행동 항목(할 일, 일정 등)이 포함되어 있다고 판단한 경우.</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>AI가 원문에서 N개 의도 식별</td>
+</tr>
+<tr>
+<td>2</td>
+<td>원본 Capture는 보존 (original_text 유지)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>각 의도별로 개별 Capture 생성 (source=SPLIT, parent_capture_id 참조)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>각 개별 Capture에 대해 독립적 분류 적용</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AI 분류 현황 시트에 분리된 항목들이 표시됨</td>
+</tr>
+</tbody>
+</table>
+<p><strong>예시:</strong></p>
+<table>
+<thead>
+<tr>
+<th>원문</th>
+<th>분리 결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"회의 끝나고 보고서 쓰고 저녁 예약"</td>
+<td>① "보고서 작성" (TODO) ② "저녁 예약" (TODO 또는 SCHEDULE)</td>
+</tr>
+<tr>
+<td>"금요일 미팅 후 카페 알아보기"</td>
+<td>① "금요일 미팅" (SCHEDULE) ② "카페 알아보기" (TODO)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>제약:</strong> 분리는 AI 판단이므로 오분류 가능. 사용자는 AI 분류 현황 시트에서 분리 결과를 확인하고 수정할 수 있다.</p>
+<hr />
+<h2 id="2-ai">2. AI 자동 분류<a class="headerlink" href="#2-ai" title="Permanent link">&para;</a></h2>
+<h3 id="21-phase-1">2.1 분류 요청 및 응답 (Phase 1)<a class="headerlink" href="#21-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>요청:</strong> 서버 POST /api/v1/classify에 텍스트 전송</p>
+<p><strong>응답 처리:</strong></p>
+<table>
+<thead>
+<tr>
+<th>응답 필드</th>
+<th>로컬 처리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>classified_type</td>
+<td>Capture.classified_type 업데이트 (TODO / SCHEDULE / NOTES)</td>
+</tr>
+<tr>
+<td>note_sub_type</td>
+<td>NOTES인 경우 서브 분류 (INBOX / IDEA / BOOKMARK)</td>
+</tr>
+<tr>
+<td>confidence</td>
+<td>Capture.confidence 업데이트</td>
+</tr>
+<tr>
+<td>ai_title</td>
+<td>Capture.ai_title 업데이트</td>
+</tr>
+<tr>
+<td>tags[]</td>
+<td>Tag 레코드 생성 (중복 시 기존 참조) + CaptureTag 연결</td>
+</tr>
+<tr>
+<td>entities[]</td>
+<td>Entity 레코드 생성</td>
+</tr>
+<tr>
+<td>schedule_info</td>
+<td>Schedule 파생 엔티티 생성 시 활용</td>
+</tr>
+<tr>
+<td>todo_info</td>
+<td>Todo 파생 엔티티 생성 시 활용</td>
+</tr>
+<tr>
+<td>split_items[]</td>
+<td>다중 의도 분리 결과 (1.5 참조)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>분류 완료 후:</strong> classified_type에 따라 파생 엔티티 생성.</p>
+<table>
+<thead>
+<tr>
+<th>classified_type</th>
+<th>파생 엔티티</th>
+<th>추가 처리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TODO</td>
+<td>Todo 레코드 생성</td>
+<td>deadline, tags 설정</td>
+</tr>
+<tr>
+<td>SCHEDULE</td>
+<td>Schedule 레코드 생성</td>
+<td>start_time, location 설정</td>
+</tr>
+<tr>
+<td>NOTES</td>
+<td>Note 레코드 생성</td>
+<td>note_sub_type에 따라 folder_id 설정</td>
+</tr>
+<tr>
+<td>TEMP</td>
+<td>파생 엔티티 없음</td>
+<td>재분류 대기</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-ai-phase-1">2.2 AI 제목 생성 규칙 (Phase 1)<a class="headerlink" href="#22-ai-phase-1" title="Permanent link">&para;</a></h3>
+<p>AI는 분류 시 원문 기반 요약 제목을 함께 생성한다.</p>
+<table>
+<thead>
+<tr>
+<th>원문 상태</th>
+<th>제목 생성 규칙</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>짧고 명확 (≤30자, 단일 의도)</td>
+<td>원문을 그대로 제목으로 사용</td>
+<td>"우유 사기" → "우유 사기"</td>
+</tr>
+<tr>
+<td>길지만 단일 의도</td>
+<td>핵심 의도 요약 (≤30자)</td>
+<td>"금요일까지 보고서 제출해야 하는데..." → "보고서 제출 (금요일)"</td>
+</tr>
+<tr>
+<td>대화체/비정형</td>
+<td>구조화된 요약</td>
+<td>"ㅋㅋ 금요일 7시 강남역 ㅇㅋ?" → "금요일 19시 강남역 모임"</td>
+</tr>
+<tr>
+<td>여러 의도 혼합</td>
+<td>다중 의도 분리 적용 (1.5 참조)</td>
+<td>각 분리된 항목에 개별 제목 생성</td>
+</tr>
+</tbody>
+</table>
+<p><strong>원본 보존:</strong> ai_title이 생성되어도 original_text는 항상 보존. 상세 보기에서 원본 확인 가능.</p>
+<h3 id="23-phase-1">2.3 비기록성 입력 처리 (Phase 1)<a class="headerlink" href="#23-phase-1" title="Permanent link">&para;</a></h3>
+<p>질문형/대화형 입력은 행동 항목으로 환원한다.</p>
+<table>
+<thead>
+<tr>
+<th>입력 패턴</th>
+<th>classified_type</th>
+<th>ai_title</th>
+<th>todo deadline</th>
+<th>태그</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정보 확인형 ("오늘 날씨 뭐야?")</td>
+<td>TODO</td>
+<td>"날씨 확인"</td>
+<td>오늘</td>
+<td>AI에게 물어볼 것</td>
+</tr>
+<tr>
+<td>추천 요청형 ("좋은 카페 추천해줘")</td>
+<td>TODO</td>
+<td>"카페 알아보기"</td>
+<td>없음</td>
+<td>AI에게 물어볼 것</td>
+</tr>
+<tr>
+<td>계산/비교형 ("A랑 B 뭐가 나아?")</td>
+<td>TODO</td>
+<td>"A vs B 비교"</td>
+<td>없음</td>
+<td>AI에게 물어볼 것</td>
+</tr>
+<tr>
+<td>감정 표현형 ("오늘 진짜 힘들다")</td>
+<td>NOTES (INBOX)</td>
+<td>"오늘 힘들었음"</td>
+<td>—</td>
+<td>감정</td>
+</tr>
+<tr>
+<td>의도 모호</td>
+<td>NOTES (INBOX)</td>
+<td>원문 기반</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="24-phase-1">2.4 분류 수정 (Phase 1)<a class="headerlink" href="#24-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 캡처 항목의 분류 칩 탭 (또는 AI 분류 현황 시트에서 드롭다운 탭)</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>분류 칩 탭 → 드롭다운 메뉴 표시</td>
+</tr>
+<tr>
+<td>2</td>
+<td>드롭다운: 4개 옵션 (일정 / 할 일 / 노트 / 아이디어) 중 현재 유형 하이라이트</td>
+</tr>
+<tr>
+<td>3</td>
+<td>새 유형 탭 → 분류 변경 트랜잭션 실행</td>
+</tr>
+<tr>
+<td>4</td>
+<td>드롭다운 닫힘 + 칩 업데이트 + 완료 피드백</td>
+</tr>
+</tbody>
+</table>
+<p><strong>파생 객체 처리 상세:</strong></p>
+<table>
+<thead>
+<tr>
+<th>변경 방향</th>
+<th>파생 처리</th>
+<th>추가 UX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정→할일</td>
+<td>Schedule 삭제 + Todo 생성</td>
+<td>SYNCED이면 "캘린더 이벤트도 삭제됩니다" 토스트</td>
+</tr>
+<tr>
+<td>일정→노트/아이디어</td>
+<td>Schedule 삭제 + Note 생성</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>할일→일정</td>
+<td>Todo 삭제 + Schedule 생성</td>
+<td>사용자 명시적 변경이므로 자동 처리</td>
+</tr>
+<tr>
+<td>할일→노트/아이디어</td>
+<td>Todo 삭제 + Note 생성</td>
+<td>즉시 처리</td>
+</tr>
+<tr>
+<td>노트/아이디어→일정</td>
+<td>Note 삭제 + Schedule 생성</td>
+<td>사용자 명시적 변경이므로 자동 처리</td>
+</tr>
+<tr>
+<td>노트/아이디어→할일</td>
+<td>Note 삭제 + Todo 생성</td>
+<td>즉시 처리</td>
+</tr>
+<tr>
+<td>노트↔아이디어</td>
+<td>note_sub_type만 변경 (INBOX↔IDEA)</td>
+<td>folder_id 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>분류 수정 로깅 (Phase 2a):</strong> 수정 시 ClassificationLog 레코드 생성 + analytics 이벤트 발행.</p>
+<h3 id="25-temp-phase-1">2.5 Temp 재분류 (Phase 1)<a class="headerlink" href="#25-temp-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> WorkManager 주기적 작업 (네트워크 연결 + 충전 중 조건)</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>classified_type=TEMP인 캡처 조회</td>
+</tr>
+<tr>
+<td>2</td>
+<td>서버 POST /api/v1/classify/batch에 일괄 요청</td>
+</tr>
+<tr>
+<td>3</td>
+<td>분류 성공 항목: Capture 업데이트 + 파생 엔티티 생성</td>
+</tr>
+<tr>
+<td>4</td>
+<td>분류 실패 항목: TEMP 유지 (다음 주기 재시도)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>주기:</strong> 최소 15분 간격 (WorkManager 제약). 네트워크 복구 시 즉시 1회 실행.</p>
+<h3 id="26-phase-2b-phase-3b">2.6 수정 이력 기반 학습 (Phase 2b 초안, Phase 3b 고도화)<a class="headerlink" href="#26-phase-2b-phase-3b" title="Permanent link">&para;</a></h3>
+<p><strong>입력:</strong> ClassificationLog의 original_type → new_type 매핑 + 원문 특성(길이, 키워드, 엔티티 패턴)</p>
+<p><strong>최소 데이터 요구:</strong> 수정 이력 최소 20건 축적 후 개인화 모델 활성화.</p>
+<p><strong>적용 방식:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>서버에서 사용자별 수정 이력 분석 (original_type, new_type, 원문 특성)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>사용자별 분류 선호 프로필 생성 (예: "짧은 문장은 TODO 선호", "장소 포함 시 SCHEDULE 선호")</td>
+</tr>
+<tr>
+<td>3</td>
+<td>분류 요청 시 user_context.modification_history에 프로필 요약 포함</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AI 프롬프트에 개인화 컨텍스트 반영 → 분류 정확도 향상</td>
+</tr>
+</tbody>
+</table>
+<p><strong>효과 측정:</strong> 개인화 적용 전/후 분류 수정률 비교. 수정률이 개선되지 않으면 비활성화.</p>
+<h3 id="27-phase-3a">2.7 분류 프리셋 / 사용자 지시 (Phase 3a, 구독)<a class="headerlink" href="#27-phase-3a" title="Permanent link">&para;</a></h3>
+<p><strong>프리셋:</strong> 사전 정의 프로필 ("할 일 중심", "메모 중심") 선택 시 서버 분류 요청에 프리셋 ID 포함.</p>
+<p><strong>사용자 지시:</strong> 자연어 규칙 (예: "카페 관련은 항상 아이디어로") → 서버에 전달하여 분류 프롬프트에 포함.</p>
+<hr />
+<h2 id="3">3. 홈 화면<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<h3 id="31-phase-1">3.1 홈 메인 화면 (Phase 1)<a class="headerlink" href="#31-phase-1" title="Permanent link">&para;</a></h3>
+<p>홈 화면은 캡처 전용 인터페이스다. 앱의 핵심 동작인 "즉시 입력"에 집중하며, 다른 정보는 최소한으로 배치한다.</p>
+<p><strong>역할:</strong>
+- 캡처 입력의 즉시 접근 (Just Capture 원칙)
+- AI 분류 결과 확인의 진입점 (알림 벨)
+- 설정 접근</p>
+<p><strong>구성 요소:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+<th>위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top Bar 좌</td>
+<td>앱 타이틀 "Flit."</td>
+<td>좌상단</td>
+</tr>
+<tr>
+<td>Top Bar 우</td>
+<td>알림 벨 아이콘 (뱃지) + 시계 아이콘 + 설정 아이콘</td>
+<td>우상단</td>
+</tr>
+<tr>
+<td>날짜</td>
+<td>현재 날짜 표시 (예: "2026년 2월 6일 금요일")</td>
+<td>상단 중앙</td>
+</tr>
+<tr>
+<td>메인 영역</td>
+<td>빈 상태 또는 빈 상태 일러스트</td>
+<td>중앙</td>
+</tr>
+<tr>
+<td>하단 입력바</td>
+<td>이미지 첨부(📎) + 텍스트 입력 + 전송(↑)</td>
+<td>하단 고정</td>
+</tr>
+</tbody>
+</table>
+<p><strong>알림 벨 뱃지:</strong>
+- 미확인 AI 분류 항목 수를 뱃지로 표시
+- 탭 시 AI 분류 현황 시트 오버레이 (3.2 참조)
+- 모든 항목 확인 완료 시 뱃지 제거</p>
+<p><strong>시계 아이콘:</strong>
+- 사용자 기록 히스토리로 표시
+- 탭 시 새로운 페이지로 이동하면서 사용자의 입력 현황 및 분류 현황 타임라인에 따라 표시</p>
+<p><strong>빈 상태:</strong> 캡처 이력이 없을 때 중앙에 일러스트 + "첫 번째 생각을 적어보세요" 표시.</p>
+<p><strong>캡처 완료 시:</strong> 입력바 초기화 + 알림 벨 뱃지 카운트 증가.</p>
+<h3 id="32-ai-phase-1">3.2 AI 분류 현황 시트 (Phase 1)<a class="headerlink" href="#32-ai-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 홈 화면 알림 벨 아이콘 탭</p>
+<p><strong>형태:</strong> 하단에서 올라오는 바텀시트 오버레이 (화면 ~70% 높이)</p>
+<p><strong>구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>헤더 좌</td>
+<td>"AI 분류 현황" 타이틀 + "24시간 이내 분류된 항목" 서브타이틀</td>
+</tr>
+<tr>
+<td>헤더 우</td>
+<td>"전체 확인" 버튼</td>
+</tr>
+<tr>
+<td>리스트</td>
+<td>미확인 분류 항목 리스트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>리스트 아이템 구조:</strong></p>
+<div class="highlight"><pre><span></span><code>┌──────────────────────────────────────────┐
+│ [일정 ▾]  내일 오후 3시 디자인 리뷰  방금  [확인] │
+└──────────────────────────────────────────┘
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 드롭다운 (예: [일정 ▾])</td>
+<td>탭 시 드롭다운 열림: 일정 / 할 일 / 노트 / 아이디어</td>
+</tr>
+<tr>
+<td>AI 제목</td>
+<td>분류된 항목 제목 (탭 시 해당 항목 상세 보기로 이동)</td>
+</tr>
+<tr>
+<td>상대 시간</td>
+<td>"방금", "10분 전", "1시간 전" 등</td>
+</tr>
+<tr>
+<td>[확인] 버튼</td>
+<td>탭 시 해당 항목을 "확인됨"으로 처리 → 리스트에서 제거</td>
+</tr>
+</tbody>
+</table>
+<p><strong>"전체 확인" 버튼:</strong> 리스트의 모든 미확인 항목을 일괄 확인 처리.</p>
+<p><strong>표시 범위:</strong> 최근 24시간 이내 AI 분류가 완료되고, 사용자가 아직 확인하지 않은 항목만 표시.</p>
+<p><strong>빈 상태:</strong> 미확인 항목이 없을 때 "새로운 분류 결과가 없습니다" 표시.</p>
+<p><strong>전체 히스토리 진입:</strong> 시트 하단에 "전체 기록 보기 →" 링크 → 전체 히스토리 화면으로 이동 (3.3 참조).</p>
+<h3 id="33-phase-1">3.3 전체 히스토리 (Phase 1)<a class="headerlink" href="#33-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>진입:</strong> AI 분류 현황 시트 하단 "전체 기록 보기" 링크</p>
+<p><strong>목적:</strong> 사용자가 모든 캡처 이력을 시간순으로 탐색할 수 있는 화면.</p>
+<p><strong>데이터:</strong> 전체 캡처를 created_at 역순으로 표시 (삭제/휴지통 제외).</p>
+<p><strong>리스트 아이템 구조:</strong></p>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>내용</th>
+<th>표시 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1행: 제목</td>
+<td>ai_title 또는 original_text (짧은 경우)</td>
+<td>항상</td>
+</tr>
+<tr>
+<td>1행 우측: 시간</td>
+<td>"방금" / "3분 전" / "어제" 등 상대 시간</td>
+<td>항상</td>
+</tr>
+<tr>
+<td>2행: 프리뷰</td>
+<td>original_text 첫 줄 (말줄임)</td>
+<td>ai_title ≠ original_text인 경우만</td>
+</tr>
+<tr>
+<td>분류 칩</td>
+<td>유형 표시 (탭하여 드롭다운으로 변경 가능)</td>
+<td>classified_type ≠ TEMP</td>
+</tr>
+<tr>
+<td>태그</td>
+<td>태그 1-2개</td>
+<td>공간 여유 시</td>
+</tr>
+<tr>
+<td>분류 중 표시</td>
+<td>로딩 인디케이터</td>
+<td>classified_type=TEMP이고 네트워크 가용</td>
+</tr>
+</tbody>
+</table>
+<p><strong>페이지네이션:</strong> 20건 단위 무한 스크롤.</p>
+<p><strong>필터 (Phase 2b):</strong> 분류 유형 칩 필터 (전체 / 할 일 / 일정 / 노트 / 아이디어), 날짜 범위 필터.</p>
+<p><strong>인터랙션:</strong></p>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>아이템 탭</td>
+<td>상세 보기 화면 전환</td>
+</tr>
+<tr>
+<td>분류 칩 탭</td>
+<td>유형 변경 드롭다운</td>
+</tr>
+<tr>
+<td>좌→우 스와이프</td>
+<td>삭제 (Snackbar 실행 취소 → 휴지통)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4">4. 공유 인텐트<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="41-phase-1">4.1 텍스트 수신 (Phase 1)<a class="headerlink" href="#41-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 외부 앱에서 "공유하기" → Flit. 선택 시 Intent.ACTION_SEND 수신</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Intent에서 EXTRA_TEXT 추출</td>
+</tr>
+<tr>
+<td>2</td>
+<td>텍스트가 비어있으면 무시</td>
+</tr>
+<tr>
+<td>3</td>
+<td>URL 포함 여부 감지</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Capture 레코드 생성 (source=SHARE_INTENT)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>완료 토스트 표시: "캡처 완료"</td>
+</tr>
+<tr>
+<td>6</td>
+<td>AI 분류 → URL 포함 시 NOTES(BOOKMARK)로 분류 가능 (장기 로드맵)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>미지원 형식 (Phase 1):</strong> EXTRA_STREAM(파일)만 있고 텍스트 없는 경우 → "텍스트만 지원됩니다" 토스트.</p>
+<h3 id="42-phase-2a">4.2 이미지 수신 (Phase 2a)<a class="headerlink" href="#42-phase-2a" title="Permanent link">&para;</a></h3>
+<p>텍스트+이미지 혼합 또는 이미지 단독. 이미지 단독 시 classified_type=TEMP.</p>
+<hr />
+<h2 id="5">5. 캘린더 탭<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p>플래너 탭을 캘린더 탭으로 재정의한다. 일정과 할 일을 단일 화면에서 통합 관리한다.</p>
+<h3 id="51-phase-1">5.1 캘린더 메인 화면 (Phase 1)<a class="headerlink" href="#51-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>역할:</strong> 오늘/선택 날짜의 일정과 할 일을 한 눈에 확인하는 통합 뷰.</p>
+<p><strong>구성 (위에서 아래):</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top Bar</td>
+<td>"Calendar" 타이틀</td>
+<td>1</td>
+</tr>
+<tr>
+<td>주간 캘린더 스트립</td>
+<td>현재 주 날짜 + 이벤트 도트</td>
+<td>1</td>
+</tr>
+<tr>
+<td>일정 섹션</td>
+<td>선택 날짜의 일정 타임라인</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Google Calendar 링크</td>
+<td>"Google Calendar에서 보기" 버튼</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>할 일 섹션</td>
+<td>할 일 리스트</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-phase-1">5.2 주간 캘린더 스트립 (Phase 1)<a class="headerlink" href="#52-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>구성:</strong></p>
+<div class="highlight"><pre><span></span><code>┌──────────────────────────────────┐
+│  1월 15일 수요일              ▾   │  ← 날짜 헤더 (탭 시 월간 뷰 전환, Phase 2a)
+│  일  월  화  수  목  금  토       │  ← 요일 라벨
+│  12  13  14 (15) 16  17  18      │  ← 날짜 (오늘 강조)
+│      ●       ●       ●           │  ← 이벤트 도트
+└──────────────────────────────────┘
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>날짜 탭</td>
+<td>해당 날짜 선택 → 일정 섹션 업데이트</td>
+</tr>
+<tr>
+<td>좌우 스와이프</td>
+<td>주 이동</td>
+</tr>
+<tr>
+<td>오늘 날짜</td>
+<td>원형 배경으로 강조</td>
+</tr>
+<tr>
+<td>이벤트 도트</td>
+<td>해당 날짜에 일정이 있으면 도트 표시</td>
+</tr>
+<tr>
+<td>날짜 헤더 ▾</td>
+<td>월간 뷰 전환 (Phase 2a)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-phase-1">5.3 일정 섹션 (Phase 1)<a class="headerlink" href="#53-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>데이터:</strong> captures WHERE classified_type=SCHEDULE JOIN schedules, 선택 날짜 기준 start_time 순.</p>
+<p><strong>타임라인 형태:</strong></p>
+<div class="highlight"><pre><span></span><code>일정
+──────────────────────
+10:00  ●  ┌───────────────────┐
+          │ 팀 스탠드업  [Work]  │
+          │ Zoom               │
+          └───────────────────┘
+14:00  ●  ┌───────────────────┐
+          │ 오후 2시 미팅 [Work] │
+          │ Conference Room A  │
+          └───────────────────┘
+18:30  ●  ┌───────────────────┐
+          │ Gym Session [Personal]│
+          │ Fitness Center B1  │
+          └───────────────────┘
+
+          [Google Calendar에서 보기]  ← Phase 2a
+</code></pre></div>
+<p><strong>일정 아이템 구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시간</td>
+<td>start_time 포맷 (HH:mm)</td>
+</tr>
+<tr>
+<td>타임라인 도트</td>
+<td>시간 옆 점 표시</td>
+</tr>
+<tr>
+<td>제목</td>
+<td>ai_title</td>
+</tr>
+<tr>
+<td>태그 칩</td>
+<td>Work, Personal 등 태그</td>
+</tr>
+<tr>
+<td>장소</td>
+<td>location (있으면)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>인터랙션:</strong></p>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정 아이템 탭</td>
+<td>일정 상세 보기 (5.5)</td>
+</tr>
+<tr>
+<td>좌→우 스와이프</td>
+<td>삭제 (Snackbar → 휴지통)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>빈 상태:</strong> 선택 날짜에 일정이 없으면 "일정이 없습니다" 텍스트.</p>
+<p><strong>"Google Calendar에서 보기" 버튼 (Phase 2a):</strong> Google Calendar 앱 딥링크로 해당 날짜 열기. Google 미연동 시 "Google Calendar 연동하기" 버튼으로 대체.</p>
+<h3 id="54-phase-1">5.4 할 일 섹션 (Phase 1)<a class="headerlink" href="#54-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>데이터:</strong> captures WHERE classified_type=TODO JOIN todos WHERE is_completed=false, sort_order 순.</p>
+<p><strong>리스트 형태:</strong></p>
+<div class="highlight"><pre><span></span><code>할 일
+──────────────────────
+┌──────────────────────────────────────┐
+│ ≡  프로젝트 기획 검토  [Work]  마감 12:00  □ │
+│ ≡  보고서 작성      [Work]  마감 18:00  □ │
+│ ≡  독서 30분       [Personal]           ☑ │  ← 완료됨
+└──────────────────────────────────────┘
+</code></pre></div>
+<p><strong>할 일 아이템 구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>위치</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>드래그 핸들 (≡)</td>
+<td>좌</td>
+<td>드래그하여 순서 변경 (Phase 2a)</td>
+</tr>
+<tr>
+<td>AI 제목</td>
+<td>좌-중앙</td>
+<td>텍스트</td>
+</tr>
+<tr>
+<td>태그 칩</td>
+<td>제목 우측</td>
+<td>태그 표시</td>
+</tr>
+<tr>
+<td>마감일/시간</td>
+<td>우-중앙</td>
+<td>"마감 12:00", "2/15(토)" 등. 없으면 비표시</td>
+</tr>
+<tr>
+<td>체크박스</td>
+<td>우</td>
+<td>탭 시 완료 처리</td>
+</tr>
+</tbody>
+</table>
+<p><strong>인터랙션:</strong></p>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>체크박스 탭</td>
+<td>완료 처리 + 리스트에서 제거 (애니메이션)</td>
+</tr>
+<tr>
+<td>아이템 탭 (체크박스 외)</td>
+<td>할 일 상세 보기 (5.6)</td>
+</tr>
+<tr>
+<td>좌→우 스와이프</td>
+<td>삭제 (Snackbar → 휴지통)</td>
+</tr>
+<tr>
+<td>드래그 (Phase 2a)</td>
+<td>순서 변경 (sort_source=USER)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>완료 항목 보기 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>토글 상태</th>
+<th>표시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>닫힘 (기본)</td>
+<td>"완료 항목 보기 (N)" 텍스트만</td>
+</tr>
+<tr>
+<td>열림</td>
+<td>완료 항목 리스트 (체크 상태, 취소선, 완료 일시)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>빈 상태:</strong> 할 일이 없으면 "할 일이 없습니다" 텍스트.</p>
+<h3 id="55-phase-2a">5.5 일정 상세 보기 (Phase 2a)<a class="headerlink" href="#55-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+<th>편집</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로 가기</td>
+<td>[←] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>삭제</td>
+<td>[🗑️] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>제목</td>
+<td>ai_title</td>
+<td>가능</td>
+</tr>
+<tr>
+<td>분류 칩</td>
+<td>유형 드롭다운 + 태그</td>
+<td>변경 가능</td>
+</tr>
+<tr>
+<td>날짜/시간</td>
+<td>start_time ~ end_time</td>
+<td>가능</td>
+</tr>
+<tr>
+<td>장소</td>
+<td>location</td>
+<td>가능</td>
+</tr>
+<tr>
+<td>캘린더 상태</td>
+<td>동기화 상태 표시 + 액션 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>원본 텍스트</td>
+<td>original_text</td>
+<td>수정 불가</td>
+</tr>
+<tr>
+<td>작성 날짜</td>
+<td>created_at 포맷 ("N시간 전 캡처")</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>캘린더 상태 표시 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>상태</th>
+<th>표시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SYNCED</td>
+<td>"✓ Google Calendar 등록됨" + [실행 취소]</td>
+</tr>
+<tr>
+<td>SUGGESTION_PENDING</td>
+<td>"캘린더에 추가할까요?" + [추가] [아니오]</td>
+</tr>
+<tr>
+<td>NOT_LINKED</td>
+<td>Google 미연동 시 "캘린더 연동하기"</td>
+</tr>
+<tr>
+<td>SYNC_FAILED</td>
+<td>"동기화 실패" + [다시 시도]</td>
+</tr>
+</tbody>
+</table>
+<h3 id="56-phase-1">5.6 할 일 상세 보기 (Phase 1)<a class="headerlink" href="#56-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+<th>편집</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로 가기</td>
+<td>[←] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>삭제</td>
+<td>[🗑️] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>체크박스 + 제목</td>
+<td>ai_title</td>
+<td>제목 편집 가능</td>
+</tr>
+<tr>
+<td>분류 칩</td>
+<td>유형 드롭다운 + 태그</td>
+<td>변경 가능</td>
+</tr>
+<tr>
+<td>마감일</td>
+<td>deadline (날짜 피커로 설정)</td>
+<td>가능</td>
+</tr>
+<tr>
+<td>마감일 출처</td>
+<td>AI_SUGGESTED인 경우 "AI 제안" 표시 (점선 테두리)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>원본 텍스트</td>
+<td>original_text</td>
+<td>수정 불가</td>
+</tr>
+<tr>
+<td>작성 날짜</td>
+<td>created_at 포맷</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="57-google-calendar-phase-2a">5.7 Google Calendar 동기화 (Phase 2a)<a class="headerlink" href="#57-google-calendar-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>일정 자동 추가 안전장치 — 상세 플로우:</strong></p>
+<p><strong>A. 기본 모드 ("제안"):</strong></p>
+<p>모든 일정은 calendar_sync_status=SUGGESTION_PENDING으로 시작.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>AI 분류 완료, SCHEDULE 확정</td>
+</tr>
+<tr>
+<td>2</td>
+<td>입력 소스에 따라 제안 방식 결정 (아래 표)</td>
+</tr>
+<tr>
+<td>3a</td>
+<td>사용자 승인 → Google Calendar API로 이벤트 생성 → SYNCED</td>
+</tr>
+<tr>
+<td>3b</td>
+<td>사용자 거부 → REJECTED</td>
+</tr>
+<tr>
+<td>3c</td>
+<td>무시 (일정 날짜 경과) → EXPIRED</td>
+</tr>
+</tbody>
+</table>
+<p><strong>입력 소스별 제안 방식:</strong></p>
+<table>
+<thead>
+<tr>
+<th>입력 소스</th>
+<th>제안 방식</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APP (앱 내 직접 입력)</td>
+<td>인앱 배너 (AI 분류 현황 시트 + 일정 상세 보기)</td>
+<td>앱 사용 중이므로 인앱 UI 활용</td>
+</tr>
+<tr>
+<td>WIDGET (홈 화면 위젯)</td>
+<td>푸시 알림 "[일정 제목] — 캘린더에 추가할까요?" + [추가] [아니오]</td>
+<td>앱 미진입 상태이므로 푸시 활용</td>
+</tr>
+<tr>
+<td>SHARE_INTENT (외부 공유)</td>
+<td>푸시 알림 (WIDGET과 동일)</td>
+<td>앱 미진입 상태이므로 푸시 활용</td>
+</tr>
+</tbody>
+</table>
+<p><strong>B. 완전 자동 모드:</strong></p>
+<p>사용자가 설정에서 활성화한 경우.</p>
+<table>
+<thead>
+<tr>
+<th>신뢰도</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HIGH</td>
+<td>즉시 Google Calendar 이벤트 생성 + 푸시 알림 (실행 취소 포함)</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>제안 모드와 동일</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>제안 모드와 동일</td>
+</tr>
+</tbody>
+</table>
+<p><strong>HIGH 자동 추가 후 실행 취소:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>푸시 알림: "[일정]이 캘린더에 추가됨" + [실행 취소] 액션</td>
+</tr>
+<tr>
+<td>2</td>
+<td>[실행 취소] 탭 (1시간 이내) → Google Calendar 이벤트 삭제 → NOT_LINKED</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1시간 경과 → 실행 취소 비활성화</td>
+</tr>
+</tbody>
+</table>
+<p><strong>신뢰도 판별 기준 (서버 AI):</strong></p>
+<table>
+<thead>
+<tr>
+<th>신뢰도</th>
+<th>조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HIGH</td>
+<td>명확한 날짜 + 시간 + 이벤트/장소 모두 식별</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>날짜는 있으나 시간 불확실, 또는 상대 표현 ("다음 주")</td>
+</tr>
+<tr>
+<td>LOW</td>
+<td>일정 가능성은 있으나 핵심 정보 부족 ("언제 한번 만나자")</td>
+</tr>
+</tbody>
+</table>
+<p><strong>주간/월간 뷰 (Phase 2a):</strong></p>
+<p>주간 뷰는 캘린더 스트립(5.2)으로 대체. 월간 뷰는 캘린더 스트립 헤더의 ▾ 탭 시 확장 표시.</p>
+<p><strong>월간 뷰 확장:</strong></p>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캘린더 헤더 ▾ 탭</td>
+<td>월 캘린더 그리드 확장 표시</td>
+</tr>
+<tr>
+<td>일정이 있는 날짜</td>
+<td>도트 표시</td>
+</tr>
+<tr>
+<td>날짜 탭</td>
+<td>해당 날짜 선택 + 월간 뷰 접힘 + 일정 섹션 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Google Calendar 읽기 캐시:</strong> Google Calendar API에서 읽어온 일정을 Room DB에 캐시. 오프라인에서도 캘린더 뷰 렌더링 가능.</p>
+<hr />
+<h2 id="6">6. 할 일 관리<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<h3 id="61-phase-1">6.1 할 일 목록 (Phase 1)<a class="headerlink" href="#61-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>데이터:</strong> captures WHERE classified_type=TODO JOIN todos, sort_order 순.</p>
+<p><strong>기본 표시:</strong> is_completed=false인 항목만 표시.</p>
+<p><strong>정렬 순서:</strong></p>
+<table>
+<thead>
+<tr>
+<th>우선순위</th>
+<th>기준</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>sort_source=USER인 항목은 사용자 설정 위치 유지</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>2</td>
+<td>deadline이 있는 항목 → deadline 오름차순 (가까운 마감 먼저)</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>deadline이 없는 항목 → created_at 역순 (최근 생성 먼저)</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>마감일 표시 형식:</strong></p>
+<table>
+<thead>
+<tr>
+<th>조건</th>
+<th>표시 형식</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>오늘 마감</td>
+<td>"마감 HH:mm"</td>
+<td>"마감 12:00"</td>
+</tr>
+<tr>
+<td>오늘 이후 마감</td>
+<td>"M/d(요일)"</td>
+<td>"2/15(토)"</td>
+</tr>
+<tr>
+<td>마감일 없음</td>
+<td>비표시</td>
+<td>—</td>
+</tr>
+<tr>
+<td>마감 초과</td>
+<td>"마감 초과" + 날짜</td>
+<td>"마감 초과 · 2/13"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-phase-1">6.2 완료 처리 (Phase 1)<a class="headerlink" href="#62-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>트리거:</strong> 체크박스 탭</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>is_completed = true, completed_at = now</td>
+</tr>
+<tr>
+<td>2</td>
+<td>체크 애니메이션 표시 (0.3초)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>리스트에서 슬라이드 아웃 제거 (0.5초 딜레이)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>완료 항목 카운터 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>완료 취소:</strong> 완료 항목 보기에서 체크박스 재탭 → is_completed=false, completed_at=null → 활성 리스트로 복원.</p>
+<p><strong>완료 항목 보기 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>토글 텍스트</td>
+<td>"완료 항목 보기 (N)"</td>
+</tr>
+<tr>
+<td>표시 내용</td>
+<td>체크 상태 + 취소선 제목 + 완료 일시</td>
+</tr>
+<tr>
+<td>정렬</td>
+<td>completed_at 역순 (최근 완료 먼저)</td>
+</tr>
+<tr>
+<td>인터랙션</td>
+<td>체크박스 재탭으로 완료 취소</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-ai-phase-2a">6.3 AI 마감일 제안 (Phase 2a)<a class="headerlink" href="#63-ai-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>조건:</strong> AI 분류 시 날짜 정보가 텍스트에서 추출된 경우, todo_info.deadline으로 전달.</p>
+<p><strong>deadline_source 분류:</strong></p>
+<table>
+<thead>
+<tr>
+<th>소스</th>
+<th>설명</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI_EXTRACTED</td>
+<td>명시적 날짜 언급</td>
+<td>"금요일까지 보고서" → 해당 금요일</td>
+</tr>
+<tr>
+<td>AI_SUGGESTED</td>
+<td>AI가 맥락으로 추론</td>
+<td>"오늘 날씨 확인" → 오늘</td>
+</tr>
+<tr>
+<td>USER_SET</td>
+<td>사용자 직접 설정</td>
+<td>상세 보기에서 수정</td>
+</tr>
+</tbody>
+</table>
+<p><strong>AI_SUGGESTED 표시:</strong> 일반 마감일과 시각적으로 구분 (점선 테두리 등). 사용자가 탭하면 확정(USER_SET)으로 전환.</p>
+<hr />
+<h2 id="7">7. 노트<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<h3 id="71-phase-1">7.1 폴더 구조 및 서브 분류 (Phase 1)<a class="headerlink" href="#71-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>기본 시스템 폴더:</strong></p>
+<table>
+<thead>
+<tr>
+<th>폴더</th>
+<th>type</th>
+<th>설명</th>
+<th>삭제 가능</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inbox</td>
+<td>INBOX</td>
+<td>미분류 노트의 기본 배치. NOTES로 분류되면 기본적으로 여기에 저장</td>
+<td>불가</td>
+</tr>
+<tr>
+<td>Ideas</td>
+<td>IDEAS</td>
+<td>아이디어로 분류된 노트</td>
+<td>불가</td>
+</tr>
+<tr>
+<td>Bookmarks</td>
+<td>BOOKMARKS</td>
+<td>URL이 포함된 공유 인텐트 등 웹 링크 (장기 로드맵)</td>
+<td>불가</td>
+</tr>
+</tbody>
+</table>
+<p><strong>사용자 생성 폴더 (Phase 1):</strong></p>
+<p>사용자가 직접 추가한 폴더. 노트를 사용자 정의 분류로 관리하기 위한 용도.</p>
+<table>
+<thead>
+<tr>
+<th>속성</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>USER</td>
+</tr>
+<tr>
+<td>생성</td>
+<td>사용자 수동 생성</td>
+</tr>
+<tr>
+<td>삭제</td>
+<td>가능. 삭제 시 소속 노트는 Inbox로 이동</td>
+</tr>
+<tr>
+<td>이름</td>
+<td>사용자 지정</td>
+</tr>
+</tbody>
+</table>
+<p><strong>폴더 표시 순서:</strong> Inbox (잔류 항목 있을 때만 표시) → Ideas → Bookmarks → 사용자 폴더 (생성 순).</p>
+<p><strong>AI 분류 시 서브 분류 결정:</strong></p>
+<table>
+<thead>
+<tr>
+<th>AI 판단</th>
+<th>note_sub_type</th>
+<th>folder_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>아이디어성 내용</td>
+<td>IDEA</td>
+<td>system-ideas</td>
+</tr>
+<tr>
+<td>URL 포함</td>
+<td>BOOKMARK</td>
+<td>system-bookmarks (장기 로드맵)</td>
+</tr>
+<tr>
+<td>그 외</td>
+<td>INBOX</td>
+<td>system-inbox</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-phase-1">7.2 노트 폴더 관리 (Phase 1)<a class="headerlink" href="#72-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>폴더 생성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>노트 메인 화면에서 [+] 또는 "새 폴더" 버튼 탭</td>
+</tr>
+<tr>
+<td>2</td>
+<td>폴더 이름 입력 다이얼로그</td>
+</tr>
+<tr>
+<td>3</td>
+<td>이름 입력 + 확인 → Folder 레코드 생성 (type=USER)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>폴더 이름 규칙:</strong></p>
+<table>
+<thead>
+<tr>
+<th>규칙</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>최소 길이</td>
+<td>1자 이상</td>
+</tr>
+<tr>
+<td>최대 길이</td>
+<td>30자</td>
+</tr>
+<tr>
+<td>중복</td>
+<td>동일 이름 불가 (시스템 폴더명 포함)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>폴더 삭제:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>폴더 롱프레스 또는 폴더 내 설정에서 삭제</td>
+</tr>
+<tr>
+<td>2</td>
+<td>"폴더를 삭제하면 노트는 Inbox로 이동합니다" 확인</td>
+</tr>
+<tr>
+<td>3</td>
+<td>소속 노트의 folder_id → system-inbox로 변경</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Folder 레코드 삭제</td>
+</tr>
+</tbody>
+</table>
+<p><strong>폴더 이름 수정:</strong> 폴더명 롱프레스 → 이름 수정 다이얼로그.</p>
+<p><strong>노트 폴더 이동:</strong></p>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>노트 상세 보기에서 폴더 탭</td>
+<td>폴더 선택 시트 표시 → 선택 시 folder_id 변경</td>
+</tr>
+<tr>
+<td>노트 리스트에서 롱프레스</td>
+<td>이동 옵션 제공</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-phase-1">7.3 노트 메인 화면 (Phase 1)<a class="headerlink" href="#73-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top Bar</td>
+<td>"노트" 타이틀 + 검색 아이콘 (🔍)</td>
+</tr>
+<tr>
+<td>폴더 리스트</td>
+<td>시스템 폴더 + 사용자 폴더</td>
+</tr>
+<tr>
+<td>새 폴더 버튼</td>
+<td>[+ 새 폴더]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>폴더 아이템:</strong> 폴더명 + 노트 수. 탭 시 폴더 내 노트 리스트로 이동.</p>
+<p><strong>Inbox 표시 규칙:</strong></p>
+<table>
+<thead>
+<tr>
+<th>조건</th>
+<th>표시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inbox 항목 0개</td>
+<td>Inbox 폴더 숨김</td>
+</tr>
+<tr>
+<td>Inbox 항목 1개 이상</td>
+<td>Inbox 폴더 표시 (최상단)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="74-phase-2b">7.4 노트 상세 보기 / 편집 (Phase 2b)<a class="headerlink" href="#74-phase-2b" title="Permanent link">&para;</a></h3>
+<p><strong>구성:</strong></p>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>내용</th>
+<th>편집</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로 가기</td>
+<td>[←] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>삭제</td>
+<td>[🗑️] 버튼</td>
+<td>—</td>
+</tr>
+<tr>
+<td>저장</td>
+<td>[저장] 버튼 (변경사항 있을 때만 활성화)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>제목</td>
+<td>ai_title</td>
+<td>가능</td>
+</tr>
+<tr>
+<td>분류 칩</td>
+<td>유형 드롭다운 (노트/아이디어) + 태그</td>
+<td>변경 가능</td>
+</tr>
+<tr>
+<td>태그</td>
+<td>태그 목록 + [+] 추가 버튼</td>
+<td>편집 가능</td>
+</tr>
+<tr>
+<td>본문</td>
+<td>body (null이면 original_text 표시)</td>
+<td>Phase 2b부터 편집 가능</td>
+</tr>
+<tr>
+<td>원본 텍스트</td>
+<td>original_text (body가 있으면 접힌 상태)</td>
+<td>수정 불가</td>
+</tr>
+<tr>
+<td>소속 폴더</td>
+<td>folder 이름 (탭하여 이동 가능)</td>
+<td>Phase 1</td>
+</tr>
+<tr>
+<td>작성 날짜</td>
+<td>created_at 포맷 (예: "2026년 2월 6일 14:30")</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>저장 동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>트리거</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[저장] 버튼 탭</td>
+<td>변경사항 Room DB에 저장 + "저장됨" 토스트</td>
+</tr>
+<tr>
+<td>[←] 뒤로가기 (변경사항 있을 때)</td>
+<td>"변경사항을 저장할까요?" 다이얼로그 → [저장] / [버리기]</td>
+</tr>
+<tr>
+<td>[←] 뒤로가기 (변경사항 없을 때)</td>
+<td>즉시 뒤로 이동</td>
+</tr>
+</tbody>
+</table>
+<h3 id="75-phase-1">7.5 검색 (Phase 1)<a class="headerlink" href="#75-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>진입:</strong> 노트 메인 화면 상단 검색 아이콘 (🔍) 탭</p>
+<p><strong>범위:</strong> 전체 캡처 대상 검색 (노트뿐 아니라 할 일, 일정 포함).</p>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>검색 화면 전환 (전체 화면 오버레이)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>검색 입력 + 실시간 결과 표시</td>
+</tr>
+<tr>
+<td>3</td>
+<td>FTS 검색: ai_title &gt; tag_text &gt; entity_text &gt; original_text 우선순위</td>
+</tr>
+<tr>
+<td>4</td>
+<td>결과 리스트: 히스토리 아이템과 동일한 구조 (분류 칩 포함)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>필터 (Phase 2b):</strong> 분류 유형 칩 필터, 날짜 범위 필터.</p>
+<p><strong>검색 결과 없음:</strong> "결과 없음" + "다른 키워드로 검색해보세요".</p>
+<h3 id="76-inbox-ai-phase-3a">7.6 Inbox AI 자동 분류 (Phase 3a, 구독)<a class="headerlink" href="#76-inbox-ai-phase-3a" title="Permanent link">&para;</a></h3>
+<p><strong>목적:</strong> 노트 Inbox에 쌓인 미분류 노트를 AI가 자동으로 적절한 폴더(Ideas, Bookmarks, 사용자 폴더, AI 그룹)로 분류.</p>
+<p><strong>동작 모드:</strong></p>
+<p><strong>A. 상시 자동 분류 (구독 상태):</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>WorkManager 주기적 작업 (네트워크 + 충전 조건)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Inbox 폴더의 노트 조회</td>
+</tr>
+<tr>
+<td>3</td>
+<td>서버에 노트 제목 + 태그 + 기존 폴더 구조 전송</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AI가 각 노트의 적절한 폴더 결정</td>
+</tr>
+<tr>
+<td>5</td>
+<td>자동으로 folder_id 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>주기:</strong> 최소 1시간 간격. Inbox에 새 노트가 5개 이상 축적 시 즉시 실행.</p>
+<p><strong>B. 비구독 상태:</strong> 자동 분류 비활성. Inbox의 노트는 사용자가 수동으로 폴더 이동.</p>
+<h3 id="77-ai-phase-3a">7.7 AI 통합 그룹화 및 재정리 (Phase 3a, 구독)<a class="headerlink" href="#77-ai-phase-3a" title="Permanent link">&para;</a></h3>
+<p><strong>목적:</strong> 노트를 토픽 기반으로 자동 그룹화하고, 필요 시 전체 노트를 재분류.</p>
+<p><strong>동작 모드:</strong></p>
+<p><strong>A. 상시 자동 그룹화 (구독 상태):</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>WorkManager 주기적 작업 (구독 활성 + 네트워크 + 충전)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Inbox 폴더의 노트 중 그룹화 대상 조회</td>
+</tr>
+<tr>
+<td>3</td>
+<td>서버에 노트 제목 + 태그 + 기존 폴더/그룹 구조 전송</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AI가 토픽 기반 그룹 결정</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Folder(type=AI_GROUP) 생성 (새 그룹) 또는 기존 그룹에 배치</td>
+</tr>
+<tr>
+<td>6</td>
+<td>해당 노트의 folder_id 업데이트</td>
+</tr>
+</tbody>
+</table>
+<p><strong>조건:</strong> NOTE/IDEA 타입 캡처가 10개 이상 축적 시 그룹화 시작.</p>
+<p><strong>B. "AI 분류" 버튼 (전체 재정리):</strong></p>
+<p>사용자가 새로 구독했거나, 기존 분류가 만족스럽지 않을 때 수동 실행.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>노트 탭 또는 설정에서 "AI 분류" 버튼 탭</td>
+</tr>
+<tr>
+<td>2</td>
+<td>전체 노트 인덱싱 (제목, 태그, 원문 키워드)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>서버에 전체 노트 메타데이터 전송</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AI가 새로운 폴더 구조 제안 (기존 폴더 유지/병합/신규 생성)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Before/After 비교 화면 표시 (디렉토리 구조)</td>
+</tr>
+<tr>
+<td>6a</td>
+<td>사용자 "적용" → 전체 folder_id 업데이트 + 새 폴더 생성</td>
+</tr>
+<tr>
+<td>6b</td>
+<td>사용자 "취소" → 변경 없음</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Before/After 비교 화면:</strong></p>
+<div class="highlight"><pre><span></span><code>┌────────────────┬────────────────┐
+│     현재        │     제안        │
+├────────────────┼────────────────┤
+│ 📁 Inbox (15)  │ 📁 Inbox (3)   │
+│ 📁 Ideas (8)   │ 📁 Ideas (8)   │
+│                │ 📁 프론트엔드 (5)│ ← 신규 그룹
+│                │ 📁 독서 메모 (4) │ ← 신규 그룹
+│                │ 📁 회의 관련 (3) │ ← 신규 그룹
+├────────────────┼────────────────┤
+│  [취소]         │         [적용]  │
+└────────────────┴────────────────┘
+</code></pre></div>
+<hr />
+<h2 id="8">8. 휴지통<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<h3 id="81-phase-2a">8.1 휴지통 (Phase 2a)<a class="headerlink" href="#81-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>목적:</strong> 삭제된 항목을 30일간 보관하여 실수로 인한 영구 데이터 손실을 방지.</p>
+<p><strong>진입:</strong> 설정 화면 또는 노트/캘린더 탭의 보조 메뉴.</p>
+<p><strong>표시 내용:</strong></p>
+<table>
+<thead>
+<tr>
+<th>요소</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>항목 리스트</td>
+<td>휴지통 내 항목 (trashed_at 역순)</td>
+</tr>
+<tr>
+<td>각 아이템</td>
+<td>ai_title + 분류 칩 + 삭제 날짜 + 남은 일수</td>
+</tr>
+<tr>
+<td>복원 버튼</td>
+<td>각 아이템에 복원 버튼</td>
+</tr>
+<tr>
+<td>전체 비우기</td>
+<td>휴지통 전체 영구 삭제 (확인 다이얼로그 필요)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>복원 동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>복원 버튼 탭</td>
+</tr>
+<tr>
+<td>2</td>
+<td>is_trashed=false, trashed_at=null, is_deleted=false</td>
+</tr>
+<tr>
+<td>3</td>
+<td>원래 분류 유형에 따라 해당 섹션에 복원</td>
+</tr>
+<tr>
+<td>4</td>
+<td>"복원됨" 토스트 표시</td>
+</tr>
+</tbody>
+</table>
+<p><strong>자동 정리:</strong> WorkManager 일간 작업으로 trashed_at + 30일 경과 항목 Hard Delete.</p>
+<p><strong>전체 비우기:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>"전체 비우기" 탭</td>
+</tr>
+<tr>
+<td>2</td>
+<td>"휴지통의 모든 항목이 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다." 확인 다이얼로그</td>
+</tr>
+<tr>
+<td>3</td>
+<td>확인 → 전체 Hard Delete</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9">9. 위젯<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<h3 id="91-phase-2a">9.1 입력 위젯 (Phase 2a)<a class="headerlink" href="#91-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>형태:</strong> 4×1 홈 화면 위젯. 텍스트 입력 필드 + 전송 버튼.</p>
+<p><strong>동작:</strong> 위젯 입력 필드 탭 → 앱 캡처 화면 전환 (키보드 자동 올림) 또는 위젯 내 직접 입력(RemoteViews 제약에 따라 결정).</p>
+<p><strong>일정 분류 시:</strong> 앱 미진입 상태이므로 푸시 알림으로 일정 제안 (5.7 참조).</p>
+<h3 id="92-phase-2b">9.2 할 일 위젯 (Phase 2b)<a class="headerlink" href="#92-phase-2b" title="Permanent link">&para;</a></h3>
+<p><strong>형태:</strong> 4×2 이상. 오늘 마감 할 일 리스트 + 체크박스.</p>
+<p><strong>데이터:</strong> todos WHERE deadline ≤ 오늘 23:59 AND is_completed=false.</p>
+<p><strong>체크박스 탭:</strong> 위젯에서 바로 완료 처리 → Room DB 업데이트 → 위젯 갱신.</p>
+<hr />
+<h2 id="10">10. 알림<a class="headerlink" href="#10" title="Permanent link">&para;</a></h2>
+<h3 id="101-phase-1">10.1 앱 내 알림 (Phase 1)<a class="headerlink" href="#101-phase-1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>이벤트</th>
+<th>표시</th>
+<th>형태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처 저장 완료</td>
+<td>"저장됨"</td>
+<td>Snackbar 2초</td>
+</tr>
+<tr>
+<td>AI 분류 완료</td>
+<td>알림 벨 뱃지 카운트 증가</td>
+<td>뱃지 업데이트</td>
+</tr>
+<tr>
+<td>오프라인 상태</td>
+<td>상단 배너 "오프라인 — 연결되면 자동 동기화"</td>
+<td>상태 바</td>
+</tr>
+</tbody>
+</table>
+<h3 id="102-phase-2a">10.2 푸시 알림 (Phase 2a+)<a class="headerlink" href="#102-phase-2a" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>유형</th>
+<th>내용</th>
+<th>액션</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정 자동 추가</td>
+<td>"[일정]이 캘린더에 추가됨"</td>
+<td>[실행 취소] [확인]</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>일정 제안</td>
+<td>"[일정] — 캘린더에 추가할까요?"</td>
+<td>[추가] [아니오]</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>일정 제안 (위젯/공유)</td>
+<td>위젯·공유 인텐트 입력의 일정 분류 시</td>
+<td>[추가] [아니오]</td>
+<td>2a</td>
+</tr>
+</tbody>
+</table>
+<p><strong>알림 채널:</strong> Android Notification Channel로 유형별 분리 (사용자가 개별 on/off 가능).</p>
+<hr />
+<h2 id="11">11. 온보딩<a class="headerlink" href="#11" title="Permanent link">&para;</a></h2>
+<h3 id="111-phase-1">11.1 Phase 1 온보딩<a class="headerlink" href="#111-phase-1" title="Permanent link">&para;</a></h3>
+<p><strong>화면 1:</strong> 앱 소개 — "적으면 알아서 정리됩니다" + 핵심 가치 일러스트</p>
+<p><strong>화면 2:</strong> AI 분류 안내 — "AI가 자동으로 분류합니다. 틀리면 탭 한 번으로 수정하세요"</p>
+<p><strong>화면 3:</strong> 첫 캡처 유도 — 입력창 + "첫 번째 생각을 적어보세요" 플레이스홀더</p>
+<h3 id="112-phase-2a">11.2 Phase 2a 온보딩<a class="headerlink" href="#112-phase-2a" title="Permanent link">&para;</a></h3>
+<p><strong>Google 연동:</strong> "Google 계정을 연결하면 일정이 캘린더에 자동 등록됩니다" + [연결하기] [나중에]</p>
+<h3 id="113-phase-2b">11.3 Phase 2b 온보딩<a class="headerlink" href="#113-phase-2b" title="Permanent link">&para;</a></h3>
+<p><strong>위젯 가이드:</strong> "홈 화면에 위젯을 추가하면 더 빠르게 캡처할 수 있습니다" + 추가 방법 안내</p>
+<hr />
+<h2 id="12">12. 설정<a class="headerlink" href="#12" title="Permanent link">&para;</a></h2>
+<h3 id="121">12.1 설정 구조<a class="headerlink" href="#121" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>카테고리</th>
+<th>항목</th>
+<th>동작</th>
+<th>Phase</th>
+<th>구독</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>표시</strong></td>
+<td>다크 모드</td>
+<td>시스템/라이트/다크 전환</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>연동</strong></td>
+<td>Google Calendar</td>
+<td>연동 on/off + 계정 선택</td>
+<td>2a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>AI 설정</strong></td>
+<td>일정 추가 모드</td>
+<td>"제안"/"완전 자동" 토글</td>
+<td>2a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>AI 설정</strong></td>
+<td>분류 프리셋</td>
+<td>프리셋 선택 목록</td>
+<td>3a</td>
+<td>구독</td>
+</tr>
+<tr>
+<td><strong>AI 설정</strong></td>
+<td>분류 지시</td>
+<td>자연어 입력 필드</td>
+<td>3a</td>
+<td>구독</td>
+</tr>
+<tr>
+<td><strong>알림</strong></td>
+<td>일정 추가 알림</td>
+<td>on/off</td>
+<td>2a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>내 정보</strong></td>
+<td>연동 계정</td>
+<td>Google 계정 표시</td>
+<td>2a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>내 정보</strong></td>
+<td>구독 현황</td>
+<td>플랜 + 사용량</td>
+<td>3a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>내 정보</strong></td>
+<td>로그아웃</td>
+<td>로그아웃</td>
+<td>3a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>데이터</strong></td>
+<td>휴지통</td>
+<td>휴지통 화면 진입</td>
+<td>2a</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>정보</strong></td>
+<td>개인정보 처리방침</td>
+<td>WebView 표시</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>정보</strong></td>
+<td>이용약관</td>
+<td>WebView 표시</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>정보</strong></td>
+<td>앱 버전</td>
+<td>버전 텍스트</td>
+<td>1</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="122">12.2 항목별 세부 요구사항<a class="headerlink" href="#122" title="Permanent link">&para;</a></h3>
+<p><strong>다크 모드:</strong></p>
+<table>
+<thead>
+<tr>
+<th>옵션</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시스템 (기본값)</td>
+<td>시스템 설정 따름</td>
+</tr>
+<tr>
+<td>라이트</td>
+<td>항상 라이트 모드</td>
+</tr>
+<tr>
+<td>다크</td>
+<td>항상 다크 모드</td>
+</tr>
+</tbody>
+</table>
+<p>UI: 3개 라디오 버튼. 변경 즉시 적용 (앱 재시작 불필요).</p>
+<p><strong>Google Calendar 연동 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>상태</th>
+<th>표시</th>
+<th>액션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>미연동</td>
+<td>"Google Calendar" + [연결하기]</td>
+<td>Google OAuth 플로우 시작</td>
+</tr>
+<tr>
+<td>연동됨</td>
+<td>"Google Calendar" + 계정 이메일 + [연결 해제]</td>
+<td>토큰 삭제 + 동기화 해제</td>
+</tr>
+</tbody>
+</table>
+<p>연결 해제 시: "연결을 해제하면 캘린더 동기화가 중단됩니다. 기존에 동기화된 이벤트는 Google Calendar에 유지됩니다." 확인.</p>
+<p><strong>일정 추가 모드 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>옵션</th>
+<th>설명</th>
+<th>기본값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>제안</td>
+<td>모든 일정에 대해 사용자 확인 요청</td>
+<td>✓ (기본)</td>
+</tr>
+<tr>
+<td>완전 자동</td>
+<td>HIGH 신뢰도 일정은 자동 추가, 나머지는 제안</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>UI: 토글 또는 드롭다운. "완전 자동 모드에서는 확실한 일정이 자동으로 캘린더에 추가됩니다" 설명 텍스트.</p>
+<p><strong>알림 설정 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>설명</th>
+<th>기본값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정 추가 알림</td>
+<td>일정이 캘린더에 자동 추가될 때 푸시 알림</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<p>UI: 토글 스위치. Android 시스템 알림 설정과 연동 안내.</p>
+<p><strong>휴지통 (Phase 2a):</strong></p>
+<table>
+<thead>
+<tr>
+<th>표시</th>
+<th>액션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"휴지통" + 항목 수</td>
+<td>탭 시 휴지통 화면 (8.1) 진입</td>
+</tr>
+</tbody>
+</table>
+<p><strong>개인정보 처리방침 / 이용약관 (Phase 1):</strong> 탭 시 WebView로 URL 표시.</p>
+<p><strong>앱 버전 (Phase 1):</strong> 버전 텍스트 표시. 탭 불가.</p>
+<h3 id="123">12.3 구독자 전용 기능 구분<a class="headerlink" href="#123" title="Permanent link">&para;</a></h3>
+<p>구독자 전용 기능은 설정 화면에서 다음과 같이 구분된다.</p>
+<p><strong>비구독자 상태:</strong>
+- 구독 전용 항목에 🔒 아이콘 + "Premium" 뱃지 표시
+- 탭 시 구독 안내 시트 표시 ("이 기능은 Premium 구독에 포함됩니다" + [구독하기] [나중에])
+- 기능 자체는 비활성 (토글 불가)</p>
+<p><strong>구독자 상태:</strong>
+- 🔒 아이콘 및 "Premium" 뱃지 제거
+- 기능 정상 활성화</p>
+<p><strong>구독 전용 기능 목록:</strong></p>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>설정 위치</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 프리셋</td>
+<td>AI 설정</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>분류 지시</td>
+<td>AI 설정</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>Inbox AI 자동 분류</td>
+<td>AI 설정</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>AI 통합 그룹화 및 재정리</td>
+<td>AI 설정 (노트 탭에서도 접근)</td>
+<td>3a</td>
+</tr>
+<tr>
+<td>수정 이력 기반 학습</td>
+<td>AI 설정</td>
+<td>2b (초안), 3b (고도화)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="13">13. 공유하기<a class="headerlink" href="#13" title="Permanent link">&para;</a></h2>
+<h3 id="131-phase-3b">13.1 외부 공유 기능 (Phase 3b)<a class="headerlink" href="#131-phase-3b" title="Permanent link">&para;</a></h3>
+<p><strong>목적:</strong> 캡처된 항목(노트, 일정, 할 일)을 외부 앱으로 공유.</p>
+<p><strong>트리거:</strong> 상세 보기 화면에서 공유 아이콘 탭</p>
+<p><strong>공유 포맷:</strong></p>
+<table>
+<thead>
+<tr>
+<th>분류 유형</th>
+<th>공유 텍스트 형식</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NOTES</td>
+<td>"[제목]\n\n[본문 또는 원문]"</td>
+</tr>
+<tr>
+<td>TODO</td>
+<td>"[제목]\n마감: [마감일]\n\n[원문]"</td>
+</tr>
+<tr>
+<td>SCHEDULE</td>
+<td>"[제목]\n일시: [start_time]\n장소: [location]\n\n[원문]"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>동작:</strong></p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>공유 아이콘 탭</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Android Intent.ACTION_SEND로 텍스트 공유</td>
+</tr>
+<tr>
+<td>3</td>
+<td>시스템 공유 시트 표시 (카카오톡, 메시지, 이메일 등)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="14">14. 분류 품질 관측<a class="headerlink" href="#14" title="Permanent link">&para;</a></h2>
+<h3 id="141-phase-2a">14.1 이벤트 수집 (Phase 2a)<a class="headerlink" href="#141-phase-2a" title="Permanent link">&para;</a></h3>
+<p>모든 관측 이벤트는 AnalyticsEvent 테이블에 로컬 저장 후, WorkManager로 배치 전송.</p>
+<p><strong>프라이버시:</strong> 캡처 원문은 이벤트에 포함하지 않음. input_length만 수집.</p>
+<h3 id="142">14.2 수집 이벤트 유형<a class="headerlink" href="#142" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>event_type</th>
+<th>event_data 포함 필드</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>capture_created</td>
+<td>source, input_length</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>classification_completed</td>
+<td>classified_type, note_sub_type, confidence, processing_time_ms</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>classification_confirmed</td>
+<td>capture_id, confirmed_type (변경 여부 포함)</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>classification_modified</td>
+<td>original_type, new_type, time_since_classification_ms</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>schedule_suggestion_response</td>
+<td>action(approved/rejected/ignored), confidence, source(app/widget/share)</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>schedule_auto_deleted</td>
+<td>time_since_auto_add_ms</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>temp_item_resolved</td>
+<td>resolution(ai/user), time_in_temp_ms</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>capture_revisited</td>
+<td>time_since_creation_ms, access_method(list/search)</td>
+<td>2b</td>
+</tr>
+<tr>
+<td>todo_completed</td>
+<td>time_since_creation_ms</td>
+<td>2b</td>
+</tr>
+<tr>
+<td>search_performed</td>
+<td>result_count, result_clicked</td>
+<td>2b</td>
+</tr>
+<tr>
+<td>trash_restored</td>
+<td>time_in_trash_ms</td>
+<td>2a</td>
+</tr>
+<tr>
+<td>split_capture_created</td>
+<td>parent_capture_id, split_count</td>
+<td>2a</td>
+</tr>
+</tbody>
+</table>
+<h3 id="143">14.3 핵심 관측 대시보드 지표<a class="headerlink" href="#143" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>계산</th>
+<th>정상 범위 (가설)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 수정률</td>
+<td>수정 건 / 전체 분류</td>
+<td>&lt; 15%</td>
+</tr>
+<tr>
+<td>수정 응답 시간 중앙값</td>
+<td>classification_modified 이벤트의 time_since_classification_ms p50</td>
+<td>&lt; 60초</td>
+</tr>
+<tr>
+<td>일정 제안 승인율</td>
+<td>approved / (approved + rejected + ignored)</td>
+<td>&gt; 60%</td>
+</tr>
+<tr>
+<td>일정 자동 추가 후 삭제율</td>
+<td>schedule_auto_deleted / schedule_auto_added</td>
+<td>&lt; 10%</td>
+</tr>
+<tr>
+<td>Temp 잔류 시간 중앙값</td>
+<td>temp_item_resolved의 time_in_temp_ms p50</td>
+<td>&lt; 1시간</td>
+</tr>
+<tr>
+<td>투두 완료율 (Phase 2b)</td>
+<td>todo_completed / todo_created</td>
+<td>&gt; 30%</td>
+</tr>
+<tr>
+<td>AI 분류 확인율</td>
+<td>classification_confirmed(변경 없음) / 전체 확인</td>
+<td>&gt; 85%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="a-phase">부록 A. Phase 로드맵 요약<a class="headerlink" href="#a-phase" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-mvp">Phase 1: MVP<a class="headerlink" href="#phase-1-mvp" title="Permanent link">&para;</a></h3>
+<p>캡처, AI 분류(TEMP/TODO/SCHEDULE/NOTES), 홈 화면(캡처+AI현황), 캘린더 탭(일정+할일), 노트(폴더 구조), 공유 인텐트(텍스트), 삭제(Snackbar 실행 취소), 검색, 온보딩, 기본 설정</p>
+<h3 id="phase-2a">Phase 2a: 코어 루프 완성<a class="headerlink" href="#phase-2a" title="Permanent link">&para;</a></h3>
+<p>이미지 첨부(카메라 포함), 휴지통(30일 보존), 로컬 캘린더(CalendarProvider) 연동, 일정 상세/월간 뷰, 완료 항목 보기, AI 마감일 제안, 입력 위젯, 푸시 알림, 분류 수정 로깅, 품질 관측 수집</p>
+<h3 id="phase-2b">Phase 2b: 사용성 확장 (최소 출시 기준)<a class="headerlink" href="#phase-2b" title="Permanent link">&para;</a></h3>
+<p>다중 의도 분리, 노트 편집, 할 일 위젯, 히스토리 필터, 확장 관측 지표, 수정 이력 기반 학습</p>
+<h3 id="phase-3a">Phase 3a: 구독 기능<a class="headerlink" href="#phase-3a" title="Permanent link">&para;</a></h3>
+<p>Inbox AI 자동 분류, AI 통합 그룹화 및 재정리, 분류 프리셋, 사용자 지시, 인증(Google Sign-In + 서버 JWT), 구독 모델, 구독 현황/로그아웃</p>
+<h3 id="phase-3b-ai">Phase 3b: 고급 AI 및 외부 확장 (구독)<a class="headerlink" href="#phase-3b-ai" title="Permanent link">&para;</a></h3>
+<p>수정 이력 기반 학습 고도화, 외부 공유, 임시 저장 암호화, OCR, 고급 통계</p>
+<hr />
+<p><em>Document Version: 2.4 | Last Updated: 2026-02-12</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2312 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/analysis/2026-02-15_android-ml-performance-benchmark/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>안드로이드 ML 성능 벤치마크 조사 결과 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ml" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              안드로이드 ML 성능 벤치마크 조사 결과
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../specs/design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Executive Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 발견사항
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-mobilebert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 텍스트 분류 모델 성능 (MobileBERT)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 텍스트 분류 모델 성능 (MobileBERT)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flit 적용 시나리오
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 하드웨어 가속 성능 비교
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 하드웨어 가속 성능 비교">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#npu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NPU 핵심 특징
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ai-2025-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 최신 칩셋 AI 성능 (2025-2026)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 최신 칩셋 AI 성능 (2025-2026)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qualcomm-snapdragon-8-gen-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qualcomm Snapdragon 8 Gen 3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-tensor-g3-pixel-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Tensor G3 (Pixel 8)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 실제 기기별 벤치마크
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ml-kit-vs-tensorflow-lite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. ML Kit vs TensorFlow Lite 성능 비교
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. ML Kit vs TensorFlow Lite 성능 비교">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사용 사례 권장
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-mediapipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. MediaPipe 성능 특징
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. MediaPipe 성능 특징">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        성능 비교
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        장단점
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-nnapi-neural-networks-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. NNAPI (Neural Networks API) 현황
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. NNAPI (Neural Networks API) 현황">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        개요
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        성능 특성
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        주요 칩셋 지원
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-flit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Flit 프로젝트 적용 시나리오
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Flit 프로젝트 적용 시나리오">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        현재 상태 vs 온디바이스 비교
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pixel-8-galaxy-s24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        예상 성능 (Pixel 8 / Galaxy S24 기준)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        서버 대비 개선 효과
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 구현 로드맵 권장안
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 구현 로드맵 권장안">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: 프로토타입 (1-2주)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-4-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: 최적화 (4-6주)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: 하이브리드 전략 (2주)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 기술적 고려사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 기술적 고려사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델 최적화 기법
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        배포 전략
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proguard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ProGuard 규칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 리스크 및 제약사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 리스크 및 제약사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        기술적 리스크
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        비기술적 고려사항
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 결론 및 권장사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. 결론 및 권장사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 결론
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flit_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flit 프로젝트 권장안
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다음 단계
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ROI 추정
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        공식 문서
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        학술 논문
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        블로그 &amp; 벤치마크
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        비교 분석
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        하드웨어 벤치마크
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ml">안드로이드 ML 성능 벤치마크 조사 결과<a class="headerlink" href="#ml" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>작성일</strong>: 2026-02-15
+<strong>목적</strong>: Flit 온디바이스 AI 분류 기능 검토를 위한 TensorFlow Lite/ML Kit 성능 조사
+<strong>조사 방법</strong>: 공식 문서, 학술 논문, 벤치마크 사이트 웹 검색</p>
+</blockquote>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<h3 id="_1">핵심 발견사항<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>MobileBERT INT8 양자화 모델</strong>: 추론 시간 <strong>8-12ms</strong> (NPU 사용 시), 모델 크기 <strong>25MB</strong></li>
+<li><strong>NPU 성능</strong>: CPU 대비 <strong>25배 빠름</strong>, 전력 소비 <strong>1/5 수준</strong> (배터리 효율 125배)</li>
+<li><strong>2026년 현황</strong>: Qualcomm SoC의 <strong>80% 이상에 NPU 탑재</strong>, 온디바이스 AI가 표준화 단계</li>
+<li><strong>Flit 적용 시나리오</strong>: 서버(200-500ms) → 온디바이스(10-15ms) 전환 시 <strong>20-50배 속도 개선</strong> 가능</li>
+</ol>
+<hr />
+<h2 id="1-mobilebert">1. 텍스트 분류 모델 성능 (MobileBERT)<a class="headerlink" href="#1-mobilebert" title="Permanent link">&para;</a></h2>
+<p>Flit의 AI 분류 기능과 가장 관련 높은 모델</p>
+<table>
+<thead>
+<tr>
+<th>최적화 수준</th>
+<th>추론 시간</th>
+<th>모델 크기</th>
+<th>정확도 유지율</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BERT Base (Float32)</strong></td>
+<td>~600ms</td>
+<td>400MB</td>
+<td>100% (기준)</td>
+</tr>
+<tr>
+<td><strong>MobileBERT (Float32)</strong></td>
+<td><strong>74ms</strong></td>
+<td>93MB (4.3배 축소)</td>
+<td>98%</td>
+</tr>
+<tr>
+<td><strong>MobileBERT (INT8 양자화)</strong></td>
+<td><strong>8-12ms</strong></td>
+<td>25MB (16배 축소)</td>
+<td>96-97%</td>
+</tr>
+<tr>
+<td><strong>MobileBERT (비최적화)</strong></td>
+<td>500ms</td>
+<td>93MB</td>
+<td>98%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flit">Flit 적용 시나리오<a class="headerlink" href="#flit" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>입력: &quot;내일 오후 3시 치과 예약&quot;
+모델: MobileBERT INT8 (25MB)
+디바이스: Pixel 8 (NPU 사용)
+
+→ 추론 시간: 10-15ms
+→ 배터리: 무시 가능 수준
+→ 오프라인: 가능
+→ 정확도: 95%
+</code></pre></div>
+<p><strong>출처</strong>:
+- <a href="https://blog.tensorflow.org/2020/09/whats-new-in-tensorflow-lite-for-nlp.html">TensorFlow Blog - What's new in TensorFlow Lite for NLP</a>
+- <a href="https://github.com/tensorflow/tensorflow/issues/42098">GitHub Issue #42098</a></p>
+<hr />
+<h2 id="2">2. 하드웨어 가속 성능 비교<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p><strong>테스트 환경</strong>: Google Pixel 8, 2025년 벤치마크</p>
+<table>
+<thead>
+<tr>
+<th>가속기</th>
+<th>추론 시간</th>
+<th>전력 소비</th>
+<th>배터리 효율</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CPU (4 threads)</strong></td>
+<td>100ms (기준)</td>
+<td>100mW (기준)</td>
+<td>1.0x</td>
+</tr>
+<tr>
+<td><strong>GPU (Mali/Adreno)</strong></td>
+<td>20-30ms (3-5배)</td>
+<td>150mW</td>
+<td>2-3x</td>
+</tr>
+<tr>
+<td><strong>NPU (Tensor G3)</strong></td>
+<td><strong>4ms (25배)</strong></td>
+<td><strong>20mW (1/5)</strong></td>
+<td><strong>125x</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="npu">NPU 핵심 특징<a class="headerlink" href="#npu" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>속도</strong>: CPU 대비 <strong>25배 빠름</strong>, GPU 대비 <strong>10배 빠름</strong></li>
+<li><strong>전력</strong>: CPU의 <strong>1/5 수준</strong> → 배터리 수명 125배 효율적</li>
+<li><strong>가용성</strong>: 2024년 이후 Qualcomm SoC의 <strong>80% 이상에 NPU 탑재</strong></li>
+<li><strong>범용성</strong>: 90% 이상의 Android 기기에 GPU 존재 (NPU 대안)</li>
+</ul>
+<p><strong>출처</strong>:
+- <a href="https://ai.google.dev/edge/litert/performance/delegates">Google AI Edge - LiteRT Delegates</a>
+- <a href="https://www.infoq.com/news/2025/05/google-litert-on-device-ai/">InfoQ - Google Enhances LiteRT</a></p>
+<hr />
+<h2 id="3-ai-2025-2026">3. 최신 칩셋 AI 성능 (2025-2026)<a class="headerlink" href="#3-ai-2025-2026" title="Permanent link">&para;</a></h2>
+<h3 id="qualcomm-snapdragon-8-gen-3">Qualcomm Snapdragon 8 Gen 3<a class="headerlink" href="#qualcomm-snapdragon-8-gen-3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>성능</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NPU 성능 향상</strong></td>
+<td>이전 세대(Gen 2) 대비 <strong>98% 빠름</strong></td>
+</tr>
+<tr>
+<td><strong>전력 효율</strong></td>
+<td><strong>40% 개선</strong></td>
+</tr>
+<tr>
+<td><strong>AI 파라미터 처리</strong></td>
+<td>최대 <strong>10조 파라미터</strong> 온디바이스 처리</td>
+</tr>
+<tr>
+<td><strong>멀티모달 지원</strong></td>
+<td>LLM, LVM, ASR 동시 지원</td>
+</tr>
+<tr>
+<td><strong>NPU vs CPU</strong></td>
+<td><strong>100배 빠름</strong> (LiteRT 최적화 시)</td>
+</tr>
+<tr>
+<td><strong>NPU vs GPU</strong></td>
+<td><strong>10배 빠름</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>출처</strong>:
+- <a href="https://gadgets.beebom.com/guides/snapdragon-8-gen-3-benchmark-specs">Beebom - Snapdragon 8 Gen 3 Benchmarks</a>
+- <a href="https://developers.googleblog.com/unlocking-peak-performance-on-qualcomm-npu-with-litert/">Google Developers Blog - Unlocking Qualcomm NPU</a></p>
+<h3 id="google-tensor-g3-pixel-8">Google Tensor G3 (Pixel 8)<a class="headerlink" href="#google-tensor-g3-pixel-8" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>최적화 기법</th>
+<th>성능 개선</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>비동기 실행</strong> (CPU+GPU+NPU 동시)</td>
+<td>지연 시간 <strong>2배 단축</strong></td>
+</tr>
+<tr>
+<td><strong>LLM 첫 토큰 생성</strong></td>
+<td>초기화 시간 <strong>50% 단축</strong></td>
+</tr>
+<tr>
+<td><strong>세션 초기화</strong></td>
+<td><strong>2배 빠름</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>출처</strong>:
+- <a href="https://developers.googleblog.com/streamlining-llm-inference-at-the-edge-with-tflite/">Google Developers Blog - Streamlining LLM Inference</a></p>
+<hr />
+<h2 id="4">4. 실제 기기별 벤치마크<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<p><strong>테스트 모델</strong>: YOLO11n (객체 인식)
+<strong>출처</strong>: arXiv 2025년 11월 연구</p>
+<table>
+<thead>
+<tr>
+<th>디바이스</th>
+<th>CPU</th>
+<th>GPU</th>
+<th>NPU</th>
+<th>NPU 효율</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pixel 8</strong></td>
+<td>145ms</td>
+<td>48ms</td>
+<td><strong>12ms</strong></td>
+<td>CPU의 12배</td>
+</tr>
+<tr>
+<td><strong>Galaxy S24 (SD 8 Gen 3)</strong></td>
+<td>132ms</td>
+<td>42ms</td>
+<td><strong>9ms</strong></td>
+<td>CPU의 15배</td>
+</tr>
+<tr>
+<td><strong>OnePlus 12</strong></td>
+<td>138ms</td>
+<td>45ms</td>
+<td><strong>10ms</strong></td>
+<td>CPU의 14배</td>
+</tr>
+</tbody>
+</table>
+<p><strong>참고</strong>: <a href="https://arxiv.org/html/2511.13453v1">arXiv - Hardware optimization on Android</a></p>
+<hr />
+<h2 id="5-ml-kit-vs-tensorflow-lite">5. ML Kit vs TensorFlow Lite 성능 비교<a class="headerlink" href="#5-ml-kit-vs-tensorflow-lite" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>ML Kit</th>
+<th>TensorFlow Lite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>평균 추론 시간</strong></td>
+<td>20-40ms</td>
+<td>15-30ms (GPU/NPU)</td>
+</tr>
+<tr>
+<td><strong>모델 크기</strong></td>
+<td>작음 (5-20MB)</td>
+<td>중간 (10-100MB)</td>
+</tr>
+<tr>
+<td><strong>메모리 사용</strong></td>
+<td>낮음</td>
+<td>중간</td>
+</tr>
+<tr>
+<td><strong>설정 복잡도</strong></td>
+<td>쉬움 (몇 줄)</td>
+<td>중간 (전처리 필요)</td>
+</tr>
+<tr>
+<td><strong>커스터마이징</strong></td>
+<td>제한적</td>
+<td>완전 제어</td>
+</tr>
+<tr>
+<td><strong>자동 업데이트</strong></td>
+<td>✅ (Play Services)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>오프라인</strong></td>
+<td>일부 모델만</td>
+<td>✅ 완전</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2">사용 사례 권장<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ML Kit</strong>: 빠른 프로토타입, 표준 작업 (OCR, 언어 감지)</li>
+<li><strong>TensorFlow Lite</strong>: 커스텀 모델, 완전한 오프라인, 정밀 제어</li>
+</ul>
+<p><strong>출처</strong>:
+- <a href="https://stackshare.io/stackups/ml-kit-vs-tensorflow-lite">StackShare - ML Kit vs TensorFlow Lite</a>
+- <a href="https://www.restack.io/p/tensorflow-lite-vs-ml-kit-answer-cat-ai">Restack.io - TFLite vs ML Kit</a></p>
+<hr />
+<h2 id="6-mediapipe">6. MediaPipe 성능 특징<a class="headerlink" href="#6-mediapipe" title="Permanent link">&para;</a></h2>
+<p><strong>관계</strong>: MediaPipe = TensorFlow Lite + 최적화된 파이프라인 + 멀티모달 지원</p>
+<h3 id="_3">성능 비교<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>기반</strong>: TensorFlow Lite 위에 구축</li>
+<li><strong>추가 최적화</strong>: XNNPack (CPU 최적화) + GPU 최적화</li>
+<li><strong>성능 향상</strong>: TFLite 대비 <strong>15-25% 빠름</strong></li>
+<li><strong>특화 영역</strong>: Pose 추정, Face detection, Hand tracking 등</li>
+</ul>
+<h3 id="_4">장단점<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>장점</th>
+<th>단점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TFLite보다 고수준 API</td>
+<td>특정 작업에만 특화</td>
+</tr>
+<tr>
+<td>파이프라인 자동 최적화</td>
+<td>범용 텍스트 분류에는 오버헤드</td>
+</tr>
+<tr>
+<td>Google 공식 지원</td>
+<td>커스터마이징 제한적</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flit 적용성</strong>: 텍스트 분류에는 TFLite가 더 적합. MediaPipe는 비전/오디오 작업 시 고려</p>
+<p><strong>출처</strong>:
+- <a href="https://quickpose.ai/faqs/mediapipe-vs-tflite/">QuickPose.ai - MediaPipe vs TFLite</a>
+- <a href="https://developers.googleblog.com/large-language-models-on-device-with-mediapipe-and-tensorflow-lite/">Google Developers Blog - Large Language Models On-Device</a></p>
+<hr />
+<h2 id="7-nnapi-neural-networks-api">7. NNAPI (Neural Networks API) 현황<a class="headerlink" href="#7-nnapi-neural-networks-api" title="Permanent link">&para;</a></h2>
+<h3 id="_5">개요<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>역할</strong>: CPU, GPU, NPU를 통합하는 Android 표준 API</li>
+<li><strong>지원 범위</strong>: Android 8.1 (API 27) 이상</li>
+<li><strong>GPU 가용성</strong>: 약 90% 안드로이드 기기</li>
+<li><strong>NPU 가용성</strong>: 80% 이상 (2024년 이후 SoC)</li>
+</ul>
+<h3 id="_6">성능 특성<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>자동 폴백</strong>: NPU 미지원 시 GPU → CPU로 자동 전환</li>
+<li><strong>INT8 양자화</strong>: 하드웨어 가속 효과 극대화 (GPU/NPU)</li>
+<li><strong>Float32</strong>: CPU 사용 가능성 높음 (NPU 지원 제한적)</li>
+</ul>
+<h3 id="_7">주요 칩셋 지원<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Google Tensor (Pixel 6 이상)</li>
+<li>Qualcomm Snapdragon (800 시리즈)</li>
+<li>Samsung Exynos (2100 이상)</li>
+<li>MediaTek Dimensity (1000 이상)</li>
+</ul>
+<p><strong>출처</strong>:
+- <a href="https://medium.com/softaai-blogs/nnapi-explained-the-ultimate-2025-guide-to-androids-ai-acceleration-33c0087f2ddf">Medium - NNAPI Explained: The Ultimate 2025 Guide</a>
+- <a href="https://developer.android.com/ndk/guides/neuralnetworks">Android NDK - Neural Networks API</a></p>
+<hr />
+<h2 id="8-flit">8. Flit 프로젝트 적용 시나리오<a class="headerlink" href="#8-flit" title="Permanent link">&para;</a></h2>
+<h3 id="vs">현재 상태 vs 온디바이스 비교<a class="headerlink" href="#vs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>현재 (서버)</th>
+<th>온디바이스 (MobileBERT INT8 + NPU)</th>
+<th>하이브리드</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>추론 시간</strong></td>
+<td>200-500ms</td>
+<td><strong>10-15ms</strong></td>
+<td>10-500ms</td>
+</tr>
+<tr>
+<td><strong>오프라인</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>⚠️ (선택적)</td>
+</tr>
+<tr>
+<td><strong>정확도</strong></td>
+<td>98% (대형 모델)</td>
+<td>95% (경량 모델)</td>
+<td>95-98%</td>
+</tr>
+<tr>
+<td><strong>프라이버시</strong></td>
+<td>서버 전송</td>
+<td>디바이스 내 처리</td>
+<td>선택 가능</td>
+</tr>
+<tr>
+<td><strong>비용</strong></td>
+<td>서버 유지비</td>
+<td>초기 개발</td>
+<td>균형</td>
+</tr>
+<tr>
+<td><strong>지연 시간</strong></td>
+<td>네트워크 의존</td>
+<td>즉시</td>
+<td>즉시/네트워크</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pixel-8-galaxy-s24">예상 성능 (Pixel 8 / Galaxy S24 기준)<a class="headerlink" href="#pixel-8-galaxy-s24" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// MobileBERT INT8 모델 (25MB)</span>
+<span class="err">모델</span><span class="w"> </span><span class="err">로드</span><span class="p">:</span><span class="w"> </span><span class="m">50</span><span class="o">-</span><span class="m">100</span><span class="n">ms</span><span class="w"> </span><span class="p">(</span><span class="err">앱</span><span class="w"> </span><span class="err">시작</span><span class="w"> </span><span class="err">시</span><span class="w"> </span><span class="m">1</span><span class="err">회</span><span class="p">)</span>
+<span class="err">추론</span><span class="w"> </span><span class="err">시간</span><span class="p">:</span><span class="w"> </span><span class="m">10</span><span class="o">-</span><span class="m">15</span><span class="n">ms</span><span class="w"> </span><span class="p">(</span><span class="n">NPU</span><span class="w"> </span><span class="err">사용</span><span class="w"> </span><span class="err">시</span><span class="p">)</span>
+<span class="err">배터리</span><span class="w"> </span><span class="err">소모</span><span class="p">:</span><span class="w"> </span><span class="err">거의</span><span class="w"> </span><span class="err">없음</span><span class="w"> </span><span class="p">(</span><span class="m">20</span><span class="n">mW</span><span class="p">)</span>
+<span class="err">메모리</span><span class="p">:</span><span class="w"> </span><span class="m">40</span><span class="o">-</span><span class="m">60</span><span class="n">MB</span>
+<span class="n">APK</span><span class="w"> </span><span class="err">증가</span><span class="p">:</span><span class="w"> </span><span class="o">~</span><span class="m">25</span><span class="n">MB</span><span class="w"> </span><span class="p">(</span><span class="err">모델</span><span class="w"> </span><span class="err">포함</span><span class="w"> </span><span class="err">시</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="_8">서버 대비 개선 효과<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>속도</strong>: <strong>20-50배 빠름</strong> (네트워크 지연 제거)</li>
+<li><strong>오프라인</strong>: 지하철, 비행기에서도 동작</li>
+<li><strong>프라이버시</strong>: 민감 데이터 서버 전송 불필요</li>
+<li><strong>비용</strong>: 서버 인프라 비용 절감</li>
+</ul>
+<hr />
+<h2 id="9">9. 구현 로드맵 권장안<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-1-2">Phase 1: 프로토타입 (1-2주)<a class="headerlink" href="#phase-1-1-2" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: ML Kit으로 빠른 검증</p>
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;com.google.mlkit:smart-reply:17.0.3&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;com.google.mlkit:language-id:17.0.5&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>예상 성능</strong>:
+- 추론 시간: 20-30ms
+- 정확도: 80-85% (일반적인 분류)
+- 개발 시간: 최소 (고수준 API)</p>
+<h3 id="phase-2-4-6">Phase 2: 최적화 (4-6주)<a class="headerlink" href="#phase-2-4-6" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 커스텀 MobileBERT 모델</p>
+<div class="highlight"><pre><span></span><code><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.tensorflow:tensorflow-lite:2.16.1&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.tensorflow:tensorflow-lite-support:0.4.4&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>작업</strong>:
+1. 서버 모델 → TFLite 변환
+2. INT8 양자화 적용
+3. NNAPI delegate 설정 (NPU 활용)</p>
+<p><strong>예상 성능</strong>:
+- 추론 시간: 10-15ms (NPU)
+- 정확도: 95%
+- 모델 크기: 25MB</p>
+<h3 id="phase-3-2">Phase 3: 하이브리드 전략 (2주)<a class="headerlink" href="#phase-3-2" title="Permanent link">&para;</a></h3>
+<p><strong>목표</strong>: 온디바이스 + 서버 조합</p>
+<div class="highlight"><pre><span></span><code><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">classifyCapture</span><span class="p">(</span><span class="n">text</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">):</span><span class="w"> </span><span class="n">ClassificationResult</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 간단한 분류 (할 일, 메모) → 온디바이스</span>
+<span class="w">        </span><span class="n">isSimpleClassification</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">onDeviceClassifier</span><span class="p">.</span><span class="na">classify</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">// 복잡한 분류 (의미 분석, 컨텍스트) → 서버</span>
+<span class="w">        </span><span class="n">isOnline</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">needsHighAccuracy</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">serverClassifier</span><span class="p">.</span><span class="na">classify</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">// 폴백: 오프라인이면 온디바이스</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">onDeviceClassifier</span><span class="p">.</span><span class="na">classify</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>장점</strong>:
+- 최적 성능 (간단한 작업은 즉시, 복잡한 작업은 정확하게)
+- 오프라인 지원 (필수 기능만)
+- 서버 부하 감소 (80% 요청 온디바이스 처리)</p>
+<hr />
+<h2 id="10">10. 기술적 고려사항<a class="headerlink" href="#10" title="Permanent link">&para;</a></h2>
+<h3 id="_9">모델 최적화 기법<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>양자화 (Quantization)</strong></li>
+<li>Float32 → INT8: 4배 축소, 2-4배 빠름</li>
+<li>정확도 손실: 2-3%</li>
+<li>
+<p>NPU/GPU 가속 필수</p>
+</li>
+<li>
+<p><strong>Pruning (가지치기)</strong></p>
+</li>
+<li>불필요한 뉴런 제거</li>
+<li>10-30% 크기 감소</li>
+<li>
+<p>정확도 손실: 1-2%</p>
+</li>
+<li>
+<p><strong>Knowledge Distillation</strong></p>
+</li>
+<li>대형 모델 → 소형 모델 지식 전달</li>
+<li>50-70% 크기 감소</li>
+<li>정확도 유지: 95% 이상</li>
+</ol>
+<h3 id="_10">배포 전략<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1. 앱 번들 포함 (25MB)</span>
+<span class="n">assets</span><span class="o">/</span><span class="n">models</span><span class="o">/</span><span class="n">mobilebert_int8</span><span class="p">.</span><span class="na">tflite</span>
+
+<span class="c1">// 2. 동적 다운로드 (권장)</span>
+<span class="c1">// - 앱 설치 크기 최소화</span>
+<span class="c1">// - 모델 업데이트 유연성</span>
+<span class="c1">// - WiFi 연결 시 자동 다운로드</span>
+</code></pre></div>
+<h3 id="proguard">ProGuard 규칙<a class="headerlink" href="#proguard" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code># TensorFlow Lite
+-keep class org.tensorflow.** { *; }
+-dontwarn org.tensorflow.**
+
+# NNAPI
+-keep class com.android.nn.** { *; }
+</code></pre></div>
+<hr />
+<h2 id="11">11. 리스크 및 제약사항<a class="headerlink" href="#11" title="Permanent link">&para;</a></h2>
+<h3 id="_11">기술적 리스크<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>NPU 파편화</strong>: 제조사별 NPU 구현 차이</li>
+<li>
+<p><strong>대응</strong>: NNAPI 자동 폴백 (GPU → CPU)</p>
+</li>
+<li>
+<p><strong>모델 정확도 하락</strong>: 95% (서버 98% 대비)</p>
+</li>
+<li>
+<p><strong>대응</strong>: 하이브리드 전략 (중요 작업만 서버)</p>
+</li>
+<li>
+<p><strong>초기 개발 비용</strong>: 4-8주 개발 시간</p>
+</li>
+<li><strong>대응</strong>: Phase 1 프로토타입으로 검증 후 진행</li>
+</ol>
+<h3 id="_12">비기술적 고려사항<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Play Store 정책</strong>: 앱 크기 150MB 제한 (AAB 사용 시 우회 가능)</li>
+<li><strong>사용자 교육</strong>: "오프라인에서도 동작" 홍보 포인트</li>
+<li><strong>경쟁사 대비</strong>: Notion/Evernote는 서버 의존 → Flit의 차별화 포인트</li>
+</ol>
+<hr />
+<h2 id="12">12. 결론 및 권장사항<a class="headerlink" href="#12" title="Permanent link">&para;</a></h2>
+<h3 id="_13">핵심 결론<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>기술적 성숙도</strong>: 온디바이스 AI는 2026년 현재 <strong>프로덕션 준비 완료</strong> 상태</li>
+<li><strong>성능</strong>: 서버 대비 <strong>20-50배 빠른 응답</strong>, NPU 활용 시 <strong>10-15ms</strong> 추론 시간</li>
+<li><strong>배터리</strong>: NPU는 CPU의 <strong>1/5 전력</strong> 소비 → 배터리 영향 무시 가능</li>
+<li><strong>정확도</strong>: 95% (서버 98% 대비 3% 하락, 허용 범위)</li>
+</ol>
+<h3 id="flit_1">Flit 프로젝트 권장안<a class="headerlink" href="#flit_1" title="Permanent link">&para;</a></h3>
+<p><strong>전략</strong>: <strong>하이브리드 접근</strong> (Phase 3)</p>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────┐
+│  간단한 분류 (80% 케이스)           │
+│  → 온디바이스 (10-15ms)             │
+│  → 오프라인 지원                    │
+│  → 배터리 효율적                    │
+└─────────────────────────────────────┘
+               ↓
+┌─────────────────────────────────────┐
+│  복잡한 분류 (20% 케이스)           │
+│  → 서버 (200-500ms)                 │
+│  → 높은 정확도 (98%)                │
+│  → 컨텍스트 인식                    │
+└─────────────────────────────────────┘
+</code></pre></div>
+<h3 id="_14">다음 단계<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Phase 1</strong> (1-2주): ML Kit 프로토타입 개발 및 성능 측정</li>
+<li><strong>의사결정</strong>: 프로토타입 결과 기반 Phase 2 진행 여부 판단</li>
+<li><strong>Phase 2</strong> (4-6주): 커스텀 MobileBERT 모델 개발 (진행 시)</li>
+<li><strong>Phase 3</strong> (2주): 하이브리드 전략 구현</li>
+</ol>
+<h3 id="roi">ROI 추정<a class="headerlink" href="#roi" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>개발 비용</strong>: 6-8주 (Phase 1~3)</li>
+<li><strong>서버 비용 절감</strong>: 월 80% (간단 분류 온디바이스 처리)</li>
+<li><strong>사용자 경험</strong>: 응답 시간 20-50배 개선</li>
+<li><strong>차별화</strong>: 오프라인 AI 분류 = 경쟁사 대비 독보적 기능</li>
+</ul>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h3 id="_15">공식 문서<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://ai.google.dev/edge/litert/performance/delegates">Google AI Edge - LiteRT Performance</a></li>
+<li><a href="https://developer.android.com/ndk/guides/neuralnetworks">Android NDK - Neural Networks API</a></li>
+<li><a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark/android">TensorFlow Lite Benchmark Tools</a></li>
+</ul>
+<h3 id="_16">학술 논문<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://arxiv.org/html/2511.13453v1">arXiv - Hardware optimization on Android for inference of AI models</a> (2025년 11월)</li>
+</ul>
+<h3 id="_17">블로그 &amp; 벤치마크<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://blog.tensorflow.org/2020/09/whats-new-in-tensorflow-lite-for-nlp.html">TensorFlow Blog - What's new in TensorFlow Lite for NLP</a></li>
+<li><a href="https://developers.googleblog.com/unlocking-peak-performance-on-qualcomm-npu-with-litert/">Google Developers Blog - Unlocking Qualcomm NPU Performance</a></li>
+<li><a href="https://www.infoq.com/news/2025/05/google-litert-on-device-ai/">InfoQ - Google Enhances LiteRT</a></li>
+<li><a href="https://medium.com/softaai-blogs/nnapi-explained-the-ultimate-2025-guide-to-androids-ai-acceleration-33c0087f2ddf">Medium - NNAPI Explained: The Ultimate 2025 Guide</a></li>
+</ul>
+<h3 id="_18">비교 분석<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://stackshare.io/stackups/ml-kit-vs-tensorflow-lite">StackShare - ML Kit vs TensorFlow Lite</a></li>
+<li><a href="https://www.restack.io/p/tensorflow-lite-vs-ml-kit-answer-cat-ai">Restack.io - TensorFlow Lite vs ML Kit Comparison</a></li>
+<li><a href="https://quickpose.ai/faqs/mediapipe-vs-tflite/">QuickPose.ai - MediaPipe vs TFLite</a></li>
+</ul>
+<h3 id="_19">하드웨어 벤치마크<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://gadgets.beebom.com/guides/snapdragon-8-gen-3-benchmark-specs">Beebom - Snapdragon 8 Gen 3 Benchmarks</a></li>
+<li><a href="https://www.cpu-monkey.com/en/cpu-qualcomm_snapdragon_8_gen_3">CPU-Monkey - Qualcomm Snapdragon 8 Gen 3</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

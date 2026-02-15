@@ -1,0 +1,4533 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Flit. 멀티모달 캡처 앱 문서">
+      
+      
+      
+        <link rel="canonical" href="https://elaus00.github.io/Flit/specs/ux-writing-audit/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Flit. UX 라이팅 감사 보고서 - Flit. Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/flit.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flit-ux" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="Flit. Docs" class="md-header__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flit. Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Flit. UX 라이팅 감사 보고서
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="라이트 모드로 전환"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="라이트 모드로 전환" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="black"  aria-label="다크 모드로 전환"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="다크 모드로 전환" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Flit. Docs" class="md-nav__button md-logo" aria-label="Flit. Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flit. Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/elaus00/Flit" title="저장소로 이동" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    elaus00/Flit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제품 방향
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제품 방향
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/flit_prd_v10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PRD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../direction/philosophy_principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    철학 및 원칙
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../brand-identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    브랜드 아이덴티티
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    가이드
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    디자인 가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/architecture_conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    아키텍처 컨벤션
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    인사이트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    인사이트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_bugfix-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    버그 수정 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_legacy-audit-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    레거시 코드 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-07_multi-agent-insights/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    멀티 에이전트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_rebrand-lessons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    리브랜딩 교훈
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_state-hoisting-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Hoisting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-14_roborazzi-robolectric-pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roborazzi 함정
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../insights/2026-02-13_bash-permission-patterns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bash 권한 패턴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    분석
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    분석
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/ui-improvement-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI 개선 보고서
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/material-design-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Material Design 점검
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../analysis/qa-retrospective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QA 회고
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    성능
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    가이드
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/performance_log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    성능 로그
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/2026-02-12_benchmark_apm_workflow_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    벤치마크 노트
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-ux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. UX 라이팅 가이드라인
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. UX 라이팅 가이드라인">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 원칙
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 한국어 톤앤매너 가이드
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 유형별 가이드
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.3 유형별 가이드">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        빈 상태 (Empty State)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        에러 메시지
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        버튼/액션 라벨
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#placeholder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placeholder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 현재 텍스트 목록
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 현재 텍스트 목록">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-capturecontent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 홈 화면 (CaptureContent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-calendarscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 캘린더 화면 (CalendarScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-scheduletimeline-tasklist-calendarcard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 캘린더 컴포넌트 (ScheduleTimeline / TaskList / CalendarCard)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-notesscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 노트 화면 (NotesScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 폴더 다이얼로그
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-notedetailscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 노트 상세 화면 (NoteDetailScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-settingsscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 설정 화면 (SettingsScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-viewmodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 설정 ViewModel 에러 메시지
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-ai-aistatussheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.9 AI 분류 현황 (AIStatusSheet)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#210-classificationdropdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.10 분류 드롭다운 (ClassificationDropdown)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#211-onboardingscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.11 온보딩 (OnboardingScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212-searchscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.12 검색 화면 (SearchScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#213-trashscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.13 휴지통 (TrashScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#214-historyscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.14 전체 기록 (HistoryScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#215-capturedetailscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.15 캡처 상세 (CaptureDetailScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#216-capturedetailscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.16 캘린더 동기화 섹션 (CaptureDetailScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#217" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.17 공통 컴포넌트
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#218" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.18 위젯
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#219-oauth-settingsscreen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.19 OAuth 디버그 다이얼로그 (SettingsScreen)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#220-loginscreen-phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.20 로그인 화면 (LoginScreen) — Phase 3a 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#221-subscriptionscreen-phase-3a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.21 구독 화면 (SubscriptionScreen) — Phase 3a 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#222-ai-reorganizescreen-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.22 AI 재구성 화면 (ReorganizeScreen) — Phase 3b 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#223-analyticsdashboardscreen-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.23 분석 대시보드 (AnalyticsDashboardScreen) — Phase 3b 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#224-ai-aiclassificationsettingsscreen-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.24 AI 분류 설정 (AiClassificationSettingsScreen) — Phase 3b 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#225-calendarsettingsscreen-phase-3b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.25 캘린더 설정 (CalendarSettingsScreen) — Phase 3b 추가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 개선 제안 요약
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 개선 제안 요약">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p0-2026-02-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P0 (즉시 수정 필요) — 일관성 문제 ✅ 전체 반영 완료 (2026-02-12)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p1-2026-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 (개선 권장) — 톤앤매너 &amp; 표현 개선 ✅ 대부분 반영 완료 (2026-02-14)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2-2026-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2 (향후 고려) — 감성적 표현 &amp; 세련됨 ✅ 대부분 반영 완료 (2026-02-14)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 종합 분석
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 종합 분석">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 통계
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 주요 문제점 (해결 현황)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 잘 된 점
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="flit-ux">Flit. UX 라이팅 감사 보고서<a class="headerlink" href="#flit-ux" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>작성일: 2026-02-08
+대상: Presentation 레이어 전체 (.kt 49개 파일 + 위젯 XML 3개)
+목적: 앱 내 모든 사용자 노출 텍스트 전수 조사 + UX 라이팅 개선 제안</p>
+</blockquote>
+<hr />
+<h2 id="1-ux">1. UX 라이팅 가이드라인<a class="headerlink" href="#1-ux" title="Permanent link">&para;</a></h2>
+<h3 id="11">1.1 원칙<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>원칙</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>명확성</strong></td>
+<td>사용자가 한 번에 이해할 수 있는 문장. 전문 용어 최소화</td>
+</tr>
+<tr>
+<td><strong>간결성</strong></td>
+<td>모바일은 화면이 작으므로 한 줄로 전달. CTA는 2-4글자</td>
+</tr>
+<tr>
+<td><strong>행동 유도</strong></td>
+<td>빈 상태/에러 메시지에는 반드시 "다음 행동"을 안내</td>
+</tr>
+<tr>
+<td><strong>일관성</strong></td>
+<td>같은 개념에 같은 단어 사용 (할 일/할일 혼용 금지)</td>
+</tr>
+<tr>
+<td><strong>친근함</strong></td>
+<td>딱딱한 시스템 메시지가 아닌, 사람이 말하는 듯한 톤</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12">1.2 한국어 톤앤매너 가이드<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>기준</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>문체</strong></td>
+<td>해요체 (친근하면서 정중) — "저장되었습니다" 대신 "저장했어요" 권장</td>
+</tr>
+<tr>
+<td><strong>숫자</strong></td>
+<td>한글 표기 ("3분" 대신 "3분" — 아라비아 숫자 사용)</td>
+</tr>
+<tr>
+<td><strong>영문</strong></td>
+<td>고유명사(Flit., Google Calendar)만 영문 유지, 나머지 한글화</td>
+</tr>
+<tr>
+<td><strong>존칭</strong></td>
+<td>사용자 지칭 불필요 (주어 생략이 자연스러운 한국어 특성 활용)</td>
+</tr>
+<tr>
+<td><strong>부정</strong></td>
+<td>"~할 수 없습니다" 대신 "~해주세요" (긍정적 안내 우선)</td>
+</tr>
+<tr>
+<td><strong>느낌표</strong></td>
+<td>최소 사용 (온보딩/성공 시만 허용)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13">1.3 유형별 가이드<a class="headerlink" href="#13" title="Permanent link">&para;</a></h3>
+<h4 id="empty-state">빈 상태 (Empty State)<a class="headerlink" href="#empty-state" title="Permanent link">&para;</a></h4>
+<ul>
+<li>왜 비어있는지 설명 + 어떻게 채울 수 있는지 안내</li>
+<li>예: "아직 노트가 없어요" + "캡처하면 AI가 자동으로 분류해요"</li>
+</ul>
+<h4 id="_1">에러 메시지<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>무엇이 잘못되었는지 + 어떻게 해결하는지</li>
+<li>예: "저장에 실패했어요. 다시 시도해주세요"</li>
+</ul>
+<h4 id="_2">버튼/액션 라벨<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li>동사형 2-4글자: "저장", "삭제", "확인", "전송"</li>
+<li>결과를 예측할 수 있는 라벨: "삭제" 대신 "휴지통으로 이동"</li>
+</ul>
+<h4 id="placeholder">Placeholder<a class="headerlink" href="#placeholder" title="Permanent link">&para;</a></h4>
+<ul>
+<li>동사형 권유문: "떠오르는 생각을 적어보세요..."</li>
+<li>말줄임표(...)로 입력 유도</li>
+</ul>
+<hr />
+<h2 id="2">2. 현재 텍스트 목록<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<h3 id="21-capturecontent">2.1 홈 화면 (CaptureContent)<a class="headerlink" href="#21-capturecontent" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"Flit."</code></td>
+<td>제목</td>
+<td>CaptureContent.kt:216</td>
+<td>- (브랜드명)</td>
+</tr>
+<tr>
+<td>벨 아이콘</td>
+<td><code>"AI 분류 현황"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:245</td>
+<td>-</td>
+</tr>
+<tr>
+<td>히스토리 아이콘</td>
+<td><code>"전체 기록"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:254</td>
+<td>-</td>
+</tr>
+<tr>
+<td>설정 아이콘</td>
+<td><code>"설정"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:263</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뱃지 텍스트</td>
+<td><code>"99+"</code> / <code>"$unconfirmedCount"</code></td>
+<td>뱃지</td>
+<td>CaptureContent.kt:236</td>
+<td>-</td>
+</tr>
+<tr>
+<td>입력 placeholder</td>
+<td><code>"떠오르는 생각을 캡처하세요..."</code></td>
+<td>placeholder</td>
+<td>CaptureContent.kt:150</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>이미지 미리보기</td>
+<td><code>"첨부 이미지"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:314</td>
+<td>-</td>
+</tr>
+<tr>
+<td>이미지 제거</td>
+<td><code>"이미지 제거"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:330</td>
+<td>-</td>
+</tr>
+<tr>
+<td>이미지 첨부</td>
+<td><code>"이미지 첨부"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:366</td>
+<td>-</td>
+</tr>
+<tr>
+<td>전송 버튼</td>
+<td><code>"전송"</code></td>
+<td>contentDescription</td>
+<td>CaptureContent.kt:397</td>
+<td>-</td>
+</tr>
+<tr>
+<td>스낵바 (저장 성공)</td>
+<td><code>"캡처가 저장되었습니다"</code></td>
+<td>snackbar</td>
+<td>CaptureContent.kt:71</td>
+<td>P1: "캡처가 저장되었어요"</td>
+</tr>
+<tr>
+<td>이미지 캡처 기본 텍스트</td>
+<td><code>"이미지 캡처"</code></td>
+<td>시스템 텍스트</td>
+<td>CaptureViewModel.kt:113</td>
+<td>-</td>
+</tr>
+<tr>
+<td>에러 (저장 실패)</td>
+<td><code>"저장에 실패했습니다."</code></td>
+<td>에러</td>
+<td>CaptureViewModel.kt:132</td>
+<td>P1: "저장에 실패했어요. 다시 시도해주세요"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-calendarscreen">2.2 캘린더 화면 (CalendarScreen)<a class="headerlink" href="#22-calendarscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>삭제 스낵바</td>
+<td><code>"삭제되었습니다"</code></td>
+<td>snackbar</td>
+<td>CalendarScreen.kt:44</td>
+<td>P1: "삭제했어요"</td>
+</tr>
+<tr>
+<td>실행 취소</td>
+<td><code>"실행 취소"</code></td>
+<td>액션 라벨</td>
+<td>CalendarScreen.kt:45</td>
+<td>-</td>
+</tr>
+<tr>
+<td>캘린더 추가 성공</td>
+<td><code>"캘린더에 추가되었습니다"</code></td>
+<td>snackbar</td>
+<td>CalendarScreen.kt:54</td>
+<td>P1: "캘린더에 추가했어요"</td>
+</tr>
+<tr>
+<td>실행 취소 실패</td>
+<td><code>"실행 취소에 실패했습니다."</code></td>
+<td>에러</td>
+<td>CalendarViewModel.kt:235</td>
+<td>P1: "되돌리기에 실패했어요"</td>
+</tr>
+<tr>
+<td>삭제 실패</td>
+<td><code>"삭제에 실패했습니다."</code></td>
+<td>에러</td>
+<td>CalendarViewModel.kt:248</td>
+<td>P1: "삭제에 실패했어요"</td>
+</tr>
+<tr>
+<td>캘린더 동기화 실패</td>
+<td><code>"캘린더 동기화에 실패했습니다."</code></td>
+<td>에러</td>
+<td>CalendarViewModel.kt:265</td>
+<td>P1: "캘린더 동기화에 실패했어요"</td>
+</tr>
+<tr>
+<td>캘린더 거부 실패</td>
+<td><code>"캘린더 동기화 거부에 실패했습니다."</code></td>
+<td>에러</td>
+<td>CalendarViewModel.kt:283</td>
+<td>P1: "캘린더 동기화 거부에 실패했어요"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-scheduletimeline-tasklist-calendarcard">2.3 캘린더 컴포넌트 (ScheduleTimeline / TaskList / CalendarCard)<a class="headerlink" href="#23-scheduletimeline-tasklist-calendarcard" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정 섹션 헤더</td>
+<td><code>"일정"</code></td>
+<td>섹션 제목</td>
+<td>ScheduleTimeline.kt:47</td>
+<td>-</td>
+</tr>
+<tr>
+<td>일정 빈 상태</td>
+<td><code>"일정이 없습니다"</code></td>
+<td>빈 상태</td>
+<td>ScheduleTimeline.kt:343</td>
+<td>P2: "오늘은 일정이 없어요"</td>
+</tr>
+<tr>
+<td>캘린더 추가 버튼</td>
+<td><code>"캘린더 추가"</code></td>
+<td>버튼</td>
+<td>ScheduleTimeline.kt:256</td>
+<td>-</td>
+</tr>
+<tr>
+<td>무시 버튼</td>
+<td><code>"무시"</code></td>
+<td>버튼</td>
+<td>ScheduleTimeline.kt:270</td>
+<td>-</td>
+</tr>
+<tr>
+<td>동기화됨 배지</td>
+<td><code>"동기화됨"</code></td>
+<td>배지</td>
+<td>ScheduleTimeline.kt:293</td>
+<td>-</td>
+</tr>
+<tr>
+<td>제안 배지</td>
+<td><code>"제안"</code></td>
+<td>배지</td>
+<td>ScheduleTimeline.kt:294</td>
+<td>-</td>
+</tr>
+<tr>
+<td>실패 배지</td>
+<td><code>"실패"</code></td>
+<td>배지</td>
+<td>ScheduleTimeline.kt:295</td>
+<td>-</td>
+</tr>
+<tr>
+<td>거부됨 배지</td>
+<td><code>"거부됨"</code></td>
+<td>배지</td>
+<td>ScheduleTimeline.kt:296</td>
+<td>-</td>
+</tr>
+<tr>
+<td>종일 시간 텍스트</td>
+<td><code>"종일"</code></td>
+<td>시간</td>
+<td>ScheduleTimeline.kt:319</td>
+<td>-</td>
+</tr>
+<tr>
+<td>일정 삭제 아이콘</td>
+<td><code>"일정 삭제"</code></td>
+<td>contentDescription</td>
+<td>ScheduleTimeline.kt:224</td>
+<td>-</td>
+</tr>
+<tr>
+<td>할 일 섹션 헤더</td>
+<td><code>"할 일"</code></td>
+<td>섹션 제목</td>
+<td>TaskList.kt:53</td>
+<td>-</td>
+</tr>
+<tr>
+<td>할 일 빈 상태</td>
+<td><code>"할 일이 없습니다"</code></td>
+<td>빈 상태</td>
+<td>TaskList.kt:262</td>
+<td>P2: "할 일이 없어요"</td>
+</tr>
+<tr>
+<td>AI 마감일 배지</td>
+<td><code>"AI"</code></td>
+<td>배지</td>
+<td>TaskList.kt:140</td>
+<td>-</td>
+</tr>
+<tr>
+<td>마감 텍스트</td>
+<td><code>"M/d HH:mm 마감"</code></td>
+<td>날짜 포맷</td>
+<td>TaskList.kt:243</td>
+<td>-</td>
+</tr>
+<tr>
+<td>확장 마감 텍스트</td>
+<td><code>"마감: ${formatDeadline(...)}"</code></td>
+<td>날짜</td>
+<td>TaskList.kt:169</td>
+<td>-</td>
+</tr>
+<tr>
+<td>체크박스 완료됨</td>
+<td><code>"완료됨"</code></td>
+<td>stateDescription</td>
+<td>TaskList.kt:211</td>
+<td>-</td>
+</tr>
+<tr>
+<td>체크박스 미완료</td>
+<td><code>"미완료"</code></td>
+<td>stateDescription</td>
+<td>TaskList.kt:211</td>
+<td>-</td>
+</tr>
+<tr>
+<td>완료됨 아이콘</td>
+<td><code>"완료됨"</code></td>
+<td>contentDescription</td>
+<td>TaskList.kt:226</td>
+<td>-</td>
+</tr>
+<tr>
+<td>월 헤더</td>
+<td><code>"${monthValue}월"</code> / <code>"${monthValue}월 ${weekOfMonth}주차"</code></td>
+<td>헤더</td>
+<td>CalendarCard.kt:125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>월 드롭다운 아이템</td>
+<td><code>"${month}월"</code></td>
+<td>메뉴</td>
+<td>CalendarCard.kt:144</td>
+<td>-</td>
+</tr>
+<tr>
+<td>접기/펼치기</td>
+<td><code>"접기"</code> / <code>"펼치기"</code></td>
+<td>contentDescription</td>
+<td>CalendarCard.kt:157</td>
+<td>-</td>
+</tr>
+<tr>
+<td>요일</td>
+<td><code>"일"</code> <code>"월"</code> <code>"화"</code> <code>"수"</code> <code>"목"</code> <code>"금"</code> <code>"토"</code></td>
+<td>요일</td>
+<td>CalendarCard.kt:228, 334</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="24-notesscreen">2.4 노트 화면 (NotesScreen)<a class="headerlink" href="#24-notesscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>헤더 제목</td>
+<td><code>"Notes"</code></td>
+<td>제목</td>
+<td>NotesScreen.kt:179</td>
+<td>P0: "노트" (한글 통일)</td>
+</tr>
+<tr>
+<td>휴지통 아이콘</td>
+<td><code>"휴지통"</code></td>
+<td>contentDescription</td>
+<td>NotesScreen.kt:189</td>
+<td>-</td>
+</tr>
+<tr>
+<td>검색 아이콘</td>
+<td><code>"검색"</code></td>
+<td>contentDescription</td>
+<td>NotesScreen.kt:196</td>
+<td>-</td>
+</tr>
+<tr>
+<td>전체 필터 칩</td>
+<td><code>"전체"</code></td>
+<td>칩</td>
+<td>NotesScreen.kt:250</td>
+<td>-</td>
+</tr>
+<tr>
+<td>새 폴더 아이콘</td>
+<td><code>"새 폴더"</code></td>
+<td>contentDescription</td>
+<td>NotesScreen.kt:318</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 이름 변경 메뉴</td>
+<td><code>"이름 변경"</code></td>
+<td>메뉴</td>
+<td>NotesScreen.kt:282</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 삭제 메뉴</td>
+<td><code>"삭제"</code></td>
+<td>메뉴</td>
+<td>NotesScreen.kt:289</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태 (필터 있음)</td>
+<td><code>"이 폴더에 노트가 없습니다"</code></td>
+<td>빈 상태</td>
+<td>NotesScreen.kt:460</td>
+<td>P2: "이 폴더에 노트가 없어요"</td>
+</tr>
+<tr>
+<td>빈 상태 (필터 없음)</td>
+<td><code>"아직 노트가 없습니다"</code></td>
+<td>빈 상태</td>
+<td>NotesScreen.kt:461</td>
+<td>P2: "아직 노트가 없어요"</td>
+</tr>
+<tr>
+<td>빈 상태 안내</td>
+<td><code>"캡처한 내용 중 노트로 분류된 항목이 여기에 표시됩니다"</code></td>
+<td>보조 텍스트</td>
+<td>NotesScreen.kt:467</td>
+<td>P2: "캡처하면 노트로 분류된 항목이 여기에 나타나요"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="25">2.5 폴더 다이얼로그<a class="headerlink" href="#25" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>새 폴더 다이얼로그 제목</td>
+<td><code>"새 폴더"</code></td>
+<td>다이얼로그 제목</td>
+<td>CreateFolderDialog.kt:29</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 이름 라벨</td>
+<td><code>"폴더 이름"</code></td>
+<td>입력 라벨</td>
+<td>CreateFolderDialog.kt:34</td>
+<td>-</td>
+</tr>
+<tr>
+<td>생성 버튼</td>
+<td><code>"생성"</code></td>
+<td>버튼</td>
+<td>CreateFolderDialog.kt:46</td>
+<td>-</td>
+</tr>
+<tr>
+<td>취소 버튼</td>
+<td><code>"취소"</code></td>
+<td>버튼</td>
+<td>CreateFolderDialog.kt:51</td>
+<td>-</td>
+</tr>
+<tr>
+<td>이름 변경 제목</td>
+<td><code>"폴더 이름 변경"</code></td>
+<td>다이얼로그 제목</td>
+<td>RenameFolderDialog.kt:29</td>
+<td>-</td>
+</tr>
+<tr>
+<td>새 이름 라벨</td>
+<td><code>"새 이름"</code></td>
+<td>입력 라벨</td>
+<td>RenameFolderDialog.kt:34</td>
+<td>-</td>
+</tr>
+<tr>
+<td>변경 버튼</td>
+<td><code>"변경"</code></td>
+<td>버튼</td>
+<td>RenameFolderDialog.kt:46</td>
+<td>-</td>
+</tr>
+<tr>
+<td>취소 버튼</td>
+<td><code>"취소"</code></td>
+<td>버튼</td>
+<td>RenameFolderDialog.kt:51</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="26-notedetailscreen">2.6 노트 상세 화면 (NoteDetailScreen)<a class="headerlink" href="#26-notedetailscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"노트"</code></td>
+<td>제목</td>
+<td>NoteDetailScreen.kt:60</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기 아이콘</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>NoteDetailScreen.kt:70</td>
+<td>-</td>
+</tr>
+<tr>
+<td>저장 아이콘</td>
+<td><code>"저장"</code></td>
+<td>contentDescription</td>
+<td>NoteDetailScreen.kt:91</td>
+<td>-</td>
+</tr>
+<tr>
+<td>에러 텍스트</td>
+<td><code>uiState.error</code> (동적)</td>
+<td>에러</td>
+<td>NoteDetailScreen.kt:128</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다시 시도 버튼</td>
+<td><code>"다시 시도"</code></td>
+<td>버튼</td>
+<td>NoteDetailScreen.kt:135</td>
+<td>-</td>
+</tr>
+<tr>
+<td>제목 placeholder</td>
+<td><code>"제목"</code></td>
+<td>placeholder</td>
+<td>NoteDetailScreen.kt:179</td>
+<td>P2: "제목을 입력하세요"</td>
+</tr>
+<tr>
+<td>본문 placeholder</td>
+<td><code>"내용을 입력하세요..."</code></td>
+<td>placeholder</td>
+<td>NoteDetailScreen.kt:217</td>
+<td>-</td>
+</tr>
+<tr>
+<td>첨부 이미지 라벨</td>
+<td><code>"첨부 이미지"</code></td>
+<td>라벨</td>
+<td>NoteDetailScreen.kt:232</td>
+<td>-</td>
+</tr>
+<tr>
+<td>첨부 이미지</td>
+<td><code>"첨부 이미지"</code></td>
+<td>contentDescription</td>
+<td>NoteDetailScreen.kt:245</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 라벨</td>
+<td><code>"폴더"</code></td>
+<td>라벨</td>
+<td>NoteDetailScreen.kt:254</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 없음</td>
+<td><code>"없음"</code></td>
+<td>텍스트</td>
+<td>NoteDetailScreen.kt:348</td>
+<td>P2: "폴더 없음"</td>
+</tr>
+<tr>
+<td>폴더 선택 아이콘</td>
+<td><code>"폴더 선택"</code></td>
+<td>contentDescription</td>
+<td>NoteDetailScreen.kt:371</td>
+<td>-</td>
+</tr>
+<tr>
+<td>폴더 선택 바텀시트</td>
+<td><code>"폴더 선택"</code></td>
+<td>바텀시트 제목</td>
+<td>NoteDetailScreen.kt:404</td>
+<td>-</td>
+</tr>
+<tr>
+<td>선택됨 아이콘</td>
+<td><code>"선택됨"</code></td>
+<td>contentDescription</td>
+<td>NoteDetailScreen.kt:433</td>
+<td>-</td>
+</tr>
+<tr>
+<td>생성일</td>
+<td><code>"생성일: ${formatDateTime(...)}"</code></td>
+<td>날짜</td>
+<td>NoteDetailScreen.kt:271</td>
+<td>-</td>
+</tr>
+<tr>
+<td>수정일</td>
+<td><code>"수정일: ${formatDateTime(...)}"</code></td>
+<td>날짜</td>
+<td>NoteDetailScreen.kt:277</td>
+<td>-</td>
+</tr>
+<tr>
+<td>노트 없음 에러</td>
+<td><code>"노트를 찾을 수 없습니다"</code></td>
+<td>에러</td>
+<td>NoteDetailViewModel.kt:72</td>
+<td>P1: "노트를 찾을 수 없어요"</td>
+</tr>
+<tr>
+<td>분류 칩 (아이디어)</td>
+<td><code>"아이디어"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:314</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (북마크)</td>
+<td><code>"북마크"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:315</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (노트)</td>
+<td><code>"노트"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:316</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (할 일)</td>
+<td><code>"할 일"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:317</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (일정)</td>
+<td><code>"일정"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:318</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (임시)</td>
+<td><code>"임시"</code></td>
+<td>칩</td>
+<td>NoteDetailScreen.kt:319</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="27-settingsscreen">2.7 설정 화면 (SettingsScreen)<a class="headerlink" href="#27-settingsscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"Settings"</code></td>
+<td>제목</td>
+<td>SettingsScreen.kt:60</td>
+<td>P0: "설정" (한글 통일)</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>SettingsScreen.kt:70</td>
+<td>-</td>
+</tr>
+<tr>
+<td>테마 섹션</td>
+<td><code>"테마"</code></td>
+<td>섹션 헤더</td>
+<td>SettingsScreen.kt:92</td>
+<td>-</td>
+</tr>
+<tr>
+<td>시스템 설정</td>
+<td><code>"시스템 설정"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:97</td>
+<td>-</td>
+</tr>
+<tr>
+<td>시스템 설정 설명</td>
+<td><code>"기기 설정에 따름"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:98</td>
+<td>-</td>
+</tr>
+<tr>
+<td>라이트 모드</td>
+<td><code>"라이트 모드"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:106</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다크 모드</td>
+<td><code>"다크 모드"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:114</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Google Calendar 섹션</td>
+<td><code>"Google Calendar"</code></td>
+<td>섹션 헤더</td>
+<td>SettingsScreen.kt:123</td>
+<td>- (고유명사)</td>
+</tr>
+<tr>
+<td>Google Calendar 연동</td>
+<td><code>"Google Calendar 연동"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:127</td>
+<td>-</td>
+</tr>
+<tr>
+<td>연동 설명</td>
+<td><code>"일정을 Google Calendar에 동기화"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:128</td>
+<td>-</td>
+</tr>
+<tr>
+<td>OAuth 시작</td>
+<td><code>"Google OAuth 시작 (자동)"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:136</td>
+<td>P1: "Google 계정 연결"</td>
+</tr>
+<tr>
+<td>OAuth 설명</td>
+<td><code>"브라우저 인증 후 앱으로 자동 복귀"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:137</td>
+<td>P1: "브라우저에서 인증 후 자동으로 돌아와요"</td>
+</tr>
+<tr>
+<td>자동 추가</td>
+<td><code>"자동 추가"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:156</td>
+<td>-</td>
+</tr>
+<tr>
+<td>자동 추가 설명</td>
+<td><code>"신뢰도 높은 일정은 자동 추가"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:157</td>
+<td>-</td>
+</tr>
+<tr>
+<td>제안 모드</td>
+<td><code>"제안 모드"</code></td>
+<td>옵션 제목</td>
+<td>SettingsScreen.kt:165</td>
+<td>-</td>
+</tr>
+<tr>
+<td>제안 모드 설명</td>
+<td><code>"일정 추가 전 승인 요청"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:166</td>
+<td>-</td>
+</tr>
+<tr>
+<td>알림 섹션</td>
+<td><code>"알림"</code></td>
+<td>섹션 헤더</td>
+<td>SettingsScreen.kt:206</td>
+<td>-</td>
+</tr>
+<tr>
+<td>알림 설명</td>
+<td><code>"일정 추가 확인 및 제안 알림"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:211</td>
+<td>-</td>
+</tr>
+<tr>
+<td>정보 섹션</td>
+<td><code>"정보"</code></td>
+<td>섹션 헤더</td>
+<td>SettingsScreen.kt:220</td>
+<td>-</td>
+</tr>
+<tr>
+<td>개인정보 처리방침</td>
+<td><code>"개인정보 처리방침"</code></td>
+<td>항목</td>
+<td>SettingsScreen.kt:224</td>
+<td>-</td>
+</tr>
+<tr>
+<td>이용약관</td>
+<td><code>"이용약관"</code></td>
+<td>항목</td>
+<td>SettingsScreen.kt:231</td>
+<td>-</td>
+</tr>
+<tr>
+<td>앱 버전</td>
+<td><code>"앱 버전"</code></td>
+<td>항목</td>
+<td>SettingsScreen.kt:238</td>
+<td>-</td>
+</tr>
+<tr>
+<td>버전 번호</td>
+<td><code>"1.0.0"</code></td>
+<td>텍스트</td>
+<td>SettingsScreen.kt:239</td>
+<td>-</td>
+</tr>
+<tr>
+<td>선택됨 아이콘</td>
+<td><code>"선택됨"</code></td>
+<td>contentDescription</td>
+<td>SettingsScreen.kt:343</td>
+<td>-</td>
+</tr>
+<tr>
+<td>개발자 도구 섹션</td>
+<td><code>"개발자 도구"</code></td>
+<td>섹션 헤더</td>
+<td>SettingsScreen.kt:248</td>
+<td>-</td>
+</tr>
+<tr>
+<td>이미지 캡처 테스트</td>
+<td><code>"이미지 캡처 테스트"</code></td>
+<td>항목</td>
+<td>SettingsScreen.kt:709</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>테스트 설명</td>
+<td><code>"갤러리에서 이미지를 선택하여 캡처로 제출"</code></td>
+<td>설명</td>
+<td>SettingsScreen.kt:716</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>캘린더 연동 결과</td>
+<td><code>"캘린더 연동 결과"</code></td>
+<td>다이얼로그 제목</td>
+<td>SettingsScreen.kt:291</td>
+<td>-</td>
+</tr>
+<tr>
+<td>확인 버튼</td>
+<td><code>"확인"</code></td>
+<td>버튼</td>
+<td>SettingsScreen.kt:295</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="28-viewmodel">2.8 설정 ViewModel 에러 메시지<a class="headerlink" href="#28-viewmodel" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OAuth 미설정</td>
+<td><code>"GOOGLE_OAUTH_CLIENT_ID를 설정해야 합니다."</code></td>
+<td>에러</td>
+<td>SettingsScreen.kt:144</td>
+<td>- (개발자용)</td>
+</tr>
+<tr>
+<td>code 미입력</td>
+<td><code>"code/redirect_uri를 입력해주세요."</code></td>
+<td>검증</td>
+<td>SettingsViewModel.kt:131</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>access_token 미입력</td>
+<td><code>"access_token을 입력해주세요."</code></td>
+<td>검증</td>
+<td>SettingsViewModel.kt:161</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>연결 성공</td>
+<td><code>"Google Calendar 연결 성공"</code></td>
+<td>성공</td>
+<td>SettingsViewModel.kt:145</td>
+<td>-</td>
+</tr>
+<tr>
+<td>연결 실패</td>
+<td><code>"연결 실패"</code></td>
+<td>에러</td>
+<td>SettingsViewModel.kt:145</td>
+<td>P1: "연결에 실패했어요. 다시 시도해주세요"</td>
+</tr>
+<tr>
+<td>토큰 저장 성공</td>
+<td><code>"토큰 저장 성공"</code></td>
+<td>성공</td>
+<td>SettingsViewModel.kt:181</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>토큰 저장 실패</td>
+<td><code>"토큰 저장 실패"</code></td>
+<td>에러</td>
+<td>SettingsViewModel.kt:181</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>Google 인증 필요</td>
+<td><code>"Google 계정 연결이 필요합니다."</code></td>
+<td>에러</td>
+<td>SettingsViewModel.kt:260</td>
+<td>-</td>
+</tr>
+<tr>
+<td>토큰 만료</td>
+<td><code>"Google 토큰이 만료되었습니다. 다시 연결해주세요."</code></td>
+<td>에러</td>
+<td>SettingsViewModel.kt:261</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Google API 오류</td>
+<td><code>"Google Calendar API 오류가 발생했습니다."</code></td>
+<td>에러</td>
+<td>SettingsViewModel.kt:262</td>
+<td>-</td>
+</tr>
+<tr>
+<td>캘린더 이벤트 조회</td>
+<td><code>"캘린더 이벤트 ${events.size}건 조회됨"</code></td>
+<td>성공</td>
+<td>SettingsViewModel.kt:208</td>
+<td>- (디버그)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="29-ai-aistatussheet">2.9 AI 분류 현황 (AIStatusSheet)<a class="headerlink" href="#29-ai-aistatussheet" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>패널 제목</td>
+<td><code>"AI 분류 현황"</code></td>
+<td>제목</td>
+<td>AIStatusSheet.kt:173</td>
+<td>-</td>
+</tr>
+<tr>
+<td>부제</td>
+<td><code>"24시간 이내 분류된 항목"</code></td>
+<td>보조 텍스트</td>
+<td>AIStatusSheet.kt:181</td>
+<td>-</td>
+</tr>
+<tr>
+<td>전체 확인 버튼</td>
+<td><code>"전체 확인"</code></td>
+<td>버튼</td>
+<td>AIStatusSheet.kt:189</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태</td>
+<td><code>"미확인 분류가 없습니다"</code></td>
+<td>빈 상태</td>
+<td>AIStatusSheet.kt:98</td>
+<td>P2: "미확인 분류가 없어요"</td>
+</tr>
+<tr>
+<td>전체 기록 보기</td>
+<td><code>"전체 기록 보기"</code></td>
+<td>링크</td>
+<td>AIStatusSheet.kt:143</td>
+<td>-</td>
+</tr>
+<tr>
+<td>확인 버튼 (개별)</td>
+<td><code>"확인"</code></td>
+<td>버튼</td>
+<td>AIStatusSheet.kt:257</td>
+<td>-</td>
+</tr>
+<tr>
+<td>상대 시간</td>
+<td><code>"방금"</code> / <code>"N분 전"</code> / <code>"N시간 전"</code> / <code>"어제"</code></td>
+<td>시간</td>
+<td>AIStatusSheet.kt:275-279</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="210-classificationdropdown">2.10 분류 드롭다운 (ClassificationDropdown)<a class="headerlink" href="#210-classificationdropdown" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일정</td>
+<td><code>"일정"</code></td>
+<td>분류 옵션</td>
+<td>ClassificationDropdown.kt:102</td>
+<td>-</td>
+</tr>
+<tr>
+<td>할 일</td>
+<td><code>"할 일"</code></td>
+<td>분류 옵션</td>
+<td>ClassificationDropdown.kt:103</td>
+<td>-</td>
+</tr>
+<tr>
+<td>노트</td>
+<td><code>"노트"</code></td>
+<td>분류 옵션</td>
+<td>ClassificationDropdown.kt:104</td>
+<td>-</td>
+</tr>
+<tr>
+<td>아이디어</td>
+<td><code>"아이디어"</code></td>
+<td>분류 옵션</td>
+<td>ClassificationDropdown.kt:105</td>
+<td>-</td>
+</tr>
+<tr>
+<td>미분류</td>
+<td><code>"미분류"</code></td>
+<td>분류 라벨</td>
+<td>ClassificationDropdown.kt:121</td>
+<td>-</td>
+</tr>
+<tr>
+<td>북마크</td>
+<td><code>"북마크"</code></td>
+<td>분류 라벨</td>
+<td>ClassificationDropdown.kt:117</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="211-onboardingscreen">2.11 온보딩 (OnboardingScreen)<a class="headerlink" href="#211-onboardingscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>건너뛰기</td>
+<td><code>"건너뛰기"</code></td>
+<td>링크</td>
+<td>OnboardingScreen.kt:77</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1페이지 브랜드</td>
+<td><code>"Flit."</code></td>
+<td>브랜드</td>
+<td>OnboardingScreen.kt:140</td>
+<td>-</td>
+</tr>
+<tr>
+<td>1페이지 메인</td>
+<td><code>"적으면\n알아서 정리됩니다"</code></td>
+<td>제목</td>
+<td>OnboardingScreen.kt:150</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>1페이지 설명</td>
+<td><code>"떠오르는 순간, 바로 던지면 끝.\n정리는 AI가 알아서 합니다."</code></td>
+<td>설명</td>
+<td>OnboardingScreen.kt:161</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>2페이지 칩</td>
+<td><code>"할 일"</code> <code>"일정"</code> <code>"노트"</code></td>
+<td>칩</td>
+<td>OnboardingScreen.kt:187-189</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2페이지 메인</td>
+<td><code>"AI가 자동으로\n분류합니다"</code></td>
+<td>제목</td>
+<td>OnboardingScreen.kt:195</td>
+<td>-</td>
+</tr>
+<tr>
+<td>2페이지 설명</td>
+<td><code>"틀리면 탭 한 번으로 수정하세요.\n당신은 기록만 하면 됩니다."</code></td>
+<td>설명</td>
+<td>OnboardingScreen.kt:206</td>
+<td>P1: "당신은" 생략 → "기록만 하면 돼요"</td>
+</tr>
+<tr>
+<td>Google 페이지 제목</td>
+<td><code>"Google Calendar\n연동"</code></td>
+<td>제목</td>
+<td>OnboardingScreen.kt:232</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Google 페이지 설명</td>
+<td><code>"일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있습니다."</code></td>
+<td>설명</td>
+<td>OnboardingScreen.kt:243</td>
+<td>P2: "~받을 수 있어요"</td>
+</tr>
+<tr>
+<td>연결됨</td>
+<td><code>"연결됨"</code></td>
+<td>상태</td>
+<td>OnboardingScreen.kt:262</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Google Calendar 연결</td>
+<td><code>"Google Calendar 연결"</code></td>
+<td>버튼</td>
+<td>OnboardingScreen.kt:278</td>
+<td>-</td>
+</tr>
+<tr>
+<td>나중에 설정 안내</td>
+<td><code>"나중에 설정에서 연결할 수도 있습니다."</code></td>
+<td>보조 텍스트</td>
+<td>OnboardingScreen.kt:289</td>
+<td>P2: "나중에 설정에서 연결할 수도 있어요"</td>
+</tr>
+<tr>
+<td>3페이지 제목</td>
+<td><code>"첫 번째 생각을\n적어보세요"</code></td>
+<td>제목</td>
+<td>OnboardingScreen.kt:339</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>3페이지 설명</td>
+<td><code>"무엇이든 좋습니다.\n할 일, 일정, 아이디어 — 그냥 적으세요."</code></td>
+<td>설명</td>
+<td>OnboardingScreen.kt:350</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>3페이지 placeholder</td>
+<td><code>"첫 번째 생각을 적어보세요..."</code></td>
+<td>placeholder</td>
+<td>OnboardingScreen.kt:386</td>
+<td>-</td>
+</tr>
+<tr>
+<td>전송 아이콘</td>
+<td><code>"전송"</code></td>
+<td>contentDescription</td>
+<td>OnboardingScreen.kt:422</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다음 버튼</td>
+<td><code>"다음"</code></td>
+<td>버튼</td>
+<td>OnboardingScreen.kt:466</td>
+<td>-</td>
+</tr>
+<tr>
+<td>시작하기 버튼</td>
+<td><code>"시작하기"</code></td>
+<td>버튼</td>
+<td>OnboardingScreen.kt:466</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="212-searchscreen">2.12 검색 화면 (SearchScreen)<a class="headerlink" href="#212-searchscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>SearchScreen.kt:86</td>
+<td>-</td>
+</tr>
+<tr>
+<td>검색 placeholder</td>
+<td><code>"캡처 검색"</code></td>
+<td>placeholder</td>
+<td>SearchScreen.kt:110</td>
+<td>P2: "검색어를 입력하세요"</td>
+</tr>
+<tr>
+<td>지우기 아이콘</td>
+<td><code>"지우기"</code></td>
+<td>contentDescription</td>
+<td>SearchScreen.kt:137</td>
+<td>-</td>
+</tr>
+<tr>
+<td>초기 상태</td>
+<td><code>"캡처를 검색하세요"</code></td>
+<td>빈 상태</td>
+<td>SearchScreen.kt:176</td>
+<td>P2: "캡처를 검색해보세요"</td>
+</tr>
+<tr>
+<td>결과 없음 제목</td>
+<td><code>"결과 없음"</code></td>
+<td>빈 상태</td>
+<td>SearchScreen.kt:200</td>
+<td>-</td>
+</tr>
+<tr>
+<td>결과 없음 설명</td>
+<td><code>"다른 키워드로 검색해보세요"</code></td>
+<td>보조 텍스트</td>
+<td>SearchScreen.kt:206</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩 (할 일)</td>
+<td><code>"할 일"</code></td>
+<td>칩</td>
+<td>SearchScreen.kt:280</td>
+<td>P0: "할일" (FilterChipRow와 불일치)</td>
+</tr>
+<tr>
+<td>분류 칩 (일정/노트)</td>
+<td><code>"일정"</code> <code>"노트"</code></td>
+<td>칩</td>
+<td>SearchScreen.kt:281-282</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="213-trashscreen">2.13 휴지통 (TrashScreen)<a class="headerlink" href="#213-trashscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로 아이콘</td>
+<td><code>"뒤로"</code></td>
+<td>contentDescription</td>
+<td>TrashScreen.kt:198</td>
+<td>P0: "뒤로가기" (일관성)</td>
+</tr>
+<tr>
+<td>휴지통 제목</td>
+<td><code>"휴지통"</code></td>
+<td>제목</td>
+<td>TrashScreen.kt:204</td>
+<td>-</td>
+</tr>
+<tr>
+<td>비우기 버튼</td>
+<td><code>"비우기"</code></td>
+<td>버튼</td>
+<td>TrashScreen.kt:214</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태</td>
+<td><code>"휴지통이 비어 있습니다"</code></td>
+<td>빈 상태</td>
+<td>TrashScreen.kt:88</td>
+<td>P2: "휴지통이 비어 있어요"</td>
+</tr>
+<tr>
+<td>비우기 다이얼로그 제목</td>
+<td><code>"휴지통 비우기"</code></td>
+<td>다이얼로그 제목</td>
+<td>TrashScreen.kt:120</td>
+<td>-</td>
+</tr>
+<tr>
+<td>비우기 경고</td>
+<td><code>"모든 항목이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다."</code></td>
+<td>경고</td>
+<td>TrashScreen.kt:123</td>
+<td>- (좋은 문구)</td>
+</tr>
+<tr>
+<td>삭제 버튼</td>
+<td><code>"삭제"</code></td>
+<td>버튼</td>
+<td>TrashScreen.kt:132</td>
+<td>-</td>
+</tr>
+<tr>
+<td>취소 버튼</td>
+<td><code>"취소"</code></td>
+<td>버튼</td>
+<td>TrashScreen.kt:137</td>
+<td>-</td>
+</tr>
+<tr>
+<td>완전 삭제 제목</td>
+<td><code>"완전 삭제"</code></td>
+<td>다이얼로그 제목</td>
+<td>TrashScreen.kt:150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>완전 삭제 경고</td>
+<td><code>"이 항목을 영구적으로 삭제합니다.\n이 작업은 되돌릴 수 없습니다."</code></td>
+<td>경고</td>
+<td>TrashScreen.kt:153</td>
+<td>-</td>
+</tr>
+<tr>
+<td>복원 버튼</td>
+<td><code>"복원"</code></td>
+<td>버튼</td>
+<td>TrashScreen.kt:282</td>
+<td>-</td>
+</tr>
+<tr>
+<td>완전 삭제 버튼</td>
+<td><code>"완전 삭제"</code></td>
+<td>버튼</td>
+<td>TrashScreen.kt:295</td>
+<td>-</td>
+</tr>
+<tr>
+<td>삭제 시각</td>
+<td><code>"삭제: $trashedDate"</code></td>
+<td>날짜</td>
+<td>TrashScreen.kt:263</td>
+<td>P1: "삭제일: $trashedDate"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="214-historyscreen">2.14 전체 기록 (HistoryScreen)<a class="headerlink" href="#214-historyscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>뒤로 아이콘</td>
+<td><code>"뒤로"</code></td>
+<td>contentDescription</td>
+<td>HistoryScreen.kt:231</td>
+<td>P0: "뒤로가기" (일관성)</td>
+</tr>
+<tr>
+<td>전체 기록 제목</td>
+<td><code>"전체 기록"</code></td>
+<td>제목</td>
+<td>HistoryScreen.kt:236</td>
+<td>-</td>
+</tr>
+<tr>
+<td>삭제 스낵바</td>
+<td><code>"삭제되었습니다"</code></td>
+<td>snackbar</td>
+<td>HistoryScreen.kt:50</td>
+<td>P1: "삭제했어요"</td>
+</tr>
+<tr>
+<td>실행 취소</td>
+<td><code>"실행 취소"</code></td>
+<td>액션 라벨</td>
+<td>HistoryScreen.kt:51</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태 제목</td>
+<td><code>"기록이 없습니다"</code></td>
+<td>빈 상태</td>
+<td>HistoryScreen.kt:149</td>
+<td>P2: "기록이 없어요"</td>
+</tr>
+<tr>
+<td>빈 상태 설명</td>
+<td><code>"캡처한 내용이 여기에 시간순으로 표시됩니다"</code></td>
+<td>보조 텍스트</td>
+<td>HistoryScreen.kt:154</td>
+<td>P2: "캡처하면 시간순으로 여기에 나타나요"</td>
+</tr>
+<tr>
+<td>날짜 필터 (전체)</td>
+<td><code>"전체"</code></td>
+<td>칩</td>
+<td>HistoryScreen.kt:305</td>
+<td>-</td>
+</tr>
+<tr>
+<td>날짜 필터 (오늘)</td>
+<td><code>"오늘"</code></td>
+<td>칩</td>
+<td>HistoryScreen.kt:310</td>
+<td>-</td>
+</tr>
+<tr>
+<td>날짜 필터 (이번 주)</td>
+<td><code>"이번 주"</code></td>
+<td>칩</td>
+<td>HistoryScreen.kt:315</td>
+<td>-</td>
+</tr>
+<tr>
+<td>날짜 필터 (이번 달)</td>
+<td><code>"이번 달"</code></td>
+<td>칩</td>
+<td>HistoryScreen.kt:320</td>
+<td>-</td>
+</tr>
+<tr>
+<td>상대 시간</td>
+<td><code>"방금"</code> / <code>"N분 전"</code> / <code>"N시간 전"</code> / <code>"어제"</code> / <code>"N일 전"</code></td>
+<td>시간</td>
+<td>HistoryItem.kt:126-134</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 중</td>
+<td><code>"분류 중"</code></td>
+<td>상태</td>
+<td>HistoryItem.kt:97</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="215-capturedetailscreen">2.15 캡처 상세 (CaptureDetailScreen)<a class="headerlink" href="#215-capturedetailscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목 (기본)</td>
+<td><code>"캡처 상세"</code></td>
+<td>제목</td>
+<td>CaptureDetailScreen.kt:51</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>CaptureDetailScreen.kt:63</td>
+<td>-</td>
+</tr>
+<tr>
+<td>에러 텍스트</td>
+<td><code>uiState.errorMessage</code></td>
+<td>에러</td>
+<td>CaptureDetailScreen.kt:95</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다시 시도</td>
+<td><code>"다시 시도"</code></td>
+<td>버튼</td>
+<td>CaptureDetailScreen.kt:101</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 라벨</td>
+<td><code>"분류"</code></td>
+<td>라벨</td>
+<td>CaptureDetailScreen.kt:122</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 칩</td>
+<td><code>"할 일"</code> <code>"일정"</code> <code>"노트"</code> <code>"아이디어"</code></td>
+<td>칩</td>
+<td>CaptureDetailScreen.kt:247-264</td>
+<td>-</td>
+</tr>
+<tr>
+<td>첨부 이미지 라벨</td>
+<td><code>"첨부 이미지"</code></td>
+<td>라벨</td>
+<td>CaptureDetailScreen.kt:156</td>
+<td>-</td>
+</tr>
+<tr>
+<td>첨부 이미지</td>
+<td><code>"첨부 이미지"</code></td>
+<td>contentDescription</td>
+<td>CaptureDetailScreen.kt:169</td>
+<td>-</td>
+</tr>
+<tr>
+<td>생성 시각 라벨</td>
+<td><code>"생성 시각"</code></td>
+<td>라벨</td>
+<td>CaptureDetailScreen.kt:182</td>
+<td>-</td>
+</tr>
+<tr>
+<td>원문 라벨</td>
+<td><code>"원문"</code></td>
+<td>라벨</td>
+<td>CaptureDetailScreen.kt:201</td>
+<td>-</td>
+</tr>
+<tr>
+<td>캡처 없음 에러</td>
+<td><code>"캡처를 찾을 수 없습니다"</code></td>
+<td>에러</td>
+<td>CaptureDetailViewModel.kt:84</td>
+<td>P1: "캡처를 찾을 수 없어요"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="216-capturedetailscreen">2.16 캘린더 동기화 섹션 (CaptureDetailScreen)<a class="headerlink" href="#216-capturedetailscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캘린더 동기화 라벨</td>
+<td><code>"캘린더 동기화"</code></td>
+<td>라벨</td>
+<td>CaptureDetailScreen.kt:319</td>
+<td>-</td>
+</tr>
+<tr>
+<td>동기화됨</td>
+<td><code>"Google Calendar에 동기화됨"</code></td>
+<td>상태</td>
+<td>CaptureDetailScreen.kt:337</td>
+<td>-</td>
+</tr>
+<tr>
+<td>제안 상태</td>
+<td><code>"캘린더 추가를 제안합니다"</code></td>
+<td>상태</td>
+<td>CaptureDetailScreen.kt:338</td>
+<td>P2: "캘린더에 추가할까요?"</td>
+</tr>
+<tr>
+<td>동기화 실패</td>
+<td><code>"동기화 실패"</code></td>
+<td>상태</td>
+<td>CaptureDetailScreen.kt:339</td>
+<td>-</td>
+</tr>
+<tr>
+<td>거부됨</td>
+<td><code>"사용자가 거부함"</code></td>
+<td>상태</td>
+<td>CaptureDetailScreen.kt:340</td>
+<td>P1: "거부됨" (간결하게)</td>
+</tr>
+<tr>
+<td>연결 안됨</td>
+<td><code>"연결되지 않음"</code></td>
+<td>상태</td>
+<td>CaptureDetailScreen.kt:341</td>
+<td>-</td>
+</tr>
+<tr>
+<td>캘린더에 추가</td>
+<td><code>"캘린더에 추가"</code></td>
+<td>버튼</td>
+<td>CaptureDetailScreen.kt:363</td>
+<td>-</td>
+</tr>
+<tr>
+<td>무시</td>
+<td><code>"무시"</code></td>
+<td>버튼</td>
+<td>CaptureDetailScreen.kt:376</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="217">2.17 공통 컴포넌트<a class="headerlink" href="#217" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>탭 라벨 (Notes)</td>
+<td><code>"Notes"</code></td>
+<td>탭 contentDescription</td>
+<td>FlitBottomNav.kt:125</td>
+<td>P0: "노트" (한글 통일)</td>
+</tr>
+<tr>
+<td>탭 라벨 (Home)</td>
+<td><code>"Home"</code></td>
+<td>탭 contentDescription</td>
+<td>FlitBottomNav.kt:130</td>
+<td>P0: "홈" (한글 통일)</td>
+</tr>
+<tr>
+<td>탭 라벨 (Calendar)</td>
+<td><code>"Calendar"</code></td>
+<td>탭 contentDescription</td>
+<td>FlitBottomNav.kt:135</td>
+<td>P0: "캘린더" (한글 통일)</td>
+</tr>
+<tr>
+<td>필터 칩 (전체)</td>
+<td><code>"전체"</code></td>
+<td>칩</td>
+<td>FilterChipRow.kt:33</td>
+<td>-</td>
+</tr>
+<tr>
+<td>필터 칩 (일정)</td>
+<td><code>"일정"</code></td>
+<td>칩</td>
+<td>FilterChipRow.kt:38</td>
+<td>-</td>
+</tr>
+<tr>
+<td>필터 칩 (할일)</td>
+<td><code>"할일"</code></td>
+<td>칩</td>
+<td>FilterChipRow.kt:43</td>
+<td>P0: "할 일" (띄어쓰기 통일)</td>
+</tr>
+<tr>
+<td>필터 칩 (노트)</td>
+<td><code>"노트"</code></td>
+<td>칩</td>
+<td>FilterChipRow.kt:48</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="218">2.18 위젯<a class="headerlink" href="#218" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>캡처 위젯 접근성</td>
+<td><code>"Flit."</code></td>
+<td>contentDescription</td>
+<td>widget_capture.xml:15</td>
+<td>P1: "캡처 위젯"</td>
+</tr>
+<tr>
+<td>캡처 위젯 텍스트</td>
+<td><code>"탭하여 캡처하기"</code></td>
+<td>텍스트</td>
+<td>widget_capture.xml:23</td>
+<td>-</td>
+</tr>
+<tr>
+<td>할 일 위젯 제목</td>
+<td><code>"오늘 할 일"</code></td>
+<td>제목</td>
+<td>widget_todo.xml:14</td>
+<td>-</td>
+</tr>
+<tr>
+<td>할 일 위젯 빈 상태</td>
+<td><code>"할 일이 없습니다"</code></td>
+<td>빈 상태</td>
+<td>widget_todo.xml:36</td>
+<td>P2: "할 일이 없어요"</td>
+</tr>
+<tr>
+<td>앱 열기</td>
+<td><code>"앱 열기"</code></td>
+<td>링크</td>
+<td>widget_todo.xml:48</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="219-oauth-settingsscreen">2.19 OAuth 디버그 다이얼로그 (SettingsScreen)<a class="headerlink" href="#219-oauth-settingsscreen" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>코드 교환 제목</td>
+<td><code>"OAuth Code 교환"</code></td>
+<td>다이얼로그 제목</td>
+<td>SettingsScreen.kt:541</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>라벨</td>
+<td><code>"authorization code"</code></td>
+<td>입력 라벨</td>
+<td>SettingsScreen.kt:547</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>라벨</td>
+<td><code>"redirect_uri"</code></td>
+<td>입력 라벨</td>
+<td>SettingsScreen.kt:563</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>요청 버튼</td>
+<td><code>"요청"</code></td>
+<td>버튼</td>
+<td>SettingsScreen.kt:582</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>취소 버튼</td>
+<td><code>"취소"</code></td>
+<td>버튼</td>
+<td>SettingsScreen.kt:585</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>토큰 저장 제목</td>
+<td><code>"토큰 직접 저장"</code></td>
+<td>다이얼로그 제목</td>
+<td>SettingsScreen.kt:614</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>라벨</td>
+<td><code>"access_token"</code></td>
+<td>입력 라벨</td>
+<td>SettingsScreen.kt:620</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>라벨</td>
+<td><code>"refresh_token (optional)"</code></td>
+<td>입력 라벨</td>
+<td>SettingsScreen.kt:628</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>라벨</td>
+<td><code>"expires_in seconds (optional)"</code></td>
+<td>입력 라벨</td>
+<td>SettingsScreen.kt:636</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>저장 버튼</td>
+<td><code>"저장"</code></td>
+<td>버튼</td>
+<td>SettingsScreen.kt:648</td>
+<td>- (디버그)</td>
+</tr>
+<tr>
+<td>취소 버튼</td>
+<td><code>"취소"</code></td>
+<td>버튼</td>
+<td>SettingsScreen.kt:651</td>
+<td>- (디버그)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="220-loginscreen-phase-3a">2.20 로그인 화면 (LoginScreen) — Phase 3a 추가<a class="headerlink" href="#220-loginscreen-phase-3a" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"로그인"</code></td>
+<td>제목</td>
+<td>LoginScreen.kt:99</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>LoginScreen.kt:108</td>
+<td>-</td>
+</tr>
+<tr>
+<td>태그라인</td>
+<td><code>"적으면, 알아서 정리됩니다"</code></td>
+<td>부제목</td>
+<td>LoginScreen.kt:136</td>
+<td>- (PRD 공식 태그라인)</td>
+</tr>
+<tr>
+<td>Google 로그인 버튼</td>
+<td><code>"Google로 로그인"</code></td>
+<td>버튼</td>
+<td>LoginScreen.kt:165</td>
+<td>-</td>
+</tr>
+<tr>
+<td>안내 텍스트</td>
+<td><code>"로그인 없이도 기본 기능을 사용할 수 있습니다"</code></td>
+<td>안내</td>
+<td>LoginScreen.kt:183</td>
+<td>-</td>
+</tr>
+<tr>
+<td>주의 텍스트</td>
+<td><code>"다른 Google 계정으로 로그인하면 기존 로컬 데이터는 초기화됩니다"</code></td>
+<td>주의</td>
+<td>LoginScreen.kt:191</td>
+<td>-</td>
+</tr>
+<tr>
+<td>OAuth 미설정 에러</td>
+<td><code>"GOOGLE_WEB_CLIENT_ID를 설정해주세요."</code></td>
+<td>에러</td>
+<td>LoginScreen.kt:62</td>
+<td>- (개발자용)</td>
+</tr>
+<tr>
+<td>로그인 실패 에러</td>
+<td><code>"Google 로그인에 실패했습니다. 다시 시도해주세요."</code></td>
+<td>에러</td>
+<td>LoginScreen.kt:64</td>
+<td>P1: "Google 로그인에 실패했어요. 다시 시도해주세요"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="221-subscriptionscreen-phase-3a">2.21 구독 화면 (SubscriptionScreen) — Phase 3a 추가<a class="headerlink" href="#221-subscriptionscreen-phase-3a" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"구독 관리"</code></td>
+<td>제목</td>
+<td>SubscriptionScreen.kt:66</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>SubscriptionScreen.kt:75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>기능 섹션</td>
+<td><code>"Premium 기능"</code></td>
+<td>섹션 제목</td>
+<td>SubscriptionScreen.kt:103</td>
+<td>-</td>
+</tr>
+<tr>
+<td>기능 목록</td>
+<td><code>"AI 그룹 분류"</code> <code>"받은함 자동 분류"</code> <code>"의미 검색"</code> <code>"노트 재구성"</code> <code>"분석 대시보드"</code> <code>"이미지 텍스트 인식 (OCR)"</code> <code>"분류 프리셋"</code> <code>"맞춤 지시어"</code></td>
+<td>기능명</td>
+<td>SubscriptionScreen.kt:111-118</td>
+<td>-</td>
+</tr>
+<tr>
+<td>업그레이드 버튼</td>
+<td><code>"Premium으로 업그레이드"</code></td>
+<td>버튼</td>
+<td>SubscriptionScreen.kt:166</td>
+<td>-</td>
+</tr>
+<tr>
+<td>플랜 이름</td>
+<td><code>"Premium"</code> / <code>"Free"</code></td>
+<td>라벨</td>
+<td>SubscriptionScreen.kt:213</td>
+<td>-</td>
+</tr>
+<tr>
+<td>플랜 설명 (Premium)</td>
+<td><code>"모든 기능을 사용할 수 있습니다"</code></td>
+<td>설명</td>
+<td>SubscriptionScreen.kt:223</td>
+<td>P2: "모든 기능을 사용할 수 있어요"</td>
+</tr>
+<tr>
+<td>플랜 설명 (Free)</td>
+<td><code>"기본 기능만 사용 가능합니다"</code></td>
+<td>설명</td>
+<td>SubscriptionScreen.kt:223</td>
+<td>P2: "기본 기능만 사용할 수 있어요"</td>
+</tr>
+<tr>
+<td>사용 가능 아이콘</td>
+<td><code>"사용 가능"</code></td>
+<td>contentDescription</td>
+<td>SubscriptionScreen.kt:261</td>
+<td>-</td>
+</tr>
+<tr>
+<td>프리미엄 전용 아이콘</td>
+<td><code>"프리미엄 전용"</code></td>
+<td>contentDescription</td>
+<td>SubscriptionScreen.kt:268</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="222-ai-reorganizescreen-phase-3b">2.22 AI 재구성 화면 (ReorganizeScreen) — Phase 3b 추가<a class="headerlink" href="#222-ai-reorganizescreen-phase-3b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"AI 재구성"</code></td>
+<td>제목</td>
+<td>ReorganizeScreen.kt:67</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>ReorganizeScreen.kt:77</td>
+<td>-</td>
+</tr>
+<tr>
+<td>로딩 텍스트</td>
+<td><code>"AI가 노트를 분석 중입니다..."</code></td>
+<td>로딩</td>
+<td>ReorganizeScreen.kt:104</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다시 시도</td>
+<td><code>"다시 시도"</code></td>
+<td>버튼</td>
+<td>ReorganizeScreen.kt:127</td>
+<td>-</td>
+</tr>
+<tr>
+<td>컬럼 헤더</td>
+<td><code>"현재"</code> / <code>"AI 제안"</code></td>
+<td>헤더</td>
+<td>ReorganizeScreen.kt:149,157</td>
+<td>-</td>
+</tr>
+<tr>
+<td>액션 라벨</td>
+<td><code>"새 폴더"</code> / <code>"이동"</code></td>
+<td>라벨</td>
+<td>ReorganizeScreen.kt:176-177</td>
+<td>- (action 매핑 적용됨)</td>
+</tr>
+<tr>
+<td>적용 버튼</td>
+<td><code>"제안 적용 (N건)"</code></td>
+<td>버튼</td>
+<td>ReorganizeScreen.kt:210</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="223-analyticsdashboardscreen-phase-3b">2.23 분석 대시보드 (AnalyticsDashboardScreen) — Phase 3b 추가<a class="headerlink" href="#223-analyticsdashboardscreen-phase-3b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"분석"</code></td>
+<td>제목</td>
+<td>AnalyticsDashboardScreen.kt:63</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>AnalyticsDashboardScreen.kt:73</td>
+<td>-</td>
+</tr>
+<tr>
+<td>다시 시도</td>
+<td><code>"다시 시도"</code></td>
+<td>버튼</td>
+<td>AnalyticsDashboardScreen.kt:101</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태 제목</td>
+<td><code>"아직 분석할 데이터가 없어요"</code></td>
+<td>빈 상태</td>
+<td>AnalyticsDashboardScreen.kt:127</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 상태 설명</td>
+<td><code>"캡처를 시작하면 통계가 여기에 나타나요"</code></td>
+<td>보조 텍스트</td>
+<td>AnalyticsDashboardScreen.kt:134</td>
+<td>-</td>
+</tr>
+<tr>
+<td>총 캡처</td>
+<td><code>"총 캡처"</code></td>
+<td>통계 카드</td>
+<td>AnalyticsDashboardScreen.kt:164</td>
+<td>-</td>
+</tr>
+<tr>
+<td>유형별 분포</td>
+<td><code>"유형별 분포"</code></td>
+<td>섹션 제목</td>
+<td>AnalyticsDashboardScreen.kt:172</td>
+<td>-</td>
+</tr>
+<tr>
+<td>카운트</td>
+<td><code>"N건"</code></td>
+<td>카운트</td>
+<td>AnalyticsDashboardScreen.kt:193</td>
+<td>-</td>
+</tr>
+<tr>
+<td>평균 분류 시간</td>
+<td><code>"평균 분류 시간"</code></td>
+<td>통계 카드</td>
+<td>AnalyticsDashboardScreen.kt:199</td>
+<td>-</td>
+</tr>
+<tr>
+<td>인기 태그</td>
+<td><code>"인기 태그"</code></td>
+<td>섹션 제목</td>
+<td>AnalyticsDashboardScreen.kt:207</td>
+<td>-</td>
+</tr>
+<tr>
+<td>태그 카운트</td>
+<td><code>"N회"</code></td>
+<td>카운트</td>
+<td>AnalyticsDashboardScreen.kt:223</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="224-ai-aiclassificationsettingsscreen-phase-3b">2.24 AI 분류 설정 (AiClassificationSettingsScreen) — Phase 3b 추가<a class="headerlink" href="#224-ai-aiclassificationsettingsscreen-phase-3b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"AI 분류 설정"</code></td>
+<td>제목</td>
+<td>AiClassificationSettingsScreen.kt:83</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>AiClassificationSettingsScreen.kt:93</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 프리셋 헤더</td>
+<td><code>"분류 프리셋"</code></td>
+<td>섹션 헤더</td>
+<td>AiClassificationSettingsScreen.kt:115</td>
+<td>-</td>
+</tr>
+<tr>
+<td>프리셋 라벨</td>
+<td><code>"분류 프리셋"</code></td>
+<td>라벨</td>
+<td>AiClassificationSettingsScreen.kt:140</td>
+<td>-</td>
+</tr>
+<tr>
+<td>기본 프리셋</td>
+<td><code>"기본"</code></td>
+<td>옵션</td>
+<td>AiClassificationSettingsScreen.kt:152,296</td>
+<td>-</td>
+</tr>
+<tr>
+<td>업무 프리셋</td>
+<td><code>"업무"</code></td>
+<td>옵션</td>
+<td>AiClassificationSettingsScreen.kt:301</td>
+<td>-</td>
+</tr>
+<tr>
+<td>개인 프리셋</td>
+<td><code>"개인"</code></td>
+<td>옵션</td>
+<td>AiClassificationSettingsScreen.kt:306</td>
+<td>-</td>
+</tr>
+<tr>
+<td>프리셋 설명</td>
+<td><code>"일반적인 분류 규칙"</code> / <code>"업무 중심 분류"</code> / <code>"개인 생활 중심 분류"</code></td>
+<td>설명</td>
+<td>AiClassificationSettingsScreen.kt:297,302,307</td>
+<td>-</td>
+</tr>
+<tr>
+<td>분류 규칙 헤더</td>
+<td><code>"분류 규칙"</code></td>
+<td>섹션 헤더</td>
+<td>AiClassificationSettingsScreen.kt:197</td>
+<td>-</td>
+</tr>
+<tr>
+<td>규칙 placeholder</td>
+<td><code>"예: 업무 관련 내용은 일정으로 분류"</code></td>
+<td>placeholder</td>
+<td>AiClassificationSettingsScreen.kt:226</td>
+<td>-</td>
+</tr>
+<tr>
+<td>저장 버튼</td>
+<td><code>"저장"</code></td>
+<td>버튼</td>
+<td>AiClassificationSettingsScreen.kt:251</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="225-calendarsettingsscreen-phase-3b">2.25 캘린더 설정 (CalendarSettingsScreen) — Phase 3b 추가<a class="headerlink" href="#225-calendarsettingsscreen-phase-3b" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>현재 텍스트</th>
+<th>유형</th>
+<th>파일:줄</th>
+<th>개선 제안</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상단바 제목</td>
+<td><code>"캘린더 설정"</code></td>
+<td>제목</td>
+<td>CalendarSettingsScreen.kt:98</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뒤로가기</td>
+<td><code>"뒤로가기"</code></td>
+<td>contentDescription</td>
+<td>CalendarSettingsScreen.kt:108</td>
+<td>-</td>
+</tr>
+<tr>
+<td>연동 캘린더 헤더</td>
+<td><code>"연동 캘린더"</code></td>
+<td>섹션 헤더</td>
+<td>CalendarSettingsScreen.kt:131</td>
+<td>-</td>
+</tr>
+<tr>
+<td>연동 캘린더 라벨</td>
+<td><code>"연동 캘린더"</code></td>
+<td>라벨</td>
+<td>CalendarSettingsScreen.kt:137</td>
+<td>-</td>
+</tr>
+<tr>
+<td>선택 필요</td>
+<td><code>"선택 필요"</code></td>
+<td>기본값</td>
+<td>CalendarSettingsScreen.kt:140</td>
+<td>-</td>
+</tr>
+<tr>
+<td>새로고침</td>
+<td><code>"캘린더 목록 새로고침"</code></td>
+<td>액션</td>
+<td>CalendarSettingsScreen.kt:147</td>
+<td>-</td>
+</tr>
+<tr>
+<td>새로고침 설명</td>
+<td><code>"기기 캘린더 목록을 다시 불러옵니다"</code></td>
+<td>설명</td>
+<td>CalendarSettingsScreen.kt:148</td>
+<td>P2: "기기 캘린더 목록을 다시 불러와요"</td>
+</tr>
+<tr>
+<td>일정 추가 헤더</td>
+<td><code>"일정 추가"</code></td>
+<td>섹션 헤더</td>
+<td>CalendarSettingsScreen.kt:158</td>
+<td>-</td>
+</tr>
+<tr>
+<td>자동 추가</td>
+<td><code>"자동 추가"</code></td>
+<td>토글 라벨</td>
+<td>CalendarSettingsScreen.kt:164</td>
+<td>-</td>
+</tr>
+<tr>
+<td>자동 추가 설명 (ON)</td>
+<td><code>"신뢰도 높은 일정을 자동으로 캘린더에 추가"</code></td>
+<td>설명</td>
+<td>CalendarSettingsScreen.kt:165</td>
+<td>-</td>
+</tr>
+<tr>
+<td>자동 추가 설명 (OFF)</td>
+<td><code>"일정 추가 전 사용자 승인을 요청합니다"</code></td>
+<td>설명</td>
+<td>CalendarSettingsScreen.kt:166</td>
+<td>P2: "일정 추가 전 승인을 요청해요"</td>
+</tr>
+<tr>
+<td>알림</td>
+<td><code>"알림"</code></td>
+<td>토글 라벨</td>
+<td>CalendarSettingsScreen.kt:174</td>
+<td>-</td>
+</tr>
+<tr>
+<td>알림 설명 (ON)</td>
+<td><code>"자동 추가된 일정을 알림으로 확인"</code></td>
+<td>설명</td>
+<td>CalendarSettingsScreen.kt:175</td>
+<td>-</td>
+</tr>
+<tr>
+<td>알림 설명 (OFF)</td>
+<td><code>"승인 대기 중인 일정이 있을 때 알림"</code></td>
+<td>설명</td>
+<td>CalendarSettingsScreen.kt:176</td>
+<td>-</td>
+</tr>
+<tr>
+<td>바텀시트 제목</td>
+<td><code>"연동 캘린더 선택"</code></td>
+<td>제목</td>
+<td>CalendarSettingsScreen.kt:253</td>
+<td>-</td>
+</tr>
+<tr>
+<td>빈 캘린더</td>
+<td><code>"사용 가능한 캘린더가 없습니다"</code></td>
+<td>빈 상태</td>
+<td>CalendarSettingsScreen.kt:267</td>
+<td>P2: "사용 가능한 캘린더가 없어요"</td>
+</tr>
+<tr>
+<td>선택됨</td>
+<td><code>"선택됨"</code></td>
+<td>contentDescription</td>
+<td>CalendarSettingsScreen.kt:294</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3">3. 개선 제안 요약<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<h3 id="p0-2026-02-12">P0 (즉시 수정 필요) — 일관성 문제 ✅ 전체 반영 완료 (2026-02-12)<a class="headerlink" href="#p0-2026-02-12" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>현재</th>
+<th>개선</th>
+<th>위치</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>"Notes"</code> (헤더)</td>
+<td><code>"노트"</code></td>
+<td>NotesScreen.kt:179</td>
+<td>앱 내 다른 곳은 "노트"로 한글 사용</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>"Settings"</code> (헤더)</td>
+<td><code>"설정"</code></td>
+<td>SettingsScreen.kt:60</td>
+<td>앱 내 다른 곳은 "설정"으로 한글 사용</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>"Notes"</code> (탭 라벨)</td>
+<td><code>"노트"</code></td>
+<td>FlitBottomNav.kt:125</td>
+<td>접근성 라벨은 한글이 적절</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>"Home"</code> (탭 라벨)</td>
+<td><code>"홈"</code></td>
+<td>FlitBottomNav.kt:130</td>
+<td>접근성 라벨은 한글이 적절</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>"Calendar"</code> (탭 라벨)</td>
+<td><code>"캘린더"</code></td>
+<td>FlitBottomNav.kt:135</td>
+<td>접근성 라벨은 한글이 적절</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>"할일"</code> (필터 칩)</td>
+<td><code>"할 일"</code></td>
+<td>FilterChipRow.kt:43</td>
+<td>다른 모든 곳은 "할 일"로 띄어쓰기</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>"뒤로"</code> (contentDescription)</td>
+<td><code>"뒤로가기"</code></td>
+<td>TrashScreen.kt:198, HistoryScreen.kt:231</td>
+<td>다른 화면은 "뒤로가기"로 통일</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>"할 일"</code> vs <code>"할일"</code> 혼용</td>
+<td><code>"할 일"</code> 통일</td>
+<td>SearchScreen.kt:280, FilterChipRow.kt:43</td>
+<td>검색 결과 칩에서도 통일 필요</td>
+</tr>
+</tbody>
+</table>
+<h3 id="p1-2026-02-14">P1 (개선 권장) — 톤앤매너 &amp; 표현 개선 ✅ 대부분 반영 완료 (2026-02-14)<a class="headerlink" href="#p1-2026-02-14" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>현재</th>
+<th>개선</th>
+<th>위치</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>"캡처가 저장되었습니다"</code></td>
+<td><code>"캡처가 저장되었어요"</code></td>
+<td>CaptureContent.kt:71</td>
+<td>해요체 통일</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>"저장에 실패했습니다."</code></td>
+<td><code>"저장에 실패했어요. 다시 시도해주세요"</code></td>
+<td>CaptureViewModel.kt:132</td>
+<td>해결 방법 안내</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>"삭제되었습니다"</code> (x2)</td>
+<td><code>"삭제했어요"</code></td>
+<td>CalendarScreen.kt:44, HistoryScreen.kt:50</td>
+<td>해요체, 능동형</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>"캘린더에 추가되었습니다"</code></td>
+<td><code>"캘린더에 추가했어요"</code></td>
+<td>CalendarScreen.kt:54</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>"실행 취소에 실패했습니다."</code></td>
+<td>~~<code>"되돌리기에 실패했어요"</code>~~ → <code>"실행 취소에 실패했어요"</code></td>
+<td>CalendarViewModel.kt:235</td>
+<td>✅ 해요체 전환 완료. "실행 취소"는 design-guide 용어 통일표 공식 용어이므로 유지</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>"삭제에 실패했습니다."</code></td>
+<td><code>"삭제에 실패했어요"</code></td>
+<td>CalendarViewModel.kt:248</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>7</td>
+<td>에러 메시지들 <code>"~했습니다."</code></td>
+<td><code>"~했어요"</code></td>
+<td>CalendarViewModel.kt:265,283</td>
+<td>해요체 통일</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>"Google OAuth 시작 (자동)"</code></td>
+<td><code>"Google 계정 연결"</code></td>
+<td>SettingsScreen.kt:136</td>
+<td>⏭️ 코드에서 해당 텍스트 미발견 (이전 리팩토링으로 제거된 것으로 추정)</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>"브라우저 인증 후 앱으로 자동 복귀"</code></td>
+<td><code>"브라우저에서 인증 후 자동으로 돌아와요"</code></td>
+<td>SettingsScreen.kt:137</td>
+<td>⏭️ 코드에서 해당 텍스트 미발견</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>"연결 실패"</code></td>
+<td><code>"연결에 실패했어요. 다시 시도해주세요"</code></td>
+<td>SettingsViewModel.kt:145</td>
+<td>⏭️ 코드에서 해당 텍스트 미발견</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>"노트를 찾을 수 없습니다"</code></td>
+<td><code>"노트를 찾을 수 없어요"</code></td>
+<td>NoteDetailViewModel.kt:72</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>"캡처를 찾을 수 없습니다"</code></td>
+<td><code>"캡처를 찾을 수 없어요"</code></td>
+<td>CaptureDetailViewModel.kt:84</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>"사용자가 거부함"</code></td>
+<td><code>"거부됨"</code></td>
+<td>CaptureDetailScreen.kt:340</td>
+<td>간결하게 (다른 배지와 동일 형태)</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>"당신은 기록만 하면 됩니다."</code></td>
+<td><code>"기록만 하면 돼요."</code></td>
+<td>OnboardingScreen.kt:206</td>
+<td>"당신은" 생략, 해요체</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>"삭제: $trashedDate"</code></td>
+<td><code>"삭제일: $trashedDate"</code></td>
+<td>TrashScreen.kt:263</td>
+<td>"삭제:"보다 "삭제일:"이 명확</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>"Flit."</code> (위젯 접근성)</td>
+<td><code>"캡처 위젯"</code></td>
+<td>widget_capture.xml:15</td>
+<td>브랜드명보다 기능 설명</td>
+</tr>
+</tbody>
+</table>
+<h3 id="p2-2026-02-14">P2 (향후 고려) — 감성적 표현 &amp; 세련됨 ✅ 대부분 반영 완료 (2026-02-14)<a class="headerlink" href="#p2-2026-02-14" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>현재</th>
+<th>개선</th>
+<th>위치</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>"일정이 없습니다"</code></td>
+<td><code>"오늘은 일정이 없어요"</code></td>
+<td>ScheduleTimeline.kt:343</td>
+<td>시간 맥락 추가</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>"할 일이 없습니다"</code></td>
+<td><code>"할 일이 없어요"</code></td>
+<td>TaskList.kt:262</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>"이 폴더에 노트가 없습니다"</code></td>
+<td><code>"이 폴더에 노트가 없어요"</code></td>
+<td>NotesScreen.kt:460</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>"아직 노트가 없습니다"</code></td>
+<td><code>"아직 노트가 없어요"</code></td>
+<td>NotesScreen.kt:461</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>"캡처한 내용 중 노트로 분류된 항목이 여기에 표시됩니다"</code></td>
+<td><code>"캡처하면 노트로 분류된 항목이 여기에 나타나요"</code></td>
+<td>NotesScreen.kt:467</td>
+<td>능동형, 해요체</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>"제목"</code> (placeholder)</td>
+<td><code>"제목을 입력하세요"</code></td>
+<td>NoteDetailScreen.kt:179</td>
+<td>입력 유도</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>"없음"</code> (폴더 미선택)</td>
+<td><code>"폴더 없음"</code></td>
+<td>NoteDetailScreen.kt:348</td>
+<td>맥락 명확</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>"캡처 검색"</code> (placeholder)</td>
+<td><code>"검색어를 입력하세요"</code></td>
+<td>SearchScreen.kt:110</td>
+<td>일반적 placeholder</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>"캡처를 검색하세요"</code></td>
+<td><code>"캡처를 검색해보세요"</code></td>
+<td>SearchScreen.kt:176</td>
+<td>"해보세요"가 더 친근</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>"미확인 분류가 없습니다"</code></td>
+<td><code>"미확인 분류가 없어요"</code></td>
+<td>AIStatusSheet.kt:98</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>"기록이 없습니다"</code></td>
+<td><code>"기록이 없어요"</code></td>
+<td>HistoryScreen.kt:149</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>"캡처한 내용이 여기에 시간순으로 표시됩니다"</code></td>
+<td><code>"캡처하면 시간순으로 여기에 나타나요"</code></td>
+<td>HistoryScreen.kt:154</td>
+<td>능동형</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>"휴지통이 비어 있습니다"</code></td>
+<td><code>"휴지통이 비어 있어요"</code></td>
+<td>TrashScreen.kt:88</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>"일정을 캘린더에 자동으로 추가하고\n알림을 받을 수 있습니다."</code></td>
+<td><code>"~받을 수 있어요"</code></td>
+<td>OnboardingScreen.kt:243</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>"나중에 설정에서 연결할 수도 있습니다."</code></td>
+<td><code>"나중에 설정에서 연결할 수도 있어요"</code></td>
+<td>OnboardingScreen.kt:289</td>
+<td>해요체</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>"캘린더 추가를 제안합니다"</code></td>
+<td><code>"캘린더에 추가할까요?"</code></td>
+<td>CaptureDetailScreen.kt:338</td>
+<td>질문형이 더 자연스러움</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>"할 일이 없습니다"</code> (위젯)</td>
+<td><code>"할 일이 없어요"</code></td>
+<td>widget_todo.xml:36</td>
+<td>⏭️ widget_todo.xml 파일 미존재</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4">4. 종합 분석<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="41">4.1 통계<a class="headerlink" href="#41" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>수량</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>전체 사용자 노출 텍스트</td>
+<td><strong>약 220개</strong> (Phase 3a/3b 포함)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>P0 이슈 (즉시 수정)</td>
+<td><strong>8건</strong></td>
+<td>✅ 전체 반영 (2026-02-12)</td>
+</tr>
+<tr>
+<td>P1 이슈 (개선 권장)</td>
+<td><strong>16건</strong> (13건 반영, 3건 코드 미발견)</td>
+<td>✅ 대부분 반영 (2026-02-14)</td>
+</tr>
+<tr>
+<td>P2 이슈 (향후 고려)</td>
+<td><strong>17건</strong> (14건 반영, 1건 파일 미존재, 2건 미반영)</td>
+<td>✅ 대부분 반영 (2026-02-14)</td>
+</tr>
+<tr>
+<td>신규 화면 추가 텍스트</td>
+<td><strong>~50개</strong> (6개 화면)</td>
+<td>감사 완료 (2026-02-14)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42">4.2 주요 문제점 (해결 현황)<a class="headerlink" href="#42" title="Permanent link">&para;</a></h3>
+<ol>
+<li>~~<strong>한영 혼용 문제</strong>: 헤더 제목이 "Notes", "Settings"로 영문~~ → ✅ P0 전체 반영 (2026-02-12)</li>
+<li>~~<strong>문체 불일치 (합니다/해요)</strong>: 스낵바/에러 메시지가 "~했습니다" 체~~ → ✅ 해요체 통일 완료 (2026-02-14)</li>
+<li>~~<strong>띄어쓰기 불일치</strong>: "할 일" vs "할일" 혼용~~ → ✅ P0 전체 반영 (2026-02-12)</li>
+<li>~~<strong>contentDescription 불일치</strong>: "뒤로" vs "뒤로가기" 혼용~~ → ✅ P0 전체 반영 (2026-02-12)</li>
+<li><strong>잔여 합니다체</strong> (신규 화면): LoginScreen "실패했습니다", SubscriptionScreen "사용할 수 있습니다/가능합니다", CalendarSettingsScreen "요청합니다/불러옵니다/없습니다" — 향후 수정 필요</li>
+</ol>
+<h3 id="43">4.3 잘 된 점<a class="headerlink" href="#43" title="Permanent link">&para;</a></h3>
+<ol>
+<li>온보딩 문구가 감성적이고 브랜드 가치를 잘 전달 ("적으면 알아서 정리됩니다", "첫 번째 생각을 적어보세요")</li>
+<li>캡처 입력 placeholder가 행동을 유도 ("떠오르는 생각을 캡처하세요...")</li>
+<li>삭제 경고 다이얼로그가 결과를 명확히 안내 ("영구적으로 삭제됩니다. 되돌릴 수 없습니다")</li>
+<li>빈 상태 메시지에 보조 설명이 포함되어 있어 사용자 안내가 잘 됨</li>
+<li>상대 시간 표현이 자연스러움 ("방금", "N분 전", "어제")</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
