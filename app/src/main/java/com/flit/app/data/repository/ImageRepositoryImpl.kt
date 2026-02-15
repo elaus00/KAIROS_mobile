@@ -15,7 +15,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class ImageRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : ImageRepository {
 
     private val capturesDir: File

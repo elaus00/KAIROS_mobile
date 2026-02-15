@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DeviceIdProvider @Inject constructor(
-    @Named("encrypted_prefs") private val prefs: SharedPreferences
+    @param:Named("encrypted_prefs") private val prefs: SharedPreferences
 ) {
     companion object {
         private const val KEY_DEVICE_ID = "device_id"

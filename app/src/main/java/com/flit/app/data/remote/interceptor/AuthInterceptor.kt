@@ -14,7 +14,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class AuthInterceptor @Inject constructor(
-    @Named("encrypted_prefs") private val prefs: SharedPreferences
+    @param:Named("encrypted_prefs") private val prefs: SharedPreferences
 ) : Interceptor {
 
     companion object {

@@ -41,7 +41,7 @@ sealed class CaptureImageExportEvent {
 
 @HiltViewModel
 class CaptureImageExportViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context
+    @param:ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CaptureImageExportUiState(isLoading = true))
     val uiState: StateFlow<CaptureImageExportUiState> = _uiState.asStateFlow()

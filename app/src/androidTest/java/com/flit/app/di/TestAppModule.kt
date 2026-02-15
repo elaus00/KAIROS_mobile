@@ -6,6 +6,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.Strictness
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,7 +46,7 @@ object TestAppModule {
     @Singleton
     fun provideGson(): Gson {
         return GsonBuilder()
-            .setLenient()
+            .setStrictness(Strictness.LENIENT)
             .create()
     }
 }

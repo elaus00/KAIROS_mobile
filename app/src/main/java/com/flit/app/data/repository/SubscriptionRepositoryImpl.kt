@@ -20,7 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class SubscriptionRepositoryImpl @Inject constructor(
     private val api: FlitApi,
-    @Named("encrypted_prefs") private val prefs: SharedPreferences
+    @param:Named("encrypted_prefs") private val prefs: SharedPreferences
 ) : SubscriptionRepository {
 
     companion object {

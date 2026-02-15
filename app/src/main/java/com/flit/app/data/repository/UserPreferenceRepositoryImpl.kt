@@ -17,7 +17,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class UserPreferenceRepositoryImpl @Inject constructor(
-    @Named("encrypted_prefs") private val prefs: SharedPreferences
+    @param:Named("encrypted_prefs") private val prefs: SharedPreferences
 ) : UserPreferenceRepository {
 
     companion object {

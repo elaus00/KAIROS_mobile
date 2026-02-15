@@ -38,7 +38,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+    @param:ApplicationContext private val appContext: Context,
     private val userPreferenceRepository: UserPreferenceRepository,
     private val calendarRepository: CalendarRepository,
     private val imageRepository: ImageRepository,

@@ -27,7 +27,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class CalendarRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val scheduleDao: ScheduleDao,
     private val userPreferenceRepository: UserPreferenceRepository
 ) : CalendarRepository {

@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val api: FlitApi,
     private val deviceIdProvider: DeviceIdProvider,
-    @Named("encrypted_prefs") private val prefs: SharedPreferences,
+    @param:Named("encrypted_prefs") private val prefs: SharedPreferences,
     private val database: FlitDatabase
 ) : AuthRepository {
 

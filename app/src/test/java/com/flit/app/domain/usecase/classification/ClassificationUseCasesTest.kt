@@ -253,7 +253,7 @@ class ClassificationUseCasesTest {
         coVerify(exactly = 1) {
             trackEventUseCase(
                 "classification_confirmed",
-                match { it != null && it.contains("cap-1") && it.contains("TODO") }
+                match { it.contains("cap-1") && it.contains("TODO") }
             )
         }
     }
