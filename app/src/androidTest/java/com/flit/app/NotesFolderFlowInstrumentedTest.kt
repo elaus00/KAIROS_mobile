@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -37,6 +38,7 @@ class NotesFolderFlowInstrumentedTest {
         composeRule.waitUntil("", 10_000L) {
             composeRule.onAllNodesWithText("전체").fetchSemanticsNodes().isNotEmpty()
         }
-        composeRule.onNodeWithText("전체").performClick()
+        composeRule.onNodeWithText("전체").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("전체").assertIsDisplayed()
     }
 }

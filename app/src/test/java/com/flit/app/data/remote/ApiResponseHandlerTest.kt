@@ -7,6 +7,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import retrofit2.Response
 
@@ -37,14 +38,16 @@ class ApiResponseHandlerTest {
 
     // === unwrap 에러 케이스 ===
 
-    @Test(expected = ApiException.ServerError::class)
+    @Test
     fun `status ok지만 data null이면 예외`() {
         val envelope = ApiEnvelope<String>(status = "ok", data = null)
         val response = Response.success(envelope)
-        ApiResponseHandler.unwrap(response)
+        assertThrows(ApiException.ServerError::class.java) {
+            ApiResponseHandler.unwrap(response)
+        }
     }
 
-    @Test(expected = ApiException::class)
+    @Test
     fun `status error면 예외`() {
         val envelope = ApiEnvelope<String>(
             status = "error",
@@ -52,7 +55,9 @@ class ApiResponseHandlerTest {
             error = ApiErrorResponse("INVALID_REQUEST", "잘못된 요청")
         )
         val response = Response.success(envelope)
-        ApiResponseHandler.unwrap(response)
+        assertThrows(ApiException.InvalidRequest::class.java) {
+            ApiResponseHandler.unwrap(response)
+        }
     }
 
     @Test

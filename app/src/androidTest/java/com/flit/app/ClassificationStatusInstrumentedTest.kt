@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -37,6 +38,6 @@ class ClassificationStatusInstrumentedTest {
         composeRule.waitUntil("", 10_000L) {
             composeRule.onAllNodesWithText("AI 분류 현황").fetchSemanticsNodes().isNotEmpty()
         }
-        composeRule.onNodeWithText("AI 분류 현황")
+        composeRule.onNodeWithText("AI 분류 현황").assertIsDisplayed()
     }
 }

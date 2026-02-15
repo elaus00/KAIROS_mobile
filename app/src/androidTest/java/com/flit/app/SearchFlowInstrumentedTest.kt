@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -45,5 +46,6 @@ class SearchFlowInstrumentedTest {
             composeRule.onAllNodesWithTag("search_input").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithTag("search_input").performTextInput("아이디어")
+        composeRule.onNodeWithTag("search_input").assertTextContains("아이디어")
     }
 }

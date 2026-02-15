@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -37,7 +38,7 @@ class SettingsThemeInstrumentedTest {
         composeRule.waitUntil("", 10_000L) {
             composeRule.onAllNodesWithText("설정").fetchSemanticsNodes().isNotEmpty()
         }
-        composeRule.onNodeWithText("다크 모드").performClick()
-        composeRule.onNodeWithText("다크 모드")
+        composeRule.onNodeWithText("다크 모드").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("다크 모드").assertIsDisplayed()
     }
 }

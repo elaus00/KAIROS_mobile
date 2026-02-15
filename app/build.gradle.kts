@@ -176,13 +176,7 @@ val jacocoExclusions = listOf(
     "**/data/worker/**"
 )
 
-val debugKotlinClasses = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/devDebug") {
-    include("com/flit/app/domain/usecase/**")
-    include("com/flit/app/presentation/**/*ViewModel*.class")
-    exclude(jacocoExclusions)
-}
-
-val debugJavaClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/devDebug/classes") {
+val debugMainClasses = fileTree("${layout.buildDirectory.get().asFile}/intermediates/classes/devDebug/transformDevDebugClassesWithAsm/dirs") {
     include("com/flit/app/domain/usecase/**")
     include("com/flit/app/presentation/**/*ViewModel*.class")
     exclude(jacocoExclusions)
@@ -203,7 +197,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(false)
     }
 
-    classDirectories.setFrom(files(debugKotlinClasses, debugJavaClasses))
+    classDirectories.setFrom(files(debugMainClasses))
     sourceDirectories.setFrom(files("src/main/java"))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
@@ -211,12 +205,17 @@ tasks.register<JacocoReport>("jacocoTestReport") {
             include("outputs/unit_test_code_coverage/devDebugUnitTest/testDevDebugUnitTest.exec")
         }
     )
+    doFirst {
+        if (classDirectories.asFileTree.isEmpty) {
+            error("No class files found for JaCoCo report. Check classDirectories path.")
+        }
+    }
 }
 
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     dependsOn("testDevDebugUnitTest")
 
-    classDirectories.setFrom(files(debugKotlinClasses, debugJavaClasses))
+    classDirectories.setFrom(files(debugMainClasses))
     sourceDirectories.setFrom(files("src/main/java"))
     executionData.setFrom(
         fileTree(layout.buildDirectory.get().asFile) {
@@ -224,6 +223,11 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
             include("outputs/unit_test_code_coverage/devDebugUnitTest/testDevDebugUnitTest.exec")
         }
     )
+    doFirst {
+        if (classDirectories.asFileTree.isEmpty) {
+            error("No class files found for JaCoCo verification. Check classDirectories path.")
+        }
+    }
 
     violationRules {
         rule {

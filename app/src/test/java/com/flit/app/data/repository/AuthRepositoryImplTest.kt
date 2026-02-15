@@ -26,6 +26,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -108,7 +109,7 @@ class AuthRepositoryImplTest {
         coVerify { api.authGoogle(match { it.deviceId == "test-device-id" }) }
     }
 
-    @Test(expected = ApiException.Unauthorized::class)
+    @Test
     fun `loginWithGoogle - 401 응답 시 Unauthorized 예외`() = runTest {
         // Given
         coEvery { api.authGoogle(any()) } returns Response.error(
@@ -117,8 +118,13 @@ class AuthRepositoryImplTest {
                 .toResponseBody("application/json".toMediaType())
         )
 
-        // When — Unauthorized 예외 발생 기대
-        repository.loginWithGoogle("invalid-token")
+        // When / Then
+        try {
+            repository.loginWithGoogle("invalid-token")
+            fail("Unauthorized 예외가 발생해야 합니다")
+        } catch (_: ApiException.Unauthorized) {
+            // expected
+        }
     }
 
     // ── refreshToken ──
@@ -165,13 +171,18 @@ class AuthRepositoryImplTest {
         assertEquals("new-refresh", token.refreshToken)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `refreshToken - 리프레시 토큰 없으면 예외`() = runTest {
         // Given — 저장된 리프레시 토큰 없음
         every { prefs.getString("auth_refresh_token", null) } returns null
 
-        // When — IllegalStateException 발생 기대
-        repository.refreshToken()
+        // When / Then
+        try {
+            repository.refreshToken()
+            fail("IllegalStateException 예외가 발생해야 합니다")
+        } catch (_: IllegalStateException) {
+            // expected
+        }
     }
 
     // ── isLoggedIn ──

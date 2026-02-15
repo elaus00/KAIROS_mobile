@@ -11,6 +11,7 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -64,12 +65,17 @@ class LoginWithGoogleUseCaseTest {
         assertEquals("FREE", result.subscriptionTier)
     }
 
-    @Test(expected = RuntimeException::class)
+    @Test
     fun `authRepository 로그인 실패 시 예외 전파`() = runTest {
         // Given
         coEvery { authRepository.loginWithGoogle("bad-token") } throws RuntimeException("로그인 실패")
 
-        // When — 예외 발생 기대
-        useCase("bad-token")
+        // When / Then
+        try {
+            useCase("bad-token")
+            fail("RuntimeException 예외가 발생해야 합니다")
+        } catch (_: RuntimeException) {
+            // expected
+        }
     }
 }

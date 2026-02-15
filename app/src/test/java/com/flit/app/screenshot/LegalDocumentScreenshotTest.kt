@@ -1,6 +1,8 @@
 package com.flit.app.screenshot
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithText
 import com.flit.app.presentation.settings.LegalDocumentScreen
 import com.flit.app.presentation.settings.LegalDocumentSection
 import org.junit.Rule
@@ -58,6 +60,7 @@ class LegalDocumentScreenshotTest {
                 onNavigateBack = {}
             )
         }
+        composeTestRule.onNodeWithText("개인정보 처리방침").assertIsDisplayed()
     }
 
     @Test
@@ -88,6 +91,7 @@ class LegalDocumentScreenshotTest {
                 onNavigateBack = {}
             )
         }
+        composeTestRule.onNodeWithText("서비스 이용약관").assertIsDisplayed()
     }
 
     @Test
@@ -116,5 +120,6 @@ class LegalDocumentScreenshotTest {
                 onNavigateBack = {}
             )
         }
+        composeTestRule.onNodeWithText("개인정보 처리방침").assertIsDisplayed()
     }
 }
