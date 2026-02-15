@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     id("jacoco")
 }
 
@@ -94,22 +96,6 @@ android {
             buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         }
     }
-
-    // 불필요한 variant 제거: devRelease, stagingDebug, productionDebug
-    androidComponents {
-        beforeVariants { variantBuilder ->
-            val flavor = variantBuilder.productFlavors.firstOrNull()?.second
-            val buildType = variantBuilder.buildType
-
-            variantBuilder.enable = when {
-                flavor == "dev" && buildType == "release" -> false       // devRelease 제거
-                flavor == "staging" && buildType == "debug" -> false     // stagingDebug 제거
-                flavor == "production" && buildType == "debug" -> false  // productionDebug 제거
-                else -> true  // 나머지는 모두 활성화 (자동 생성 포함)
-            }
-        }
-    }
-
     buildTypes {
         debug {
             buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
@@ -139,6 +125,21 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
         unitTests.isIncludeAndroidResources = true
+    }
+}
+
+// 불필요한 variant 제거: devRelease, stagingDebug, productionDebug
+androidComponents {
+    beforeVariants { variantBuilder ->
+        val flavor = variantBuilder.productFlavors.firstOrNull()?.second
+        val buildType = variantBuilder.buildType
+
+        variantBuilder.enable = when {
+            flavor == "dev" && buildType == "release" -> false       // devRelease 제거
+            flavor == "staging" && buildType == "debug" -> false     // stagingDebug 제거
+            flavor == "production" && buildType == "debug" -> false  // productionDebug 제거
+            else -> true  // 나머지는 모두 활성화 (자동 생성 포함)
+        }
     }
 }
 
@@ -323,8 +324,13 @@ dependencies {
     implementation(libs.androidx.tracing.ktx)
     implementation(libs.compose.runtime.tracing)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+
     // Google Play Billing
-    implementation("com.android.billingclient:billing-ktx:7.0.0")
+    implementation(libs.billing.ktx)
 
     // Testing - Unit Tests
     testImplementation(libs.junit)

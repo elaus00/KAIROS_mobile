@@ -8,4 +8,6 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.baselineprofile) apply false
     alias(libs.plugins.roborazzi) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
+    alias(libs.plugins.google.services) apply false
 }
