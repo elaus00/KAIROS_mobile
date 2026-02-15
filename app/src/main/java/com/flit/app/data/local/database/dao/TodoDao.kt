@@ -59,7 +59,9 @@ interface TodoDao {
     fun getActiveTodos(): Flow<List<TodoEntity>>
 
     /**
-     * 전체 할 일 조회 (완료 여부 무관, deadline 있는 것 우선 → deadline 오름차순, 없는 것은 created_at 역순)
+     * 전체 할 일 조회
+     * - 사용자가 순서 변경한 항목(sort_source=USER)은 sort_order 우선
+     * - 그 외 항목은 deadline 우선 정렬
      */
     @Query("""
         SELECT t.* FROM todos t
@@ -67,6 +69,8 @@ interface TodoDao {
         WHERE c.is_deleted = 0
         AND c.is_trashed = 0
         ORDER BY
+            CASE WHEN t.sort_source = 'USER' THEN 0 ELSE 1 END,
+            CASE WHEN t.sort_source = 'USER' THEN t.sort_order ELSE NULL END ASC,
             CASE WHEN t.deadline IS NULL THEN 1 ELSE 0 END,
             t.deadline ASC,
             t.created_at DESC
@@ -158,7 +162,7 @@ interface TodoDao {
     suspend fun getTodayIncompleteTodos(todayEndMs: Long?): List<TodoWithCaptureRow>
 
     /**
-     * 오늘 마감 할 일 조회 — 완료 포함 (위젯용, 미완료 우선 정렬)
+     * 오늘 마감 할 일 조회 — 완료 포함 (위젯용)
      */
     @Query("""
         SELECT t.id AS todoId, t.capture_id AS captureId,
@@ -169,11 +173,31 @@ interface TodoDao {
         WHERE c.is_deleted = 0 AND c.is_trashed = 0
         AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
         ORDER BY
-            CASE WHEN t.is_completed = 0 THEN 0 ELSE 1 END,
+            CASE WHEN t.deadline IS NULL THEN 1 ELSE 0 END,
             t.deadline ASC,
-            t.sort_order ASC
+            t.sort_order ASC,
+            t.created_at DESC
     """)
     suspend fun getTodayTodosForWidget(todayEndMs: Long?): List<TodoWithCaptureRow>
+
+    /**
+     * 오늘 마감 할 일 조회 — 완료 포함 (위젯 Flow 구독용)
+     */
+    @Query("""
+        SELECT t.id AS todoId, t.capture_id AS captureId,
+               c.ai_title AS aiTitle, c.original_text AS originalText,
+               t.deadline, t.is_completed AS isCompleted
+        FROM todos t
+        INNER JOIN captures c ON t.capture_id = c.id
+        WHERE c.is_deleted = 0 AND c.is_trashed = 0
+        AND (:todayEndMs IS NULL OR t.deadline <= :todayEndMs)
+        ORDER BY
+            CASE WHEN t.deadline IS NULL THEN 1 ELSE 0 END,
+            t.deadline ASC,
+            t.sort_order ASC,
+            t.created_at DESC
+    """)
+    fun observeTodayTodosForWidget(todayEndMs: Long?): Flow<List<TodoWithCaptureRow>>
 
     /**
      * 오늘 마감 할 일 전체 수 — 완료 포함 (위젯 오버플로우 표시용)

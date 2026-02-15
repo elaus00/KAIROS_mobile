@@ -67,7 +67,10 @@ fun ClassificationDropdown(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(colors.card)
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(colors.card),
+            shape = RoundedCornerShape(8.dp)
         ) {
             classificationOptions.forEach { option ->
                 DropdownMenuItem(

@@ -214,9 +214,11 @@ body {
 .md-sidebar--secondary .md-nav--secondary {
   background: var(--flit-sidebar-bg);
   border-radius: 8px;
-  padding: 1.6rem 0.8rem;
+  padding: 1.6rem 0.6rem 1.6rem 0.8rem;
   border: 1px solid var(--flit-border);
   margin-left: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 6rem);
 }
 
 .md-sidebar--secondary .md-nav--secondary > .md-nav__title {

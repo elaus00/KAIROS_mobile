@@ -57,6 +57,7 @@ class QuickCaptureActivity : ComponentActivity() {
 
         val themePreference = loadThemePreference()
         val fontPreference = loadCaptureFontPreference()
+        val captureTextSizeSp = (fontPreference.captureFontSize - 2).coerceAtLeast(14)
         val fontScale = fontPreference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
 
         // 사용자 설정(테마/글씨 크기) 기반 UI 스타일 로드
@@ -67,6 +68,7 @@ class QuickCaptureActivity : ComponentActivity() {
 
         // 루트 컨테이너 (배경 탭하면 닫기)
         val root = FrameLayout(this).apply {
+            setBackgroundColor(colors.scrim)
             setOnClickListener { finish() }
         }
 
@@ -85,14 +87,14 @@ class QuickCaptureActivity : ComponentActivity() {
 
         // 입력 필드 (카드 내 남는 공간 전부 차지)
         editText = EditText(this).apply {
-            hint = "무엇이든 캡처하세요..."
+            hint = null
             setHintTextColor(colors.hint)
             setTextColor(colors.text)
-            textSize = fontPreference.captureFontSize.toFloat()
+            textSize = captureTextSizeSp.toFloat()
             background = null
             isSingleLine = false
-            minLines = 5
-            maxLines = 15
+            minLines = 6
+            maxLines = 18
             gravity = Gravity.TOP or Gravity.START
             setPadding(dp(20), dp(20), dp(20), dp(12))
             imeOptions = EditorInfo.IME_ACTION_DONE
@@ -126,28 +128,35 @@ class QuickCaptureActivity : ComponentActivity() {
 
         // 좌측: 브랜드 워드마크 (Sora 폰트 + 채움 도트)
         val soraTypeface = ResourcesCompat.getFont(this, R.font.sora_variable)
-        val brandView = FlitBrandView(this, soraTypeface, 12f * fontScale, colors.brandText)
-        val brandParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        val brandView = FlitBrandView(this, soraTypeface, 14f * fontScale, colors.brandText)
+        val brandParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
         toolbar.addView(brandView, brandParams)
+        toolbar.addView(
+            View(this),
+            LinearLayout.LayoutParams(0, 0, 1f)
+        )
 
-        // 우측: "완료" 버튼 (44dp 터치 타겟 확보)
+        // 우측: "완료" 버튼
         doneButton = TextView(this).apply {
             text = "완료"
             textSize = 14f * fontScale
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(colors.buttonText)
             gravity = Gravity.CENTER
-            minimumHeight = dp(44)
+            minimumHeight = dp(40)
             setPadding(dp(24), dp(0), dp(24), dp(0))
             background = GradientDrawable().apply {
                 setColor(colors.buttonBackground)
-                cornerRadius = dp(22).toFloat()
+                cornerRadius = dp(20).toFloat()
             }
             setOnClickListener { submitCapture() }
         }
         val doneParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            dp(44)
+            dp(40)
         )
         toolbar.addView(doneButton, doneParams)
 
@@ -163,21 +172,27 @@ class QuickCaptureActivity : ComponentActivity() {
             FrameLayout.LayoutParams.WRAP_CONTENT
         ).apply {
             gravity = Gravity.TOP
-            setMargins(dp(16), dp(80), dp(16), dp(0))
+            setMargins(dp(16), dp(16), dp(16), dp(0))
         }
-        card.minimumHeight = dp(200)
+        card.minimumHeight = dp(240)
         root.addView(card, cardParams)
 
         setContentView(root)
 
         // 키보드와 최소 16dp 여백 보장 — EditText 최대 높이 동적 제한
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val statusTop = systemBarsInsets.top
             val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            val navBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            val navBottom = systemBarsInsets.bottom
             val bottomInset = maxOf(imeBottom, navBottom)
+
+            cardParams.topMargin = statusTop + dp(16)
+            card.layoutParams = cardParams
+
             if (view.height > 0) {
-                val maxCardHeight = view.height - dp(80) - bottomInset - dp(16)
-                editText.maxHeight = (maxCardHeight - dp(50)).coerceAtLeast(dp(100))
+                val maxCardHeight = view.height - cardParams.topMargin - bottomInset - dp(16)
+                editText.maxHeight = (maxCardHeight - dp(40)).coerceAtLeast(dp(120))
             }
             insets
         }
@@ -264,6 +279,7 @@ class QuickCaptureActivity : ComponentActivity() {
                 cardBorder = 0xFF333333.toInt(),         // 경계선 대비 강화
                 text = 0xDEFFFFFF.toInt(),               // 87% white (Material 기준)
                 hint = 0x99FFFFFF.toInt(),               // 60% white
+                scrim = 0x73000000.toInt(),              // 배경 위젯/홈 요소 시각 분리
                 brandText = 0x61FFFFFF.toInt(),          // 38% white (4.5:1 미달이지만 장식 텍스트)
                 buttonBackground = 0xFFE0E0E0.toInt(),   // 밝은 회색 버튼
                 buttonText = 0xFF121212.toInt()           // 어두운 텍스트 (대비 ~15:1)
@@ -274,6 +290,7 @@ class QuickCaptureActivity : ComponentActivity() {
                 cardBorder = 0xFFE0E0E0.toInt(),         // 경계선 대비 강화
                 text = 0xDE000000.toInt(),                // 87% black
                 hint = 0x99000000.toInt(),                // 60% black
+                scrim = 0x66000000.toInt(),               // 배경 위젯/홈 요소 시각 분리
                 brandText = 0x61000000.toInt(),           // 38% black
                 buttonBackground = 0xFF1A1A1A.toInt(),
                 buttonText = 0xFFFFFFFF.toInt()           // 대비 ~17:1
@@ -317,6 +334,7 @@ class QuickCaptureActivity : ComponentActivity() {
         val cardBorder: Int,
         val text: Int,
         val hint: Int,
+        val scrim: Int,
         val brandText: Int,
         val buttonBackground: Int,
         val buttonText: Int
@@ -344,9 +362,10 @@ class QuickCaptureActivity : ComponentActivity() {
             letterSpacing = 0.08f  // ≈ 1sp / 12sp
         }
 
-        // 도트 크기: MINIMUM 프리셋 기준 2.5dp, 갭 0.5dp
+        // 도트 크기/간격/오프셋: MINIMUM 프리셋 기준 (2.5dp / 0.5dp / 0.5dp)
         private val dotRadius = 1.25f * density
         private val dotGap = 0.5f * density
+        private val dotBaselineOffset = 0.5f * density
 
         private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = this@FlitBrandView.color
@@ -371,7 +390,7 @@ class QuickCaptureActivity : ComponentActivity() {
 
             // 채움 도트 — 베이스라인 높이에 중심
             val dotCx = paddingLeft + textWidth + dotGap + dotRadius
-            val dotCy = baseline - dotRadius + (1f * density)  // 베이스라인 약간 위
+            val dotCy = baseline - dotRadius + dotBaselineOffset
             canvas.drawCircle(dotCx, dotCy, dotRadius, dotPaint)
         }
     }

@@ -1,11 +1,16 @@
 package com.flit.app.presentation.widget
 
 import android.content.Context
+import android.os.SystemClock
+import android.util.Log
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
+import com.flit.app.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 /**
  * 위젯 갱신 헬퍼
@@ -20,9 +25,15 @@ object WidgetUpdateHelper {
      */
     fun updateCaptureWidget(context: Context) {
         scope.launch {
+            val traceId = newTraceId("capture")
+            logDebug("[$traceId] updateCaptureWidget requested")
             try {
-                CaptureGlanceWidget().updateAll(context)
+                val elapsed = measureTimeMillis {
+                    CaptureGlanceWidget().updateAll(context)
+                }
+                logDebug("[$traceId] updateCaptureWidget success durationMs=$elapsed")
             } catch (e: Exception) {
+                Log.e(WIDGET_HELPER_TAG, "[$traceId] updateCaptureWidget failed", e)
                 // 위젯 갱신 실패는 무시 (테스트 환경 등)
             }
         }
@@ -33,9 +44,22 @@ object WidgetUpdateHelper {
      */
     fun updateTodoWidget(context: Context) {
         scope.launch {
+            val traceId = newTraceId("todo")
+            logDebug("[$traceId] updateTodoWidget requested")
             try {
-                TodoGlanceWidget().updateAll(context)
+                val glanceIds = runCatching {
+                    GlanceAppWidgetManager(context).getGlanceIds(TodoGlanceWidget::class.java)
+                }.getOrElse { e ->
+                    Log.e(WIDGET_HELPER_TAG, "[$traceId] failed to get glance ids", e)
+                    emptyList()
+                }
+                logDebug("[$traceId] updateTodoWidget targets=${glanceIds.joinToString()}")
+                val elapsed = measureTimeMillis {
+                    TodoGlanceWidget().updateAll(context)
+                }
+                logDebug("[$traceId] updateTodoWidget success durationMs=$elapsed")
             } catch (e: Exception) {
+                Log.e(WIDGET_HELPER_TAG, "[$traceId] updateTodoWidget failed", e)
                 // 위젯 갱신 실패는 무시 (테스트 환경 등)
             }
         }
@@ -47,5 +71,16 @@ object WidgetUpdateHelper {
     fun updateAllWidgets(context: Context) {
         updateCaptureWidget(context)
         updateTodoWidget(context)
+    }
+}
+
+private const val WIDGET_HELPER_TAG = "WidgetUpdateHelperTrace"
+
+private fun newTraceId(prefix: String): String =
+    "$prefix-${SystemClock.elapsedRealtimeNanos().toString(16)}"
+
+private fun logDebug(message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(WIDGET_HELPER_TAG, message)
     }
 }

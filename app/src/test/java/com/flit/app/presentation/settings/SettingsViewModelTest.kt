@@ -63,6 +63,7 @@ class SettingsViewModelTest {
         subscriptionRepository = mockk(relaxed = true)
         every { calendarRepository.isCalendarPermissionGranted() } returns true
         coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
+        coEvery { scheduleRepository.getAllSchedulesForSync() } returns emptyList()
     }
 
     @After

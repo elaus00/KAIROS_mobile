@@ -7,7 +7,6 @@ import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ScheduleRepository
 import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.TagRepository
-import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.flit.app.domain.usecase.analytics.TrackEventUseCase
 import com.flit.app.domain.usecase.capture.FormatCaptureForShareUseCase
@@ -47,7 +46,6 @@ class CaptureDetailViewModelTest {
     private lateinit var trackEventUseCase: TrackEventUseCase
     private lateinit var formatCaptureForShare: FormatCaptureForShareUseCase
     private lateinit var tagRepository: TagRepository
-    private lateinit var userPreferenceRepository: UserPreferenceRepository
 
     @Before
     fun setUp() {
@@ -59,8 +57,6 @@ class CaptureDetailViewModelTest {
         trackEventUseCase = mockk(relaxed = true)
         formatCaptureForShare = mockk(relaxed = true)
         tagRepository = mockk(relaxed = true)
-        userPreferenceRepository = mockk(relaxed = true)
-        coEvery { userPreferenceRepository.getString(any(), any()) } answers { secondArg() }
     }
 
     @After
@@ -91,8 +87,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -123,8 +118,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -149,8 +143,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -182,8 +175,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 
@@ -209,8 +201,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
         assertEquals("캡처를 찾을 수 없어요", viewModel.uiState.value.errorMessage)
@@ -240,8 +231,7 @@ class CaptureDetailViewModelTest {
             calendarRepository = calendarRepository,
             trackEventUseCase = trackEventUseCase,
             formatCaptureForShare = formatCaptureForShare,
-            tagRepository = tagRepository,
-            userPreferenceRepository = userPreferenceRepository
+            tagRepository = tagRepository
         )
         advanceUntilIdle()
 

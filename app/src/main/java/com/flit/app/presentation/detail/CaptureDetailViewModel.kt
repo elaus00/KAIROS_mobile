@@ -4,19 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flit.app.domain.model.ClassifiedType
-import com.flit.app.domain.model.FontSizePreference
 import com.flit.app.domain.model.NoteSubType
 import com.flit.app.domain.model.CalendarSyncStatus
 import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ScheduleRepository
 import com.flit.app.domain.repository.TagRepository
-import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.calendar.ApproveCalendarSuggestionUseCase
 import com.flit.app.domain.usecase.analytics.TrackEventUseCase
 import com.flit.app.domain.usecase.capture.FormatCaptureForShareUseCase
 import com.flit.app.domain.usecase.classification.ChangeClassificationUseCase
-import com.flit.app.domain.usecase.settings.PreferenceKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,8 +36,7 @@ class CaptureDetailViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val trackEventUseCase: TrackEventUseCase,
     private val formatCaptureForShare: FormatCaptureForShareUseCase,
-    private val tagRepository: TagRepository,
-    private val userPreferenceRepository: UserPreferenceRepository
+    private val tagRepository: TagRepository
 ) : ViewModel() {
 
     private val captureId: String = savedStateHandle.get<String>("captureId") ?: ""
@@ -50,18 +46,6 @@ class CaptureDetailViewModel @Inject constructor(
 
     init {
         loadCapture()
-        loadFontSize()
-    }
-
-    /** 본문 글씨 크기 로드 */
-    private fun loadFontSize() {
-        viewModelScope.launch {
-            val sizeKey = userPreferenceRepository.getString(PreferenceKeys.KEY_CAPTURE_FONT_SIZE, FontSizePreference.MEDIUM.name)
-            val pref = FontSizePreference.fromString(sizeKey)
-            _uiState.update {
-                it.copy(bodyFontSize = pref.bodyFontSize, bodyLineHeight = pref.bodyLineHeight)
-            }
-        }
     }
 
     /**

@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:gravity="bottom"
         android:paddingBottom="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="오늘 할 일"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary" />
 
@@ -29,7 +29,7 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="2월 12일 (수)"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textColor="?android:attr/textColorSecondary" />
 
     </LinearLayout>
@@ -61,7 +61,7 @@
             android:layout_weight="1"
             android:layout_marginStart="4dp"
             android:text="프로젝트 제안서 작성"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="?android:attr/textColorPrimary"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="14:00"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:textColor="?android:attr/textColorSecondary" />
     </LinearLayout>
 
@@ -102,7 +102,7 @@
             android:layout_weight="1"
             android:layout_marginStart="4dp"
             android:text="팀 미팅 참석"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="?android:attr/textColorPrimary"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="17:00"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:textColor="?android:attr/textColorSecondary" />
     </LinearLayout>
 </LinearLayout>

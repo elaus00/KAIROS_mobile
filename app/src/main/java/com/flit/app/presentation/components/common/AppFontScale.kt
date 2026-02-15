@@ -48,7 +48,7 @@ fun rememberAppFontScale(): Float {
         .collectAsState(initial = FontSizePreference.MEDIUM.name)
 
     val preference = FontSizePreference.fromString(sizeKey)
-    return preference.bodyFontSize / FontSizePreference.MEDIUM.bodyFontSize.toFloat()
+    return preference.appFontScale
 }
 
 @Composable

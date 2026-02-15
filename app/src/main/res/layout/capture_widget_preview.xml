@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 캡처 위젯 피커 미리보기 (API 31+, 대형 노트패드 스타일) -->
+<!-- 캡처 위젯 피커 미리보기 (API 31+, 4x1 기본) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:background="@drawable/widget_preview_bg"
     android:padding="16dp">
 
-    <!-- 노트패드 스타일 입력 영역 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="top|start"
-        android:background="@drawable/widget_input_preview_bg"
-        android:padding="16dp">
+    <ImageView
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/ic_widget_edit"
+        android:contentDescription="캡처 입력"
+        android:tint="?android:attr/textColorPrimary" />
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_widget_edit"
-            android:contentDescription="캡처 입력"
-            android:tint="?android:attr/textColorPrimary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="무엇이든 캡처하세요"
-            android:textSize="16sp"
-            android:textColor="#999999" />
-    </LinearLayout>
-
-    <!-- 하단: 오늘 캡처 수 -->
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="end"
-        android:paddingTop="8dp"
-        android:text="오늘 3개"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:layout_marginStart="8dp"
+        android:text="빠르게 캡쳐하기"
+        android:textSize="18sp"
+        android:textColor="#999999" />
 </LinearLayout>

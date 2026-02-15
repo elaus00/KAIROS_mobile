@@ -1,7 +1,16 @@
 package com.flit.app.presentation.widget
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.os.SystemClock
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -16,7 +25,9 @@ import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.updateAll
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
@@ -38,10 +49,12 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDecoration
 import androidx.glance.text.TextStyle
+import com.flit.app.BuildConfig
 import com.flit.app.MainActivity
 import com.flit.app.R
 import com.flit.app.data.local.database.dao.TodoDao
 import com.flit.app.data.local.database.dao.TodoWithCaptureRow
+import com.flit.app.data.local.database.entities.TodoEntity
 import com.flit.app.domain.repository.UserPreferenceRepository
 import com.flit.app.domain.usecase.todo.ToggleTodoCompletionUseCase
 import dagger.hilt.EntryPoint
@@ -52,6 +65,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.system.measureTimeMillis
 
 /**
  * 할 일 홈 화면 위젯 (Glance)
@@ -71,45 +88,39 @@ class TodoGlanceWidget : GlanceAppWidget() {
     }
 
     companion object {
-        const val DISPLAY_LIMIT = 5
         val TodoIdKey = ActionParameters.Key<String>("todo_id")
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val traceId = newTraceId("provide")
+        val startedAt = SystemClock.elapsedRealtime()
+        logDebug("[$traceId] provideGlance start glanceId=$id thread=${Thread.currentThread().name}")
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             TodoWidgetEntryPoint::class.java
         )
-        val (items, totalCount) = loadData(entryPoint)
         val isDark = resolveWidgetDarkTheme(context, entryPoint.userPreferenceRepository())
+        val todayEnd = calculateTodayEndMillis()
+        logDebug("[$traceId] provideGlance binding flow todayEnd=$todayEnd")
         val todayLabel = SimpleDateFormat("M월 d일 (E)", Locale.KOREAN)
             .format(Date())
 
         provideContent {
+            val rowsFlow = remember(todayEnd) {
+                entryPoint.todoDao().observeTodayTodosForWidget(todayEnd)
+            }
+            val items by rowsFlow.collectAsState(initial = emptyList())
+            LaunchedEffect(items) {
+                logDebug("[$traceId] flowEmission count=${items.size}, rows=${items.toWidgetSnapshot()}")
+            }
+
             TodoContent(
                 items = items,
-                totalCount = totalCount,
                 todayLabel = todayLabel,
                 isDark = isDark
             )
         }
-    }
-
-    private suspend fun loadData(entryPoint: TodoWidgetEntryPoint): Pair<List<TodoWithCaptureRow>, Int> {
-        return try {
-            val todoDao = entryPoint.todoDao()
-            val todayEnd = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 59)
-                set(Calendar.MILLISECOND, 999)
-            }.timeInMillis
-            val items = todoDao.getTodayTodosForWidget(todayEnd)
-            val total = todoDao.getTodayTodoCountForWidget(todayEnd)
-            items to total
-        } catch (e: Exception) {
-            emptyList<TodoWithCaptureRow>() to 0
-        }
+        logDebug("[$traceId] provideGlance end durationMs=${SystemClock.elapsedRealtime() - startedAt}")
     }
 }
 
@@ -122,20 +133,93 @@ class ToggleTodoAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        val todoId = parameters[TodoGlanceWidget.TodoIdKey] ?: return
+        val traceId = newTraceId("toggle")
+        val actionStartedAt = SystemClock.elapsedRealtime()
+        val todoId = parameters[TodoGlanceWidget.TodoIdKey]
+        if (todoId == null) {
+            Log.e(TODO_WIDGET_TAG, "[$traceId] missing todo_id action parameter")
+            return
+        }
+        val activeCount = ToggleTraceState.activeToggleCount.incrementAndGet()
+        logDebug(
+            "[$traceId] onAction start todoId=$todoId glanceId=$glanceId activeToggleCount=$activeCount " +
+                "thread=${Thread.currentThread().name}"
+        )
+
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             TodoGlanceWidget.TodoWidgetEntryPoint::class.java
         )
-        entryPoint.toggleTodoCompletionUseCase()(todoId)
-        TodoGlanceWidget().update(context, glanceId)
+
+        try {
+            val todoDao = entryPoint.todoDao()
+            val todayEnd = calculateTodayEndMillis()
+            val beforeEntity = withContext(Dispatchers.IO) {
+                todoDao.getById(todoId)
+            }
+            val beforeWidgetRows = withContext(Dispatchers.IO) {
+                todoDao.getTodayTodosForWidget(todayEnd)
+            }
+            logDebug(
+                "[$traceId] beforeToggle todo=${beforeEntity.toEntitySnapshot()}, " +
+                    "todayRows=${beforeWidgetRows.toWidgetSnapshot()}"
+            )
+
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    entryPoint.toggleTodoCompletionUseCase()(todoId, trackEvent = false)
+                }
+            }.onSuccess {
+                val afterEntity = withContext(Dispatchers.IO) {
+                    todoDao.getById(todoId)
+                }
+                val afterWidgetRows = withContext(Dispatchers.IO) {
+                    todoDao.getTodayTodosForWidget(todayEnd)
+                }
+                logDebug(
+                    "[$traceId] afterToggle todo=${afterEntity.toEntitySnapshot()}, " +
+                        "todayRows=${afterWidgetRows.toWidgetSnapshot()}"
+                )
+
+                val glanceIds = runCatching {
+                    GlanceAppWidgetManager(context).getGlanceIds(TodoGlanceWidget::class.java)
+                }.getOrElse { e ->
+                    Log.e(TODO_WIDGET_TAG, "[$traceId] failed to get glance ids", e)
+                    emptyList()
+                }
+                val appWidgetIds = runCatching {
+                    AppWidgetManager.getInstance(context).getAppWidgetIds(
+                        ComponentName(context, TodoWidgetReceiver::class.java)
+                    ).toList()
+                }.getOrElse { e ->
+                    Log.e(TODO_WIDGET_TAG, "[$traceId] failed to get appWidget ids", e)
+                    emptyList()
+                }
+                logDebug(
+                    "[$traceId] updateTargets glanceIds=${glanceIds.joinToString()}, " +
+                        "appWidgetIds=${appWidgetIds.joinToString()}"
+                )
+
+                val elapsed = measureTimeMillis {
+                    TodoGlanceWidget().updateAll(context)
+                }
+                logDebug("[$traceId] updateAll completed durationMs=$elapsed")
+            }.onFailure { e ->
+                Log.e(TODO_WIDGET_TAG, "[$traceId] toggle failed for todoId=$todoId", e)
+            }
+        } finally {
+            val remained = ToggleTraceState.activeToggleCount.decrementAndGet()
+            logDebug(
+                "[$traceId] onAction end elapsedMs=${SystemClock.elapsedRealtime() - actionStartedAt} " +
+                    "activeToggleCount=$remained"
+            )
+        }
     }
 }
 
 @Composable
 private fun TodoContent(
     items: List<TodoWithCaptureRow>,
-    totalCount: Int,
     todayLabel: String,
     isDark: Boolean
 ) {
@@ -146,13 +230,6 @@ private fun TodoContent(
             .fillMaxSize()
             .background(colors.background)
             .cornerRadius(16.dp)
-            .clickable(
-                onClick = actionStartActivity<MainActivity>(
-                    parameters = actionParametersOf(
-                        ActionParameters.Key<String>("navigate_to_tab") to "calendar"
-                    )
-                )
-            )
     ) {
         Column(
             modifier = GlanceModifier
@@ -161,13 +238,22 @@ private fun TodoContent(
         ) {
             // 헤더: 제목 + 날짜
             Row(
-                modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+                    .clickable(
+                        onClick = actionStartActivity<MainActivity>(
+                            parameters = actionParametersOf(
+                                ActionParameters.Key<String>("navigate_to_tab") to "calendar"
+                            )
+                        )
+                    ),
+                verticalAlignment = Alignment.Bottom
             ) {
                 Text(
                     text = "오늘 할 일",
                     style = TextStyle(
-                        fontSize = 20.5.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = colors.onBackground
                     )
@@ -176,18 +262,17 @@ private fun TodoContent(
                 Text(
                     text = todayLabel,
                     style = TextStyle(
-                        fontSize = 12.5.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         color = colors.onSurfaceVariant
                     )
                 )
-                Spacer(modifier = GlanceModifier.defaultWeight())
             }
 
             // 할 일 리스트 또는 빈 상태
             if (items.isEmpty()) {
                 Box(
-                    modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+                    modifier = GlanceModifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -200,31 +285,14 @@ private fun TodoContent(
                 }
             } else {
                 val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                LazyColumn(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-                    items(items, itemId = { it.todoId.hashCode().toLong() }) { item ->
+                LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+                    // itemId에 완료 상태 포함: isCompleted 변경 시 Glance가 새 아이템으로 인식하도록
+                    items(items, itemId = { "${it.todoId}_${it.isCompleted}".hashCode().toLong() }) { item ->
                         TodoItemRow(
                             item = item,
                             timeFormat = timeFormat,
                             colors = colors
                         )
-                    }
-                    // 오버플로우 표시
-                    if (totalCount > TodoGlanceWidget.DISPLAY_LIMIT) {
-                        val overflow = totalCount - TodoGlanceWidget.DISPLAY_LIMIT
-                        item(itemId = -1L) {
-                            Box(
-                                modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "+${overflow}개 더 있음",
-                                    style = TextStyle(
-                                        fontSize = 12.5.sp,
-                                        color = colors.onSurfaceVariant
-                                    )
-                                )
-                            }
-                        }
                     }
                 }
             }
@@ -282,7 +350,7 @@ private fun TodoItemRow(
                 textDecoration = textDecoration
             ),
             maxLines = 1,
-            modifier = GlanceModifier.defaultWeight().clickable(
+            modifier = GlanceModifier.clickable(
                 onClick = actionStartActivity<MainActivity>(
                     parameters = actionParametersOf(
                         ActionParameters.Key<String>("navigate_to_capture_id") to item.captureId
@@ -356,4 +424,77 @@ private fun fixedColor(color: Color): ColorProvider =
  */
 class TodoWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TodoGlanceWidget()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)?.toList()
+            ?: emptyList()
+        val extraKeys = intent.extras?.keySet()?.joinToString().orEmpty()
+        logDebug(
+            "[receiver] onReceive action=${intent.action}, appWidgetIds=$appWidgetIds, " +
+                "extraKeys=$extraKeys"
+        )
+        super.onReceive(context, intent)
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        logDebug("[receiver] onUpdate appWidgetIds=${appWidgetIds.toList()}")
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onEnabled(context: Context) {
+        logDebug("[receiver] onEnabled")
+        super.onEnabled(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        logDebug("[receiver] onDisabled")
+        super.onDisabled(context)
+    }
+}
+
+private const val TODO_WIDGET_TAG = "TodoWidgetTrace"
+private const val MAX_WIDGET_LOG_ITEMS = 12
+
+private object ToggleTraceState {
+    val activeToggleCount = AtomicInteger(0)
+}
+
+private fun newTraceId(prefix: String): String =
+    "$prefix-${SystemClock.elapsedRealtimeNanos().toString(16)}"
+
+private fun calculateTodayEndMillis(): Long {
+    return Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }.timeInMillis
+}
+
+private fun List<TodoWithCaptureRow>.toWidgetSnapshot(limit: Int = MAX_WIDGET_LOG_ITEMS): String {
+    if (isEmpty()) return "[]"
+    val shown = take(limit).joinToString(" | ") { row ->
+        val itemId = "${row.todoId}_${row.isCompleted}".hashCode().toLong()
+        "todoId=${row.todoId},done=${row.isCompleted},deadline=${row.deadline},itemId=$itemId"
+    }
+    return if (size > limit) {
+        "[$shown | ... +${size - limit}개]"
+    } else {
+        "[$shown]"
+    }
+}
+
+private fun TodoEntity?.toEntitySnapshot(): String {
+    if (this == null) return "null"
+    return "id=$id,done=$isCompleted,deadline=$deadline,completedAt=$completedAt,updatedAt=$updatedAt"
+}
+
+private fun logDebug(message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(TODO_WIDGET_TAG, message)
+    }
 }

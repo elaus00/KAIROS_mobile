@@ -85,6 +85,7 @@ abstract class FlitDatabase : RoomDatabase() {
 
             private fun seedSystemFolders(db: SupportSQLiteDatabase) {
                 val now = System.currentTimeMillis()
+                // 기존 폴더가 있으면 INSERT, 없으면 IGNORE
                 db.execSQL(
                     """
                     INSERT OR IGNORE INTO folders (id, name, type, sort_order, created_at)
@@ -103,6 +104,11 @@ abstract class FlitDatabase : RoomDatabase() {
                     VALUES ('system-bookmarks', '북마크', 'BOOKMARKS', 2, $now)
                     """.trimIndent()
                 )
+
+                // 기존 폴더 이름 업데이트 (받은함 → 인박스)
+                db.execSQL("UPDATE folders SET name = '인박스' WHERE id = 'system-inbox'")
+                db.execSQL("UPDATE folders SET name = '아이디어' WHERE id = 'system-ideas'")
+                db.execSQL("UPDATE folders SET name = '북마크' WHERE id = 'system-bookmarks'")
             }
         }
     }

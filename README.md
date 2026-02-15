@@ -158,7 +158,7 @@ app/src/main/java/com/flit/app/
 | **Phase 4: 실시간 인식** | 실시간 캡처/인식 고도화 | 계획 |
 
 - **구현 규모(로컬 스캔 기준)**: Kotlin 소스 236개, Unit Test 파일 24개
-- **참고**: `SyncRepositoryImpl`의 서버 Pull 결과 로컬 반영은 TODO로 남아 있음
+- **참고**: `SyncRepositoryImpl`는 서버 Pull 결과를 로컬 DB에 반영하도록 구현되어 있으며, 동기화 안정화 작업은 Phase 3에서 지속 진행 중
 
 ## 빌드 및 실행
 
