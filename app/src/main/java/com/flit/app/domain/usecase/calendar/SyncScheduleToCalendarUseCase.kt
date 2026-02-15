@@ -1,7 +1,6 @@
 package com.flit.app.domain.usecase.calendar
 
 import com.flit.app.domain.model.CalendarSyncStatus
-import com.flit.app.domain.model.ConfidenceLevel
 import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ScheduleRepository
@@ -42,39 +41,37 @@ class SyncScheduleToCalendarUseCase @Inject constructor(
         val mode = getCalendarSettingsUseCase.getCalendarMode()
         val shouldNotify = getCalendarSettingsUseCase.isNotificationEnabled()
 
-        when {
-            mode == CalendarSettingsKeys.MODE_AUTO && schedule.confidence == ConfidenceLevel.HIGH -> {
-                val startTime = schedule.startTime
-                if (startTime == null) {
-                    calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.SUGGESTION_PENDING)
-                    if (shouldNotify) {
-                        calendarNotifier.notifySuggestion(title)
-                    }
-                    return
-                }
-                // 자동 동기화
-                try {
-                    calendarRepository.syncToCalendar(
-                        scheduleId = scheduleId,
-                        title = title,
-                        startTime = startTime,
-                        endTime = schedule.endTime,
-                        location = schedule.location,
-                        isAllDay = schedule.isAllDay
-                    )
-                    if (shouldNotify) {
-                        calendarNotifier.notifyAutoSync(title)
-                    }
-                } catch (e: Exception) {
-                    calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.SYNC_FAILED)
-                }
-            }
-            else -> {
-                // MEDIUM/LOW → 제안 상태로 전환 + 알림
+        if (mode == CalendarSettingsKeys.MODE_AUTO) {
+            val startTime = schedule.startTime
+            if (startTime == null) {
+                // 시작 시간 없음 → 제안 대기
                 calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.SUGGESTION_PENDING)
                 if (shouldNotify) {
                     calendarNotifier.notifySuggestion(title)
                 }
+                return
+            }
+            // 자동 동기화 (confidence 무관 — 이미 SCHEDULE로 분류 확정)
+            try {
+                calendarRepository.syncToCalendar(
+                    scheduleId = scheduleId,
+                    title = title,
+                    startTime = startTime,
+                    endTime = schedule.endTime,
+                    location = schedule.location,
+                    isAllDay = schedule.isAllDay
+                )
+                if (shouldNotify) {
+                    calendarNotifier.notifyAutoSync(title)
+                }
+            } catch (e: Exception) {
+                calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.SYNC_FAILED)
+            }
+        } else {
+            // SUGGEST 모드 → 제안 상태로 전환 + 알림
+            calendarRepository.updateSyncStatus(scheduleId, CalendarSyncStatus.SUGGESTION_PENDING)
+            if (shouldNotify) {
+                calendarNotifier.notifySuggestion(title)
             }
         }
     }

@@ -92,18 +92,20 @@ class ClassifyCaptureWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         Log.d(TAG, "ClassifyCaptureWorker 시작")
 
-        val pendingItems = syncQueueRepository.getPendingItems()
-        if (pendingItems.isEmpty()) {
-            Log.d(TAG, "처리할 PENDING 항목 없음")
-            return Result.success()
-        }
+        var totalSuccessCount = 0
+        var totalFailCount = 0
 
-        Log.d(TAG, "PENDING 항목 ${pendingItems.size}개 처리 시작")
+        // 처리 중 새로 추가된 항목도 수거하기 위해 반복
+        while (true) {
+            val pendingItems = syncQueueRepository.getPendingItems()
+            if (pendingItems.isEmpty()) break
 
-        var successCount = 0
-        var failCount = 0
+            Log.d(TAG, "PENDING 항목 ${pendingItems.size}개 처리 시작")
 
-        for (item in pendingItems) {
+            var successCount = 0
+            var failCount = 0
+
+            for (item in pendingItems) {
             try {
                 // PROCESSING 상태로 변경
                 syncQueueRepository.updateStatus(item.id, SyncQueueStatus.PROCESSING)
@@ -216,13 +218,22 @@ class ClassifyCaptureWorker @AssistedInject constructor(
             }
         }
 
-        Log.d(TAG, "ClassifyCaptureWorker 완료: 성공 $successCount, 실패 $failCount")
+            Log.d(TAG, "배치 처리 완료: 성공 $successCount, 실패 $failCount")
+            totalSuccessCount += successCount
+            totalFailCount += failCount
 
-        // 완료된 항목 정리
-        syncQueueRepository.deleteCompleted()
+            // 완료된 항목 정리
+            syncQueueRepository.deleteCompleted()
+        }
+
+        if (totalSuccessCount == 0 && totalFailCount == 0) {
+            Log.d(TAG, "처리할 PENDING 항목 없음")
+        } else {
+            Log.d(TAG, "ClassifyCaptureWorker 완료: 총 성공 $totalSuccessCount, 총 실패 $totalFailCount")
+        }
 
         // 분류 완료 후 위젯 갱신 (새 TODO 생성 가능)
-        if (successCount > 0) {
+        if (totalSuccessCount > 0) {
             WidgetUpdateHelper.updateAllWidgets(applicationContext)
         }
 

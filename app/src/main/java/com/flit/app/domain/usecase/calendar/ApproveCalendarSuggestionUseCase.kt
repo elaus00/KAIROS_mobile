@@ -1,5 +1,6 @@
 package com.flit.app.domain.usecase.calendar
 
+import com.flit.app.domain.model.CalendarException
 import com.flit.app.domain.repository.CalendarRepository
 import com.flit.app.domain.repository.CaptureRepository
 import com.flit.app.domain.repository.ScheduleRepository
@@ -19,11 +20,13 @@ class ApproveCalendarSuggestionUseCase @Inject constructor(
         val schedule = scheduleRepository.getScheduleById(scheduleId) ?: return
         val capture = captureRepository.getCaptureById(schedule.captureId) ?: return
         val title = capture.aiTitle ?: capture.originalText.take(30)
+        val startTime = schedule.startTime
+            ?: throw CalendarException.InsertFailed("시작 시간이 없어서 캘린더에 추가할 수 없어요")
 
         calendarRepository.syncToCalendar(
             scheduleId = scheduleId,
             title = title,
-            startTime = schedule.startTime ?: return,
+            startTime = startTime,
             endTime = schedule.endTime,
             location = schedule.location,
             isAllDay = schedule.isAllDay

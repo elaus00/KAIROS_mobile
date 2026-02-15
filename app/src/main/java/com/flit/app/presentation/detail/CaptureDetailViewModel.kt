@@ -154,7 +154,8 @@ class CaptureDetailViewModel @Inject constructor(
                 approveSuggestion(scheduleId)
                 loadCapture()
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.message) }
+                // 캘린더 동기화 실패 → 해당 섹션 상태만 변경 (전체 화면 에러 전환 방지)
+                _uiState.update { it.copy(calendarSyncStatus = CalendarSyncStatus.SYNC_FAILED) }
             }
         }
     }
